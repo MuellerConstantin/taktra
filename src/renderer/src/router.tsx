@@ -4,7 +4,8 @@ import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
 import TagsView from './views/TagsView'
 import ReportsView from './views/ReportsView'
-import SettingsView from './views/SettingsView'
+import SettingsView from './views/settings/SettingsView'
+import AppearanceSettings from './views/settings/AppearanceSettings'
 
 export const router = createHashRouter([
   {
@@ -16,7 +17,14 @@ export const router = createHashRouter([
       { path: 'projects', element: <ProjectsView /> },
       { path: 'tags', element: <TagsView /> },
       { path: 'reports', element: <ReportsView /> },
-      { path: 'settings', element: <SettingsView /> }
+      {
+        path: 'settings',
+        element: <SettingsView />,
+        children: [
+          { index: true, element: <Navigate to="appearance" replace /> },
+          { path: 'appearance', element: <AppearanceSettings /> }
+        ]
+      }
     ]
   }
 ])

@@ -52,6 +52,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 - **UI Components**: React Aria Components with `tailwindcss-react-aria-components`
   (no shadcn/ui)
 - **Database**: SQLite
+- **App Settings**: `electron-store`
 
 ## Project Structure
 
@@ -59,10 +60,12 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 .
 ├── src/
 │   ├── main/                         # Electron main process
-│   │   └── index.ts                  # App lifecycle, window creation
+│   │   ├── index.ts                  # App lifecycle, window creation
+│   │   └── settings.ts               # App settings store, IPC handlers, theme
 │   ├── preload/                      # Bridge between main and renderer
 │   │   ├── index.ts                  # Exposes the typed `window.api`
 │   │   └── global.d.ts               # Global typing for `window.api`
+│   ├── shared/                       # Types shared by main, preload and renderer
 │   └── renderer/                     # React UI
 │       ├── index.html                # Entry HTML incl. Content-Security-Policy
 │       └── src/
@@ -70,7 +73,8 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │           ├── main.css              # Tailwind entry, plugins and theme tokens
 │           ├── router.tsx            # Route definitions
 │           ├── layouts/              # Route layouts (AppLayout: sidebar + outlet)
-│           ├── views/                # One component per route
+│           ├── views/                # One component per route; nested routes in subfolders (settings/)
+│           ├── hooks/                # React hooks (e.g. useSettings wrapping window.api.settings)
 │           └── components/           # Reusable UI components
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
@@ -92,8 +96,13 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   reports. Schema versions are tracked with `PRAGMA user_version`, the file
   type is marked with `PRAGMA application_id`.
 - **App settings outside the database**: Preferences that belong to the
-  installation (recent files, theme, window state) live in a config file in
-  the user's app data directory, not in a database file.
+  installation (recent files, theme, window state) live in
+  `%APPDATA%\taktra\settings.json`, not in a database file. They are owned by
+  the main process via `electron-store` (JSON schema validation, defaults,
+  atomic writes, version migrations) and reach the renderer only through
+  `window.api.settings`. The `Settings` type lives in `src/shared/` and is used
+  by main, preload and renderer alike. `electron-store` is ESM-only and is
+  therefore bundled into the CJS main build (`externalizeDeps.exclude`).
 - **Database access only in the main process**: The renderer never touches
   SQLite or Node APIs. It talks to the main process through a typed API
   exposed in the preload script via `contextBridge`. The renderer runs with
@@ -116,12 +125,18 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   hash router. react-aria's `RouterProvider` is wired to React Router in
   `AppLayout`, so react-aria `Link`s navigate client-side.
 - **Theme via CSS variables**: Colors, radii and shadows are semantic tokens
-  (`--primary`, `--muted-foreground`, …) defined in `main.css` for `:root` and
-  `.dark`, and exposed to Tailwind through `@theme` (`bg-primary`,
-  `text-muted-foreground`, …). Components use these tokens only, never raw
-  Tailwind palette colors, so light/dark and future palette changes happen in
-  one place. Dark mode is toggled by the `.dark` class on the root element.
-  The primary color is `#a855f7`; neutrals carry a faint tint of its hue.
+  (`--primary`, `--muted-foreground`, …) defined in `main.css` for light and
+  for `prefers-color-scheme: dark`, and exposed to Tailwind through `@theme`
+  (`bg-primary`, `text-muted-foreground`, …). Components use these tokens
+  only, never raw Tailwind palette colors, so light/dark and future palette
+  changes happen in one place. The primary color is `#a855f7`; neutrals carry
+  a faint tint of its hue.
+- **Dark mode via `nativeTheme`**: The theme setting (`system` | `light` |
+  `dark`, default `system`) is applied in the main process through
+  `nativeTheme.themeSource`. That drives `prefers-color-scheme` in the
+  renderer as well as native UI (menus, dialogs, scrollbars), and `system`
+  follows Windows live. The renderer never toggles classes itself. The window's
+  `backgroundColor` matches the theme so there is no light flash on startup.
 
 ## Coding Principles
 

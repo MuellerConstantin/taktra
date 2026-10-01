@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { initSettings } from './settings'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -12,6 +13,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     icon,
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0c0a0f' : '#fbf9fc',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
@@ -37,6 +39,7 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('app.taktra')
+  initSettings()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

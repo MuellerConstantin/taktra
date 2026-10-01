@@ -1,8 +1,13 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
+import type { Settings } from '../shared/settings'
 
-// Typed API exposed to the renderer as `window.api`. Main-process features
-// (database access, etc.) get added here as IPC calls.
-const api = {}
+const api = {
+  settings: {
+    get: (): Promise<Settings> => ipcRenderer.invoke('settings:get'),
+    update: (patch: Partial<Settings>): Promise<Settings> =>
+      ipcRenderer.invoke('settings:update', patch)
+  }
+}
 
 export type Api = typeof api
 
