@@ -48,9 +48,11 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 - **Runtime**: Electron 44+, Node.js 24+, TypeScript 6+
 - **UI**: React 19+
 - **Routing**: React Router 8+ (hash router)
-- **Styling**: Tailwind CSS v4+
+- **i18n**: `use-intl` (currently `en` and `de`)
+- **Styling**: Tailwind CSS v4+, `tailwind-variants` for component variants, `tailwind-merge`
 - **UI Components**: React Aria Components with `tailwindcss-react-aria-components`
   (no shadcn/ui)
+- **Icons**: Remix Icon via `@remixicon/react`
 - **Database**: SQLite
 - **App Settings**: `electron-store`
 
@@ -72,10 +74,16 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │           ├── main.tsx              # React entry point
 │           ├── main.css              # Tailwind entry, plugins and theme tokens
 │           ├── router.tsx            # Route definitions
-│           ├── layouts/              # Route layouts (AppLayout: sidebar + outlet)
 │           ├── views/                # One component per route; nested routes in subfolders (settings/)
-│           ├── hooks/                # React hooks (e.g. useSettings wrapping window.api.settings)
-│           └── components/           # Reusable UI components
+│           ├── contexts/             # Context objects and providers (settings, locale)
+│           ├── hooks/                # React hooks (e.g. useSettings reading the settings context)
+│           ├── messages/             # Translations (en.json, de.json)
+│           ├── i18n.d.ts             # Types translation keys against en.json
+│           └── components/           # UI components (Atomic Design)
+│               ├── atoms/            # Styled react-aria wrappers (Field, RadioGroup, Select, …) and utils.ts
+│               ├── molecules/        # Composed components (ViewHeader, ViewPlaceholder)
+│               ├── organisms/        # Full sections (Sidebar)
+│               └── templates/        # Layouts (AppTemplate: sidebar + route outlet)
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
 ├── electron.vite.config.ts
@@ -123,7 +131,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk. React Router therefore uses a
   hash router. react-aria's `RouterProvider` is wired to React Router in
-  `AppLayout`, so react-aria `Link`s navigate client-side.
+  `AppTemplate`, so react-aria `Link`s navigate client-side.
 - **Theme via CSS variables**: Colors, radii and shadows are semantic tokens
   (`--primary`, `--muted-foreground`, …) defined in `main.css` for light and
   for `prefers-color-scheme: dark`, and exposed to Tailwind through `@theme`
@@ -131,6 +139,22 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   only, never raw Tailwind palette colors, so light/dark and future palette
   changes happen in one place. The primary color is `#a855f7`; neutrals carry
   a faint tint of its hue.
+- **i18n from the start**: All user-facing strings live in
+  `src/renderer/src/messages/` and are read via `useTranslations`. No hardcoded
+  UI strings in components. English is the default and the reference: keys are
+  typed against `en.json`, so a missing or misspelled key fails the typecheck.
+  The language is an app setting; `LocaleProvider` feeds it to `use-intl`,
+  react-aria's `I18nProvider` and `<html lang>`.
+- **Atomic Design**: Components follow the structure of tarvello — atoms,
+  molecules, organisms, templates. Atoms wrap react-aria-components with the
+  theme styling, built with `tailwind-variants` and the helpers in
+  `atoms/utils.ts` (`focusRing`, `composeTailwindRenderProps`). Views and
+  higher-level components use these atoms instead of styling react-aria
+  primitives directly. Components use named exports.
+- **Context, provider and hook in separate files**: The `react-refresh` lint
+  rule only allows component exports per file, so a context object lives in
+  `contexts/XContext.ts`, its provider in `contexts/XProvider.tsx`, and the
+  consuming hook in `hooks/useX.ts`.
 - **Dark mode via `nativeTheme`**: The theme setting (`system` | `light` |
   `dark`, default `system`) is applied in the main process through
   `nativeTheme.themeSource`. That drives `prefers-color-scheme` in the

@@ -1,7 +1,10 @@
-import ViewPlaceholder from '../components/ViewPlaceholder'
+import { useTranslations } from 'use-intl'
+import { ViewPlaceholder } from '../components/molecules/ViewPlaceholder'
 
 function ReportsView(): React.JSX.Element {
-  return <ViewPlaceholder title="Auswertung" description="Auswertung nach Projekten und Tags" />
+  const t = useTranslations('ReportsView')
+
+  return <ViewPlaceholder title={t('title')} description={t('placeholder')} />
 }
 
 export default ReportsView

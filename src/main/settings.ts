@@ -1,11 +1,12 @@
 import { ipcMain, nativeTheme } from 'electron'
 import Store from 'electron-store'
-import { themeSources, type Settings } from '../shared/settings'
+import { languages, themeSources, type Settings } from '../shared/settings'
 
 const store = new Store<Settings>({
   name: 'settings',
   schema: {
-    theme: { type: 'string', enum: [...themeSources], default: 'system' }
+    theme: { type: 'string', enum: [...themeSources], default: 'system' },
+    language: { type: 'string', enum: [...languages], default: 'en' }
   },
   clearInvalidConfig: true
 })

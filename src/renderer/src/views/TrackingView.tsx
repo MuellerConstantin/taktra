@@ -1,7 +1,10 @@
-import ViewPlaceholder from '../components/ViewPlaceholder'
+import { useTranslations } from 'use-intl'
+import { ViewPlaceholder } from '../components/molecules/ViewPlaceholder'
 
 function TrackingView(): React.JSX.Element {
-  return <ViewPlaceholder title="Erfassung" description="Zeiteinträge des ausgewählten Tags" />
+  const t = useTranslations('TrackingView')
+
+  return <ViewPlaceholder title={t('title')} description={t('placeholder')} />
 }
 
 export default TrackingView

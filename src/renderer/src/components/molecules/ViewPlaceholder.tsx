@@ -1,11 +1,11 @@
-import ViewHeader from './ViewHeader'
+import { ViewHeader } from './ViewHeader'
 
 interface ViewPlaceholderProps {
   readonly title: string
   readonly description: string
 }
 
-function ViewPlaceholder({ title, description }: ViewPlaceholderProps): React.JSX.Element {
+export function ViewPlaceholder({ title, description }: ViewPlaceholderProps): React.JSX.Element {
   return (
     <div className="flex h-full flex-col">
       <ViewHeader title={title} />
@@ -15,5 +15,3 @@ function ViewPlaceholder({ title, description }: ViewPlaceholderProps): React.JS
     </div>
   )
 }
-
-export default ViewPlaceholder

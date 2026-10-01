@@ -1,5 +1,5 @@
 import { createHashRouter, Navigate } from 'react-router'
-import AppLayout from './layouts/AppLayout'
+import { AppTemplate } from './components/templates/AppTemplate'
 import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
 import TagsView from './views/TagsView'
@@ -10,7 +10,7 @@ import AppearanceSettings from './views/settings/AppearanceSettings'
 export const router = createHashRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: <AppTemplate />,
     children: [
       { index: true, element: <Navigate to="/tracking" replace /> },
       { path: 'tracking', element: <TrackingView /> },

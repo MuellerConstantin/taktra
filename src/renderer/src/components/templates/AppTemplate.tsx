@@ -1,8 +1,8 @@
 import { RouterProvider } from 'react-aria-components'
 import { Outlet, useHref, useNavigate } from 'react-router'
-import Sidebar from '../components/Sidebar'
+import { Sidebar } from '../organisms/Sidebar'
 
-function AppLayout(): React.JSX.Element {
+export function AppTemplate(): React.JSX.Element {
   const navigate = useNavigate()
 
   return (
@@ -16,5 +16,3 @@ function AppLayout(): React.JSX.Element {
     </RouterProvider>
   )
 }
-
-export default AppLayout

@@ -1,6 +1,7 @@
 import { Link } from 'react-aria-components'
 import { useMatch } from 'react-router'
-import logo from '../../../../resources/icon.svg'
+import { useTranslations } from 'use-intl'
+import logo from '../../../../../resources/icon.svg'
 
 interface NavItemProps {
   readonly to: string
@@ -21,7 +22,9 @@ function NavItem({ to, label }: NavItemProps): React.JSX.Element {
   )
 }
 
-function Sidebar(): React.JSX.Element {
+export function Sidebar(): React.JSX.Element {
+  const t = useTranslations('Navigation')
+
   return (
     <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex items-center gap-2 px-5 py-5">
@@ -29,16 +32,14 @@ function Sidebar(): React.JSX.Element {
         <span className="text-lg font-semibold">taktra</span>
       </div>
       <nav className="flex flex-1 flex-col gap-1 px-3">
-        <NavItem to="/tracking" label="Erfassung" />
-        <NavItem to="/projects" label="Projekte" />
-        <NavItem to="/tags" label="Tags" />
-        <NavItem to="/reports" label="Auswertung" />
+        <NavItem to="/tracking" label={t('tracking')} />
+        <NavItem to="/projects" label={t('projects')} />
+        <NavItem to="/tags" label={t('tags')} />
+        <NavItem to="/reports" label={t('reports')} />
       </nav>
       <nav className="border-t border-sidebar-border px-3 py-3">
-        <NavItem to="/settings" label="Einstellungen" />
+        <NavItem to="/settings" label={t('settings')} />
       </nav>
     </aside>
   )
 }
-
-export default Sidebar

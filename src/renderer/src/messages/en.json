@@ -1,0 +1,45 @@
+{
+  "Navigation": {
+    "tracking": "Tracking",
+    "projects": "Projects",
+    "tags": "Tags",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "TrackingView": {
+    "title": "Tracking",
+    "placeholder": "Time entries of the selected day"
+  },
+  "ProjectsView": {
+    "title": "Projects",
+    "placeholder": "Projects and their activities"
+  },
+  "TagsView": {
+    "title": "Tags",
+    "placeholder": "Tags across all projects"
+  },
+  "ReportsView": {
+    "title": "Reports",
+    "placeholder": "Reports by project and tag"
+  },
+  "SettingsView": {
+    "title": "Settings",
+    "appearance": "Appearance"
+  },
+  "AppearanceSettings": {
+    "theme": {
+      "label": "Color scheme",
+      "system": "System",
+      "systemDescription": "Follows the system setting",
+      "light": "Light",
+      "lightDescription": "Always use the light design",
+      "dark": "Dark",
+      "darkDescription": "Always use the dark design"
+    },
+    "language": {
+      "label": "Language",
+      "en": "English",
+      "de": "Deutsch"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "Navigation": {
+    "tracking": "Erfassung",
+    "projects": "Projekte",
+    "tags": "Tags",
+    "reports": "Auswertung",
+    "settings": "Einstellungen"
+  },
+  "TrackingView": {
+    "title": "Erfassung",
+    "placeholder": "Zeiteinträge des ausgewählten Tags"
+  },
+  "ProjectsView": {
+    "title": "Projekte",
+    "placeholder": "Projekte und ihre Activities"
+  },
+  "TagsView": {
+    "title": "Tags",
+    "placeholder": "Projektübergreifende Tags"
+  },
+  "ReportsView": {
+    "title": "Auswertung",
+    "placeholder": "Auswertung nach Projekten und Tags"
+  },
+  "SettingsView": {
+    "title": "Einstellungen",
+    "appearance": "Darstellung"
+  },
+  "AppearanceSettings": {
+    "theme": {
+      "label": "Farbschema",
+      "system": "System",
+      "systemDescription": "Folgt der Systemeinstellung",
+      "light": "Hell",
+      "lightDescription": "Immer helles Design",
+      "dark": "Dunkel",
+      "darkDescription": "Immer dunkles Design"
+    },
+    "language": {
+      "label": "Sprache",
+      "en": "English",
+      "de": "Deutsch"
+    }
+  }
+}
