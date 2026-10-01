@@ -47,6 +47,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 
 - **Runtime**: Electron 44+, Node.js 24+, TypeScript 6+
 - **UI**: React 19+
+- **Routing**: React Router 8+ (hash router)
 - **Styling**: Tailwind CSS v4+
 - **UI Components**: React Aria Components with `tailwindcss-react-aria-components`
   (no shadcn/ui)
@@ -61,13 +62,16 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │   │   └── index.ts                  # App lifecycle, window creation
 │   ├── preload/                      # Bridge between main and renderer
 │   │   ├── index.ts                  # Exposes the typed `window.api`
-│   │   └── index.d.ts                # Global typing for `window.api`
+│   │   └── global.d.ts               # Global typing for `window.api`
 │   └── renderer/                     # React UI
 │       ├── index.html                # Entry HTML incl. Content-Security-Policy
 │       └── src/
 │           ├── main.tsx              # React entry point
 │           ├── main.css              # Tailwind entry, plugins and theme tokens
-│           └── App.tsx
+│           ├── router.tsx            # Route definitions
+│           ├── layouts/              # Route layouts (AppLayout: sidebar + outlet)
+│           ├── views/                # One component per route
+│           └── components/           # Reusable UI components
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
 ├── electron.vite.config.ts
@@ -107,6 +111,10 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   deleted, so historic reports stay complete.
 - **Windows first**: The app is built and tested for Windows. macOS and Linux
   packaging is not configured.
+- **Hash routing**: The packaged app loads `index.html` via `file://`, where
+  path-based URLs would resolve to files on disk. React Router therefore uses a
+  hash router. react-aria's `RouterProvider` is wired to React Router in
+  `AppLayout`, so react-aria `Link`s navigate client-side.
 - **Theme via CSS variables**: Colors, radii and shadows are semantic tokens
   (`--primary`, `--muted-foreground`, …) defined in `main.css` for `:root` and
   `.dark`, and exposed to Tailwind through `@theme` (`bg-primary`,
