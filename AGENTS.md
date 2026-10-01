@@ -66,7 +66,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │       ├── index.html                # Entry HTML incl. Content-Security-Policy
 │       └── src/
 │           ├── main.tsx              # React entry point
-│           ├── main.css              # Tailwind entry and plugins
+│           ├── main.css              # Tailwind entry, plugins and theme tokens
 │           └── App.tsx
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
@@ -107,6 +107,13 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   deleted, so historic reports stay complete.
 - **Windows first**: The app is built and tested for Windows. macOS and Linux
   packaging is not configured.
+- **Theme via CSS variables**: Colors, radii and shadows are semantic tokens
+  (`--primary`, `--muted-foreground`, …) defined in `main.css` for `:root` and
+  `.dark`, and exposed to Tailwind through `@theme` (`bg-primary`,
+  `text-muted-foreground`, …). Components use these tokens only, never raw
+  Tailwind palette colors, so light/dark and future palette changes happen in
+  one place. Dark mode is toggled by the `.dark` class on the root element.
+  The primary color is `#a855f7`; neutrals carry a faint tint of its hue.
 
 ## Coding Principles
 
