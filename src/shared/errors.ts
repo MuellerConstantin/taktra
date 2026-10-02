@@ -7,6 +7,8 @@ export const errorCodes = [
   'PROFILE_NEWER_VERSION',
   'PROJECT_NOT_FOUND',
   'PROJECT_NAME_TAKEN',
+  'TAG_NOT_FOUND',
+  'TAG_NAME_TAKEN',
   'VALIDATION_FAILED',
   'UNKNOWN'
 ] as const

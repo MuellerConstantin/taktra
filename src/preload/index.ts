@@ -3,6 +3,7 @@ import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { Settings } from '../shared/settings'
+import type { Tag, TagInput } from '../shared/tags'
 
 function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
   return ipcRenderer.invoke(channel, ...args)
@@ -32,6 +33,12 @@ const api = {
     setArchived: (id: number, archived: boolean) =>
       invoke<Project>('projects:setArchived', id, archived),
     delete: (id: number) => invoke<void>('projects:delete', id)
+  },
+  tags: {
+    list: () => invoke<Tag[]>('tags:list'),
+    create: (input: TagInput) => invoke<Tag>('tags:create', input),
+    update: (id: number, patch: Partial<TagInput>) => invoke<Tag>('tags:update', id, patch),
+    delete: (id: number) => invoke<void>('tags:delete', id)
   }
 }
 

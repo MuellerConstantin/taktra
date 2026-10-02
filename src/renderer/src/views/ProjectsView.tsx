@@ -13,7 +13,7 @@ import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
-import { suggestProjectColor } from '../lib/projectColors'
+import { suggestColor } from '../lib/colors'
 
 function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
@@ -130,7 +130,7 @@ function ProjectsView(): React.JSX.Element {
       {dialog && (
         <ProjectDialog
           project={dialog.project}
-          defaultColor={suggestProjectColor(projects ?? [])}
+          defaultColor={suggestColor(projects ?? [])}
           onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}
         />

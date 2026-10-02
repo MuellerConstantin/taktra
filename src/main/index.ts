@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { initProfiles } from './profiles'
 import { initProjects } from './projects'
 import { initSettings } from './settings'
+import { initTags } from './tags'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -44,6 +45,7 @@ app.whenReady().then(() => {
   initSettings()
   initProfiles()
   initProjects()
+  initTags()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

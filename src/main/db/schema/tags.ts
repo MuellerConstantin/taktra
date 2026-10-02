@@ -1,0 +1,19 @@
+import { sql } from 'drizzle-orm'
+import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+
+export const tags = sqliteTable(
+  'tags',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
+    color: text(),
+    createdAt: integer({ mode: 'timestamp_ms' })
+      .notNull()
+      .$defaultFn(() => new Date()),
+    updatedAt: integer({ mode: 'timestamp_ms' })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date())
+  },
+  (table) => [uniqueIndex('tags_name_unique').on(sql`lower(${table.name})`)]
+)

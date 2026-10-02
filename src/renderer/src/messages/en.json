@@ -77,7 +77,26 @@
   },
   "TagsView": {
     "title": "Tags",
-    "placeholder": "Tags across all projects"
+    "create": "New tag",
+    "empty": "No tags yet.",
+    "noMatches": "No matching tags.",
+    "search": "Search tags",
+    "edit": "Edit {name}",
+    "delete": "Delete {name}",
+    "deleteConfirmTitle": "Delete tag “{name}”?",
+    "deleteConfirmText": "The tag is deleted permanently. This cannot be undone.",
+    "deleteConfirmAction": "Delete",
+    "cancel": "Cancel"
+  },
+  "TagDialog": {
+    "createTitle": "New tag",
+    "editTitle": "Edit tag",
+    "nameLabel": "Name",
+    "nameRequired": "Please enter a name.",
+    "colorLabel": "Color",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
   },
   "ReportsView": {
     "title": "Reports",
@@ -131,6 +150,8 @@
     "PROFILE_NEWER_VERSION": "The profile was created or updated by a newer version of Taktra. Update Taktra to open it.",
     "PROJECT_NOT_FOUND": "The project no longer exists.",
     "PROJECT_NAME_TAKEN": "A project with this name already exists.",
+    "TAG_NOT_FOUND": "The tag no longer exists.",
+    "TAG_NAME_TAKEN": "A tag with this name already exists.",
     "VALIDATION_FAILED": "The input is invalid.",
     "UNKNOWN": "Something went wrong. Please try again."
   }

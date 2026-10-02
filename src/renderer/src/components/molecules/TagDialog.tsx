@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Project } from '../../../../shared/projects'
+import type { Tag } from '../../../../shared/tags'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { COLORS } from '../../lib/colors'
@@ -11,25 +11,23 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 
-interface ProjectDialogProps {
-  /** The project to edit; without one, a new project is created. */
-  readonly project?: Project
+interface TagDialogProps {
+  readonly tag?: Tag
   readonly defaultColor: string
   readonly onClose: () => void
-  readonly onSaved: (project: Project) => void
+  readonly onSaved: (tag: Tag) => void
 }
 
-export function ProjectDialog({
-  project,
+export function TagDialog({
+  tag,
   defaultColor,
   onClose,
   onSaved
-}: ProjectDialogProps): React.JSX.Element {
-  const t = useTranslations('ProjectDialog')
+}: TagDialogProps): React.JSX.Element {
+  const t = useTranslations('TagDialog')
   const errorMessage = useErrorMessage()
-  const [name, setName] = useState(project?.name ?? '')
-  const [description, setDescription] = useState(project?.description ?? '')
-  const [color, setColor] = useState(project?.color ?? defaultColor)
+  const [name, setName] = useState(tag?.name ?? '')
+  const [color, setColor] = useState(tag?.color ?? defaultColor)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
 
@@ -38,10 +36,8 @@ export function ProjectDialog({
     setPending(true)
     setError(null)
     try {
-      const input = { name, description, color }
-      onSaved(
-        project ? await api.projects.update(project.id, input) : await api.projects.create(input)
-      )
+      const input = { name, color }
+      onSaved(tag ? await api.tags.update(tag.id, input) : await api.tags.create(input))
       onClose()
     } catch (caught) {
       setError(errorMessage(caught))
@@ -55,7 +51,7 @@ export function ProjectDialog({
       <Dialog>
         {({ close }) => (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <DialogHeading>{project ? t('editTitle') : t('createTitle')}</DialogHeading>
+            <DialogHeading>{tag ? t('editTitle') : t('createTitle')}</DialogHeading>
             <TextField
               label={t('nameLabel')}
               value={name}
@@ -63,11 +59,6 @@ export function ProjectDialog({
               isRequired
               autoFocus
               validate={(value) => (value.trim() ? null : t('nameRequired'))}
-            />
-            <TextField
-              label={t('descriptionLabel')}
-              value={description}
-              onChange={setDescription}
             />
             <ColorSwatchPicker
               label={t('colorLabel')}
@@ -81,7 +72,7 @@ export function ProjectDialog({
                 {t('cancel')}
               </Button>
               <Button type="submit" isDisabled={isPending}>
-                {project ? t('save') : t('create')}
+                {tag ? t('save') : t('create')}
               </Button>
             </div>
           </Form>

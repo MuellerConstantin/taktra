@@ -1,21 +1,14 @@
 import { eq, isNull, sql } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import type { Project, ProjectInput } from '../shared/projects'
+import { normalizeColor } from './colors'
 import { getActiveDatabase } from './db/database'
+import { isUniqueViolation } from './db/errors'
 import { projects } from './db/schema'
 import { handle } from './ipc'
 
-const HEX_COLOR = /^#[0-9a-f]{6}$/
-
 interface ListOptions {
   readonly includeArchived?: boolean
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  for (let current = error; current instanceof Error; current = current.cause) {
-    if ((current as { code?: string }).code === 'SQLITE_CONSTRAINT_UNIQUE') return true
-  }
-  return false
 }
 
 function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
@@ -26,14 +19,10 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
   if (input.name !== undefined && !name)
     throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
 
-  const color = optional(input.color?.toLowerCase())
-  if (color && !HEX_COLOR.test(color))
-    throw new AppError('VALIDATION_FAILED', `Invalid project color: ${color}`)
-
   return {
     name,
     description: optional(input.description),
-    color
+    color: normalizeColor(input.color)
   }
 }
 

@@ -77,7 +77,26 @@
   },
   "TagsView": {
     "title": "Tags",
-    "placeholder": "Projektübergreifende Tags"
+    "create": "Neuer Tag",
+    "empty": "Noch keine Tags.",
+    "noMatches": "Keine passenden Tags.",
+    "search": "Tags durchsuchen",
+    "edit": "{name} bearbeiten",
+    "delete": "{name} löschen",
+    "deleteConfirmTitle": "Tag „{name}“ löschen?",
+    "deleteConfirmText": "Der Tag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "deleteConfirmAction": "Löschen",
+    "cancel": "Abbrechen"
+  },
+  "TagDialog": {
+    "createTitle": "Neuer Tag",
+    "editTitle": "Tag bearbeiten",
+    "nameLabel": "Name",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "colorLabel": "Farbe",
+    "cancel": "Abbrechen",
+    "create": "Anlegen",
+    "save": "Speichern"
   },
   "ReportsView": {
     "title": "Auswertung",
@@ -131,6 +150,8 @@
     "PROFILE_NEWER_VERSION": "Das Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, um es zu öffnen.",
     "PROJECT_NOT_FOUND": "Das Projekt existiert nicht mehr.",
     "PROJECT_NAME_TAKEN": "Ein Projekt mit diesem Namen existiert bereits.",
+    "TAG_NOT_FOUND": "Der Tag existiert nicht mehr.",
+    "TAG_NAME_TAKEN": "Ein Tag mit diesem Namen existiert bereits.",
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   }
