@@ -152,6 +152,15 @@
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel"
   },
+  "TagDetailView": {
+    "subtitle": "Tag",
+    "edit": "Edit",
+    "total": "Total {duration}",
+    "empty": "No time has been tracked on activities with this tag yet.",
+    "activityCount": "{count, plural, one {# activity} other {# activities}}",
+    "entryCount": "{count, plural, one {# entry} other {# entries}}",
+    "editActivity": "Edit {name}"
+  },
   "TagBadges": {
     "more": "{count, plural, one {# more tag} other {# more tags}}"
   },

@@ -45,6 +45,7 @@ const api = {
   },
   tags: {
     list: () => invoke<Tag[]>('tags:list'),
+    get: (id: number) => invoke<Tag>('tags:get', id),
     create: (input: TagInput) => invoke<Tag>('tags:create', input),
     update: (id: number, patch: Partial<TagInput>) => invoke<Tag>('tags:update', id, patch),
     delete: (id: number) => invoke<void>('tags:delete', id)

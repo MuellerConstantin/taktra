@@ -5,6 +5,7 @@ import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
 import ProjectDetailView from './views/ProjectDetailView'
 import TagsView from './views/TagsView'
+import TagDetailView from './views/TagDetailView'
 import ReportsView from './views/ReportsView'
 import AppSettingsView from './views/settings/app/AppSettingsView'
 import AppearanceSettings from './views/settings/app/AppearanceSettings'
@@ -24,6 +25,7 @@ export const router = createHashRouter([
           { path: 'projects', element: <ProjectsView /> },
           { path: 'projects/:projectId', element: <ProjectDetailView /> },
           { path: 'tags', element: <TagsView /> },
+          { path: 'tags/:tagId', element: <TagDetailView /> },
           { path: 'reports', element: <ReportsView /> },
           {
             path: 'profile',

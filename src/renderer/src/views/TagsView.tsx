@@ -1,5 +1,6 @@
 import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Tag } from '../../../shared/tags'
@@ -20,6 +21,7 @@ function TagsView(): React.JSX.Element {
   const t = useTranslations('TagsView')
   const errorMessage = useErrorMessage()
   const { activeProfile } = useProfiles()
+  const navigate = useNavigate()
   const [tags, setTags] = useState<readonly Tag[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dialog, setDialog] = useState<{ readonly tag?: Tag } | null>(null)
@@ -61,21 +63,22 @@ function TagsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         actions={
-          <>
-            <SearchField
-              aria-label={t('search')}
-              placeholder={t('search')}
-              value={query}
-              onChange={setQuery}
-              className="w-64"
-            />
-            <Button onPress={() => setDialog({})}>
-              <RiAddLine className="size-4" />
-              {t('create')}
-            </Button>
-          </>
+          <Button onPress={() => setDialog({})}>
+            <RiAddLine className="size-4" />
+            {t('create')}
+          </Button>
         }
-      />
+      >
+        <div className="flex items-center gap-2 pb-4">
+          <SearchField
+            aria-label={t('search')}
+            placeholder={t('search')}
+            value={query}
+            onChange={setQuery}
+            className="w-64"
+          />
+        </div>
+      </ViewHeader>
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
       {error && <p className="p-8 text-sm text-destructive">{error}</p>}
       {!error && tags && (
@@ -83,6 +86,7 @@ function TagsView(): React.JSX.Element {
           <GridList
             aria-label={t('title')}
             items={visibleTags}
+            onAction={(key) => navigate(`/tags/${key}`)}
             className="min-h-0 flex-1"
             renderEmptyState={() =>
               visibleTags.length === 0 && (

@@ -68,6 +68,7 @@ export function deleteTag(id: number): void {
 
 export function initTags(): void {
   handle('tags:list', () => listTags())
+  handle('tags:get', (_, id: number) => findTag(id))
   handle('tags:create', (_, input: TagInput) => createTag(input))
   handle('tags:update', (_, id: number, patch: Partial<TagInput>) => updateTag(id, patch))
   handle('tags:delete', (_, id: number) => deleteTag(id))
