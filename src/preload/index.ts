@@ -18,6 +18,14 @@ function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>>
   return ipcRenderer.invoke(channel, ...args)
 }
 
+function subscribe(channel: string, callback: () => void): () => void {
+  const listener = (): void => callback()
+  ipcRenderer.on(channel, listener)
+  return () => {
+    ipcRenderer.removeListener(channel, listener)
+  }
+}
+
 const api = {
   settings: {
     get: () => invoke<Settings>('settings:get'),
@@ -80,6 +88,9 @@ const api = {
     stop: () => invoke<void>('timer:stop'),
     discard: () => invoke<void>('timer:discard'),
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
+  },
+  events: {
+    onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback)
   }
 }
 

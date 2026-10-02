@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { TimeEntryDetails } from '../../../shared/timeEntries'
 import { useProfiles } from '../hooks/useProfiles'
-import { api } from '../lib/api'
+import { api, events } from '../lib/api'
 import { TimerContext } from './TimerContext'
 
 interface TimerProviderProps {
@@ -30,19 +30,18 @@ function TimerProvider({ children }: TimerProviderProps): React.JSX.Element {
     }
   }, [path, revision])
 
+  useEffect(() => events.onTimerChanged(() => setRevision((count) => count + 1)), [])
+
   const start = useCallback(async (activityId: number) => {
     await api.timer.start(activityId)
-    setRevision((count) => count + 1)
   }, [])
 
   const stop = useCallback(async () => {
     await api.timer.stop()
-    setRevision((count) => count + 1)
   }, [])
 
   const discard = useCallback(async () => {
     await api.timer.discard()
-    setRevision((count) => count + 1)
   }, [])
 
   const value = useMemo(

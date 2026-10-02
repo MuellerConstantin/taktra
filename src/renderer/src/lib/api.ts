@@ -21,4 +21,8 @@ function unwrap<T extends object>(source: T): Unwrapped<T> {
   ) as Unwrapped<T>
 }
 
-export const api = unwrap(window.api)
+const { events: ipcEvents, ...invokers } = window.api
+
+export const api = unwrap(invokers)
+
+export const events = ipcEvents

@@ -1,4 +1,5 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
+import { BrowserWindow } from 'electron'
 import { AppError } from '../shared/errors'
 import type { ActivityDetails, TimeEntryDetails } from '../shared/timeEntries'
 import { findActivity, tagsByActivity } from './activities'
@@ -12,6 +13,10 @@ const isRunning = and(isNotNull(timeEntries.startedAt), isNull(timeEntries.ended
 function toLocalDate(date: Date): string {
   const pad = (value: number): string => String(value).padStart(2, '0')
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+function notifyTimerChanged(): void {
+  for (const window of BrowserWindow.getAllWindows()) window.webContents.send('timer:changed')
 }
 
 function stopRunning(now: Date): void {
@@ -37,7 +42,7 @@ export function startTimer(activityId: number): TimeEntryDetails {
 
   const db = getActiveDatabase()
   const now = new Date()
-  return db.transaction(() => {
+  const timer = db.transaction(() => {
     stopRunning(now)
     db.insert(timeEntries)
       .values({
@@ -49,16 +54,21 @@ export function startTimer(activityId: number): TimeEntryDetails {
       .run()
     return getRunningTimer()!
   })
+  notifyTimerChanged()
+  return timer
 }
 
 export function stopTimer(): void {
   const db = getActiveDatabase()
   db.transaction(() => stopRunning(new Date()))
+  notifyTimerChanged()
 }
 
 export function discardTimer(): void {
   const entry = getActiveDatabase().select().from(timeEntries).where(isRunning).get()
-  if (entry) deleteTimeEntry(entry.id)
+  if (!entry) return
+  deleteTimeEntry(entry.id)
+  notifyTimerChanged()
 }
 
 export function listRecentActivities(limit: number): ActivityDetails[] {
