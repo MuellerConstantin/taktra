@@ -12,7 +12,10 @@ import { DropdownItem } from './ListBox'
 import { Popover } from './Popover'
 import { composeTailwindRenderProps } from './utils'
 
-export interface ComboBoxProps<T extends object> extends Omit<RACComboBoxProps<T>, 'children'> {
+export interface ComboBoxProps<
+  T extends object,
+  M extends 'single' | 'multiple' = 'single'
+> extends Omit<RACComboBoxProps<T, M>, 'children'> {
   readonly label?: string
   readonly description?: string
   readonly placeholder?: string
@@ -20,7 +23,7 @@ export interface ComboBoxProps<T extends object> extends Omit<RACComboBoxProps<T
   readonly children: React.ReactNode | ((item: T) => React.ReactNode)
 }
 
-export function ComboBox<T extends object>({
+export function ComboBox<T extends object, M extends 'single' | 'multiple' = 'single'>({
   label,
   description,
   placeholder,
@@ -28,7 +31,7 @@ export function ComboBox<T extends object>({
   children,
   items,
   ...props
-}: ComboBoxProps<T>): React.JSX.Element {
+}: ComboBoxProps<T, M>): React.JSX.Element {
   return (
     <RACComboBox
       {...props}

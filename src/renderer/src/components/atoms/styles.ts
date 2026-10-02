@@ -38,3 +38,12 @@ export const fieldGroupStyles = tv({
   base: 'group box-border flex h-9 items-center overflow-hidden rounded-lg border bg-transparent transition forced-colors:bg-[Field]',
   variants: fieldBorderStyles.variants
 })
+
+export function tintStyle(color: string | null | undefined): React.CSSProperties | undefined {
+  return color
+    ? {
+        backgroundColor: `color-mix(in oklab, ${color} 18%, transparent)`,
+        borderColor: `color-mix(in oklab, ${color} 45%, transparent)`
+      }
+    : undefined
+}

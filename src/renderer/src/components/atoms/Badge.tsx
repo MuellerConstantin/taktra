@@ -1,4 +1,5 @@
 import { twMerge } from 'tailwind-merge'
+import { tintStyle } from './styles'
 
 interface BadgeProps {
   readonly color?: string | null
@@ -13,14 +14,7 @@ export function Badge({ color, className, children }: BadgeProps): React.JSX.Ele
         'inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium',
         className
       )}
-      style={
-        color
-          ? {
-              backgroundColor: `color-mix(in oklab, ${color} 18%, transparent)`,
-              borderColor: `color-mix(in oklab, ${color} 45%, transparent)`
-            }
-          : undefined
-      }
+      style={tintStyle(color)}
     >
       <span
         aria-hidden
