@@ -7,7 +7,7 @@ import { activities, activityTags, projects, tags, timeEntries } from './db/sche
 import { handle } from './ipc'
 import { assertLocalDate } from './timeEntries'
 
-const GROUPINGS: readonly Grouping[] = ['project', 'activity', 'tag']
+const GROUPINGS: readonly Grouping[] = ['date', 'project', 'activity', 'tag']
 
 function assertIds(ids: readonly number[] | undefined, field: string): void {
   if (ids && !(Array.isArray(ids) && ids.every(Number.isInteger)))
@@ -41,6 +41,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
   if (!groupBy.every((grouping) => GROUPINGS.includes(grouping)))
     throw new AppError('VALIDATION_FAILED', `Invalid grouping: ${groupBy}`)
 
+  const byDate = groupBy.includes('date')
   const byActivity = groupBy.includes('activity')
   const byProject = byActivity || groupBy.includes('project')
   const byTag = groupBy.includes('tag')
@@ -48,6 +49,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
 
   const query = getActiveDatabase()
     .select({
+      date: byDate ? timeEntries.date : none,
       projectId: byProject ? projects.id : none,
       projectName: byProject ? projects.name : none,
       projectColor: byProject ? projects.color : none,
@@ -78,11 +80,13 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
   const filtered = joined.where(conditions(filter))
 
   const groupColumns = [
+    ...(byDate ? [timeEntries.date] : []),
     ...(byProject ? [projects.id] : []),
     ...(byActivity ? [activities.id] : []),
     ...(byTag ? [tags.id] : [])
   ]
   const orderColumns = [
+    ...(byDate ? [asc(timeEntries.date)] : []),
     ...(byProject ? [asc(sql`lower(${projects.name})`)] : []),
     ...(byActivity ? [asc(sql`lower(${activities.name})`)] : []),
     ...(byTag ? [sql`${tags.id} is null`, asc(sql`lower(${tags.name})`)] : [])
@@ -96,6 +100,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
     : new Map()
 
   return rows.map((row) => ({
+    date: row.date,
     project:
       row.projectId === null
         ? null

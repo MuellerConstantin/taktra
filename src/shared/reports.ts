@@ -9,9 +9,10 @@ export interface TimeFilter {
   readonly tagIds?: readonly number[]
 }
 
-export type Grouping = 'project' | 'activity' | 'tag'
+export type Grouping = 'date' | 'project' | 'activity' | 'tag'
 
 export interface AggregateRow {
+  readonly date: string | null
   readonly project: Pick<Project, 'id' | 'name' | 'color'> | null
   readonly activity: ActivityRef | null
   readonly tag: ActivityTag | null

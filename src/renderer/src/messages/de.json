@@ -193,7 +193,26 @@
   },
   "ReportsView": {
     "title": "Auswertung",
-    "placeholder": "Auswertung nach Projekten und Tags"
+    "projects": "Projekte",
+    "allProjects": "Alle Projekte",
+    "tags": "Tags",
+    "allTags": "Alle Tags",
+    "total": "Gesamtzeit",
+    "trackedDays": "Erfasste Tage",
+    "average": "Ø pro erfasstem Tag",
+    "empty": "In diesem Zeitraum wurde keine Zeit erfasst.",
+    "timeline": "Verlauf",
+    "distribution": "Verteilung",
+    "breakdown": "Gruppieren nach",
+    "breakdowns": {
+      "project": "Projekt",
+      "tag": "Tag",
+      "projectTag": "Projekt × Tag"
+    }
+  },
+  "ReportBreakdown": {
+    "untagged": "Ohne Tag",
+    "overlap": "Ein Eintrag zählt bei jedem Tag seiner Activity mit. Die Anteile der Tags können sich daher überschneiden und zusammen mehr als 100 % ergeben."
   },
   "AppSettingsView": {
     "title": "Einstellungen",

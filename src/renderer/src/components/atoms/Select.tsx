@@ -52,7 +52,7 @@ export function Select<T extends object, M extends 'single' | 'multiple' = 'sing
     >
       {label && <Label>{label}</Label>}
       <Button className={styles}>
-        <SelectValue className="flex-1 text-sm">
+        <SelectValue className="min-w-0 flex-1 truncate text-sm">
           {({ selectedText, defaultChildren }) => selectedText || defaultChildren}
         </SelectValue>
         <RiArrowDownSLine

@@ -193,7 +193,26 @@
   },
   "ReportsView": {
     "title": "Reports",
-    "placeholder": "Reports by project and tag"
+    "projects": "Projects",
+    "allProjects": "All projects",
+    "tags": "Tags",
+    "allTags": "All tags",
+    "total": "Total time",
+    "trackedDays": "Tracked days",
+    "average": "Average per tracked day",
+    "empty": "No time tracked in this period.",
+    "timeline": "Over time",
+    "distribution": "Distribution",
+    "breakdown": "Group by",
+    "breakdowns": {
+      "project": "Project",
+      "tag": "Tag",
+      "projectTag": "Project × tag"
+    }
+  },
+  "ReportBreakdown": {
+    "untagged": "No tag",
+    "overlap": "An entry counts towards every tag of its activity, so tag shares can overlap and add up to more than 100 %."
   },
   "AppSettingsView": {
     "title": "Settings",
