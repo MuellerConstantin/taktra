@@ -1,6 +1,7 @@
 import { createHashRouter, Navigate } from 'react-router'
 import { AppTemplate } from './components/templates/AppTemplate'
 import { ProfileTemplate } from './components/templates/ProfileTemplate'
+import MiniTimerView from './views/MiniTimerView'
 import TimerView from './views/TimerView'
 import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
@@ -14,6 +15,7 @@ import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
 import ProfileGeneralSettings from './views/settings/profile/ProfileGeneralSettings'
 
 export const router = createHashRouter([
+  { path: '/mini', element: <MiniTimerView /> },
   {
     path: '/',
     element: <AppTemplate />,

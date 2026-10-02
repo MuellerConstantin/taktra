@@ -89,6 +89,9 @@ const api = {
     discard: () => invoke<void>('timer:discard'),
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
   },
+  app: {
+    showMainWindow: () => invoke<void>('app:showMainWindow')
+  },
   events: {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback)
   }

@@ -76,6 +76,10 @@
     "open": "Open timer for {name}",
     "stop": "Stop timer"
   },
+  "MiniTimerView": {
+    "open": "Open Taktra",
+    "stop": "Stop timer"
+  },
   "StartTimerDialog": {
     "title": "Start timer",
     "projectLabel": "Project",
@@ -269,6 +273,10 @@
       "label": "Language",
       "en": "English",
       "de": "Deutsch"
+    },
+    "miniTimer": {
+      "label": "Mini timer",
+      "description": "Shows a small always-on-top window with the running timer while Taktra is minimized."
     }
   },
   "ProfileSettingsView": {

@@ -8,7 +8,8 @@ const store = new Store<Settings>({
   name: 'settings',
   schema: {
     theme: { type: 'string', enum: [...themeSources], default: 'system' },
-    language: { type: 'string', enum: [...languages], default: 'en' }
+    language: { type: 'string', enum: [...languages], default: 'en' },
+    miniTimer: { type: 'boolean', default: true }
   },
   clearInvalidConfig: true
 })

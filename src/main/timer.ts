@@ -1,6 +1,6 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
 import { BrowserWindow } from 'electron'
-import { AppError } from '../shared/errors'
+import { AppError, isAppError } from '../shared/errors'
 import type { ActivityDetails, TimeEntryDetails } from '../shared/timeEntries'
 import { findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
@@ -15,8 +15,15 @@ function toLocalDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
+const listeners = new Set<() => void>()
+
+export function onTimerChanged(listener: () => void): void {
+  listeners.add(listener)
+}
+
 function notifyTimerChanged(): void {
   for (const window of BrowserWindow.getAllWindows()) window.webContents.send('timer:changed')
+  for (const listener of listeners) listener()
 }
 
 function stopRunning(now: Date): void {
@@ -34,6 +41,15 @@ function stopRunning(now: Date): void {
 
 export function getRunningTimer(): TimeEntryDetails | null {
   return selectTimeEntryDetails(isRunning)[0] ?? null
+}
+
+export function hasRunningTimer(): boolean {
+  try {
+    return getActiveDatabase().select().from(timeEntries).where(isRunning).get() !== undefined
+  } catch (error) {
+    if (isAppError(error, 'NO_ACTIVE_PROFILE')) return false
+    throw error
+  }
 }
 
 export function startTimer(activityId: number): TimeEntryDetails {

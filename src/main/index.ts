@@ -1,8 +1,8 @@
-import { app, shell, BrowserWindow, nativeTheme } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { app, BrowserWindow, nativeTheme } from 'electron'
+import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initActivities } from './activities'
+import { attachMiniTimer, initMiniTimer } from './miniTimer'
 import { initProfiles } from './profiles'
 import { initProjects } from './projects'
 import { initReports } from './reports'
@@ -10,38 +10,28 @@ import { initSettings } from './settings'
 import { initTags } from './tags'
 import { initTimeEntries } from './timeEntries'
 import { initTimer } from './timer'
+import { createRendererWindow } from './windows'
 
 function createWindow(): void {
-  const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    show: false,
-    autoHideMenuBar: true,
-    icon,
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0c0a0f' : '#fbf9fc',
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: true,
-      contextIsolation: true
-    }
-  })
+  const mainWindow = createRendererWindow(
+    {
+      width: 1200,
+      height: 800,
+      minWidth: 800,
+      minHeight: 600,
+      show: false,
+      autoHideMenuBar: true,
+      icon,
+      backgroundColor: nativeTheme.shouldUseDarkColors ? '#0c0a0f' : '#fbf9fc'
+    },
+    ''
+  )
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  attachMiniTimer(mainWindow)
 }
 
 app.whenReady().then(() => {
@@ -53,6 +43,7 @@ app.whenReady().then(() => {
   initActivities()
   initTimeEntries()
   initTimer()
+  initMiniTimer()
   initReports()
 
   app.on('browser-window-created', (_, window) => {

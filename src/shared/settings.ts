@@ -9,4 +9,5 @@ export type Language = (typeof languages)[number]
 export interface Settings {
   readonly theme: ThemeSource
   readonly language: Language
+  readonly miniTimer: boolean
 }
