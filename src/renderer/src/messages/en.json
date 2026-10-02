@@ -13,7 +13,8 @@
     "profiles": "Profiles",
     "profileSettings": "Profile settings…",
     "newProfile": "New profile…",
-    "openProfile": "Open profile…"
+    "openProfile": "Open profile…",
+    "newerVersion": "{file} (newer version)"
   },
   "CreateProfileDialog": {
     "title": "New profile",
@@ -29,13 +30,17 @@
   "InvalidProfileAlert": {
     "title": "Not a Taktra profile",
     "text": "The selected file could not be opened as a Taktra profile.",
-    "ok": "OK"
+    "ok": "OK",
+    "newerVersionTitle": "Profile from a newer version",
+    "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra to open it."
   },
   "UnavailableProfileDialog": {
     "title": "Profile unavailable",
     "text": "The profile file could not be found or is not a valid Taktra profile. Removing the profile from the list does not touch any file.",
     "remove": "Remove from list",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "newerVersionTitle": "Profile from a newer version",
+    "newerVersionText": "This profile was created or updated by a newer version of Taktra and cannot be opened by this version. Update Taktra to use it again. Removing the profile from the list does not touch any file."
   },
   "WelcomeView": {
     "title": "Welcome to Taktra",
@@ -43,7 +48,8 @@
     "missingText": "The file of the selected profile could not be found or opened. Create a new profile, open a profile file, or remove the profile from the list.",
     "create": "Create profile",
     "open": "Open profile",
-    "removeFromList": "Remove from list"
+    "removeFromList": "Remove from list",
+    "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
   },
   "TrackingView": {
     "title": "Tracking",

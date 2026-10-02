@@ -7,7 +7,7 @@ import { useProfiles } from '../../hooks/useProfiles'
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atoms/Menu'
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
-import { InvalidProfileAlert } from './InvalidProfileAlert'
+import { InvalidProfileAlert, type InvalidProfileReason } from './InvalidProfileAlert'
 import { UnavailableProfileDialog } from './UnavailableProfileDialog'
 
 function fileName(path: string): string {
@@ -18,15 +18,17 @@ export function ProfileSwitcher(): React.JSX.Element {
   const t = useTranslations('ProfileSwitcher')
   const { profiles, activeProfile, setActiveProfile, openProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
-  const [isInvalidOpen, setInvalidOpen] = useState(false)
-  const [unavailablePath, setUnavailablePath] = useState<string | null>(null)
+  const [invalidReason, setInvalidReason] = useState<InvalidProfileReason | null>(null)
+  const [unavailableProfile, setUnavailableProfile] = useState<ProfileSummary | null>(null)
 
   const handleOpen = async (): Promise<void> => {
-    if ((await openProfile()) === 'invalid') setInvalidOpen(true)
+    const status = await openProfile()
+    if (status === 'invalid' || status === 'newerVersion') setInvalidReason(status)
   }
 
   const label = (profile: ProfileSummary): string =>
-    profile.name ?? t('missing', { file: fileName(profile.path) })
+    profile.name ??
+    t(profile.isNewerVersion ? 'newerVersion' : 'missing', { file: fileName(profile.path) })
 
   return (
     <>
@@ -62,11 +64,14 @@ export function ProfileSwitcher(): React.JSX.Element {
                   if (key === undefined) return
                   const profile = profiles.find((candidate) => candidate.path === key)
                   if (profile?.isAvailable) setActiveProfile(profile.path)
-                  else setUnavailablePath(String(key))
                 }}
               >
                 {(profile) => (
-                  <MenuItem id={profile.path} textValue={label(profile)}>
+                  <MenuItem
+                    id={profile.path}
+                    textValue={label(profile)}
+                    onAction={() => !profile.isAvailable && setUnavailableProfile(profile)}
+                  >
                     <span
                       className={
                         profile.isAvailable
@@ -99,8 +104,11 @@ export function ProfileSwitcher(): React.JSX.Element {
         </Menu>
       </MenuTrigger>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
-      <InvalidProfileAlert isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} />
-      <UnavailableProfileDialog path={unavailablePath} onClose={() => setUnavailablePath(null)} />
+      <InvalidProfileAlert reason={invalidReason} onClose={() => setInvalidReason(null)} />
+      <UnavailableProfileDialog
+        profile={unavailableProfile}
+        onClose={() => setUnavailableProfile(null)}
+      />
     </>
   )
 }

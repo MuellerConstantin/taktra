@@ -1,30 +1,31 @@
 import { useTranslations } from 'use-intl'
+import type { ProfileSummary } from '../../../../shared/profiles'
 import { useProfiles } from '../../hooks/useProfiles'
 import { AlertDialog } from '../atoms/AlertDialog'
 import { Modal } from '../atoms/Modal'
 
 interface UnavailableProfileDialogProps {
-  readonly path: string | null
+  readonly profile: ProfileSummary | null
   readonly onClose: () => void
 }
 
 export function UnavailableProfileDialog({
-  path,
+  profile,
   onClose
 }: UnavailableProfileDialogProps): React.JSX.Element {
   const t = useTranslations('UnavailableProfileDialog')
   const { removeProfile } = useProfiles()
 
   return (
-    <Modal isOpen={path !== null} onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
+    <Modal isOpen={profile !== null} onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
       <AlertDialog
-        title={t('title')}
+        title={profile?.isNewerVersion ? t('newerVersionTitle') : t('title')}
         actionLabel={t('remove')}
         cancelLabel={t('cancel')}
-        onAction={() => path && removeProfile(path)}
+        onAction={() => profile && removeProfile(profile.path)}
       >
-        <p>{t('text')}</p>
-        <p className="mt-2 font-mono text-xs break-all text-foreground">{path}</p>
+        <p>{profile?.isNewerVersion ? t('newerVersionText') : t('text')}</p>
+        <p className="mt-2 font-mono text-xs break-all text-foreground">{profile?.path}</p>
       </AlertDialog>
     </Modal>
   )

@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { DatabaseSync } from 'node:sqlite'
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import Store from 'electron-store'
 import {
@@ -8,12 +7,17 @@ import {
   type OpenProfileResult,
   type ProfilesState
 } from '../shared/profiles'
+import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
 import {
-  APPLICATION_ID,
-  RESERVED_FILE_NAMES,
-  SCHEMA_VERSION,
-  SQLITE_SIDECAR_SUFFIXES
-} from './constants'
+  activateDatabase,
+  closeActiveDatabase,
+  isActiveDatabase,
+  NewerProfileVersionError,
+  openProfileDatabase,
+  readProperty,
+  withProfileDatabase,
+  writeProperty
+} from './db/database'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -29,35 +33,50 @@ const store = new Store<KnownProfiles>({
   clearInvalidConfig: true
 })
 
-function readProfileName(path: string): string | null {
-  if (!existsSync(path)) return null
+interface ProfileInspection {
+  readonly name: string | null
+  readonly isNewerVersion: boolean
+}
+
+function inspectProfile(path: string): ProfileInspection {
+  if (!existsSync(path)) return { name: null, isNewerVersion: false }
 
   try {
-    const db = new DatabaseSync(path, { readOnly: true })
-    try {
-      const { application_id } = db.prepare('PRAGMA application_id').get() as {
-        application_id: number
-      }
-      if (application_id !== APPLICATION_ID) return null
-
-      const row = db.prepare("SELECT value FROM meta WHERE key = 'name'").get() as
-        { value: string } | undefined
-      return row?.value ?? null
-    } finally {
-      db.close()
-    }
-  } catch {
-    return null
+    const name = withProfileDatabase(path, { readOnly: true }, (db) => readProperty(db, 'name'))
+    return { name, isNewerVersion: false }
+  } catch (error) {
+    return { name: null, isNewerVersion: error instanceof NewerProfileVersionError }
   }
 }
 
+function readProfileName(path: string): string | null {
+  return inspectProfile(path).name
+}
+
+function syncActiveDatabase(): void {
+  const activePath = store.get('activePath')
+
+  try {
+    activateDatabase(activePath && existsSync(activePath) ? activePath : null)
+  } catch {
+    activateDatabase(null)
+  }
+}
+
+function updateKnownProfiles(paths: string[], activePath: string | null): void {
+  store.set({ paths, activePath })
+  syncActiveDatabase()
+}
+
 export function getProfilesState(): ProfilesState {
+  const activePath = store.get('activePath')
   const profiles = store.get('paths').map((path) => {
-    const name = readProfileName(path)
-    return { path, name, isAvailable: name !== null }
+    const { name, isNewerVersion } = inspectProfile(path)
+    const isOpenable = path === activePath ? isActiveDatabase(path) : true
+    return { path, name, isAvailable: name !== null && isOpenable, isNewerVersion }
   })
 
-  return { profiles, activePath: store.get('activePath') }
+  return { profiles, activePath }
 }
 
 export function createProfile(name: string, path: string): ProfilesState {
@@ -67,23 +86,20 @@ export function createProfile(name: string, path: string): ProfilesState {
 
   mkdirSync(dirname(path), { recursive: true })
 
-  const db = new DatabaseSync(path)
   try {
-    db.exec(`
-      PRAGMA application_id = ${APPLICATION_ID};
-      PRAGMA user_version = ${SCHEMA_VERSION};
-      CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
-    `)
-    db.prepare("INSERT INTO meta (key, value) VALUES ('name', ?)").run(trimmedName)
-    db.close()
+    const db = openProfileDatabase(path, { create: true })
+    try {
+      writeProperty(db, 'name', trimmedName)
+    } finally {
+      db.$client.close()
+    }
   } catch (error) {
-    db.close()
     rmSync(path, { force: true })
     throw error
   }
 
   const paths = store.get('paths').filter((known) => known !== path)
-  store.set({ paths: [...paths, path], activePath: path })
+  updateKnownProfiles([...paths, path], path)
 
   return getProfilesState()
 }
@@ -94,12 +110,7 @@ export function renameProfile(path: string, name: string): ProfilesState {
   if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
   if (readProfileName(path) === null) throw new Error(`Profile not available: ${path}`)
 
-  const db = new DatabaseSync(path)
-  try {
-    db.prepare("UPDATE meta SET value = ? WHERE key = 'name'").run(trimmedName)
-  } finally {
-    db.close()
-  }
+  withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', trimmedName))
 
   return getProfilesState()
 }
@@ -115,12 +126,13 @@ export function removeProfile(path: string): ProfilesState {
       ? (remaining.find((known) => readProfileName(known) !== null) ?? null)
       : activePath
 
-  store.set({ paths: remaining, activePath: nextActivePath })
+  updateKnownProfiles(remaining, nextActivePath)
   return getProfilesState()
 }
 
 export async function deleteProfile(path: string): Promise<ProfilesState> {
   if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
+  if (store.get('activePath') === path) closeActiveDatabase()
 
   for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
     if (existsSync(file)) await shell.trashItem(file)
@@ -132,7 +144,7 @@ export async function deleteProfile(path: string): Promise<ProfilesState> {
 export function setActiveProfile(path: string): ProfilesState {
   if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
 
-  store.set('activePath', path)
+  updateKnownProfiles(store.get('paths'), path)
   return getProfilesState()
 }
 
@@ -187,15 +199,20 @@ async function openProfile(window: BrowserWindow | null): Promise<OpenProfileRes
 
   const [path] = result.filePaths
   if (result.canceled || !path) return { status: 'canceled' }
-  if (readProfileName(path) === null) return { status: 'invalid' }
+  const { name, isNewerVersion } = inspectProfile(path)
+  if (isNewerVersion) return { status: 'newerVersion' }
+  if (name === null) return { status: 'invalid' }
 
   const paths = store.get('paths')
-  store.set({ paths: paths.includes(path) ? paths : [...paths, path], activePath: path })
+  updateKnownProfiles(paths.includes(path) ? paths : [...paths, path], path)
 
   return { status: 'opened', state: getProfilesState() }
 }
 
 export function initProfiles(): void {
+  syncActiveDatabase()
+  app.on('will-quit', closeActiveDatabase)
+
   ipcMain.handle('profiles:get', () => getProfilesState())
   ipcMain.handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
   ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))

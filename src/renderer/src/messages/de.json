@@ -13,7 +13,8 @@
     "profiles": "Profile",
     "profileSettings": "Profileinstellungen…",
     "newProfile": "Neues Profil…",
-    "openProfile": "Profil öffnen…"
+    "openProfile": "Profil öffnen…",
+    "newerVersion": "{file} (neuere Version)"
   },
   "CreateProfileDialog": {
     "title": "Neues Profil",
@@ -29,13 +30,17 @@
   "InvalidProfileAlert": {
     "title": "Kein Taktra-Profil",
     "text": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
-    "ok": "OK"
+    "ok": "OK",
+    "newerVersionTitle": "Profil aus neuerer Version",
+    "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, um es zu öffnen."
   },
   "UnavailableProfileDialog": {
     "title": "Profil nicht verfügbar",
     "text": "Die Profildatei wurde nicht gefunden oder ist kein gültiges Taktra-Profil. Das Entfernen aus der Liste verändert keine Datei.",
     "remove": "Aus Liste entfernen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "newerVersionTitle": "Profil aus neuerer Version",
+    "newerVersionText": "Dieses Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet und kann mit dieser Version nicht geöffnet werden. Aktualisiere Taktra, um es wieder zu nutzen. Das Entfernen aus der Liste verändert keine Datei."
   },
   "WelcomeView": {
     "title": "Willkommen bei Taktra",
@@ -43,7 +48,8 @@
     "missingText": "Die Datei des ausgewählten Profils wurde nicht gefunden oder lässt sich nicht öffnen. Lege ein neues Profil an, öffne eine Profildatei oder entferne das Profil aus der Liste.",
     "create": "Profil anlegen",
     "open": "Profil öffnen",
-    "removeFromList": "Aus Liste entfernen"
+    "removeFromList": "Aus Liste entfernen",
+    "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste."
   },
   "TrackingView": {
     "title": "Erfassung",

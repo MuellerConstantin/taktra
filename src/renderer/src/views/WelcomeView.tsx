@@ -3,7 +3,10 @@ import { RiAddLine, RiFolderOpenLine } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
 import { Button } from '../components/atoms/Button'
 import { CreateProfileDialog } from '../components/molecules/CreateProfileDialog'
-import { InvalidProfileAlert } from '../components/molecules/InvalidProfileAlert'
+import {
+  InvalidProfileAlert,
+  type InvalidProfileReason
+} from '../components/molecules/InvalidProfileAlert'
 import { useProfiles } from '../hooks/useProfiles'
 import logo from '../../../../resources/icon.svg'
 
@@ -11,10 +14,11 @@ function WelcomeView(): React.JSX.Element {
   const t = useTranslations('WelcomeView')
   const { activeProfile, openProfile, removeProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
-  const [isInvalidOpen, setInvalidOpen] = useState(false)
+  const [invalidReason, setInvalidReason] = useState<InvalidProfileReason | null>(null)
 
   const handleOpen = async (): Promise<void> => {
-    if ((await openProfile()) === 'invalid') setInvalidOpen(true)
+    const status = await openProfile()
+    if (status === 'invalid' || status === 'newerVersion') setInvalidReason(status)
   }
 
   return (
@@ -24,7 +28,11 @@ function WelcomeView(): React.JSX.Element {
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">
-            {activeProfile ? t('missingText') : t('text')}
+            {activeProfile?.isNewerVersion
+              ? t('newerVersionText')
+              : activeProfile
+                ? t('missingText')
+                : t('text')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -49,7 +57,7 @@ function WelcomeView(): React.JSX.Element {
         )}
       </div>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
-      <InvalidProfileAlert isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} />
+      <InvalidProfileAlert reason={invalidReason} onClose={() => setInvalidReason(null)} />
     </div>
   )
 }
