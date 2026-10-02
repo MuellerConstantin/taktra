@@ -2,10 +2,12 @@ import { app, shell, BrowserWindow, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { initActivities } from './activities'
 import { initProfiles } from './profiles'
 import { initProjects } from './projects'
 import { initSettings } from './settings'
 import { initTags } from './tags'
+import { initTimeEntries } from './timeEntries'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -46,6 +48,8 @@ app.whenReady().then(() => {
   initProfiles()
   initProjects()
   initTags()
+  initActivities()
+  initTimeEntries()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

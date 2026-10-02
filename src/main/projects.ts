@@ -4,7 +4,7 @@ import type { Project, ProjectInput } from '../shared/projects'
 import { normalizeColor } from './colors'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
-import { projects } from './db/schema'
+import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
 
 interface ListOptions {
@@ -26,7 +26,7 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
   }
 }
 
-function findProject(id: number): Project {
+export function findProject(id: number): Project {
   const project = getActiveDatabase().select().from(projects).where(eq(projects.id, id)).get()
   if (!project) throw new AppError('PROJECT_NOT_FOUND', String(id))
   return project
@@ -87,7 +87,18 @@ export function setProjectArchived(id: number, archived: boolean): Project {
 
 export function deleteProject(id: number): void {
   findProject(id)
-  getActiveDatabase().delete(projects).where(eq(projects.id, id)).run()
+
+  const db = getActiveDatabase()
+  const hasEntries = db
+    .select({ id: timeEntries.id })
+    .from(timeEntries)
+    .innerJoin(activities, eq(timeEntries.activityId, activities.id))
+    .where(eq(activities.projectId, id))
+    .limit(1)
+    .get()
+  if (hasEntries) throw new AppError('PROJECT_HAS_TIME_ENTRIES', String(id))
+
+  db.delete(projects).where(eq(projects.id, id)).run()
 }
 
 export function initProjects(): void {

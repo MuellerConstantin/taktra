@@ -1,9 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import type { Activity, ActivityInput } from '../shared/activities'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { Settings } from '../shared/settings'
 import type { Tag, TagInput } from '../shared/tags'
+import type {
+  TimeEntry,
+  TimeEntryDetails,
+  TimeEntryInput,
+  TimeEntryRange
+} from '../shared/timeEntries'
 
 function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
   return ipcRenderer.invoke(channel, ...args)
@@ -39,6 +46,22 @@ const api = {
     create: (input: TagInput) => invoke<Tag>('tags:create', input),
     update: (id: number, patch: Partial<TagInput>) => invoke<Tag>('tags:update', id, patch),
     delete: (id: number) => invoke<void>('tags:delete', id)
+  },
+  activities: {
+    list: (options?: { projectId?: number; includeArchived?: boolean }) =>
+      invoke<Activity[]>('activities:list', options),
+    create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
+    rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
+    setArchived: (id: number, archived: boolean) =>
+      invoke<Activity>('activities:setArchived', id, archived),
+    delete: (id: number) => invoke<void>('activities:delete', id)
+  },
+  timeEntries: {
+    list: (range: TimeEntryRange) => invoke<TimeEntryDetails[]>('timeEntries:list', range),
+    create: (input: TimeEntryInput) => invoke<TimeEntry>('timeEntries:create', input),
+    update: (id: number, input: TimeEntryInput) =>
+      invoke<TimeEntry>('timeEntries:update', id, input),
+    delete: (id: number) => invoke<void>('timeEntries:delete', id)
   }
 }
 
