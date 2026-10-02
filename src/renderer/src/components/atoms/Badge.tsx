@@ -10,7 +10,7 @@ export function Badge({ color, className, children }: BadgeProps): React.JSX.Ele
   return (
     <span
       className={twMerge(
-        'inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground',
+        'inline-flex max-w-full items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-0.5 text-xs font-medium',
         className
       )}
       style={

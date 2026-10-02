@@ -74,6 +74,9 @@
     "projectPlaceholder": "Choose a project",
     "activityLabel": "Activity",
     "createActivity": "Create “{name}”",
+    "tagsLabel": "Tags",
+    "tagsDescription": "Tags belong to the activity and apply to all of its entries.",
+    "tagsPlaceholder": "No tags",
     "modeLabel": "Time input",
     "modeRange": "Start and end",
     "modeDuration": "Duration",
@@ -123,6 +126,9 @@
     "deleteConfirmText": "The tag is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel"
+  },
+  "TagBadges": {
+    "more": "{count, plural, one {# more tag} other {# more tags}}"
   },
   "TagDialog": {
     "createTitle": "New tag",

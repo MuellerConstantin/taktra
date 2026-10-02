@@ -74,6 +74,9 @@
     "projectPlaceholder": "Projekt auswählen",
     "activityLabel": "Activity",
     "createActivity": "„{name}“ anlegen",
+    "tagsLabel": "Tags",
+    "tagsDescription": "Tags gehören zur Activity und gelten für alle ihre Einträge.",
+    "tagsPlaceholder": "Keine Tags",
     "modeLabel": "Zeitangabe",
     "modeRange": "Beginn und Ende",
     "modeDuration": "Dauer",
@@ -123,6 +126,9 @@
     "deleteConfirmText": "Der Tag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen"
+  },
+  "TagBadges": {
+    "more": "{count, plural, one {# weiterer Tag} other {# weitere Tags}}"
   },
   "TagDialog": {
     "createTitle": "Neuer Tag",

@@ -1,9 +1,9 @@
-import { and, eq, isNull, sql } from 'drizzle-orm'
-import type { Activity, ActivityInput } from '../shared/activities'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
+import type { Activity, ActivityInput, ActivityTag, ActivityWithTags } from '../shared/activities'
 import { AppError } from '../shared/errors'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
-import { activities, timeEntries } from './db/schema'
+import { activities, activityTags, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
 import { findProject } from './projects'
 
@@ -24,11 +24,34 @@ export function findActivity(id: number): Activity {
   return activity
 }
 
+export function tagsByActivity(activityIds: readonly number[]): Map<number, ActivityTag[]> {
+  const result = new Map<number, ActivityTag[]>()
+  if (activityIds.length === 0) return result
+
+  const rows = getActiveDatabase()
+    .select({
+      activityId: activityTags.activityId,
+      id: tags.id,
+      name: tags.name,
+      color: tags.color
+    })
+    .from(activityTags)
+    .innerJoin(tags, eq(activityTags.tagId, tags.id))
+    .where(inArray(activityTags.activityId, [...activityIds]))
+    .orderBy(sql`lower(${tags.name})`)
+    .all()
+
+  for (const { activityId, ...tag } of rows) {
+    result.set(activityId, [...(result.get(activityId) ?? []), tag])
+  }
+  return result
+}
+
 export function listActivities({
   projectId,
   includeArchived = false
-}: ListOptions = {}): Activity[] {
-  return getActiveDatabase()
+}: ListOptions = {}): ActivityWithTags[] {
+  const rows = getActiveDatabase()
     .select()
     .from(activities)
     .where(
@@ -39,6 +62,12 @@ export function listActivities({
     )
     .orderBy(sql`lower(${activities.name})`)
     .all()
+
+  const tagMap = tagsByActivity(rows.map((activity) => activity.id))
+  return rows.map((activity) => ({
+    ...activity,
+    tagIds: (tagMap.get(activity.id) ?? []).map((tag) => tag.id)
+  }))
 }
 
 export function createActivity(input: ActivityInput): Activity {
@@ -83,6 +112,26 @@ export function setActivityArchived(id: number, archived: boolean): Activity {
     .get()
 }
 
+export function setActivityTags(id: number, tagIds: readonly number[]): void {
+  findActivity(id)
+  const uniqueIds = [...new Set(tagIds)]
+  if (!uniqueIds.every(Number.isInteger))
+    throw new AppError('VALIDATION_FAILED', `Invalid tag ids: ${tagIds}`)
+
+  const db = getActiveDatabase()
+  db.transaction((tx) => {
+    if (uniqueIds.length > 0) {
+      const found = tx.select({ id: tags.id }).from(tags).where(inArray(tags.id, uniqueIds)).all()
+      if (found.length !== uniqueIds.length) throw new AppError('TAG_NOT_FOUND', String(tagIds))
+    }
+    tx.delete(activityTags).where(eq(activityTags.activityId, id)).run()
+    if (uniqueIds.length > 0)
+      tx.insert(activityTags)
+        .values(uniqueIds.map((tagId) => ({ activityId: id, tagId })))
+        .run()
+  })
+}
+
 export function deleteActivity(id: number): void {
   findActivity(id)
 
@@ -104,6 +153,9 @@ export function initActivities(): void {
   handle('activities:rename', (_, id: number, name: string) => renameActivity(id, name))
   handle('activities:setArchived', (_, id: number, archived: boolean) =>
     setActivityArchived(id, archived)
+  )
+  handle('activities:setTags', (_, id: number, tagIds: readonly number[]) =>
+    setActivityTags(id, tagIds)
   )
   handle('activities:delete', (_, id: number) => deleteActivity(id))
 }

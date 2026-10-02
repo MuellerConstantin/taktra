@@ -6,7 +6,7 @@ import type {
   TimeEntryInput,
   TimeEntryRange
 } from '../shared/timeEntries'
-import { findActivity } from './activities'
+import { findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
@@ -91,7 +91,7 @@ export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[
   assertLocalDate(from)
   assertLocalDate(to)
 
-  return getActiveDatabase()
+  const rows = getActiveDatabase()
     .select({
       entry: timeEntries,
       activity: { id: activities.id, name: activities.name },
@@ -103,6 +103,9 @@ export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[
     .where(and(gte(timeEntries.date, from), lte(timeEntries.date, to)))
     .orderBy(asc(timeEntries.date), asc(timeEntries.startedAt), asc(timeEntries.createdAt))
     .all()
+
+  const tagMap = tagsByActivity([...new Set(rows.map((row) => row.activity.id))])
+  return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
 }
 
 export function createTimeEntry(input: TimeEntryInput): TimeEntry {

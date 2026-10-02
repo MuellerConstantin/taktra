@@ -29,6 +29,13 @@
       "when": 1790959990934,
       "tag": "0003_add_activities_and_time_entries",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790969487662,
+      "tag": "0004_add_activity_tags",
+      "breakpoints": true
     }
   ]
 }

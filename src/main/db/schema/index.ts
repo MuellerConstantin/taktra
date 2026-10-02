@@ -1,4 +1,5 @@
 export * from './activities'
+export * from './activityTags'
 export * from './properties'
 export * from './projects'
 export * from './tags'

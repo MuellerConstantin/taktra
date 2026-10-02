@@ -9,8 +9,9 @@ import {
 import { useEffect, useState } from 'react'
 import { Form, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Activity } from '../../../../shared/activities'
+import type { ActivityWithTags } from '../../../../shared/activities'
 import type { Project } from '../../../../shared/projects'
+import type { Tag } from '../../../../shared/tags'
 import type { TimeEntryDetails, TimeEntryTimes } from '../../../../shared/timeEntries'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -56,8 +57,10 @@ export function TimeEntryDialog({
   const errorMessage = useErrorMessage()
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [projectId, setProjectId] = useState(details?.project.id ?? null)
-  const [activities, setActivities] = useState<readonly Activity[]>([])
+  const [activities, setActivities] = useState<readonly ActivityWithTags[]>([])
   const [activityName, setActivityName] = useState(details?.activity.name ?? '')
+  const [tags, setTags] = useState<readonly Tag[]>([])
+  const [chosenTagIds, setChosenTagIds] = useState<readonly number[] | null>(null)
   const [mode, setMode] = useState<Mode>(details && !details.entry.startedAt ? 'duration' : 'range')
   const [start, setStart] = useState(() => toLocalTime(details?.entry.startedAt ?? null))
   const [end, setEnd] = useState(() => toLocalTime(details?.entry.endedAt ?? null))
@@ -70,9 +73,11 @@ export function TimeEntryDialog({
   const { contains } = useFilter({ sensitivity: 'base' })
 
   useEffect(() => {
-    api.projects
-      .list()
-      .then(setProjects)
+    Promise.all([api.projects.list(), api.tags.list()])
+      .then(([projectList, tagList]) => {
+        setProjects(projectList)
+        setTags(tagList)
+      })
       .catch((caught) => setError(errorMessage(caught)))
   }, [errorMessage])
 
@@ -92,6 +97,7 @@ export function TimeEntryDialog({
   const existingActivity = activities.find(
     (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
   )
+  const tagIds = chosenTagIds ?? existingActivity?.tagIds ?? []
   const matchingActivities = activities.filter((activity) => contains(activity.name, trimmedName))
   const activityOptions: readonly ActivityOption[] =
     trimmedName && !existingActivity
@@ -102,6 +108,7 @@ export function TimeEntryDialog({
     setProjectId(typeof key === 'number' ? key : null)
     setActivities([])
     setActivityName('')
+    setChosenTagIds(null)
   }
 
   const toTimes = (): TimeEntryTimes | null => {
@@ -138,7 +145,8 @@ export function TimeEntryDialog({
     try {
       const activity =
         existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
-      if (!existingActivity) setActivities((current) => [...current, activity])
+      if (!existingActivity) setActivities((current) => [...current, { ...activity, tagIds: [] }])
+      if (chosenTagIds !== null) await api.activities.setTags(activity.id, chosenTagIds)
       const input = { activityId: activity.id, date: date.toString(), note, ...times }
       if (details) await api.timeEntries.update(details.entry.id, input)
       else await api.timeEntries.create(input)
@@ -182,6 +190,7 @@ export function TimeEntryDialog({
               items={activityOptions}
               inputValue={activityName}
               onInputChange={setActivityName}
+              onSelectionChange={(key) => typeof key === 'number' && setChosenTagIds(null)}
               allowsCustomValue
               allowsEmptyCollection
               isRequired
@@ -193,6 +202,29 @@ export function TimeEntryDialog({
                 </ComboBoxItem>
               )}
             </ComboBox>
+            <Select
+              label={t('tagsLabel')}
+              description={t('tagsDescription')}
+              placeholder={t('tagsPlaceholder')}
+              selectionMode="multiple"
+              items={tags}
+              value={[...tagIds]}
+              onChange={(keys) =>
+                setChosenTagIds(keys.filter((key): key is number => typeof key === 'number'))
+              }
+              isDisabled={!trimmedName}
+            >
+              {(tag) => (
+                <SelectItem id={tag.id} textValue={tag.name}>
+                  <span
+                    aria-hidden
+                    className="size-2.5 shrink-0 rounded-full bg-muted"
+                    style={tag.color ? { backgroundColor: tag.color } : undefined}
+                  />
+                  {tag.name}
+                </SelectItem>
+              )}
+            </Select>
             <ToggleButtonGroup
               aria-label={t('modeLabel')}
               selectionMode="single"

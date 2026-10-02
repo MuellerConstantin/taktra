@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Activity, ActivityInput } from '../shared/activities'
+import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
@@ -49,11 +49,13 @@ const api = {
   },
   activities: {
     list: (options?: { projectId?: number; includeArchived?: boolean }) =>
-      invoke<Activity[]>('activities:list', options),
+      invoke<ActivityWithTags[]>('activities:list', options),
     create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
     rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
     setArchived: (id: number, archived: boolean) =>
       invoke<Activity>('activities:setArchived', id, archived),
+    setTags: (id: number, tagIds: readonly number[]) =>
+      invoke<void>('activities:setTags', id, tagIds),
     delete: (id: number) => invoke<void>('activities:delete', id)
   },
   timeEntries: {

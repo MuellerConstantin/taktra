@@ -17,6 +17,7 @@ import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { DayNavigator } from '../components/molecules/DayNavigator'
+import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -124,7 +125,7 @@ function TrackingView(): React.JSX.Element {
           }
         >
           {(details) => {
-            const { entry, activity, project } = details
+            const { entry, activity, project, tags } = details
             return (
               <GridListItem
                 id={entry.id}
@@ -133,7 +134,7 @@ function TrackingView(): React.JSX.Element {
               >
                 <span
                   aria-hidden
-                  className="size-3 shrink-0 rounded-full bg-muted"
+                  className="mt-4 size-3 shrink-0 self-start rounded-full bg-muted"
                   style={project.color ? { backgroundColor: project.color } : undefined}
                 />
                 <div className="flex min-w-0 flex-1 flex-col py-3">
@@ -144,6 +145,7 @@ function TrackingView(): React.JSX.Element {
                   {entry.note && (
                     <span className="truncate text-xs text-muted-foreground">{entry.note}</span>
                   )}
+                  {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                 </div>
                 {entry.startedAt && entry.endedAt && (
                   <span className="text-muted-foreground tabular-nums">
