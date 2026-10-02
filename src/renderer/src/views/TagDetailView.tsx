@@ -15,11 +15,13 @@ import {
 import { ActivityDialog } from '../components/molecules/ActivityDialog'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TagDialog } from '../components/molecules/TagDialog'
+import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { api } from '../lib/api'
 import { suggestColor } from '../lib/colors'
 import { formatDuration } from '../lib/duration'
+import { allTime, periodFilter, type Period } from '../lib/period'
 
 interface ProjectGroup {
   readonly project: NonNullable<AggregateRow['project']>
@@ -52,6 +54,8 @@ function TagDetailView(): React.JSX.Element {
   const [reloadCount, setReloadCount] = useState(0)
   const [isTagDialogOpen, setTagDialogOpen] = useState(false)
   const [activityToEdit, setActivityToEdit] = useState<ActivityRef | null>(null)
+  const [period, setPeriod] = useState<Period>(allTime)
+  const { from, to } = periodFilter(period)
 
   const reload = (): void => setReloadCount((count) => count + 1)
   const groups = groupByProject(rows ?? [])
@@ -61,7 +65,7 @@ function TagDetailView(): React.JSX.Element {
     let isCurrent = true
     Promise.all([
       api.tags.get(tagId),
-      api.reports.aggregate({ tagIds: [tagId] }, ['project', 'activity'])
+      api.reports.aggregate({ tagIds: [tagId], from, to }, ['project', 'activity'])
     ])
       .then(([loadedTag, loadedRows]) => {
         if (!isCurrent) return
@@ -73,7 +77,7 @@ function TagDetailView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [tagId, reloadCount, errorMessage])
+  }, [tagId, from, to, reloadCount, errorMessage])
 
   if (error) return <p className="p-8 text-sm text-destructive">{error}</p>
   if (!tag || !rows) return <div />
@@ -99,15 +103,18 @@ function TagDetailView(): React.JSX.Element {
           </Button>
         }
       >
-        <div className="flex items-center justify-end pb-4">
+        <div className="flex items-center justify-end gap-4 pb-4">
           <span className="text-sm text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}
           </span>
+          <PeriodPicker value={period} onChange={setPeriod} />
         </div>
       </ViewHeader>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {groups.length === 0 && (
-          <p className="p-8 text-center text-sm text-muted-foreground">{t('empty')}</p>
+          <p className="p-8 text-center text-sm text-muted-foreground">
+            {period.range ? t('emptyPeriod') : t('empty')}
+          </p>
         )}
         <DisclosureGroup allowsMultipleExpanded>
           {groups.map(({ project, totalSec, rows: projectRows }) => (

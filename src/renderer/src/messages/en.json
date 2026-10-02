@@ -69,6 +69,19 @@
     "choose": "Choose day",
     "today": "Today"
   },
+  "PeriodPicker": {
+    "label": "Period",
+    "range": "Custom period",
+    "presets": {
+      "all": "All time",
+      "thisWeek": "This week",
+      "lastWeek": "Last week",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "custom": "Custom"
+    }
+  },
   "TimeEntryDialog": {
     "title": "New entry",
     "editTitle": "Edit entry",
@@ -120,6 +133,7 @@
     "total": "Total {duration}",
     "activities": "Activities",
     "empty": "No activities yet. Activities are created when you track time.",
+    "emptyPeriod": "No time tracked in this period.",
     "entryCount": "{count, plural, one {# entry} other {# entries}}",
     "editActivity": "Edit {name}"
   },
@@ -159,6 +173,7 @@
     "edit": "Edit",
     "total": "Total {duration}",
     "empty": "No time has been tracked on activities with this tag yet.",
+    "emptyPeriod": "No time tracked on activities with this tag in this period.",
     "activityCount": "{count, plural, one {# activity} other {# activities}}",
     "entryCount": "{count, plural, one {# entry} other {# entries}}",
     "editActivity": "Edit {name}"

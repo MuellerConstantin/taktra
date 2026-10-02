@@ -10,11 +10,13 @@ import { GridList, GridListItem } from '../components/atoms/GridList'
 import { ActivityDialog } from '../components/molecules/ActivityDialog'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { TagBadges } from '../components/molecules/TagBadges'
+import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { api } from '../lib/api'
 import { suggestColor } from '../lib/colors'
 import { formatDuration } from '../lib/duration'
+import { allTime, periodFilter, type Period } from '../lib/period'
 
 function ProjectDetailView(): React.JSX.Element {
   const t = useTranslations('ProjectDetailView')
@@ -27,6 +29,8 @@ function ProjectDetailView(): React.JSX.Element {
   const [reloadCount, setReloadCount] = useState(0)
   const [isProjectDialogOpen, setProjectDialogOpen] = useState(false)
   const [activityToEdit, setActivityToEdit] = useState<ActivityRef | null>(null)
+  const [period, setPeriod] = useState<Period>(allTime)
+  const { from, to } = periodFilter(period)
 
   const reload = (): void => setReloadCount((count) => count + 1)
   const total = (rows ?? []).reduce((sum, row) => sum + row.totalSec, 0)
@@ -38,7 +42,7 @@ function ProjectDetailView(): React.JSX.Element {
     let isCurrent = true
     Promise.all([
       api.projects.get(projectId),
-      api.reports.aggregate({ projectIds: [projectId] }, ['activity'])
+      api.reports.aggregate({ projectIds: [projectId], from, to }, ['activity'])
     ])
       .then(([loadedProject, loadedRows]) => {
         if (!isCurrent) return
@@ -50,7 +54,7 @@ function ProjectDetailView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [projectId, reloadCount, errorMessage])
+  }, [projectId, from, to, reloadCount, errorMessage])
 
   const toggleArchived = async (): Promise<void> => {
     if (!project) return
@@ -106,9 +110,12 @@ function ProjectDetailView(): React.JSX.Element {
             )}
             <span className="truncate">{project.description}</span>
           </div>
-          <span className="shrink-0 text-sm text-muted-foreground">
-            {t('total', { duration: formatDuration(total) })}
-          </span>
+          <div className="flex shrink-0 items-center gap-4">
+            <span className="text-sm text-muted-foreground">
+              {t('total', { duration: formatDuration(total) })}
+            </span>
+            <PeriodPicker value={period} onChange={setPeriod} />
+          </div>
         </div>
       </ViewHeader>
       {actionError && <p className="px-8 pt-4 text-sm text-destructive">{actionError}</p>}
@@ -118,7 +125,9 @@ function ProjectDetailView(): React.JSX.Element {
         className="min-h-0 flex-1"
         renderEmptyState={() =>
           activities.length === 0 && (
-            <p className="p-8 text-center text-sm text-muted-foreground">{t('empty')}</p>
+            <p className="p-8 text-center text-sm text-muted-foreground">
+              {period.range ? t('emptyPeriod') : t('empty')}
+            </p>
           )
         }
       >

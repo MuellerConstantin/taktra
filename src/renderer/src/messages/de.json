@@ -69,6 +69,19 @@
     "choose": "Tag auswählen",
     "today": "Heute"
   },
+  "PeriodPicker": {
+    "label": "Zeitraum",
+    "range": "Benutzerdefinierter Zeitraum",
+    "presets": {
+      "all": "Gesamt",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche",
+      "thisMonth": "Dieser Monat",
+      "lastMonth": "Letzter Monat",
+      "thisYear": "Dieses Jahr",
+      "custom": "Benutzerdefiniert"
+    }
+  },
   "TimeEntryDialog": {
     "title": "Neuer Eintrag",
     "editTitle": "Eintrag bearbeiten",
@@ -120,6 +133,7 @@
     "total": "Gesamt {duration}",
     "activities": "Activities",
     "empty": "Noch keine Activities. Activities entstehen beim Erfassen von Zeit.",
+    "emptyPeriod": "In diesem Zeitraum wurde keine Zeit erfasst.",
     "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
     "editActivity": "{name} bearbeiten"
   },
@@ -159,6 +173,7 @@
     "edit": "Bearbeiten",
     "total": "Gesamt {duration}",
     "empty": "Auf Activities mit diesem Tag wurde noch keine Zeit erfasst.",
+    "emptyPeriod": "In diesem Zeitraum wurde auf Activities mit diesem Tag keine Zeit erfasst.",
     "activityCount": "{count, plural, one {# Activity} other {# Activities}}",
     "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
     "editActivity": "{name} bearbeiten"
