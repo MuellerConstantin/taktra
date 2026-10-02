@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { activities } from './activities'
@@ -6,6 +7,10 @@ export const timeEntries = sqliteTable(
   'time_entries',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    uid: text()
+      .notNull()
+      .unique()
+      .$defaultFn(() => randomUUID()),
     activityId: integer()
       .notNull()
       .references(() => activities.id, { onDelete: 'restrict' }),

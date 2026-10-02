@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
@@ -86,6 +87,7 @@ export function createProfile(name: string, path: string): ProfilesState {
   try {
     const db = openProfileDatabase(path, { create: true })
     try {
+      writeProperty(db, 'uid', randomUUID())
       writeProperty(db, 'name', trimmedName)
     } finally {
       db.$client.close()

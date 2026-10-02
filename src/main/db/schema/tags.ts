@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
@@ -5,6 +6,10 @@ export const tags = sqliteTable(
   'tags',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    uid: text()
+      .notNull()
+      .unique()
+      .$defaultFn(() => randomUUID()),
     name: text().notNull(),
     color: text(),
     createdAt: integer({ mode: 'timestamp_ms' })
