@@ -12,6 +12,7 @@ import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
+import { suggestProjectColor } from '../lib/projectColors'
 
 function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
@@ -75,6 +76,11 @@ function ProjectsView(): React.JSX.Element {
           >
             {(project) => (
               <GridListItem textValue={project.name}>
+                <span
+                  aria-hidden
+                  className="size-3 shrink-0 rounded-full bg-muted"
+                  style={project.color ? { backgroundColor: project.color } : undefined}
+                />
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="truncate font-medium">{project.name}</span>
                   {project.description && (
@@ -98,6 +104,7 @@ function ProjectsView(): React.JSX.Element {
       <CreateProjectDialog
         isOpen={isCreateOpen}
         onOpenChange={setCreateOpen}
+        defaultColor={suggestProjectColor(projects)}
         onCreated={() => setReloadCount((count) => count + 1)}
       />
       <Modal

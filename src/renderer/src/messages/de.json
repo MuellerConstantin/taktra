@@ -66,6 +66,7 @@
     "nameLabel": "Name",
     "nameRequired": "Bitte einen Namen eingeben.",
     "descriptionLabel": "Beschreibung",
+    "colorLabel": "Farbe",
     "cancel": "Abbrechen",
     "create": "Anlegen"
   },

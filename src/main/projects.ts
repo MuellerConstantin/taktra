@@ -5,6 +5,8 @@ import { getActiveDatabase } from './db/database'
 import { projects } from './db/schema'
 import { handle } from './ipc'
 
+const HEX_COLOR = /^#[0-9a-f]{6}$/
+
 interface ListOptions {
   readonly includeArchived?: boolean
 }
@@ -24,10 +26,14 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
   if (input.name !== undefined && !name)
     throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
 
+  const color = optional(input.color?.toLowerCase())
+  if (color && !HEX_COLOR.test(color))
+    throw new AppError('VALIDATION_FAILED', `Invalid project color: ${color}`)
+
   return {
     name,
     description: optional(input.description),
-    color: optional(input.color)
+    color
   }
 }
 
