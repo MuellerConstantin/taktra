@@ -1,12 +1,13 @@
 import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
-import { ListLayout, Virtualizer } from 'react-aria-components'
+import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
+import { SearchField } from '../components/atoms/SearchField'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -24,6 +25,12 @@ function ProjectsView(): React.JSX.Element {
   const [reloadCount, setReloadCount] = useState(0)
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const { contains } = useFilter({ sensitivity: 'base' })
+
+  const visibleProjects = projects.filter(
+    (project) => contains(project.name, query) || contains(project.description ?? '', query)
+  )
 
   useEffect(() => {
     let isCurrent = true
@@ -55,10 +62,19 @@ function ProjectsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         actions={
-          <Button onPress={() => setDialog({})}>
-            <RiAddLine className="size-4" />
-            {t('create')}
-          </Button>
+          <>
+            <SearchField
+              aria-label={t('search')}
+              placeholder={t('search')}
+              value={query}
+              onChange={setQuery}
+              className="w-64"
+            />
+            <Button onPress={() => setDialog({})}>
+              <RiAddLine className="size-4" />
+              {t('create')}
+            </Button>
+          </>
         }
       />
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
@@ -68,10 +84,12 @@ function ProjectsView(): React.JSX.Element {
         <Virtualizer layout={ListLayout} layoutOptions={{ rowSize: 56 }}>
           <GridList
             aria-label={t('title')}
-            items={projects}
+            items={visibleProjects}
             className="min-h-0 flex-1"
             renderEmptyState={() => (
-              <p className="p-8 text-center text-sm text-muted-foreground">{t('empty')}</p>
+              <p className="p-8 text-center text-sm text-muted-foreground">
+                {query ? t('noMatches') : t('empty')}
+              </p>
             )}
           >
             {(project) => (

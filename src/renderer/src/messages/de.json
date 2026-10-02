@@ -55,6 +55,8 @@
     "title": "Projekte",
     "create": "Neues Projekt",
     "empty": "Noch keine Projekte.",
+    "noMatches": "Keine passenden Projekte.",
+    "search": "Projekte durchsuchen",
     "edit": "{name} bearbeiten",
     "delete": "{name} löschen",
     "deleteConfirmTitle": "„{name}“ löschen?",

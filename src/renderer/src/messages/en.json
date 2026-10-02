@@ -55,6 +55,8 @@
     "title": "Projects",
     "create": "New project",
     "empty": "No projects yet.",
+    "noMatches": "No matching projects.",
+    "search": "Search projects",
     "edit": "Edit {name}",
     "delete": "Delete {name}",
     "deleteConfirmTitle": "Delete “{name}”?",
