@@ -103,6 +103,7 @@ export function deleteProject(id: number): void {
 
 export function initProjects(): void {
   handle('projects:list', (_, options?: ListOptions) => listProjects(options))
+  handle('projects:get', (_, id: number) => findProject(id))
   handle('projects:create', (_, input: ProjectInput) => createProject(input))
   handle('projects:update', (_, id: number, patch: Partial<ProjectInput>) =>
     updateProject(id, patch)

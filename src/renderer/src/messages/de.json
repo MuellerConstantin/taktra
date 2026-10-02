@@ -74,10 +74,6 @@
     "projectPlaceholder": "Projekt auswählen",
     "activityLabel": "Activity",
     "createActivity": "„{name}“ anlegen",
-    "tagsLabel": "Tags",
-    "tagsDescription": "Tags gehören zur Activity und gelten für alle ihre Einträge.",
-    "tagsPlaceholder": "Tags suchen",
-    "selectedTags": "Ausgewählte Tags",
     "modeLabel": "Zeitangabe",
     "modeRange": "Beginn und Ende",
     "modeDuration": "Dauer",
@@ -92,6 +88,12 @@
     "create": "Anlegen",
     "save": "Speichern"
   },
+  "TagPicker": {
+    "label": "Tags",
+    "description": "Tags gehören zur Activity und gelten für alle ihre Einträge.",
+    "placeholder": "Tags suchen",
+    "selected": "Ausgewählte Tags"
+  },
   "ProjectsView": {
     "title": "Projekte",
     "create": "Neues Projekt",
@@ -103,7 +105,28 @@
     "deleteConfirmTitle": "„{name}“ löschen?",
     "deleteConfirmText": "Das Projekt wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "showArchived": "Archivierte",
+    "archived": "Archiviert"
+  },
+  "ProjectDetailView": {
+    "subtitle": "Projekt",
+    "edit": "Bearbeiten",
+    "archive": "Archivieren",
+    "unarchive": "Wiederherstellen",
+    "archived": "Archiviert",
+    "total": "Gesamt {duration}",
+    "activities": "Activities",
+    "empty": "Noch keine Activities. Activities entstehen beim Erfassen von Zeit.",
+    "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
+    "editActivity": "{name} bearbeiten"
+  },
+  "ActivityDialog": {
+    "title": "Activity bearbeiten",
+    "nameLabel": "Name",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
   },
   "ProjectDialog": {
     "createTitle": "Neues Projekt",

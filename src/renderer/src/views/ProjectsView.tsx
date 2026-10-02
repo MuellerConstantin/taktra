@@ -1,5 +1,6 @@
-import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
+import { RiAddLine, RiArchiveLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
@@ -8,6 +9,7 @@ import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
+import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -19,6 +21,8 @@ function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
   const errorMessage = useErrorMessage()
   const { activeProfile } = useProfiles()
+  const navigate = useNavigate()
+  const [showArchived, setShowArchived] = useState(false)
   const [projects, setProjects] = useState<readonly Project[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dialog, setDialog] = useState<{ readonly project?: Project } | null>(null)
@@ -35,7 +39,7 @@ function ProjectsView(): React.JSX.Element {
   useEffect(() => {
     let isCurrent = true
     api.projects
-      .list()
+      .list({ includeArchived: showArchived })
       .then((result) => {
         if (!isCurrent) return
         setProjects(result)
@@ -45,7 +49,7 @@ function ProjectsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, reloadCount, errorMessage])
+  }, [activeProfile?.path, showArchived, reloadCount, errorMessage])
 
   const handleDelete = async (project: Project): Promise<void> => {
     setDeleteError(null)
@@ -62,21 +66,26 @@ function ProjectsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         actions={
-          <>
-            <SearchField
-              aria-label={t('search')}
-              placeholder={t('search')}
-              value={query}
-              onChange={setQuery}
-              className="w-64"
-            />
-            <Button onPress={() => setDialog({})}>
-              <RiAddLine className="size-4" />
-              {t('create')}
-            </Button>
-          </>
+          <Button onPress={() => setDialog({})}>
+            <RiAddLine className="size-4" />
+            {t('create')}
+          </Button>
         }
-      />
+      >
+        <div className="flex items-center gap-2 pb-4">
+          <SearchField
+            aria-label={t('search')}
+            placeholder={t('search')}
+            value={query}
+            onChange={setQuery}
+            className="w-64"
+          />
+          <ToggleButton isSelected={showArchived} onChange={setShowArchived}>
+            <RiArchiveLine className="size-4" />
+            {t('showArchived')}
+          </ToggleButton>
+        </div>
+      </ViewHeader>
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
       {error && <p className="p-8 text-sm text-destructive">{error}</p>}
       {!error && projects && (
@@ -84,6 +93,7 @@ function ProjectsView(): React.JSX.Element {
           <GridList
             aria-label={t('title')}
             items={visibleProjects}
+            onAction={(key) => navigate(`/projects/${key}`)}
             className="min-h-0 flex-1"
             renderEmptyState={() =>
               visibleProjects.length === 0 && (
@@ -101,7 +111,14 @@ function ProjectsView(): React.JSX.Element {
                   style={project.color ? { backgroundColor: project.color } : undefined}
                 />
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-medium">{project.name}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="truncate font-medium">{project.name}</span>
+                    {project.archivedAt && (
+                      <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                        {t('archived')}
+                      </span>
+                    )}
+                  </span>
                   {project.description && (
                     <span className="truncate text-xs text-muted-foreground">
                       {project.description}

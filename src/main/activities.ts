@@ -1,5 +1,11 @@
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
-import type { Activity, ActivityInput, ActivityTag, ActivityWithTags } from '../shared/activities'
+import { and, count, eq, inArray, isNull, sql } from 'drizzle-orm'
+import type {
+  Activity,
+  ActivityInput,
+  ActivitySummary,
+  ActivityTag,
+  ActivityWithTags
+} from '../shared/activities'
 import { AppError } from '../shared/errors'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
@@ -67,6 +73,31 @@ export function listActivities({
   return rows.map((activity) => ({
     ...activity,
     tagIds: (tagMap.get(activity.id) ?? []).map((tag) => tag.id)
+  }))
+}
+
+export function summarizeActivities(projectId: number): ActivitySummary[] {
+  findProject(projectId)
+
+  const rows = getActiveDatabase()
+    .select({
+      activity: activities,
+      totalSec: sql<number>`coalesce(sum(${timeEntries.durationSec}), 0)`,
+      entryCount: count(timeEntries.id)
+    })
+    .from(activities)
+    .leftJoin(timeEntries, eq(timeEntries.activityId, activities.id))
+    .where(eq(activities.projectId, projectId))
+    .groupBy(activities.id)
+    .orderBy(sql`lower(${activities.name})`)
+    .all()
+
+  const tagMap = tagsByActivity(rows.map(({ activity }) => activity.id))
+  return rows.map(({ activity, totalSec, entryCount }) => ({
+    ...activity,
+    tags: tagMap.get(activity.id) ?? [],
+    totalSec,
+    entryCount
   }))
 }
 
@@ -153,6 +184,7 @@ export function deleteActivity(id: number): void {
 
 export function initActivities(): void {
   handle('activities:list', (_, options?: ListOptions) => listActivities(options))
+  handle('activities:summarize', (_, projectId: number) => summarizeActivities(projectId))
   handle('activities:create', (_, input: ActivityInput) => createActivity(input))
   handle('activities:rename', (_, id: number, name: string) => renameActivity(id, name))
   handle('activities:setArchived', (_, id: number, archived: boolean) =>

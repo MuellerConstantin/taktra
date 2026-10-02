@@ -74,10 +74,6 @@
     "projectPlaceholder": "Choose a project",
     "activityLabel": "Activity",
     "createActivity": "Create “{name}”",
-    "tagsLabel": "Tags",
-    "tagsDescription": "Tags belong to the activity and apply to all of its entries.",
-    "tagsPlaceholder": "Search tags",
-    "selectedTags": "Selected tags",
     "modeLabel": "Time input",
     "modeRange": "Start and end",
     "modeDuration": "Duration",
@@ -92,6 +88,12 @@
     "create": "Create",
     "save": "Save"
   },
+  "TagPicker": {
+    "label": "Tags",
+    "description": "Tags belong to the activity and apply to all of its entries.",
+    "placeholder": "Search tags",
+    "selected": "Selected tags"
+  },
   "ProjectsView": {
     "title": "Projects",
     "create": "New project",
@@ -103,7 +105,28 @@
     "deleteConfirmTitle": "Delete “{name}”?",
     "deleteConfirmText": "The project is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "showArchived": "Archived",
+    "archived": "Archived"
+  },
+  "ProjectDetailView": {
+    "subtitle": "Project",
+    "edit": "Edit",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "archived": "Archived",
+    "total": "Total {duration}",
+    "activities": "Activities",
+    "empty": "No activities yet. Activities are created when you track time.",
+    "entryCount": "{count, plural, one {# entry} other {# entries}}",
+    "editActivity": "Edit {name}"
+  },
+  "ActivityDialog": {
+    "title": "Edit activity",
+    "nameLabel": "Name",
+    "nameRequired": "Please enter a name.",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "ProjectDialog": {
     "createTitle": "New project",

@@ -1,5 +1,5 @@
 interface ViewHeaderProps {
-  readonly title: string
+  readonly title: React.ReactNode
   readonly subtitle?: string
   readonly actions?: React.ReactNode
   readonly children?: React.ReactNode

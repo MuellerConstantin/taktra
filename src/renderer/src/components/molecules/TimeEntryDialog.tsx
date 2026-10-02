@@ -21,11 +21,11 @@ import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
-import { Tag as TagItem, TagGroup } from '../atoms/TagGroup'
 import { TextField } from '../atoms/TextField'
 import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { ToggleButtonGroup } from '../atoms/ToggleButtonGroup'
+import { TagPicker } from './TagPicker'
 
 type Mode = 'range' | 'duration'
 
@@ -98,7 +98,6 @@ export function TimeEntryDialog({
     (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
   )
   const tagIds = chosenTagIds ?? existingActivity?.tagIds ?? []
-  const selectedTags = tags.filter((tag) => tagIds.includes(tag.id))
   const matchingActivities = activities.filter((activity) => contains(activity.name, trimmedName))
   const activityOptions: readonly ActivityOption[] =
     trimmedName && !existingActivity
@@ -199,46 +198,12 @@ export function TimeEntryDialog({
                 </ComboBoxItem>
               )}
             </ComboBox>
-            <div className="flex flex-col gap-2">
-              <ComboBox
-                label={t('tagsLabel')}
-                description={t('tagsDescription')}
-                placeholder={t('tagsPlaceholder')}
-                selectionMode="multiple"
-                defaultItems={tags}
-                value={[...tagIds]}
-                onChange={(keys) =>
-                  setChosenTagIds(keys.filter((key): key is number => typeof key === 'number'))
-                }
-                isDisabled={!trimmedName}
-              >
-                {(tag) => (
-                  <ComboBoxItem id={tag.id} textValue={tag.name}>
-                    <span
-                      aria-hidden
-                      className="size-2.5 shrink-0 rounded-full bg-muted"
-                      style={tag.color ? { backgroundColor: tag.color } : undefined}
-                    />
-                    {tag.name}
-                  </ComboBoxItem>
-                )}
-              </ComboBox>
-              {selectedTags.length > 0 && (
-                <TagGroup
-                  aria-label={t('selectedTags')}
-                  items={selectedTags}
-                  onRemove={(keys) => setChosenTagIds(tagIds.filter((id) => !keys.has(id)))}
-                  className="rounded-lg border border-input p-2"
-                  listClassName="max-h-[calc(3*1.375rem+2*0.25rem)] overflow-y-auto"
-                >
-                  {(tag) => (
-                    <TagItem id={tag.id} color={tag.color}>
-                      {tag.name}
-                    </TagItem>
-                  )}
-                </TagGroup>
-              )}
-            </div>
+            <TagPicker
+              tags={tags}
+              value={tagIds}
+              onChange={setChosenTagIds}
+              isDisabled={!trimmedName}
+            />
             <ToggleButtonGroup
               aria-label={t('modeLabel')}
               selectionMode="single"

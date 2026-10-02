@@ -1,5 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
+import type {
+  Activity,
+  ActivityInput,
+  ActivitySummary,
+  ActivityWithTags
+} from '../shared/activities'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
@@ -34,6 +39,7 @@ const api = {
   },
   projects: {
     list: (options?: { includeArchived?: boolean }) => invoke<Project[]>('projects:list', options),
+    get: (id: number) => invoke<Project>('projects:get', id),
     create: (input: ProjectInput) => invoke<Project>('projects:create', input),
     update: (id: number, patch: Partial<ProjectInput>) =>
       invoke<Project>('projects:update', id, patch),
@@ -50,6 +56,7 @@ const api = {
   activities: {
     list: (options?: { projectId?: number; includeArchived?: boolean }) =>
       invoke<ActivityWithTags[]>('activities:list', options),
+    summarize: (projectId: number) => invoke<ActivitySummary[]>('activities:summarize', projectId),
     create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
     rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
     setArchived: (id: number, archived: boolean) =>
