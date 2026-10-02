@@ -13,10 +13,7 @@
     "profiles": "Profiles",
     "profileSettings": "Profile settings…",
     "newProfile": "New profile…",
-    "openProfile": "Open profile…",
-    "invalidTitle": "Not a Taktra profile",
-    "invalidText": "The selected file could not be opened as a Taktra profile.",
-    "ok": "OK"
+    "openProfile": "Open profile…"
   },
   "CreateProfileDialog": {
     "title": "New profile",
@@ -28,6 +25,18 @@
     "createFailed": "The profile could not be created. Maybe a file already exists at this location.",
     "cancel": "Cancel",
     "create": "Create"
+  },
+  "InvalidProfileAlert": {
+    "title": "Not a Taktra profile",
+    "text": "The selected file could not be opened as a Taktra profile.",
+    "ok": "OK"
+  },
+  "WelcomeView": {
+    "title": "Welcome to Taktra",
+    "text": "Create a profile to start tracking your time, or open an existing profile file.",
+    "missingText": "The file of the selected profile could not be found. Create a new profile, open a profile file, or choose another profile in the sidebar.",
+    "create": "Create profile",
+    "open": "Open profile"
   },
   "TrackingView": {
     "title": "Tracking",
@@ -67,8 +76,7 @@
   },
   "ProfileSettingsView": {
     "title": "Profile settings",
-    "general": "General",
-    "noProfile": "No profile selected."
+    "general": "General"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",

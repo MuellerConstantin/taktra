@@ -4,11 +4,10 @@ import { Button } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../shared/profiles'
 import { useProfiles } from '../../hooks/useProfiles'
-import { AlertDialog } from '../atoms/AlertDialog'
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atoms/Menu'
-import { Modal } from '../atoms/Modal'
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
+import { InvalidProfileAlert } from './InvalidProfileAlert'
 
 function fileName(path: string): string {
   return path.split(/[\\/]/).pop() ?? path
@@ -91,11 +90,7 @@ export function ProfileSwitcher(): React.JSX.Element {
         </Menu>
       </MenuTrigger>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
-      <Modal isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} isDismissable>
-        <AlertDialog variant="destructive" title={t('invalidTitle')} actionLabel={t('ok')}>
-          {t('invalidText')}
-        </AlertDialog>
-      </Modal>
+      <InvalidProfileAlert isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} />
     </>
   )
 }

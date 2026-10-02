@@ -13,10 +13,7 @@
     "profiles": "Profile",
     "profileSettings": "Profileinstellungen…",
     "newProfile": "Neues Profil…",
-    "openProfile": "Profil öffnen…",
-    "invalidTitle": "Kein Taktra-Profil",
-    "invalidText": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
-    "ok": "OK"
+    "openProfile": "Profil öffnen…"
   },
   "CreateProfileDialog": {
     "title": "Neues Profil",
@@ -28,6 +25,18 @@
     "createFailed": "Das Profil konnte nicht angelegt werden. Eventuell existiert an diesem Ort bereits eine Datei.",
     "cancel": "Abbrechen",
     "create": "Anlegen"
+  },
+  "InvalidProfileAlert": {
+    "title": "Kein Taktra-Profil",
+    "text": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
+    "ok": "OK"
+  },
+  "WelcomeView": {
+    "title": "Willkommen bei Taktra",
+    "text": "Lege ein Profil an, um deine Zeiten zu erfassen, oder öffne eine vorhandene Profildatei.",
+    "missingText": "Die Datei des ausgewählten Profils wurde nicht gefunden. Lege ein neues Profil an, öffne eine Profildatei oder wähle in der Sidebar ein anderes Profil.",
+    "create": "Profil anlegen",
+    "open": "Profil öffnen"
   },
   "TrackingView": {
     "title": "Erfassung",
@@ -67,8 +76,7 @@
   },
   "ProfileSettingsView": {
     "title": "Profileinstellungen",
-    "general": "Allgemein",
-    "noProfile": "Kein Profil ausgewählt."
+    "general": "Allgemein"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",

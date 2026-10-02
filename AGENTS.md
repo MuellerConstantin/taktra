@@ -101,7 +101,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │               ├── atoms/            # Styled react-aria wrappers (Button, Field, Menu, Select, …), utils.ts and shared tv styles in styles.ts
 │               ├── molecules/        # Composed components (ViewHeader, ProfileSwitcher, CreateProfileDialog, …)
 │               ├── organisms/        # Full sections (Sidebar)
-│               └── templates/        # Layouts (AppTemplate: sidebar + outlet, TabViewTemplate: header + tabs + outlet)
+│               └── templates/        # Layouts (AppTemplate, ProfileTemplate, TabViewTemplate)
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
 ├── electron.vite.config.ts
@@ -159,6 +159,11 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   macOS, `~/.config/taktra` on Linux) and generated file names avoid anything
   invalid on any of the three systems. Only packaging is configured for Windows
   so far.
+- **No active profile is a first-class state**: On first start (and whenever the
+  active profile's file is missing) there is no usable profile. All
+  profile-dependent routes sit below `ProfileTemplate`, which renders the
+  `WelcomeView` (create or open a profile) instead of the route. The matching
+  sidebar entries are disabled. App settings stay reachable without a profile.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk. React Router therefore uses a
   hash router. react-aria's `RouterProvider` is wired to React Router in
