@@ -19,7 +19,7 @@ function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
   const errorMessage = useErrorMessage()
   const { activeProfile } = useProfiles()
-  const [projects, setProjects] = useState<readonly Project[]>([])
+  const [projects, setProjects] = useState<readonly Project[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dialog, setDialog] = useState<{ readonly project?: Project } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
@@ -28,7 +28,7 @@ function ProjectsView(): React.JSX.Element {
   const [query, setQuery] = useState('')
   const { contains } = useFilter({ sensitivity: 'base' })
 
-  const visibleProjects = projects.filter(
+  const visibleProjects = (projects ?? []).filter(
     (project) => contains(project.name, query) || contains(project.description ?? '', query)
   )
 
@@ -78,19 +78,20 @@ function ProjectsView(): React.JSX.Element {
         }
       />
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
-      {error ? (
-        <p className="p-8 text-sm text-destructive">{error}</p>
-      ) : (
+      {error && <p className="p-8 text-sm text-destructive">{error}</p>}
+      {!error && projects && (
         <Virtualizer layout={ListLayout} layoutOptions={{ rowSize: 56 }}>
           <GridList
             aria-label={t('title')}
             items={visibleProjects}
             className="min-h-0 flex-1"
-            renderEmptyState={() => (
-              <p className="p-8 text-center text-sm text-muted-foreground">
-                {query ? t('noMatches') : t('empty')}
-              </p>
-            )}
+            renderEmptyState={() =>
+              visibleProjects.length === 0 && (
+                <p className="p-8 text-center text-sm text-muted-foreground">
+                  {query ? t('noMatches') : t('empty')}
+                </p>
+              )
+            }
           >
             {(project) => (
               <GridListItem textValue={project.name}>
@@ -129,7 +130,7 @@ function ProjectsView(): React.JSX.Element {
       {dialog && (
         <ProjectDialog
           project={dialog.project}
-          defaultColor={suggestProjectColor(projects)}
+          defaultColor={suggestProjectColor(projects ?? [])}
           onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}
         />
