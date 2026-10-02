@@ -5,6 +5,7 @@ export interface ProfilesContextValue {
   readonly profiles: readonly ProfileSummary[]
   readonly activeProfile: ProfileSummary | null
   readonly createProfile: (name: string, path: string) => Promise<void>
+  readonly createSampleProfile: () => Promise<void>
   readonly setActiveProfile: (path: string) => Promise<void>
   readonly renameProfile: (path: string, name: string) => Promise<void>
   readonly deleteProfile: (path: string) => Promise<void>

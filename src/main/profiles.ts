@@ -13,8 +13,10 @@ import {
   openProfileDatabase,
   readProperty,
   withProfileDatabase,
-  writeProperty
+  writeProperty,
+  type ProfileDatabase
 } from './db/database'
+import { SAMPLE_PROFILE_NAME, seedSampleData } from './db/sample'
 import { handle } from './ipc'
 
 interface KnownProfiles {
@@ -77,7 +79,11 @@ export function getProfilesState(): ProfilesState {
   return { profiles, activePath }
 }
 
-export function createProfile(name: string, path: string): ProfilesState {
+export function createProfile(
+  name: string,
+  path: string,
+  populate?: (db: ProfileDatabase) => void
+): ProfilesState {
   const trimmedName = name.trim()
   if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
   if (existsSync(path)) throw new AppError('PROFILE_FILE_EXISTS', path)
@@ -87,8 +93,11 @@ export function createProfile(name: string, path: string): ProfilesState {
   try {
     const db = openProfileDatabase(path, { create: true })
     try {
-      writeProperty(db, 'uid', randomUUID())
-      writeProperty(db, 'name', trimmedName)
+      db.transaction(() => {
+        writeProperty(db, 'uid', randomUUID())
+        writeProperty(db, 'name', trimmedName)
+        populate?.(db)
+      })
     } finally {
       db.$client.close()
     }
@@ -101,6 +110,10 @@ export function createProfile(name: string, path: string): ProfilesState {
   updateKnownProfiles([...paths, path], path)
 
   return getProfilesState()
+}
+
+export function createSampleProfile(): ProfilesState {
+  return createProfile(SAMPLE_PROFILE_NAME, getDefaultProfilePath(SAMPLE_PROFILE_NAME), seedSampleData)
 }
 
 export function renameProfile(path: string, name: string): ProfilesState {
@@ -214,6 +227,7 @@ export function initProfiles(): void {
 
   handle('profiles:get', () => getProfilesState())
   handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
+  handle('profiles:createSample', () => createSampleProfile())
   handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
   handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
   handle('profiles:delete', (_, path: string) => deleteProfile(path))

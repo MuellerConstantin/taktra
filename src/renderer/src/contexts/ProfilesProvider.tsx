@@ -18,6 +18,10 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
     setState(await api.profiles.create(name, path))
   }, [])
 
+  const createSampleProfile = useCallback(async () => {
+    setState(await api.profiles.createSample())
+  }, [])
+
   const setActiveProfile = useCallback(async (path: string) => {
     setState(await api.profiles.setActive(path))
   }, [])
@@ -45,6 +49,7 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
         profiles: state.profiles,
         activeProfile: state.profiles.find((profile) => profile.path === state.activePath) ?? null,
         createProfile,
+        createSampleProfile,
         setActiveProfile,
         renameProfile,
         deleteProfile,
@@ -54,6 +59,7 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
     [
       state,
       createProfile,
+      createSampleProfile,
       setActiveProfile,
       renameProfile,
       deleteProfile,

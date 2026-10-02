@@ -44,6 +44,8 @@
     "missingText": "The file of the selected profile could not be found or opened. Create a new profile, open a profile file, or remove the profile from the list.",
     "create": "Create profile",
     "open": "Open profile",
+    "sampleText": "Just want to look around first?",
+    "sample": "Try sample profile",
     "removeFromList": "Remove from list",
     "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
   },

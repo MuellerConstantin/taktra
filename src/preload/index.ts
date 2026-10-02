@@ -25,6 +25,7 @@ const api = {
   profiles: {
     get: () => invoke<ProfilesState>('profiles:get'),
     create: (name: string, path: string) => invoke<ProfilesState>('profiles:create', name, path),
+    createSample: () => invoke<ProfilesState>('profiles:createSample'),
     setActive: (path: string) => invoke<ProfilesState>('profiles:setActive', path),
     rename: (path: string, name: string) => invoke<ProfilesState>('profiles:rename', path, name),
     delete: (path: string) => invoke<ProfilesState>('profiles:delete', path),

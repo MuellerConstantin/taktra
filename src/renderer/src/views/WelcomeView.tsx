@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RiAddLine, RiFolderOpenLine } from '@remixicon/react'
+import { RiAddLine, RiFolderOpenLine, RiSparklingLine } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
 import { Button } from '../components/atoms/Button'
 import { CreateProfileDialog } from '../components/molecules/CreateProfileDialog'
@@ -9,13 +9,13 @@ import logo from '../../../../resources/icon.svg'
 
 function WelcomeView(): React.JSX.Element {
   const t = useTranslations('WelcomeView')
-  const { activeProfile, openProfile, removeProfile } = useProfiles()
+  const { activeProfile, openProfile, createSampleProfile, removeProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [openError, setOpenError] = useState<unknown>(null)
 
-  const handleOpen = async (): Promise<void> => {
+  const handle = (action: () => Promise<void>) => async (): Promise<void> => {
     try {
-      await openProfile()
+      await action()
     } catch (error) {
       setOpenError(error)
     }
@@ -40,9 +40,16 @@ function WelcomeView(): React.JSX.Element {
             <RiAddLine aria-hidden className="size-4" />
             {t('create')}
           </Button>
-          <Button variant="secondary" onPress={handleOpen}>
+          <Button variant="secondary" onPress={handle(openProfile)}>
             <RiFolderOpenLine aria-hidden className="size-4" />
             {t('open')}
+          </Button>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-muted-foreground">{t('sampleText')}</p>
+          <Button variant="secondary" onPress={handle(createSampleProfile)}>
+            <RiSparklingLine aria-hidden className="size-4" />
+            {t('sample')}
           </Button>
         </div>
         {activeProfile && (

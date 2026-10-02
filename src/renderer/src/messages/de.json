@@ -44,6 +44,8 @@
     "missingText": "Die Datei des ausgewählten Profils wurde nicht gefunden oder lässt sich nicht öffnen. Lege ein neues Profil an, öffne eine Profildatei oder entferne das Profil aus der Liste.",
     "create": "Profil anlegen",
     "open": "Profil öffnen",
+    "sampleText": "Erst mal nur umschauen?",
+    "sample": "Beispielprofil ausprobieren",
     "removeFromList": "Aus Liste entfernen",
     "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste."
   },
