@@ -11,47 +11,38 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 
-interface CreateProjectDialogProps {
-  readonly isOpen: boolean
-  readonly onOpenChange: (isOpen: boolean) => void
+interface ProjectDialogProps {
+  /** The project to edit; without one, a new project is created. */
+  readonly project?: Project
   readonly defaultColor: string
-  readonly onCreated: (project: Project) => void
+  readonly onClose: () => void
+  readonly onSaved: (project: Project) => void
 }
 
-export function CreateProjectDialog({
-  isOpen,
-  onOpenChange,
+export function ProjectDialog({
+  project,
   defaultColor,
-  onCreated
-}: CreateProjectDialogProps): React.JSX.Element {
-  const t = useTranslations('CreateProjectDialog')
+  onClose,
+  onSaved
+}: ProjectDialogProps): React.JSX.Element {
+  const t = useTranslations('ProjectDialog')
   const errorMessage = useErrorMessage()
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [chosenColor, setChosenColor] = useState<string | null>(null)
+  const [name, setName] = useState(project?.name ?? '')
+  const [description, setDescription] = useState(project?.description ?? '')
+  const [color, setColor] = useState(project?.color ?? defaultColor)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
-
-  const color = chosenColor ?? defaultColor
-
-  const handleOpenChange = (open: boolean): void => {
-    if (!open) {
-      setName('')
-      setDescription('')
-      setChosenColor(null)
-      setError(null)
-    }
-    onOpenChange(open)
-  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     setPending(true)
     setError(null)
     try {
-      const project = await api.projects.create({ name, description, color })
-      onCreated(project)
-      handleOpenChange(false)
+      const input = { name, description, color }
+      onSaved(
+        project ? await api.projects.update(project.id, input) : await api.projects.create(input)
+      )
+      onClose()
     } catch (caught) {
       setError(errorMessage(caught))
     } finally {
@@ -60,11 +51,11 @@ export function CreateProjectDialog({
   }
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={handleOpenChange} isDismissable>
+    <Modal isOpen onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
       <Dialog>
         {({ close }) => (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <DialogHeading>{t('title')}</DialogHeading>
+            <DialogHeading>{project ? t('editTitle') : t('createTitle')}</DialogHeading>
             <TextField
               label={t('nameLabel')}
               value={name}
@@ -82,7 +73,7 @@ export function CreateProjectDialog({
               label={t('colorLabel')}
               colors={PROJECT_COLORS}
               value={color}
-              onChange={(value) => setChosenColor(value.toString('hex').toLowerCase())}
+              onChange={(value) => setColor(value.toString('hex').toLowerCase())}
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
@@ -90,7 +81,7 @@ export function CreateProjectDialog({
                 {t('cancel')}
               </Button>
               <Button type="submit" isDisabled={isPending}>
-                {t('create')}
+                {project ? t('save') : t('create')}
               </Button>
             </div>
           </Form>

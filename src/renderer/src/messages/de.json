@@ -55,20 +55,23 @@
     "title": "Projekte",
     "create": "Neues Projekt",
     "empty": "Noch keine Projekte.",
+    "edit": "{name} bearbeiten",
     "delete": "{name} löschen",
     "deleteConfirmTitle": "„{name}“ löschen?",
     "deleteConfirmText": "Das Projekt wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen"
   },
-  "CreateProjectDialog": {
-    "title": "Neues Projekt",
+  "ProjectDialog": {
+    "createTitle": "Neues Projekt",
+    "editTitle": "Projekt bearbeiten",
     "nameLabel": "Name",
     "nameRequired": "Bitte einen Namen eingeben.",
     "descriptionLabel": "Beschreibung",
     "colorLabel": "Farbe",
     "cancel": "Abbrechen",
-    "create": "Anlegen"
+    "create": "Anlegen",
+    "save": "Speichern"
   },
   "TagsView": {
     "title": "Tags",

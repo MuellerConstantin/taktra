@@ -1,4 +1,4 @@
-import { RiAddLine, RiDeleteBinLine } from '@remixicon/react'
+import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { ListLayout, Virtualizer } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
@@ -7,7 +7,7 @@ import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
-import { CreateProjectDialog } from '../components/molecules/CreateProjectDialog'
+import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useProfiles } from '../hooks/useProfiles'
@@ -20,7 +20,7 @@ function ProjectsView(): React.JSX.Element {
   const { activeProfile } = useProfiles()
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [isCreateOpen, setCreateOpen] = useState(false)
+  const [dialog, setDialog] = useState<{ readonly project?: Project } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -55,7 +55,7 @@ function ProjectsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         actions={
-          <Button onPress={() => setCreateOpen(true)}>
+          <Button onPress={() => setDialog({})}>
             <RiAddLine className="size-4" />
             {t('create')}
           </Button>
@@ -91,6 +91,13 @@ function ProjectsView(): React.JSX.Element {
                 </div>
                 <Button
                   variant="icon"
+                  aria-label={t('edit', { name: project.name })}
+                  onPress={() => setDialog({ project })}
+                >
+                  <RiPencilLine className="size-4" />
+                </Button>
+                <Button
+                  variant="icon"
                   aria-label={t('delete', { name: project.name })}
                   onPress={() => setProjectToDelete(project)}
                 >
@@ -101,12 +108,14 @@ function ProjectsView(): React.JSX.Element {
           </GridList>
         </Virtualizer>
       )}
-      <CreateProjectDialog
-        isOpen={isCreateOpen}
-        onOpenChange={setCreateOpen}
-        defaultColor={suggestProjectColor(projects)}
-        onCreated={() => setReloadCount((count) => count + 1)}
-      />
+      {dialog && (
+        <ProjectDialog
+          project={dialog.project}
+          defaultColor={suggestProjectColor(projects)}
+          onClose={() => setDialog(null)}
+          onSaved={() => setReloadCount((count) => count + 1)}
+        />
+      )}
       <Modal
         isOpen={projectToDelete !== null}
         onOpenChange={(isOpen) => !isOpen && setProjectToDelete(null)}
