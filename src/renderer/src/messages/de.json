@@ -51,11 +51,19 @@
     "title": "Heute",
     "create": "Neuer Eintrag",
     "total": "Gesamt {duration}",
-    "empty": "Heute noch nichts erfasst."
+    "empty": "Heute noch nichts erfasst.",
+    "edit": "Eintrag für {name} bearbeiten",
+    "delete": "Eintrag für {name} löschen",
+    "deleteConfirmTitle": "Eintrag für „{name}“ löschen?",
+    "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "deleteConfirmAction": "Löschen",
+    "cancel": "Abbrechen"
   },
   "TimeEntryDialog": {
     "title": "Neuer Eintrag",
+    "editTitle": "Eintrag bearbeiten",
     "projectLabel": "Projekt",
+    "projectPlaceholder": "Projekt auswählen",
     "activityLabel": "Activity",
     "createActivity": "„{name}“ anlegen",
     "modeLabel": "Zeitangabe",
@@ -68,7 +76,8 @@
     "endBeforeStart": "Das Ende muss nach dem Beginn liegen.",
     "durationRequired": "Bitte eine Dauer größer als null eingeben.",
     "cancel": "Abbrechen",
-    "create": "Anlegen"
+    "create": "Anlegen",
+    "save": "Speichern"
   },
   "ProjectsView": {
     "title": "Projekte",

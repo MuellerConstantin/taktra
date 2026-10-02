@@ -51,11 +51,19 @@
     "title": "Today",
     "create": "New entry",
     "total": "Total {duration}",
-    "empty": "Nothing tracked today yet."
+    "empty": "Nothing tracked today yet.",
+    "edit": "Edit entry for {name}",
+    "delete": "Delete entry for {name}",
+    "deleteConfirmTitle": "Delete entry for “{name}”?",
+    "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone.",
+    "deleteConfirmAction": "Delete",
+    "cancel": "Cancel"
   },
   "TimeEntryDialog": {
     "title": "New entry",
+    "editTitle": "Edit entry",
     "projectLabel": "Project",
+    "projectPlaceholder": "Choose a project",
     "activityLabel": "Activity",
     "createActivity": "Create “{name}”",
     "modeLabel": "Time input",
@@ -68,7 +76,8 @@
     "endBeforeStart": "The end must be after the start.",
     "durationRequired": "Please enter a duration longer than zero.",
     "cancel": "Cancel",
-    "create": "Create"
+    "create": "Create",
+    "save": "Save"
   },
   "ProjectsView": {
     "title": "Projects",

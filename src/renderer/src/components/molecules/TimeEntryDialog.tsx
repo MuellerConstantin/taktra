@@ -1,21 +1,24 @@
 import {
+  Time,
+  fromDate,
   getLocalTimeZone,
   toCalendarDateTime,
-  type CalendarDate,
-  type Time
+  toTime,
+  type CalendarDate
 } from '@internationalized/date'
 import { useEffect, useState } from 'react'
 import { Form, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Activity } from '../../../../shared/activities'
 import type { Project } from '../../../../shared/projects'
-import type { TimeEntryTimes } from '../../../../shared/timeEntries'
+import type { TimeEntryDetails, TimeEntryTimes } from '../../../../shared/timeEntries'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'
 import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
+import { Select, SelectItem } from '../atoms/Select'
 import { TextField } from '../atoms/TextField'
 import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
@@ -30,26 +33,38 @@ interface ActivityOption {
 
 interface TimeEntryDialogProps {
   readonly date: CalendarDate
+  readonly details?: TimeEntryDetails
   readonly onClose: () => void
   readonly onSaved: () => void
 }
 
+function toLocalTime(date: Date | null): Time | null {
+  return date ? toTime(fromDate(date, getLocalTimeZone())) : null
+}
+
+function toDurationTime(seconds: number | null): Time | null {
+  return seconds ? new Time(Math.floor(seconds / 3600), Math.floor((seconds % 3600) / 60)) : null
+}
+
 export function TimeEntryDialog({
   date,
+  details,
   onClose,
   onSaved
 }: TimeEntryDialogProps): React.JSX.Element {
   const t = useTranslations('TimeEntryDialog')
   const errorMessage = useErrorMessage()
   const [projects, setProjects] = useState<readonly Project[]>([])
-  const [projectId, setProjectId] = useState<number | null>(null)
+  const [projectId, setProjectId] = useState(details?.project.id ?? null)
   const [activities, setActivities] = useState<readonly Activity[]>([])
-  const [activityName, setActivityName] = useState('')
-  const [mode, setMode] = useState<Mode>('range')
-  const [start, setStart] = useState<Time | null>(null)
-  const [end, setEnd] = useState<Time | null>(null)
-  const [duration, setDuration] = useState<Time | null>(null)
-  const [note, setNote] = useState('')
+  const [activityName, setActivityName] = useState(details?.activity.name ?? '')
+  const [mode, setMode] = useState<Mode>(details && !details.entry.startedAt ? 'duration' : 'range')
+  const [start, setStart] = useState(() => toLocalTime(details?.entry.startedAt ?? null))
+  const [end, setEnd] = useState(() => toLocalTime(details?.entry.endedAt ?? null))
+  const [duration, setDuration] = useState(() =>
+    details?.entry.startedAt ? null : toDurationTime(details?.entry.durationSec ?? null)
+  )
+  const [note, setNote] = useState(details?.entry.note ?? '')
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
   const { contains } = useFilter({ sensitivity: 'base' })
@@ -124,12 +139,9 @@ export function TimeEntryDialog({
       const activity =
         existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
       if (!existingActivity) setActivities((current) => [...current, activity])
-      await api.timeEntries.create({
-        activityId: activity.id,
-        date: date.toString(),
-        note,
-        ...times
-      })
+      const input = { activityId: activity.id, date: date.toString(), note, ...times }
+      if (details) await api.timeEntries.update(details.entry.id, input)
+      else await api.timeEntries.create(input)
       onSaved()
       onClose()
     } catch (caught) {
@@ -144,26 +156,27 @@ export function TimeEntryDialog({
       <Dialog>
         {({ close }) => (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <DialogHeading>{t('title')}</DialogHeading>
-            <ComboBox
+            <DialogHeading>{details ? t('editTitle') : t('title')}</DialogHeading>
+            <Select
               label={t('projectLabel')}
+              placeholder={t('projectPlaceholder')}
               items={projects}
-              selectedKey={projectId}
-              onSelectionChange={handleProjectChange}
+              value={projectId}
+              onChange={handleProjectChange}
               isRequired
               autoFocus
             >
               {(project) => (
-                <ComboBoxItem id={project.id} textValue={project.name}>
+                <SelectItem id={project.id} textValue={project.name}>
                   <span
                     aria-hidden
                     className="size-2.5 shrink-0 rounded-full bg-muted"
                     style={project.color ? { backgroundColor: project.color } : undefined}
                   />
                   {project.name}
-                </ComboBoxItem>
+                </SelectItem>
               )}
-            </ComboBox>
+            </Select>
             <ComboBox
               label={t('activityLabel')}
               items={activityOptions}
@@ -230,7 +243,7 @@ export function TimeEntryDialog({
                 {t('cancel')}
               </Button>
               <Button type="submit" isDisabled={isPending}>
-                {t('create')}
+                {details ? t('save') : t('create')}
               </Button>
             </div>
           </Form>

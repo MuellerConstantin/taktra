@@ -1,11 +1,13 @@
 import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
-import { RiAddLine } from '@remixicon/react'
+import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { TimeEntryDetails } from '../../../shared/timeEntries'
+import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Modal } from '../components/atoms/Modal'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -21,8 +23,10 @@ function TrackingView(): React.JSX.Element {
   const [date] = useState(() => today(getLocalTimeZone()))
   const [entries, setEntries] = useState<readonly TimeEntryDetails[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [dialog, setDialog] = useState<{ readonly details?: TimeEntryDetails } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
+  const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const dayFormatter = new DateFormatter(locale, { dateStyle: 'full' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
@@ -43,6 +47,16 @@ function TrackingView(): React.JSX.Element {
     }
   }, [activeProfile?.path, date, reloadCount, errorMessage])
 
+  const handleDelete = async (entryId: number): Promise<void> => {
+    setDeleteError(null)
+    try {
+      await api.timeEntries.delete(entryId)
+    } catch (caught) {
+      setDeleteError(errorMessage(caught))
+    }
+    setReloadCount((count) => count + 1)
+  }
+
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
@@ -53,13 +67,14 @@ function TrackingView(): React.JSX.Element {
             <span className="text-sm text-muted-foreground">
               {t('total', { duration: formatDuration(total) })}
             </span>
-            <Button onPress={() => setDialogOpen(true)}>
+            <Button onPress={() => setDialog({})}>
               <RiAddLine className="size-4" />
               {t('create')}
             </Button>
           </>
         }
       />
+      {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
       {error && <p className="p-8 text-sm text-destructive">{error}</p>}
       {!error && entries && (
         <GridList
@@ -72,45 +87,80 @@ function TrackingView(): React.JSX.Element {
             )
           }
         >
-          {({ entry, activity, project }) => (
-            <GridListItem
-              id={entry.id}
-              textValue={`${activity.name} ${project.name}`}
-              className="h-auto"
-            >
-              <span
-                aria-hidden
-                className="size-3 shrink-0 rounded-full bg-muted"
-                style={project.color ? { backgroundColor: project.color } : undefined}
-              />
-              <div className="flex min-w-0 flex-1 flex-col py-3">
-                <span className="truncate">
-                  <span className="font-medium">{activity.name}</span>
-                  <span className="text-muted-foreground"> · {project.name}</span>
-                </span>
-                {entry.note && (
-                  <span className="truncate text-xs text-muted-foreground">{entry.note}</span>
+          {(details) => {
+            const { entry, activity, project } = details
+            return (
+              <GridListItem
+                id={entry.id}
+                textValue={`${activity.name} ${project.name}`}
+                className="h-auto"
+              >
+                <span
+                  aria-hidden
+                  className="size-3 shrink-0 rounded-full bg-muted"
+                  style={project.color ? { backgroundColor: project.color } : undefined}
+                />
+                <div className="flex min-w-0 flex-1 flex-col py-3">
+                  <span className="truncate">
+                    <span className="font-medium">{activity.name}</span>
+                    <span className="text-muted-foreground"> · {project.name}</span>
+                  </span>
+                  {entry.note && (
+                    <span className="truncate text-xs text-muted-foreground">{entry.note}</span>
+                  )}
+                </div>
+                {entry.startedAt && entry.endedAt && (
+                  <span className="text-muted-foreground tabular-nums">
+                    {timeFormatter.formatRange(entry.startedAt, entry.endedAt)}
+                  </span>
                 )}
-              </div>
-              {entry.startedAt && entry.endedAt && (
-                <span className="text-muted-foreground tabular-nums">
-                  {timeFormatter.formatRange(entry.startedAt, entry.endedAt)}
+                <span className="w-14 text-right font-medium tabular-nums">
+                  {formatDuration(entry.durationSec ?? 0)}
                 </span>
-              )}
-              <span className="w-14 text-right font-medium tabular-nums">
-                {formatDuration(entry.durationSec ?? 0)}
-              </span>
-            </GridListItem>
-          )}
+                <Button
+                  variant="icon"
+                  aria-label={t('edit', { name: activity.name })}
+                  onPress={() => setDialog({ details })}
+                >
+                  <RiPencilLine className="size-4" />
+                </Button>
+                <Button
+                  variant="icon"
+                  aria-label={t('delete', { name: activity.name })}
+                  onPress={() => setEntryToDelete(details)}
+                >
+                  <RiDeleteBinLine className="size-4" />
+                </Button>
+              </GridListItem>
+            )
+          }}
         </GridList>
       )}
-      {isDialogOpen && (
+      {dialog && (
         <TimeEntryDialog
           date={date}
-          onClose={() => setDialogOpen(false)}
+          details={dialog.details}
+          onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}
         />
       )}
+      <Modal
+        isOpen={entryToDelete !== null}
+        onOpenChange={(isOpen) => !isOpen && setEntryToDelete(null)}
+        isDismissable
+      >
+        {entryToDelete && (
+          <AlertDialog
+            variant="destructive"
+            title={t('deleteConfirmTitle', { name: entryToDelete.activity.name })}
+            actionLabel={t('deleteConfirmAction')}
+            cancelLabel={t('cancel')}
+            onAction={() => handleDelete(entryToDelete.entry.id)}
+          >
+            {t('deleteConfirmText')}
+          </AlertDialog>
+        )}
+      </Modal>
     </div>
   )
 }
