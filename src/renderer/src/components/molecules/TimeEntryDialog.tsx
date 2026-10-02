@@ -1,9 +1,9 @@
 import {
-  Time,
   fromDate,
   getLocalTimeZone,
   toCalendarDateTime,
   toTime,
+  type Time,
   type CalendarDate
 } from '@internationalized/date'
 import { useEffect, useState } from 'react'
@@ -15,6 +15,7 @@ import type { Tag } from '../../../../shared/tags'
 import type { TimeEntryDetails, TimeEntryTimes } from '../../../../shared/timeEntries'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
+import { formatDuration, parseDuration } from '../../lib/duration'
 import { Button } from '../atoms/Button'
 import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
@@ -43,10 +44,6 @@ function toLocalTime(date: Date | null): Time | null {
   return date ? toTime(fromDate(date, getLocalTimeZone())) : null
 }
 
-function toDurationTime(seconds: number | null): Time | null {
-  return seconds ? new Time(Math.floor(seconds / 3600), Math.floor((seconds % 3600) / 60)) : null
-}
-
 export function TimeEntryDialog({
   date,
   details,
@@ -65,7 +62,9 @@ export function TimeEntryDialog({
   const [start, setStart] = useState(() => toLocalTime(details?.entry.startedAt ?? null))
   const [end, setEnd] = useState(() => toLocalTime(details?.entry.endedAt ?? null))
   const [duration, setDuration] = useState(() =>
-    details?.entry.startedAt ? null : toDurationTime(details?.entry.durationSec ?? null)
+    details && !details.entry.startedAt && details.entry.durationSec
+      ? formatDuration(details.entry.durationSec)
+      : ''
   )
   const [note, setNote] = useState(details?.entry.note ?? '')
   const [error, setError] = useState<string | null>(null)
@@ -113,12 +112,8 @@ export function TimeEntryDialog({
 
   const toTimes = (): TimeEntryTimes | null => {
     if (mode === 'duration') {
-      const seconds = duration ? duration.hour * 3600 + duration.minute * 60 : 0
-      if (seconds <= 0) {
-        setError(t('durationRequired'))
-        return null
-      }
-      return { durationSec: seconds }
+      const seconds = parseDuration(duration)
+      return seconds === null ? null : { durationSec: seconds }
     }
 
     if (!start || !end) return null
@@ -260,12 +255,13 @@ export function TimeEntryDialog({
                 />
               </div>
             ) : (
-              <TimeField
+              <TextField
                 label={t('durationLabel')}
+                description={t('durationDescription')}
                 value={duration}
                 onChange={setDuration}
-                hourCycle={24}
                 isRequired
+                validate={(value) => (parseDuration(value) === null ? t('durationInvalid') : null)}
               />
             )}
             <TextField label={t('noteLabel')} value={note} onChange={setNote} />
