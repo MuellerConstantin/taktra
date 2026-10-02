@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ProfilesState } from '../../../shared/profiles'
+import { api } from '../lib/api'
 import { ProfilesContext } from './ProfilesContext'
 
 interface ProfilesProviderProps {
@@ -10,33 +11,32 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
   const [state, setState] = useState<ProfilesState | null>(null)
 
   useEffect(() => {
-    window.api.profiles.get().then(setState)
+    api.profiles.get().then(setState)
   }, [])
 
   const createProfile = useCallback(async (name: string, path: string) => {
-    setState(await window.api.profiles.create(name, path))
+    setState(await api.profiles.create(name, path))
   }, [])
 
   const setActiveProfile = useCallback(async (path: string) => {
-    setState(await window.api.profiles.setActive(path))
+    setState(await api.profiles.setActive(path))
   }, [])
 
   const renameProfile = useCallback(async (path: string, name: string) => {
-    setState(await window.api.profiles.rename(path, name))
+    setState(await api.profiles.rename(path, name))
   }, [])
 
   const deleteProfile = useCallback(async (path: string) => {
-    setState(await window.api.profiles.delete(path))
+    setState(await api.profiles.delete(path))
   }, [])
 
   const removeProfile = useCallback(async (path: string) => {
-    setState(await window.api.profiles.remove(path))
+    setState(await api.profiles.remove(path))
   }, [])
 
   const openProfile = useCallback(async () => {
-    const result = await window.api.profiles.open()
-    if (result.status === 'opened') setState(result.state)
-    return result.status
+    const result = await api.profiles.open()
+    if (result) setState(result)
   }, [])
 
   const value = useMemo(

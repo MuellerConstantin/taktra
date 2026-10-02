@@ -8,6 +8,3 @@ export interface ProjectInput {
   readonly description?: string | null
   readonly color?: string | null
 }
-
-export type ProjectResult =
-  { readonly status: 'ok'; readonly project: Project } | { readonly status: 'nameTaken' }

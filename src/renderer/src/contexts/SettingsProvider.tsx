@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Settings } from '../../../shared/settings'
+import { api } from '../lib/api'
 import { SettingsContext } from './SettingsContext'
 
 interface SettingsProviderProps {
@@ -10,11 +11,11 @@ function SettingsProvider({ children }: SettingsProviderProps): React.JSX.Elemen
   const [settings, setSettings] = useState<Settings | null>(null)
 
   useEffect(() => {
-    window.api.settings.get().then(setSettings)
+    api.settings.get().then(setSettings)
   }, [])
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
-    setSettings(await window.api.settings.update(patch))
+    setSettings(await api.settings.update(patch))
   }, [])
 
   const value = useMemo(

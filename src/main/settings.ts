@@ -1,6 +1,8 @@
-import { ipcMain, nativeTheme } from 'electron'
+import { nativeTheme } from 'electron'
 import Store from 'electron-store'
+import { AppError } from '../shared/errors'
 import { languages, themeSources, type Settings } from '../shared/settings'
+import { handle } from './ipc'
 
 const store = new Store<Settings>({
   name: 'settings',
@@ -20,13 +22,17 @@ export function getSettings(): Settings {
 }
 
 export function updateSettings(patch: Partial<Settings>): Settings {
-  store.set({ ...store.store, ...patch })
+  try {
+    store.set({ ...store.store, ...patch })
+  } catch (error) {
+    throw new AppError('VALIDATION_FAILED', String(error))
+  }
   applyTheme()
   return store.store
 }
 
 export function initSettings(): void {
   applyTheme()
-  ipcMain.handle('settings:get', () => getSettings())
-  ipcMain.handle('settings:update', (_, patch: Partial<Settings>) => updateSettings(patch))
+  handle('settings:get', () => getSettings())
+  handle('settings:update', (_, patch: Partial<Settings>) => updateSettings(patch))
 }

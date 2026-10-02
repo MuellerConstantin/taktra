@@ -1,40 +1,37 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { OpenProfileResult, ProfilesState } from '../shared/profiles'
-import type { Project, ProjectInput, ProjectResult } from '../shared/projects'
+import type { IpcResponse } from '../shared/errors'
+import type { ProfilesState } from '../shared/profiles'
+import type { Project, ProjectInput } from '../shared/projects'
 import type { Settings } from '../shared/settings'
+
+function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
+  return ipcRenderer.invoke(channel, ...args)
+}
 
 const api = {
   settings: {
-    get: (): Promise<Settings> => ipcRenderer.invoke('settings:get'),
-    update: (patch: Partial<Settings>): Promise<Settings> =>
-      ipcRenderer.invoke('settings:update', patch)
+    get: () => invoke<Settings>('settings:get'),
+    update: (patch: Partial<Settings>) => invoke<Settings>('settings:update', patch)
   },
   profiles: {
-    get: (): Promise<ProfilesState> => ipcRenderer.invoke('profiles:get'),
-    create: (name: string, path: string): Promise<ProfilesState> =>
-      ipcRenderer.invoke('profiles:create', name, path),
-    setActive: (path: string): Promise<ProfilesState> =>
-      ipcRenderer.invoke('profiles:setActive', path),
-    rename: (path: string, name: string): Promise<ProfilesState> =>
-      ipcRenderer.invoke('profiles:rename', path, name),
-    delete: (path: string): Promise<ProfilesState> => ipcRenderer.invoke('profiles:delete', path),
-    remove: (path: string): Promise<ProfilesState> => ipcRenderer.invoke('profiles:remove', path),
-    open: (): Promise<OpenProfileResult> => ipcRenderer.invoke('profiles:open'),
-    defaultPath: (name: string): Promise<string> =>
-      ipcRenderer.invoke('profiles:defaultPath', name),
-    choosePath: (defaultPath: string): Promise<string | null> =>
-      ipcRenderer.invoke('profiles:choosePath', defaultPath)
+    get: () => invoke<ProfilesState>('profiles:get'),
+    create: (name: string, path: string) => invoke<ProfilesState>('profiles:create', name, path),
+    setActive: (path: string) => invoke<ProfilesState>('profiles:setActive', path),
+    rename: (path: string, name: string) => invoke<ProfilesState>('profiles:rename', path, name),
+    delete: (path: string) => invoke<ProfilesState>('profiles:delete', path),
+    remove: (path: string) => invoke<ProfilesState>('profiles:remove', path),
+    open: () => invoke<ProfilesState | null>('profiles:open'),
+    defaultPath: (name: string) => invoke<string>('profiles:defaultPath', name),
+    choosePath: (defaultPath: string) => invoke<string | null>('profiles:choosePath', defaultPath)
   },
   projects: {
-    list: (options?: { includeArchived?: boolean }): Promise<Project[]> =>
-      ipcRenderer.invoke('projects:list', options),
-    create: (input: ProjectInput): Promise<ProjectResult> =>
-      ipcRenderer.invoke('projects:create', input),
-    update: (id: number, patch: Partial<ProjectInput>): Promise<ProjectResult> =>
-      ipcRenderer.invoke('projects:update', id, patch),
-    setArchived: (id: number, archived: boolean): Promise<Project> =>
-      ipcRenderer.invoke('projects:setArchived', id, archived),
-    delete: (id: number): Promise<void> => ipcRenderer.invoke('projects:delete', id)
+    list: (options?: { includeArchived?: boolean }) => invoke<Project[]>('projects:list', options),
+    create: (input: ProjectInput) => invoke<Project>('projects:create', input),
+    update: (id: number, patch: Partial<ProjectInput>) =>
+      invoke<Project>('projects:update', id, patch),
+    setArchived: (id: number, archived: boolean) =>
+      invoke<Project>('projects:setArchived', id, archived),
+    delete: (id: number) => invoke<void>('projects:delete', id)
   }
 }
 

@@ -5,18 +5,12 @@ import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
 import { readMigrationFiles } from 'drizzle-orm/migrator'
 import { app } from 'electron'
+import { AppError } from '../../shared/errors'
 import { APPLICATION_ID } from '../constants'
 import * as schema from './schema'
 
 export type ProfileDatabase = BetterSQLite3Database<typeof schema> & {
   $client: Database.Database
-}
-
-export class NewerProfileVersionError extends Error {
-  constructor(path: string) {
-    super(`Profile was created by a newer version of Taktra: ${path}`)
-    this.name = 'NewerProfileVersionError'
-  }
 }
 
 interface OpenOptions {
@@ -51,7 +45,7 @@ function assertKnownSchema(client: Database.Database, path: string): void {
     .get() as { latest: number | null }
 
   if (latest !== null && latest > getLatestKnownMigration()) {
-    throw new NewerProfileVersionError(path)
+    throw new AppError('PROFILE_NEWER_VERSION', path)
   }
 }
 
@@ -65,7 +59,7 @@ export function openProfileDatabase(path: string, options: OpenOptions = {}): Pr
     if (options.create) {
       client.pragma(`application_id = ${APPLICATION_ID}`)
     } else if (client.pragma('application_id', { simple: true }) !== APPLICATION_ID) {
-      throw new Error(`Not a Taktra profile: ${path}`)
+      throw new AppError('PROFILE_INVALID', path)
     }
 
     assertKnownSchema(client, path)
@@ -96,7 +90,7 @@ export function writeProperty(db: ProfileDatabase, key: string, value: string): 
 let active: { readonly path: string; readonly db: ProfileDatabase } | null = null
 
 export function getActiveDatabase(): ProfileDatabase {
-  if (!active) throw new Error('No active profile database')
+  if (!active) throw new AppError('NO_ACTIVE_PROFILE')
   return active.db
 }
 

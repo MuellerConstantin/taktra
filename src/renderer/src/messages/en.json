@@ -23,16 +23,12 @@
     "nameRequired": "Please enter a name.",
     "locationLabel": "Location",
     "changeLocation": "Change…",
-    "createFailed": "The profile could not be created. Maybe a file already exists at this location.",
     "cancel": "Cancel",
     "create": "Create"
   },
-  "InvalidProfileAlert": {
-    "title": "Not a Taktra profile",
-    "text": "The selected file could not be opened as a Taktra profile.",
-    "ok": "OK",
-    "newerVersionTitle": "Profile from a newer version",
-    "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra to open it."
+  "OpenProfileErrorAlert": {
+    "title": "Profile could not be opened",
+    "ok": "OK"
   },
   "UnavailableProfileDialog": {
     "title": "Profile unavailable",
@@ -95,8 +91,7 @@
     "nameLabel": "Name",
     "nameDescription": "Stored in the profile file. Renaming does not change the file name.",
     "nameRequired": "Please enter a name.",
-    "save": "Save",
-    "renameFailed": "The profile could not be renamed."
+    "save": "Save"
   },
   "DeleteProfileSection": {
     "title": "Delete profile",
@@ -105,7 +100,18 @@
     "confirmTitle": "Delete “{name}”?",
     "confirmText": "The profile file will be moved to the trash. You can restore it from there as long as the trash has not been emptied.",
     "confirmAction": "Delete",
-    "cancel": "Cancel",
-    "deleteFailed": "The profile could not be deleted."
+    "cancel": "Cancel"
+  },
+  "Errors": {
+    "NO_ACTIVE_PROFILE": "No profile is open.",
+    "PROFILE_NOT_FOUND": "This profile is not known to Taktra.",
+    "PROFILE_UNAVAILABLE": "The profile file could not be found or opened.",
+    "PROFILE_FILE_EXISTS": "A file already exists at this location.",
+    "PROFILE_INVALID": "The file is not a valid Taktra profile.",
+    "PROFILE_NEWER_VERSION": "The profile was created or updated by a newer version of Taktra. Update Taktra to open it.",
+    "PROJECT_NOT_FOUND": "The project no longer exists.",
+    "PROJECT_NAME_TAKEN": "A project with this name already exists.",
+    "VALIDATION_FAILED": "The input is invalid.",
+    "UNKNOWN": "Something went wrong. Please try again."
   }
 }

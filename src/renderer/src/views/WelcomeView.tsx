@@ -3,10 +3,7 @@ import { RiAddLine, RiFolderOpenLine } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
 import { Button } from '../components/atoms/Button'
 import { CreateProfileDialog } from '../components/molecules/CreateProfileDialog'
-import {
-  InvalidProfileAlert,
-  type InvalidProfileReason
-} from '../components/molecules/InvalidProfileAlert'
+import { OpenProfileErrorAlert } from '../components/molecules/OpenProfileErrorAlert'
 import { useProfiles } from '../hooks/useProfiles'
 import logo from '../../../../resources/icon.svg'
 
@@ -14,11 +11,14 @@ function WelcomeView(): React.JSX.Element {
   const t = useTranslations('WelcomeView')
   const { activeProfile, openProfile, removeProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
-  const [invalidReason, setInvalidReason] = useState<InvalidProfileReason | null>(null)
+  const [openError, setOpenError] = useState<unknown>(null)
 
   const handleOpen = async (): Promise<void> => {
-    const status = await openProfile()
-    if (status === 'invalid' || status === 'newerVersion') setInvalidReason(status)
+    try {
+      await openProfile()
+    } catch (error) {
+      setOpenError(error)
+    }
   }
 
   return (
@@ -57,7 +57,7 @@ function WelcomeView(): React.JSX.Element {
         )}
       </div>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
-      <InvalidProfileAlert reason={invalidReason} onClose={() => setInvalidReason(null)} />
+      <OpenProfileErrorAlert error={openError} onClose={() => setOpenError(null)} />
     </div>
   )
 }

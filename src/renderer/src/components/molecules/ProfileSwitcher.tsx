@@ -7,7 +7,7 @@ import { useProfiles } from '../../hooks/useProfiles'
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atoms/Menu'
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
-import { InvalidProfileAlert, type InvalidProfileReason } from './InvalidProfileAlert'
+import { OpenProfileErrorAlert } from './OpenProfileErrorAlert'
 import { UnavailableProfileDialog } from './UnavailableProfileDialog'
 
 function fileName(path: string): string {
@@ -18,12 +18,15 @@ export function ProfileSwitcher(): React.JSX.Element {
   const t = useTranslations('ProfileSwitcher')
   const { profiles, activeProfile, setActiveProfile, openProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
-  const [invalidReason, setInvalidReason] = useState<InvalidProfileReason | null>(null)
+  const [openError, setOpenError] = useState<unknown>(null)
   const [unavailableProfile, setUnavailableProfile] = useState<ProfileSummary | null>(null)
 
   const handleOpen = async (): Promise<void> => {
-    const status = await openProfile()
-    if (status === 'invalid' || status === 'newerVersion') setInvalidReason(status)
+    try {
+      await openProfile()
+    } catch (error) {
+      setOpenError(error)
+    }
   }
 
   const label = (profile: ProfileSummary): string =>
@@ -104,7 +107,7 @@ export function ProfileSwitcher(): React.JSX.Element {
         </Menu>
       </MenuTrigger>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
-      <InvalidProfileAlert reason={invalidReason} onClose={() => setInvalidReason(null)} />
+      <OpenProfileErrorAlert error={openError} onClose={() => setOpenError(null)} />
       <UnavailableProfileDialog
         profile={unavailableProfile}
         onClose={() => setUnavailableProfile(null)}

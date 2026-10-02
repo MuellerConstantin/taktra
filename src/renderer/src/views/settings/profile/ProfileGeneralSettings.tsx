@@ -5,6 +5,7 @@ import type { ProfileSummary } from '../../../../../shared/profiles'
 import { Button } from '../../../components/atoms/Button'
 import { TextField } from '../../../components/atoms/TextField'
 import { DeleteProfileSection } from '../../../components/molecules/DeleteProfileSection'
+import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
 
 interface ProfileNameFormProps {
@@ -15,6 +16,7 @@ interface ProfileNameFormProps {
 function ProfileNameForm({ profile, currentName }: ProfileNameFormProps): React.JSX.Element {
   const t = useTranslations('ProfileGeneralSettings')
   const { renameProfile } = useProfiles()
+  const errorMessage = useErrorMessage()
   const [name, setName] = useState(currentName)
   const [isPending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,8 +29,8 @@ function ProfileNameForm({ profile, currentName }: ProfileNameFormProps): React.
     setError(null)
     try {
       await renameProfile(profile.path, name.trim())
-    } catch {
-      setError(t('renameFailed'))
+    } catch (caught) {
+      setError(errorMessage(caught))
     } finally {
       setPending(false)
     }

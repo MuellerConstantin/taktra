@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../shared/profiles'
+import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useProfiles } from '../../hooks/useProfiles'
 import { AlertDialog } from '../atoms/AlertDialog'
 import { Button } from '../atoms/Button'
@@ -18,6 +19,7 @@ export function DeleteProfileSection({
 }: DeleteProfileSectionProps): React.JSX.Element {
   const t = useTranslations('DeleteProfileSection')
   const { deleteProfile } = useProfiles()
+  const errorMessage = useErrorMessage()
   const navigate = useNavigate()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,8 +29,8 @@ export function DeleteProfileSection({
     try {
       await deleteProfile(profile.path)
       navigate('/tracking')
-    } catch {
-      setError(t('deleteFailed'))
+    } catch (caught) {
+      setError(errorMessage(caught))
     }
   }
 

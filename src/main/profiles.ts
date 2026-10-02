@@ -1,23 +1,20 @@
 import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, shell } from 'electron'
 import Store from 'electron-store'
-import {
-  profileFileExtension,
-  type OpenProfileResult,
-  type ProfilesState
-} from '../shared/profiles'
+import { profileFileExtension, type ProfilesState } from '../shared/profiles'
+import { AppError, isAppError } from '../shared/errors'
 import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
 import {
   activateDatabase,
   closeActiveDatabase,
   isActiveDatabase,
-  NewerProfileVersionError,
   openProfileDatabase,
   readProperty,
   withProfileDatabase,
   writeProperty
 } from './db/database'
+import { handle } from './ipc'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -45,7 +42,7 @@ function inspectProfile(path: string): ProfileInspection {
     const name = withProfileDatabase(path, { readOnly: true }, (db) => readProperty(db, 'name'))
     return { name, isNewerVersion: false }
   } catch (error) {
-    return { name: null, isNewerVersion: error instanceof NewerProfileVersionError }
+    return { name: null, isNewerVersion: isAppError(error, 'PROFILE_NEWER_VERSION') }
   }
 }
 
@@ -81,8 +78,8 @@ export function getProfilesState(): ProfilesState {
 
 export function createProfile(name: string, path: string): ProfilesState {
   const trimmedName = name.trim()
-  if (!trimmedName) throw new Error('Profile name must not be empty')
-  if (existsSync(path)) throw new Error(`File already exists: ${path}`)
+  if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
+  if (existsSync(path)) throw new AppError('PROFILE_FILE_EXISTS', path)
 
   mkdirSync(dirname(path), { recursive: true })
 
@@ -106,9 +103,9 @@ export function createProfile(name: string, path: string): ProfilesState {
 
 export function renameProfile(path: string, name: string): ProfilesState {
   const trimmedName = name.trim()
-  if (!trimmedName) throw new Error('Profile name must not be empty')
-  if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
-  if (readProfileName(path) === null) throw new Error(`Profile not available: ${path}`)
+  if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
+  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
+  if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 
   withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', trimmedName))
 
@@ -117,7 +114,7 @@ export function renameProfile(path: string, name: string): ProfilesState {
 
 export function removeProfile(path: string): ProfilesState {
   const paths = store.get('paths')
-  if (!paths.includes(path)) throw new Error(`Unknown profile: ${path}`)
+  if (!paths.includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
 
   const remaining = paths.filter((known) => known !== path)
   const activePath = store.get('activePath')
@@ -131,7 +128,7 @@ export function removeProfile(path: string): ProfilesState {
 }
 
 export async function deleteProfile(path: string): Promise<ProfilesState> {
-  if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
+  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
   if (store.get('activePath') === path) closeActiveDatabase()
 
   for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
@@ -142,7 +139,7 @@ export async function deleteProfile(path: string): Promise<ProfilesState> {
 }
 
 export function setActiveProfile(path: string): ProfilesState {
-  if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
+  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
 
   updateKnownProfiles(store.get('paths'), path)
   return getProfilesState()
@@ -188,7 +185,7 @@ async function chooseProfilePath(
   return result.canceled || !result.filePath ? null : result.filePath
 }
 
-async function openProfile(window: BrowserWindow | null): Promise<OpenProfileResult> {
+async function openProfile(window: BrowserWindow | null): Promise<ProfilesState | null> {
   const options = {
     properties: ['openFile' as const],
     filters: [{ name: 'Taktra', extensions: [profileFileExtension] }]
@@ -198,32 +195,30 @@ async function openProfile(window: BrowserWindow | null): Promise<OpenProfileRes
     : await dialog.showOpenDialog(options)
 
   const [path] = result.filePaths
-  if (result.canceled || !path) return { status: 'canceled' }
+  if (result.canceled || !path) return null
   const { name, isNewerVersion } = inspectProfile(path)
-  if (isNewerVersion) return { status: 'newerVersion' }
-  if (name === null) return { status: 'invalid' }
+  if (isNewerVersion) throw new AppError('PROFILE_NEWER_VERSION', path)
+  if (name === null) throw new AppError('PROFILE_INVALID', path)
 
   const paths = store.get('paths')
   updateKnownProfiles(paths.includes(path) ? paths : [...paths, path], path)
 
-  return { status: 'opened', state: getProfilesState() }
+  return getProfilesState()
 }
 
 export function initProfiles(): void {
   syncActiveDatabase()
   app.on('will-quit', closeActiveDatabase)
 
-  ipcMain.handle('profiles:get', () => getProfilesState())
-  ipcMain.handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
-  ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
-  ipcMain.handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
-  ipcMain.handle('profiles:delete', (_, path: string) => deleteProfile(path))
-  ipcMain.handle('profiles:remove', (_, path: string) => removeProfile(path))
-  ipcMain.handle('profiles:open', (event) =>
-    openProfile(BrowserWindow.fromWebContents(event.sender))
-  )
-  ipcMain.handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
-  ipcMain.handle('profiles:choosePath', (event, defaultPath: string) =>
+  handle('profiles:get', () => getProfilesState())
+  handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
+  handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
+  handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
+  handle('profiles:delete', (_, path: string) => deleteProfile(path))
+  handle('profiles:remove', (_, path: string) => removeProfile(path))
+  handle('profiles:open', (event) => openProfile(BrowserWindow.fromWebContents(event.sender)))
+  handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
+  handle('profiles:choosePath', (event, defaultPath: string) =>
     chooseProfilePath(BrowserWindow.fromWebContents(event.sender), defaultPath)
   )
 }

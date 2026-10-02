@@ -1,8 +1,9 @@
 import { eq, isNull, sql } from 'drizzle-orm'
-import { ipcMain } from 'electron'
-import type { Project, ProjectInput, ProjectResult } from '../shared/projects'
+import { AppError } from '../shared/errors'
+import type { Project, ProjectInput } from '../shared/projects'
 import { getActiveDatabase } from './db/database'
 import { projects } from './db/schema'
+import { handle } from './ipc'
 
 interface ListOptions {
   readonly includeArchived?: boolean
@@ -20,7 +21,8 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
     value === undefined ? undefined : value?.trim() || null
 
   const name = input.name?.trim()
-  if (input.name !== undefined && !name) throw new Error('Project name must not be empty')
+  if (input.name !== undefined && !name)
+    throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
 
   return {
     name,
@@ -31,7 +33,7 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
 
 function findProject(id: number): Project {
   const project = getActiveDatabase().select().from(projects).where(eq(projects.id, id)).get()
-  if (!project) throw new Error(`Unknown project: ${id}`)
+  if (!project) throw new AppError('PROJECT_NOT_FOUND', String(id))
   return project
 }
 
@@ -44,37 +46,35 @@ export function listProjects({ includeArchived = false }: ListOptions = {}): Pro
     .all()
 }
 
-export function createProject(input: ProjectInput): ProjectResult {
+export function createProject(input: ProjectInput): Project {
   const db = getActiveDatabase()
   const { name, ...values } = normalize(input)
-  if (!name) throw new Error('Project name must not be empty')
+  if (!name) throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
 
   try {
-    const project = db
+    return db
       .insert(projects)
       .values({ ...values, name })
       .returning()
       .get()
-    return { status: 'ok', project }
   } catch (error) {
-    if (isUniqueViolation(error)) return { status: 'nameTaken' }
+    if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
     throw error
   }
 }
 
-export function updateProject(id: number, patch: Partial<ProjectInput>): ProjectResult {
+export function updateProject(id: number, patch: Partial<ProjectInput>): Project {
   findProject(id)
 
   try {
-    const project = getActiveDatabase()
+    return getActiveDatabase()
       .update(projects)
       .set(normalize(patch))
       .where(eq(projects.id, id))
       .returning()
       .get()
-    return { status: 'ok', project }
   } catch (error) {
-    if (isUniqueViolation(error)) return { status: 'nameTaken' }
+    if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
     throw error
   }
 }
@@ -96,13 +96,13 @@ export function deleteProject(id: number): void {
 }
 
 export function initProjects(): void {
-  ipcMain.handle('projects:list', (_, options?: ListOptions) => listProjects(options))
-  ipcMain.handle('projects:create', (_, input: ProjectInput) => createProject(input))
-  ipcMain.handle('projects:update', (_, id: number, patch: Partial<ProjectInput>) =>
+  handle('projects:list', (_, options?: ListOptions) => listProjects(options))
+  handle('projects:create', (_, input: ProjectInput) => createProject(input))
+  handle('projects:update', (_, id: number, patch: Partial<ProjectInput>) =>
     updateProject(id, patch)
   )
-  ipcMain.handle('projects:setArchived', (_, id: number, archived: boolean) =>
+  handle('projects:setArchived', (_, id: number, archived: boolean) =>
     setProjectArchived(id, archived)
   )
-  ipcMain.handle('projects:delete', (_, id: number) => deleteProject(id))
+  handle('projects:delete', (_, id: number) => deleteProject(id))
 }

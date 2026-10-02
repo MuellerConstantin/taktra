@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
+import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useProfiles } from '../../hooks/useProfiles'
+import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
@@ -18,6 +20,7 @@ export function CreateProfileDialog({
 }: CreateProfileDialogProps): React.JSX.Element {
   const t = useTranslations('CreateProfileDialog')
   const { createProfile } = useProfiles()
+  const errorMessage = useErrorMessage()
   const [name, setName] = useState('')
   const [defaultPath, setDefaultPath] = useState('')
   const [chosenPath, setChosenPath] = useState<string | null>(null)
@@ -28,7 +31,7 @@ export function CreateProfileDialog({
 
   useEffect(() => {
     if (!isOpen || chosenPath) return
-    window.api.profiles.defaultPath(name).then(setDefaultPath)
+    api.profiles.defaultPath(name).then(setDefaultPath)
   }, [isOpen, name, chosenPath])
 
   const handleOpenChange = (open: boolean): void => {
@@ -41,7 +44,7 @@ export function CreateProfileDialog({
   }
 
   const choosePath = async (): Promise<void> => {
-    const selected = await window.api.profiles.choosePath(path)
+    const selected = await api.profiles.choosePath(path)
     if (selected) setChosenPath(selected)
   }
 
@@ -52,8 +55,8 @@ export function CreateProfileDialog({
     try {
       await createProfile(name.trim(), path)
       handleOpenChange(false)
-    } catch {
-      setError(t('createFailed'))
+    } catch (caught) {
+      setError(errorMessage(caught))
     } finally {
       setPending(false)
     }

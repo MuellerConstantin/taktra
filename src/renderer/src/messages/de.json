@@ -23,16 +23,12 @@
     "nameRequired": "Bitte einen Namen eingeben.",
     "locationLabel": "Speicherort",
     "changeLocation": "Ändern…",
-    "createFailed": "Das Profil konnte nicht angelegt werden. Eventuell existiert an diesem Ort bereits eine Datei.",
     "cancel": "Abbrechen",
     "create": "Anlegen"
   },
-  "InvalidProfileAlert": {
-    "title": "Kein Taktra-Profil",
-    "text": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
-    "ok": "OK",
-    "newerVersionTitle": "Profil aus neuerer Version",
-    "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, um es zu öffnen."
+  "OpenProfileErrorAlert": {
+    "title": "Profil konnte nicht geöffnet werden",
+    "ok": "OK"
   },
   "UnavailableProfileDialog": {
     "title": "Profil nicht verfügbar",
@@ -95,8 +91,7 @@
     "nameLabel": "Name",
     "nameDescription": "Wird in der Profildatei gespeichert. Umbenennen ändert den Dateinamen nicht.",
     "nameRequired": "Bitte einen Namen eingeben.",
-    "save": "Speichern",
-    "renameFailed": "Das Profil konnte nicht umbenannt werden."
+    "save": "Speichern"
   },
   "DeleteProfileSection": {
     "title": "Profil löschen",
@@ -105,7 +100,18 @@
     "confirmTitle": "„{name}“ löschen?",
     "confirmText": "Die Profildatei wird in den Papierkorb verschoben. Von dort lässt sie sich wiederherstellen, solange der Papierkorb nicht geleert wurde.",
     "confirmAction": "Löschen",
-    "cancel": "Abbrechen",
-    "deleteFailed": "Das Profil konnte nicht gelöscht werden."
+    "cancel": "Abbrechen"
+  },
+  "Errors": {
+    "NO_ACTIVE_PROFILE": "Es ist kein Profil geöffnet.",
+    "PROFILE_NOT_FOUND": "Dieses Profil ist Taktra nicht bekannt.",
+    "PROFILE_UNAVAILABLE": "Die Profildatei wurde nicht gefunden oder lässt sich nicht öffnen.",
+    "PROFILE_FILE_EXISTS": "An diesem Ort existiert bereits eine Datei.",
+    "PROFILE_INVALID": "Die Datei ist kein gültiges Taktra-Profil.",
+    "PROFILE_NEWER_VERSION": "Das Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, um es zu öffnen.",
+    "PROJECT_NOT_FOUND": "Das Projekt existiert nicht mehr.",
+    "PROJECT_NAME_TAKEN": "Ein Projekt mit diesem Namen existiert bereits.",
+    "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
+    "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   }
 }
