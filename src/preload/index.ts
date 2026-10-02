@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { OpenProfileResult, ProfilesState } from '../shared/profiles'
+import type { Project, ProjectInput, ProjectResult } from '../shared/projects'
 import type { Settings } from '../shared/settings'
 
 const api = {
@@ -23,6 +24,17 @@ const api = {
       ipcRenderer.invoke('profiles:defaultPath', name),
     choosePath: (defaultPath: string): Promise<string | null> =>
       ipcRenderer.invoke('profiles:choosePath', defaultPath)
+  },
+  projects: {
+    list: (options?: { includeArchived?: boolean }): Promise<Project[]> =>
+      ipcRenderer.invoke('projects:list', options),
+    create: (input: ProjectInput): Promise<ProjectResult> =>
+      ipcRenderer.invoke('projects:create', input),
+    update: (id: number, patch: Partial<ProjectInput>): Promise<ProjectResult> =>
+      ipcRenderer.invoke('projects:update', id, patch),
+    setArchived: (id: number, archived: boolean): Promise<Project> =>
+      ipcRenderer.invoke('projects:setArchived', id, archived),
+    delete: (id: number): Promise<void> => ipcRenderer.invoke('projects:delete', id)
   }
 }
 
