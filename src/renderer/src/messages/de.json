@@ -48,16 +48,24 @@
     "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste."
   },
   "TrackingView": {
-    "title": "Heute",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "tomorrow": "Morgen",
+    "empty": "Für diesen Tag ist nichts erfasst.",
     "create": "Neuer Eintrag",
     "total": "Gesamt {duration}",
-    "empty": "Heute noch nichts erfasst.",
     "edit": "Eintrag für {name} bearbeiten",
     "delete": "Eintrag für {name} löschen",
     "deleteConfirmTitle": "Eintrag für „{name}“ löschen?",
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen"
+  },
+  "DayNavigator": {
+    "previous": "Vorheriger Tag",
+    "next": "Nächster Tag",
+    "choose": "Tag auswählen",
+    "today": "Heute"
   },
   "TimeEntryDialog": {
     "title": "Neuer Eintrag",

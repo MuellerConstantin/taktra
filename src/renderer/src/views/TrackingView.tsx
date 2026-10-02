@@ -1,6 +1,14 @@
-import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
+import {
+  DateFormatter,
+  getLocalTimeZone,
+  isSameDay,
+  parseDate,
+  today,
+  type CalendarDate
+} from '@internationalized/date'
 import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { TimeEntryDetails } from '../../../shared/timeEntries'
@@ -8,6 +16,7 @@ import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
+import { DayNavigator } from '../components/molecules/DayNavigator'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -15,12 +24,24 @@ import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { formatDuration } from '../lib/duration'
 
+function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
+  if (!value) return fallback
+  try {
+    return parseDate(value)
+  } catch {
+    return fallback
+  }
+}
+
 function TrackingView(): React.JSX.Element {
   const t = useTranslations('TrackingView')
   const errorMessage = useErrorMessage()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
-  const [date] = useState(() => today(getLocalTimeZone()))
+  const [searchParams, setSearchParams] = useSearchParams()
+  const todayDate = today(getLocalTimeZone())
+  const date = parseDay(searchParams.get('date'), todayDate)
+  const day = date.toString()
   const [entries, setEntries] = useState<readonly TimeEntryDetails[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dialog, setDialog] = useState<{ readonly details?: TimeEntryDetails } | null>(null)
@@ -28,14 +49,15 @@ function TrackingView(): React.JSX.Element {
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  const dayFormatter = new DateFormatter(locale, { dateStyle: 'full' })
+  const dayFormatter = new DateFormatter(locale, { dateStyle: 'long' })
+  const weekdayFormatter = new DateFormatter(locale, { weekday: 'long' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
   const total = (entries ?? []).reduce((sum, { entry }) => sum + (entry.durationSec ?? 0), 0)
 
   useEffect(() => {
     let isCurrent = true
     api.timeEntries
-      .list({ from: date.toString(), to: date.toString() })
+      .list({ from: day, to: day })
       .then((result) => {
         if (!isCurrent) return
         setEntries(result)
@@ -45,7 +67,19 @@ function TrackingView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, date, reloadCount, errorMessage])
+  }, [activeProfile?.path, day, reloadCount, errorMessage])
+
+  const title = isSameDay(date, todayDate)
+    ? t('today')
+    : isSameDay(date, todayDate.subtract({ days: 1 }))
+      ? t('yesterday')
+      : isSameDay(date, todayDate.add({ days: 1 }))
+        ? t('tomorrow')
+        : weekdayFormatter.format(date.toDate(getLocalTimeZone()))
+
+  const changeDay = (next: CalendarDate): void => {
+    setSearchParams(isSameDay(next, todayDate) ? {} : { date: next.toString() })
+  }
 
   const handleDelete = async (entryId: number): Promise<void> => {
     setDeleteError(null)
@@ -60,25 +94,27 @@ function TrackingView(): React.JSX.Element {
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
-        title={t('title')}
+        title={title}
         subtitle={dayFormatter.format(date.toDate(getLocalTimeZone()))}
         actions={
-          <>
-            <span className="text-sm text-muted-foreground">
-              {t('total', { duration: formatDuration(total) })}
-            </span>
-            <Button onPress={() => setDialog({})}>
-              <RiAddLine className="size-4" />
-              {t('create')}
-            </Button>
-          </>
+          <Button onPress={() => setDialog({})}>
+            <RiAddLine className="size-4" />
+            {t('create')}
+          </Button>
         }
-      />
+      >
+        <div className="flex items-center justify-between gap-4 pb-4">
+          <DayNavigator date={date} today={todayDate} onChange={changeDay} />
+          <span className="text-sm text-muted-foreground">
+            {t('total', { duration: formatDuration(total) })}
+          </span>
+        </div>
+      </ViewHeader>
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
       {error && <p className="p-8 text-sm text-destructive">{error}</p>}
       {!error && entries && (
         <GridList
-          aria-label={t('title')}
+          aria-label={title}
           items={entries}
           className="min-h-0 flex-1"
           renderEmptyState={() =>

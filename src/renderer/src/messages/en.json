@@ -48,16 +48,24 @@
     "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
   },
   "TrackingView": {
-    "title": "Today",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "empty": "Nothing tracked on this day.",
     "create": "New entry",
     "total": "Total {duration}",
-    "empty": "Nothing tracked today yet.",
     "edit": "Edit entry for {name}",
     "delete": "Delete entry for {name}",
     "deleteConfirmTitle": "Delete entry for “{name}”?",
     "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel"
+  },
+  "DayNavigator": {
+    "previous": "Previous day",
+    "next": "Next day",
+    "choose": "Choose day",
+    "today": "Today"
   },
   "TimeEntryDialog": {
     "title": "New entry",
