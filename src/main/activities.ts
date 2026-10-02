@@ -132,19 +132,23 @@ export function setActivityTags(id: number, tagIds: readonly number[]): void {
   })
 }
 
-export function deleteActivity(id: number): void {
-  findActivity(id)
-
-  const db = getActiveDatabase()
-  const hasEntries = db
+function hasTimeEntries(id: number): boolean {
+  return !!getActiveDatabase()
     .select({ id: timeEntries.id })
     .from(timeEntries)
     .where(eq(timeEntries.activityId, id))
     .limit(1)
     .get()
-  if (hasEntries) throw new AppError('ACTIVITY_HAS_TIME_ENTRIES', String(id))
+}
 
-  db.delete(activities).where(eq(activities.id, id)).run()
+export function deleteActivityIfUnused(id: number): void {
+  if (!hasTimeEntries(id)) getActiveDatabase().delete(activities).where(eq(activities.id, id)).run()
+}
+
+export function deleteActivity(id: number): void {
+  findActivity(id)
+  if (hasTimeEntries(id)) throw new AppError('ACTIVITY_HAS_TIME_ENTRIES', String(id))
+  getActiveDatabase().delete(activities).where(eq(activities.id, id)).run()
 }
 
 export function initActivities(): void {

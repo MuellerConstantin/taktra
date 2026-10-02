@@ -6,7 +6,7 @@ import type {
   TimeEntryInput,
   TimeEntryRange
 } from '../shared/timeEntries'
-import { findActivity, tagsByActivity } from './activities'
+import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
@@ -113,19 +113,25 @@ export function createTimeEntry(input: TimeEntryInput): TimeEntry {
 }
 
 export function updateTimeEntry(id: number, input: TimeEntryInput): TimeEntry {
-  findTimeEntry(id)
+  const previous = findTimeEntry(id)
+  const values = toValues(input)
+  const db = getActiveDatabase()
 
-  return getActiveDatabase()
-    .update(timeEntries)
-    .set(toValues(input))
-    .where(eq(timeEntries.id, id))
-    .returning()
-    .get()
+  return db.transaction(() => {
+    const entry = db.update(timeEntries).set(values).where(eq(timeEntries.id, id)).returning().get()
+    if (previous.activityId !== entry.activityId) deleteActivityIfUnused(previous.activityId)
+    return entry
+  })
 }
 
 export function deleteTimeEntry(id: number): void {
-  findTimeEntry(id)
-  getActiveDatabase().delete(timeEntries).where(eq(timeEntries.id, id)).run()
+  const entry = findTimeEntry(id)
+  const db = getActiveDatabase()
+
+  db.transaction(() => {
+    db.delete(timeEntries).where(eq(timeEntries.id, id)).run()
+    deleteActivityIfUnused(entry.activityId)
+  })
 }
 
 export function initTimeEntries(): void {
