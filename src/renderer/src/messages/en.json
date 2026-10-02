@@ -48,8 +48,27 @@
     "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
   },
   "TrackingView": {
-    "title": "Tracking",
-    "placeholder": "Time entries of the selected day"
+    "title": "Today",
+    "create": "New entry",
+    "total": "Total {duration}",
+    "empty": "Nothing tracked today yet."
+  },
+  "TimeEntryDialog": {
+    "title": "New entry",
+    "projectLabel": "Project",
+    "activityLabel": "Activity",
+    "createActivity": "Create “{name}”",
+    "modeLabel": "Time input",
+    "modeRange": "Start and end",
+    "modeDuration": "Duration",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "durationLabel": "Duration (h:mm)",
+    "noteLabel": "Note",
+    "endBeforeStart": "The end must be after the start.",
+    "durationRequired": "Please enter a duration longer than zero.",
+    "cancel": "Cancel",
+    "create": "Create"
   },
   "ProjectsView": {
     "title": "Projects",

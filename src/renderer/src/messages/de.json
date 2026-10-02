@@ -48,8 +48,27 @@
     "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste."
   },
   "TrackingView": {
-    "title": "Erfassung",
-    "placeholder": "Zeiteinträge des ausgewählten Tags"
+    "title": "Heute",
+    "create": "Neuer Eintrag",
+    "total": "Gesamt {duration}",
+    "empty": "Heute noch nichts erfasst."
+  },
+  "TimeEntryDialog": {
+    "title": "Neuer Eintrag",
+    "projectLabel": "Projekt",
+    "activityLabel": "Activity",
+    "createActivity": "„{name}“ anlegen",
+    "modeLabel": "Zeitangabe",
+    "modeRange": "Beginn und Ende",
+    "modeDuration": "Dauer",
+    "startLabel": "Beginn",
+    "endLabel": "Ende",
+    "durationLabel": "Dauer (h:mm)",
+    "noteLabel": "Notiz",
+    "endBeforeStart": "Das Ende muss nach dem Beginn liegen.",
+    "durationRequired": "Bitte eine Dauer größer als null eingeben.",
+    "cancel": "Abbrechen",
+    "create": "Anlegen"
   },
   "ProjectsView": {
     "title": "Projekte",

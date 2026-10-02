@@ -1,6 +1,7 @@
 import {
   GridList as RACGridList,
   GridListItem as RACGridListItem,
+  composeRenderProps,
   type GridListItemProps,
   type GridListProps
 } from 'react-aria-components'
@@ -36,5 +37,13 @@ export function GridListItem(props: GridListItemProps): React.JSX.Element {
   const textValue =
     props.textValue || (typeof props.children === 'string' ? props.children : undefined)
 
-  return <RACGridListItem {...props} textValue={textValue} className={itemStyles} />
+  return (
+    <RACGridListItem
+      {...props}
+      textValue={textValue}
+      className={composeRenderProps(props.className, (className, renderProps) =>
+        itemStyles({ ...renderProps, className })
+      )}
+    />
+  )
 }

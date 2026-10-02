@@ -1,4 +1,5 @@
 import { tv } from 'tailwind-variants'
+import { focusRing } from './utils'
 
 export const dropdownItemStyles = tv({
   base: 'group flex cursor-default items-center gap-4 rounded-lg py-2 pr-3 pl-3 text-sm outline outline-0 select-none forced-color-adjust-none selected:pr-1 [-webkit-tap-highlight-color:transparent]',
@@ -30,4 +31,10 @@ export const fieldBorderStyles = tv({
       true: 'border-muted forced-colors:border-[GrayText]'
     }
   }
+})
+
+export const fieldGroupStyles = tv({
+  extend: focusRing,
+  base: 'group box-border flex h-9 items-center overflow-hidden rounded-lg border bg-transparent transition forced-colors:bg-[Field]',
+  variants: fieldBorderStyles.variants
 })
