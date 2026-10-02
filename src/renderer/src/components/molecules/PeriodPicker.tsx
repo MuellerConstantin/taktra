@@ -1,5 +1,6 @@
 import { getLocalTimeZone, today } from '@internationalized/date'
 import { useLocale, type Key } from 'react-aria-components'
+import { twMerge } from 'tailwind-merge'
 import { useTranslations } from 'use-intl'
 import { periodPresets, presetRange, type Period, type PeriodPreset } from '../../lib/period'
 import { DateRangePicker } from '../atoms/DateRangePicker'
@@ -10,9 +11,10 @@ const options: readonly Period['preset'][] = [...periodPresets, 'custom']
 interface PeriodPickerProps {
   readonly value: Period
   readonly onChange: (period: Period) => void
+  readonly className?: string
 }
 
-export function PeriodPicker({ value, onChange }: PeriodPickerProps): React.JSX.Element {
+export function PeriodPicker({ value, onChange, className }: PeriodPickerProps): React.JSX.Element {
   const t = useTranslations('PeriodPicker')
   const { locale } = useLocale()
 
@@ -27,7 +29,7 @@ export function PeriodPicker({ value, onChange }: PeriodPickerProps): React.JSX.
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={twMerge('flex flex-wrap items-center justify-end gap-2', className)}>
       {value.preset === 'custom' && (
         <DateRangePicker
           aria-label={t('range')}

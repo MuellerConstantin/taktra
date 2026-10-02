@@ -101,8 +101,8 @@ function ProjectDetailView(): React.JSX.Element {
           </>
         }
       >
-        <div className="flex items-center justify-between gap-4 pb-4">
-          <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-4">
+          <div className="flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm text-muted-foreground">
             {project.archivedAt && (
               <span className="rounded-full border border-border px-2 py-0.5 text-xs">
                 {t('archived')}
@@ -110,12 +110,10 @@ function ProjectDetailView(): React.JSX.Element {
             )}
             <span className="truncate">{project.description}</span>
           </div>
-          <div className="flex shrink-0 items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {t('total', { duration: formatDuration(total) })}
-            </span>
-            <PeriodPicker value={period} onChange={setPeriod} />
-          </div>
+          <span className="shrink-0 text-sm text-muted-foreground">
+            {t('total', { duration: formatDuration(total) })}
+          </span>
+          <PeriodPicker value={period} onChange={setPeriod} className="ml-auto" />
         </div>
       </ViewHeader>
       {actionError && <p className="px-8 pt-4 text-sm text-destructive">{actionError}</p>}

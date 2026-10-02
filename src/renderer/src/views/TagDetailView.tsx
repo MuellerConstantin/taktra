@@ -103,7 +103,7 @@ function TagDetailView(): React.JSX.Element {
           </Button>
         }
       >
-        <div className="flex items-center justify-end gap-4 pb-4">
+        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 pb-4">
           <span className="text-sm text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}
           </span>
