@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import type { ProfilesState } from '../shared/profiles'
 import type { Settings } from '../shared/settings'
 
 const api = {
@@ -6,6 +7,17 @@ const api = {
     get: (): Promise<Settings> => ipcRenderer.invoke('settings:get'),
     update: (patch: Partial<Settings>): Promise<Settings> =>
       ipcRenderer.invoke('settings:update', patch)
+  },
+  profiles: {
+    get: (): Promise<ProfilesState> => ipcRenderer.invoke('profiles:get'),
+    create: (name: string, path: string): Promise<ProfilesState> =>
+      ipcRenderer.invoke('profiles:create', name, path),
+    setActive: (path: string): Promise<ProfilesState> =>
+      ipcRenderer.invoke('profiles:setActive', path),
+    defaultPath: (name: string): Promise<string> =>
+      ipcRenderer.invoke('profiles:defaultPath', name),
+    choosePath: (defaultPath: string): Promise<string | null> =>
+      ipcRenderer.invoke('profiles:choosePath', defaultPath)
   }
 }
 

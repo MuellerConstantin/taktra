@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { initProfiles } from './profiles'
 import { initSettings } from './settings'
 
 function createWindow(): void {
@@ -40,6 +41,7 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('app.taktra')
   initSettings()
+  initProfiles()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

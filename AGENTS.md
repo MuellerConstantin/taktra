@@ -11,11 +11,13 @@ can copy, back up or move like any other document.
 
 ## Functionality
 
-**Databases**
-Similar to KeePass, a user can work with several independent "databases" — for
-example one for work and one for private projects. Each database is a single
-SQLite file. The app remembers recently opened files, but the files themselves
-are self-contained.
+**Profiles**
+Similar to KeePass, a user can work with several independent profiles — for
+example one for work and one for private projects. Each profile is a single
+SQLite file (`*.taktra`) at a location of the user's choice, by default
+`%APPDATA%\taktra\profiles\`. The app remembers the known profiles and the
+active one; the files themselves are self-contained. A profile whose file was
+moved or deleted stays listed but disabled.
 
 **Projects & Activities**
 Projects group activities. An activity is the thing time is booked on (e.g.
@@ -53,7 +55,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 - **UI Components**: React Aria Components with `tailwindcss-react-aria-components`
   (no shadcn/ui)
 - **Icons**: Remix Icon via `@remixicon/react`
-- **Database**: SQLite
+- **Database**: SQLite via Node's built-in `node:sqlite`
 - **App Settings**: `electron-store`
 
 ## Project Structure
@@ -63,6 +65,8 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 ├── src/
 │   ├── main/                         # Electron main process
 │   │   ├── index.ts                  # App lifecycle, window creation
+│   │   ├── constants.ts              # Main-process constants (application id, schema version)
+│   │   ├── profiles.ts               # Known profiles store, profile file creation, IPC handlers
 │   │   └── settings.ts               # App settings store, IPC handlers, theme
 │   ├── preload/                      # Bridge between main and renderer
 │   │   ├── index.ts                  # Exposes the typed `window.api`
@@ -80,8 +84,8 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │           ├── messages/             # Translations (en.json, de.json)
 │           ├── i18n.d.ts             # Types translation keys against en.json
 │           └── components/           # UI components (Atomic Design)
-│               ├── atoms/            # Styled react-aria wrappers (Field, RadioGroup, Select, …) and utils.ts
-│               ├── molecules/        # Composed components (ViewHeader, ViewPlaceholder)
+│               ├── atoms/            # Styled react-aria wrappers (Button, Field, Menu, Select, …), utils.ts and shared tv styles in styles.ts
+│               ├── molecules/        # Composed components (ViewHeader, ProfileSwitcher, CreateProfileDialog, …)
 │               ├── organisms/        # Full sections (Sidebar)
 │               └── templates/        # Layouts (AppTemplate: sidebar + route outlet)
 ├── build/                            # Build resources for electron-builder (icons)
@@ -99,12 +103,21 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 
 - **Local-first, no backend**: Everything runs on the user's machine. No
   network access is required for any feature.
-- **One SQLite file per database**: Gives the KeePass-like "open a file"
+- **One SQLite file per profile**: Gives the KeePass-like "open a file"
   experience, makes backups a file copy, and still allows proper SQL for
-  reports. Schema versions are tracked with `PRAGMA user_version`, the file
-  type is marked with `PRAGMA application_id`.
+  reports. The file type is marked with `PRAGMA application_id` (`0x54414B54`,
+  "TAKT"), the schema version is tracked with `PRAGMA user_version`. A
+  key/value table `meta` holds file-level data such as the profile name, so a
+  copied or renamed file keeps its name. Which profiles exist and which one is
+  active is app state in `%APPDATA%\taktra\profiles.json` (own
+  `electron-store`, separate from user settings), never inside a profile.
+- **`node:sqlite` instead of a native module**: SQLite is accessed through
+  Node's built-in `node:sqlite` (release candidate since Node 25.7), which
+  avoids rebuilding a native module for every Electron version. All database
+  access lives in the main process, so swapping the driver touches only that
+  code.
 - **App settings outside the database**: Preferences that belong to the
-  installation (recent files, theme, window state) live in
+  installation (theme, language, later window state) live in
   `%APPDATA%\taktra\settings.json`, not in a database file. They are owned by
   the main process via `electron-store` (JSON schema validation, defaults,
   atomic writes, version migrations) and reach the renderer only through

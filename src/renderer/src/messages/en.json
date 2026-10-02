@@ -6,6 +6,24 @@
     "reports": "Reports",
     "settings": "Settings"
   },
+  "ProfileSwitcher": {
+    "label": "Profile",
+    "none": "No profile",
+    "missing": "{file} (not found)",
+    "profiles": "Profiles",
+    "newProfile": "New profile…"
+  },
+  "CreateProfileDialog": {
+    "title": "New profile",
+    "description": "Each profile has its own projects, activities and time entries.",
+    "nameLabel": "Name",
+    "nameRequired": "Please enter a name.",
+    "locationLabel": "Location",
+    "changeLocation": "Change…",
+    "createFailed": "The profile could not be created. Maybe a file already exists at this location.",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
   "TrackingView": {
     "title": "Tracking",
     "placeholder": "Time entries of the selected day"

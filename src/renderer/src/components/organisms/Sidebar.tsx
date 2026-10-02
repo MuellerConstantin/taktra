@@ -9,6 +9,7 @@ import {
 import { Link } from 'react-aria-components'
 import { useMatch } from 'react-router'
 import { useTranslations } from 'use-intl'
+import { ProfileSwitcher } from '../molecules/ProfileSwitcher'
 import logo from '../../../../../resources/icon.svg'
 
 interface NavItemProps {
@@ -36,10 +37,13 @@ export function Sidebar(): React.JSX.Element {
   const t = useTranslations('Navigation')
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
+    <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex items-center gap-2 px-5 py-5">
         <img src={logo} alt="" className="size-7 rounded-md" />
         <span className="text-lg font-semibold">Taktra</span>
+      </div>
+      <div className="px-3 pb-4">
+        <ProfileSwitcher />
       </div>
       <nav className="flex flex-1 flex-col gap-1 px-3">
         <NavItem to="/tracking" label={t('tracking')} icon={RiTimerLine} />

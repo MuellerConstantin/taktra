@@ -6,6 +6,24 @@
     "reports": "Auswertung",
     "settings": "Einstellungen"
   },
+  "ProfileSwitcher": {
+    "label": "Profil",
+    "none": "Kein Profil",
+    "missing": "{file} (nicht gefunden)",
+    "profiles": "Profile",
+    "newProfile": "Neues Profil…"
+  },
+  "CreateProfileDialog": {
+    "title": "Neues Profil",
+    "description": "Jedes Profil hat eigene Projekte, Activities und Zeiteinträge.",
+    "nameLabel": "Name",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "locationLabel": "Speicherort",
+    "changeLocation": "Ändern…",
+    "createFailed": "Das Profil konnte nicht angelegt werden. Eventuell existiert an diesem Ort bereits eine Datei.",
+    "cancel": "Abbrechen",
+    "create": "Anlegen"
+  },
   "TrackingView": {
     "title": "Erfassung",
     "placeholder": "Zeiteinträge des ausgewählten Tags"
