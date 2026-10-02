@@ -113,7 +113,11 @@ export function createProfile(
 }
 
 export function createSampleProfile(): ProfilesState {
-  return createProfile(SAMPLE_PROFILE_NAME, getDefaultProfilePath(SAMPLE_PROFILE_NAME), seedSampleData)
+  return createProfile(
+    SAMPLE_PROFILE_NAME,
+    getDefaultProfilePath(SAMPLE_PROFILE_NAME),
+    seedSampleData
+  )
 }
 
 export function renameProfile(path: string, name: string): ProfilesState {
@@ -173,8 +177,12 @@ function slugify(value: string): string {
   return RESERVED_FILE_NAMES.test(slug) ? `${slug}-profile` : slug
 }
 
+function profilesDirectory(): string {
+  return join(app.getPath('userData'), 'profiles')
+}
+
 export function getDefaultProfilePath(name: string): string {
-  const directory = join(app.getPath('userData'), 'profiles')
+  const directory = profilesDirectory()
   const slug = slugify(name)
 
   let candidate = join(directory, `${slug}.${profileFileExtension}`)
@@ -201,7 +209,11 @@ async function chooseProfilePath(
 }
 
 async function openProfile(window: BrowserWindow | null): Promise<ProfilesState | null> {
+  const defaultPath = profilesDirectory()
+  mkdirSync(defaultPath, { recursive: true })
+
   const options = {
+    defaultPath,
     properties: ['openFile' as const],
     filters: [{ name: 'Taktra', extensions: [profileFileExtension] }]
   }
