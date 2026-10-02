@@ -1,6 +1,7 @@
 import { createHashRouter, Navigate } from 'react-router'
 import { AppTemplate } from './components/templates/AppTemplate'
 import { ProfileTemplate } from './components/templates/ProfileTemplate'
+import TimerView from './views/TimerView'
 import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
 import ProjectDetailView from './views/ProjectDetailView'
@@ -17,10 +18,11 @@ export const router = createHashRouter([
     path: '/',
     element: <AppTemplate />,
     children: [
-      { index: true, element: <Navigate to="/tracking" replace /> },
+      { index: true, element: <Navigate to="/timer" replace /> },
       {
         element: <ProfileTemplate />,
         children: [
+          { path: 'timer', element: <TimerView /> },
           { path: 'tracking', element: <TrackingView /> },
           { path: 'projects', element: <ProjectsView /> },
           { path: 'projects/:projectId', element: <ProjectDetailView /> },

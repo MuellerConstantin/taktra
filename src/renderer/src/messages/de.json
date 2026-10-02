@@ -1,5 +1,6 @@
 {
   "Navigation": {
+    "timer": "Timer",
     "tracking": "Erfassung",
     "projects": "Projekte",
     "tags": "Tags",
@@ -49,6 +50,37 @@
     "removeFromList": "Aus Liste entfernen",
     "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste."
   },
+  "TimerView": {
+    "title": "Timer",
+    "switch": "Activity wechseln",
+    "todayTotal": "Heute {duration}",
+    "since": "Läuft seit {time}",
+    "stop": "Stoppen",
+    "discard": "Verwerfen",
+    "idle": "Kein Timer aktiv.",
+    "start": "Timer starten",
+    "recent": "Zuletzt verwendet",
+    "recentEmpty": "Activities, auf die du Zeit buchst, erscheinen hier zum schnellen Starten.",
+    "startActivity": "Timer für {name} starten",
+    "stopActivity": "Timer für {name} stoppen",
+    "discardConfirmTitle": "Laufenden Timer verwerfen?",
+    "discardConfirmText": "Die laufende Zeit wird nicht gebucht und der Eintrag gelöscht.",
+    "discardConfirmAction": "Verwerfen",
+    "cancel": "Abbrechen"
+  },
+  "TimerIndicator": {
+    "open": "Timer für {name} öffnen",
+    "stop": "Timer stoppen"
+  },
+  "StartTimerDialog": {
+    "title": "Timer starten",
+    "projectLabel": "Projekt",
+    "projectPlaceholder": "Projekt auswählen",
+    "activityLabel": "Activity",
+    "createActivity": "„{name}“ anlegen",
+    "cancel": "Abbrechen",
+    "start": "Starten"
+  },
   "TrackingView": {
     "today": "Heute",
     "yesterday": "Gestern",
@@ -61,7 +93,8 @@
     "deleteConfirmTitle": "Eintrag für „{name}“ löschen?",
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "runningSince": "Läuft seit {time}"
   },
   "DayNavigator": {
     "previous": "Vorheriger Tag",

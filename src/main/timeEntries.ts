@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, lte } from 'drizzle-orm'
+import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import type {
   TimeEntry,
@@ -87,10 +87,7 @@ function findTimeEntry(id: number): TimeEntry {
   return entry
 }
 
-export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[] {
-  assertLocalDate(from)
-  assertLocalDate(to)
-
+export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails[] {
   const rows = getActiveDatabase()
     .select({
       entry: timeEntries,
@@ -100,12 +97,18 @@ export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))
-    .where(and(gte(timeEntries.date, from), lte(timeEntries.date, to)))
+    .where(where)
     .orderBy(asc(timeEntries.date), asc(timeEntries.startedAt), asc(timeEntries.createdAt))
     .all()
 
   const tagMap = tagsByActivity([...new Set(rows.map((row) => row.activity.id))])
   return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
+}
+
+export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[] {
+  assertLocalDate(from)
+  assertLocalDate(to)
+  return selectTimeEntryDetails(and(gte(timeEntries.date, from), lte(timeEntries.date, to)))
 }
 
 export function createTimeEntry(input: TimeEntryInput): TimeEntry {

@@ -1,5 +1,6 @@
 import {
   RiBarChartBoxLine,
+  RiCalendarCheckLine,
   RiFolderLine,
   RiPriceTag3Line,
   RiSettings3Line,
@@ -11,6 +12,7 @@ import { useMatch } from 'react-router'
 import { useTranslations } from 'use-intl'
 import { useProfiles } from '../../hooks/useProfiles'
 import { ProfileSwitcher } from '../molecules/ProfileSwitcher'
+import { TimerIndicator } from '../molecules/TimerIndicator'
 import logo from '../../../../../resources/icon.svg'
 
 interface NavItemProps {
@@ -47,11 +49,18 @@ export function Sidebar(): React.JSX.Element {
         <img src={logo} alt="" className="size-7 rounded-md" />
         <span className="text-lg font-semibold">Taktra</span>
       </div>
-      <div className="px-3 pb-4">
+      <div className="flex flex-col gap-2 px-3 pb-4">
         <ProfileSwitcher />
+        <TimerIndicator />
       </div>
       <nav className="flex flex-1 flex-col gap-1 px-3">
-        <NavItem to="/tracking" label={t('tracking')} icon={RiTimerLine} isDisabled={!hasProfile} />
+        <NavItem to="/timer" label={t('timer')} icon={RiTimerLine} isDisabled={!hasProfile} />
+        <NavItem
+          to="/tracking"
+          label={t('tracking')}
+          icon={RiCalendarCheckLine}
+          isDisabled={!hasProfile}
+        />
         <NavItem
           to="/projects"
           label={t('projects')}

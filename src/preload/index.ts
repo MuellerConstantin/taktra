@@ -7,6 +7,7 @@ import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings } from '../shared/settings'
 import type { Tag, TagInput } from '../shared/tags'
 import type {
+  ActivityDetails,
   TimeEntry,
   TimeEntryDetails,
   TimeEntryInput,
@@ -72,6 +73,13 @@ const api = {
     update: (id: number, input: TimeEntryInput) =>
       invoke<TimeEntry>('timeEntries:update', id, input),
     delete: (id: number) => invoke<void>('timeEntries:delete', id)
+  },
+  timer: {
+    get: () => invoke<TimeEntryDetails | null>('timer:get'),
+    start: (activityId: number) => invoke<TimeEntryDetails>('timer:start', activityId),
+    stop: () => invoke<void>('timer:stop'),
+    discard: () => invoke<void>('timer:discard'),
+    recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
   }
 }
 

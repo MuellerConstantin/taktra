@@ -1,5 +1,6 @@
 {
   "Navigation": {
+    "timer": "Timer",
     "tracking": "Tracking",
     "projects": "Projects",
     "tags": "Tags",
@@ -49,6 +50,37 @@
     "removeFromList": "Remove from list",
     "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
   },
+  "TimerView": {
+    "title": "Timer",
+    "switch": "Switch activity",
+    "todayTotal": "Today {duration}",
+    "since": "Running since {time}",
+    "stop": "Stop",
+    "discard": "Discard",
+    "idle": "No timer running.",
+    "start": "Start timer",
+    "recent": "Recently used",
+    "recentEmpty": "Activities you track will show up here for a quick start.",
+    "startActivity": "Start timer for {name}",
+    "stopActivity": "Stop timer for {name}",
+    "discardConfirmTitle": "Discard running timer?",
+    "discardConfirmText": "The running time is not booked and the entry is deleted.",
+    "discardConfirmAction": "Discard",
+    "cancel": "Cancel"
+  },
+  "TimerIndicator": {
+    "open": "Open timer for {name}",
+    "stop": "Stop timer"
+  },
+  "StartTimerDialog": {
+    "title": "Start timer",
+    "projectLabel": "Project",
+    "projectPlaceholder": "Choose a project",
+    "activityLabel": "Activity",
+    "createActivity": "Create “{name}”",
+    "cancel": "Cancel",
+    "start": "Start"
+  },
   "TrackingView": {
     "today": "Today",
     "yesterday": "Yesterday",
@@ -61,7 +93,8 @@
     "deleteConfirmTitle": "Delete entry for “{name}”?",
     "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "runningSince": "Running since {time}"
   },
   "DayNavigator": {
     "previous": "Previous day",

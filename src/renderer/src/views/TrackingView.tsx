@@ -21,9 +21,11 @@ import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
+import { useNow } from '../hooks/useNow'
 import { useProfiles } from '../hooks/useProfiles'
+import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
-import { formatDuration } from '../lib/duration'
+import { elapsedSeconds, formatDuration } from '../lib/duration'
 
 function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
   if (!value) return fallback
@@ -49,11 +51,17 @@ function TrackingView(): React.JSX.Element {
   const [reloadCount, setReloadCount] = useState(0)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const { running, revision, discard } = useTimer()
+  const isRunningShown =
+    running !== null && (entries ?? []).some(({ entry }) => entry.id === running.entry.id)
+  const now = useNow(isRunningShown)
+  const durationOf = ({ startedAt, endedAt, durationSec }: TimeEntryDetails['entry']): number =>
+    startedAt && !endedAt ? elapsedSeconds(startedAt, now) : (durationSec ?? 0)
 
   const dayFormatter = new DateFormatter(locale, { dateStyle: 'long' })
   const weekdayFormatter = new DateFormatter(locale, { weekday: 'long' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
-  const total = (entries ?? []).reduce((sum, { entry }) => sum + (entry.durationSec ?? 0), 0)
+  const total = (entries ?? []).reduce((sum, { entry }) => sum + durationOf(entry), 0)
 
   useEffect(() => {
     let isCurrent = true
@@ -68,7 +76,7 @@ function TrackingView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, day, reloadCount, errorMessage])
+  }, [activeProfile?.path, day, reloadCount, revision, errorMessage])
 
   const title = isSameDay(date, todayDate)
     ? t('today')
@@ -85,7 +93,8 @@ function TrackingView(): React.JSX.Element {
   const handleDelete = async (entryId: number): Promise<void> => {
     setDeleteError(null)
     try {
-      await api.timeEntries.delete(entryId)
+      if (running?.entry.id === entryId) await discard()
+      else await api.timeEntries.delete(entryId)
     } catch (caught) {
       setDeleteError(errorMessage(caught))
     }
@@ -152,13 +161,19 @@ function TrackingView(): React.JSX.Element {
                     {timeFormatter.formatRange(entry.startedAt, entry.endedAt)}
                   </span>
                 )}
+                {entry.startedAt && !entry.endedAt && (
+                  <span className="text-muted-foreground tabular-nums">
+                    {t('runningSince', { time: timeFormatter.format(entry.startedAt) })}
+                  </span>
+                )}
                 <span className="w-14 text-right font-medium tabular-nums">
-                  {formatDuration(entry.durationSec ?? 0)}
+                  {formatDuration(durationOf(entry))}
                 </span>
                 <Button
                   variant="icon"
                   aria-label={t('edit', { name: activity.name })}
                   onPress={() => setDialog({ details })}
+                  isDisabled={entry.startedAt !== null && entry.endedAt === null}
                 >
                   <RiPencilLine className="size-4" />
                 </Button>

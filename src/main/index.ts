@@ -9,6 +9,7 @@ import { initReports } from './reports'
 import { initSettings } from './settings'
 import { initTags } from './tags'
 import { initTimeEntries } from './timeEntries'
+import { initTimer } from './timer'
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -51,6 +52,7 @@ app.whenReady().then(() => {
   initTags()
   initActivities()
   initTimeEntries()
+  initTimer()
   initReports()
 
   app.on('browser-window-created', (_, window) => {

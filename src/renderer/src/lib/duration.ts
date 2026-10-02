@@ -9,6 +9,15 @@ export function formatDuration(seconds: number): string {
   return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`
 }
 
+export function elapsedSeconds(startedAt: Date, now: number): number {
+  return Math.max(0, Math.floor((now - startedAt.getTime()) / 1000))
+}
+
+export function formatElapsed(seconds: number): string {
+  const pad = (value: number): string => String(value).padStart(2, '0')
+  return `${Math.floor(seconds / 3600)}:${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`
+}
+
 function toSeconds(hours: number, minutes: number): number | null {
   const seconds = Math.round(hours * 60 + minutes) * 60
   return seconds > 0 && seconds <= MAX_DURATION_SEC ? seconds : null
