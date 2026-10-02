@@ -72,5 +72,15 @@
     "nameRequired": "Please enter a name.",
     "save": "Save",
     "renameFailed": "The profile could not be renamed."
+  },
+  "DeleteProfileSection": {
+    "title": "Delete profile",
+    "description": "Moves the profile file to the trash and removes the profile from Taktra.",
+    "action": "Delete profile…",
+    "confirmTitle": "Delete “{name}”?",
+    "confirmText": "The profile file will be moved to the trash. You can restore it from there as long as the trash has not been emptied.",
+    "confirmAction": "Delete",
+    "cancel": "Cancel",
+    "deleteFailed": "The profile could not be deleted."
   }
 }

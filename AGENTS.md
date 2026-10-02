@@ -24,6 +24,10 @@ profile, the file name is only a suggestion — a slug of the profile name — a
 can be changed freely. Renaming a profile later only changes the name stored in
 the file; the file itself is never renamed or moved by the app.
 
+Deleting a profile moves its file (and any SQLite sidecar files) to the
+operating system's trash instead of erasing it, so a mistake can be undone. If
+the deleted profile was active, the next available profile becomes active.
+
 **Projects & Activities**
 Projects group activities. An activity is the thing time is booked on (e.g.
 "Daily Standup" in project "Customer X"). Recurring work needs no special

@@ -72,5 +72,15 @@
     "nameRequired": "Bitte einen Namen eingeben.",
     "save": "Speichern",
     "renameFailed": "Das Profil konnte nicht umbenannt werden."
+  },
+  "DeleteProfileSection": {
+    "title": "Profil löschen",
+    "description": "Verschiebt die Profildatei in den Papierkorb und entfernt das Profil aus Taktra.",
+    "action": "Profil löschen…",
+    "confirmTitle": "„{name}“ löschen?",
+    "confirmText": "Die Profildatei wird in den Papierkorb verschoben. Von dort lässt sie sich wiederherstellen, solange der Papierkorb nicht geleert wurde.",
+    "confirmAction": "Löschen",
+    "cancel": "Abbrechen",
+    "deleteFailed": "Das Profil konnte nicht gelöscht werden."
   }
 }

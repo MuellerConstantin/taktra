@@ -1,10 +1,15 @@
 import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import Store from 'electron-store'
 import { profileFileExtension, type ProfilesState } from '../shared/profiles'
-import { APPLICATION_ID, SCHEMA_VERSION, RESERVED_FILE_NAMES } from './constants'
+import {
+  APPLICATION_ID,
+  RESERVED_FILE_NAMES,
+  SCHEMA_VERSION,
+  SQLITE_SIDECAR_SUFFIXES
+} from './constants'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -95,6 +100,25 @@ export function renameProfile(path: string, name: string): ProfilesState {
   return getProfilesState()
 }
 
+export async function deleteProfile(path: string): Promise<ProfilesState> {
+  const paths = store.get('paths')
+  if (!paths.includes(path)) throw new Error(`Unknown profile: ${path}`)
+
+  for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
+    if (existsSync(file)) await shell.trashItem(file)
+  }
+
+  const remaining = paths.filter((known) => known !== path)
+  const activePath = store.get('activePath')
+  const nextActivePath =
+    activePath === path
+      ? (remaining.find((known) => readProfileName(known) !== null) ?? null)
+      : activePath
+
+  store.set({ paths: remaining, activePath: nextActivePath })
+  return getProfilesState()
+}
+
 export function setActiveProfile(path: string): ProfilesState {
   if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
 
@@ -147,6 +171,7 @@ export function initProfiles(): void {
   ipcMain.handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
   ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
   ipcMain.handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
+  ipcMain.handle('profiles:delete', (_, path: string) => deleteProfile(path))
   ipcMain.handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
   ipcMain.handle('profiles:choosePath', (event, defaultPath: string) =>
     chooseProfilePath(BrowserWindow.fromWebContents(event.sender), defaultPath)

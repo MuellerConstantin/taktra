@@ -25,6 +25,10 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
     setState(await window.api.profiles.rename(path, name))
   }, [])
 
+  const deleteProfile = useCallback(async (path: string) => {
+    setState(await window.api.profiles.delete(path))
+  }, [])
+
   const value = useMemo(
     () =>
       state && {
@@ -32,9 +36,10 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
         activeProfile: state.profiles.find((profile) => profile.path === state.activePath) ?? null,
         createProfile,
         setActiveProfile,
-        renameProfile
+        renameProfile,
+        deleteProfile
       },
-    [state, createProfile, setActiveProfile, renameProfile]
+    [state, createProfile, setActiveProfile, renameProfile, deleteProfile]
   )
 
   if (!value) return null

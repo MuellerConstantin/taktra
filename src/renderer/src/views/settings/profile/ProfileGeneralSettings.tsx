@@ -4,6 +4,7 @@ import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../../shared/profiles'
 import { Button } from '../../../components/atoms/Button'
 import { TextField } from '../../../components/atoms/TextField'
+import { DeleteProfileSection } from '../../../components/molecules/DeleteProfileSection'
 import { useProfiles } from '../../../hooks/useProfiles'
 
 interface ProfileNameFormProps {
@@ -60,11 +61,14 @@ function ProfileGeneralSettings(): React.JSX.Element | null {
   if (!activeProfile?.name) return null
 
   return (
-    <ProfileNameForm
-      key={activeProfile.path}
-      profile={activeProfile}
-      currentName={activeProfile.name}
-    />
+    <div className="flex flex-col gap-10">
+      <ProfileNameForm
+        key={activeProfile.path}
+        profile={activeProfile}
+        currentName={activeProfile.name}
+      />
+      <DeleteProfileSection profile={activeProfile} profileName={activeProfile.name} />
+    </div>
   )
 }
 
