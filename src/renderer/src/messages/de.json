@@ -12,7 +12,11 @@
     "missing": "{file} (nicht gefunden)",
     "profiles": "Profile",
     "profileSettings": "Profileinstellungen…",
-    "newProfile": "Neues Profil…"
+    "newProfile": "Neues Profil…",
+    "openProfile": "Profil öffnen…",
+    "invalidTitle": "Kein Taktra-Profil",
+    "invalidText": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
+    "ok": "OK"
   },
   "CreateProfileDialog": {
     "title": "Neues Profil",

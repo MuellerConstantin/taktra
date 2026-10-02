@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { RiAddLine, RiExpandUpDownLine, RiSettings3Line } from '@remixicon/react'
+import { RiAddLine, RiExpandUpDownLine, RiFolderOpenLine, RiSettings3Line } from '@remixicon/react'
 import { Button } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../shared/profiles'
 import { useProfiles } from '../../hooks/useProfiles'
+import { AlertDialog } from '../atoms/AlertDialog'
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atoms/Menu'
+import { Modal } from '../atoms/Modal'
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
 
@@ -14,8 +16,13 @@ function fileName(path: string): string {
 
 export function ProfileSwitcher(): React.JSX.Element {
   const t = useTranslations('ProfileSwitcher')
-  const { profiles, activeProfile, setActiveProfile } = useProfiles()
+  const { profiles, activeProfile, setActiveProfile, openProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
+  const [isInvalidOpen, setInvalidOpen] = useState(false)
+
+  const handleOpen = async (): Promise<void> => {
+    if ((await openProfile()) === 'invalid') setInvalidOpen(true)
+  }
 
   const label = (profile: ProfileSummary): string =>
     profile.name ?? t('missing', { file: fileName(profile.path) })
@@ -77,9 +84,18 @@ export function ProfileSwitcher(): React.JSX.Element {
             <RiAddLine aria-hidden className="size-4" />
             {t('newProfile')}
           </MenuItem>
+          <MenuItem onAction={handleOpen} textValue={t('openProfile')}>
+            <RiFolderOpenLine aria-hidden className="size-4" />
+            {t('openProfile')}
+          </MenuItem>
         </Menu>
       </MenuTrigger>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
+      <Modal isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} isDismissable>
+        <AlertDialog variant="destructive" title={t('invalidTitle')} actionLabel={t('ok')}>
+          {t('invalidText')}
+        </AlertDialog>
+      </Modal>
     </>
   )
 }

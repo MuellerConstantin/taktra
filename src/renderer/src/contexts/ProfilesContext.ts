@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { ProfileSummary } from '../../../shared/profiles'
+import type { OpenProfileResult, ProfileSummary } from '../../../shared/profiles'
 
 export interface ProfilesContextValue {
   readonly profiles: readonly ProfileSummary[]
@@ -8,6 +8,7 @@ export interface ProfilesContextValue {
   readonly setActiveProfile: (path: string) => Promise<void>
   readonly renameProfile: (path: string, name: string) => Promise<void>
   readonly deleteProfile: (path: string) => Promise<void>
+  readonly openProfile: () => Promise<OpenProfileResult['status']>
 }
 
 export const ProfilesContext = createContext<ProfilesContextValue | null>(null)

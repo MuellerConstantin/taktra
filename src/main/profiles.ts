@@ -3,7 +3,11 @@ import { dirname, join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import Store from 'electron-store'
-import { profileFileExtension, type ProfilesState } from '../shared/profiles'
+import {
+  profileFileExtension,
+  type OpenProfileResult,
+  type ProfilesState
+} from '../shared/profiles'
 import {
   APPLICATION_ID,
   RESERVED_FILE_NAMES,
@@ -166,12 +170,34 @@ async function chooseProfilePath(
   return result.canceled || !result.filePath ? null : result.filePath
 }
 
+async function openProfile(window: BrowserWindow | null): Promise<OpenProfileResult> {
+  const options = {
+    properties: ['openFile' as const],
+    filters: [{ name: 'Taktra', extensions: [profileFileExtension] }]
+  }
+  const result = window
+    ? await dialog.showOpenDialog(window, options)
+    : await dialog.showOpenDialog(options)
+
+  const [path] = result.filePaths
+  if (result.canceled || !path) return { status: 'canceled' }
+  if (readProfileName(path) === null) return { status: 'invalid' }
+
+  const paths = store.get('paths')
+  store.set({ paths: paths.includes(path) ? paths : [...paths, path], activePath: path })
+
+  return { status: 'opened', state: getProfilesState() }
+}
+
 export function initProfiles(): void {
   ipcMain.handle('profiles:get', () => getProfilesState())
   ipcMain.handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
   ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
   ipcMain.handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
   ipcMain.handle('profiles:delete', (_, path: string) => deleteProfile(path))
+  ipcMain.handle('profiles:open', (event) =>
+    openProfile(BrowserWindow.fromWebContents(event.sender))
+  )
   ipcMain.handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
   ipcMain.handle('profiles:choosePath', (event, defaultPath: string) =>
     chooseProfilePath(BrowserWindow.fromWebContents(event.sender), defaultPath)

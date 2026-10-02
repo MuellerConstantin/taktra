@@ -8,7 +8,7 @@ interface AlertDialogProps extends Omit<DialogProps, 'children'> {
   readonly children: React.ReactNode
   readonly variant?: 'info' | 'destructive'
   readonly actionLabel: string
-  readonly cancelLabel: string
+  readonly cancelLabel?: string
   readonly onAction?: () => void
 }
 
@@ -34,12 +34,14 @@ export function AlertDialog({
           />
           <div className="mt-3 text-sm text-muted-foreground">{children}</div>
           <div className="mt-6 flex justify-end gap-2">
-            <Button variant="secondary" autoFocus={variant === 'destructive'} onPress={close}>
-              {cancelLabel}
-            </Button>
+            {cancelLabel && (
+              <Button variant="secondary" autoFocus={variant === 'destructive'} onPress={close}>
+                {cancelLabel}
+              </Button>
+            )}
             <Button
               variant={variant === 'destructive' ? 'destructive' : 'primary'}
-              autoFocus={variant !== 'destructive'}
+              autoFocus={variant !== 'destructive' || !cancelLabel}
               onPress={() => {
                 onAction?.()
                 close()

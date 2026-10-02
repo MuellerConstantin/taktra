@@ -16,8 +16,10 @@ Similar to KeePass, a user can work with several independent profiles — for
 example one for work and one for private projects. Each profile is a single
 SQLite file (`*.taktra`) at a location of the user's choice, by default
 `profiles/` in the user data directory. The app remembers the known profiles and the
-active one; the files themselves are self-contained. A profile whose file was
-moved or deleted stays listed but disabled.
+active one; the files themselves are self-contained. Besides creating a new
+profile, an existing `*.taktra` file can be opened; it is only accepted if its
+`application_id` and stored name identify it as a Taktra profile. A profile
+whose file was moved or deleted stays listed but disabled.
 
 Profile name and file name are independent, as in KeePass. When creating a
 profile, the file name is only a suggestion — a slug of the profile name — and

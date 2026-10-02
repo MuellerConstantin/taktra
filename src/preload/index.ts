@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { ProfilesState } from '../shared/profiles'
+import type { OpenProfileResult, ProfilesState } from '../shared/profiles'
 import type { Settings } from '../shared/settings'
 
 const api = {
@@ -17,6 +17,7 @@ const api = {
     rename: (path: string, name: string): Promise<ProfilesState> =>
       ipcRenderer.invoke('profiles:rename', path, name),
     delete: (path: string): Promise<ProfilesState> => ipcRenderer.invoke('profiles:delete', path),
+    open: (): Promise<OpenProfileResult> => ipcRenderer.invoke('profiles:open'),
     defaultPath: (name: string): Promise<string> =>
       ipcRenderer.invoke('profiles:defaultPath', name),
     choosePath: (defaultPath: string): Promise<string | null> =>
