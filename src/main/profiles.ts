@@ -79,6 +79,22 @@ export function createProfile(name: string, path: string): ProfilesState {
   return getProfilesState()
 }
 
+export function renameProfile(path: string, name: string): ProfilesState {
+  const trimmedName = name.trim()
+  if (!trimmedName) throw new Error('Profile name must not be empty')
+  if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
+  if (readProfileName(path) === null) throw new Error(`Profile not available: ${path}`)
+
+  const db = new DatabaseSync(path)
+  try {
+    db.prepare("UPDATE meta SET value = ? WHERE key = 'name'").run(trimmedName)
+  } finally {
+    db.close()
+  }
+
+  return getProfilesState()
+}
+
 export function setActiveProfile(path: string): ProfilesState {
   if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
 
@@ -130,6 +146,7 @@ export function initProfiles(): void {
   ipcMain.handle('profiles:get', () => getProfilesState())
   ipcMain.handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
   ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
+  ipcMain.handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
   ipcMain.handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
   ipcMain.handle('profiles:choosePath', (event, defaultPath: string) =>
     chooseProfilePath(BrowserWindow.fromWebContents(event.sender), defaultPath)

@@ -11,6 +11,7 @@
     "none": "No profile",
     "missing": "{file} (not found)",
     "profiles": "Profiles",
+    "profileSettings": "Profile settings…",
     "newProfile": "New profile…"
   },
   "CreateProfileDialog": {
@@ -40,7 +41,7 @@
     "title": "Reports",
     "placeholder": "Reports by project and tag"
   },
-  "SettingsView": {
+  "AppSettingsView": {
     "title": "Settings",
     "appearance": "Appearance"
   },
@@ -59,5 +60,17 @@
       "en": "English",
       "de": "Deutsch"
     }
+  },
+  "ProfileSettingsView": {
+    "title": "Profile settings",
+    "general": "General",
+    "noProfile": "No profile selected."
+  },
+  "ProfileGeneralSettings": {
+    "nameLabel": "Name",
+    "nameDescription": "Stored in the profile file. Renaming does not change the file name.",
+    "nameRequired": "Please enter a name.",
+    "save": "Save",
+    "renameFailed": "The profile could not be renamed."
   }
 }

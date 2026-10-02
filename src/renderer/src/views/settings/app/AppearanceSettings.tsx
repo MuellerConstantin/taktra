@@ -1,13 +1,13 @@
 import { useTranslations } from 'use-intl'
-import { RadioCard, RadioGroup } from '../../components/atoms/RadioGroup'
-import { Select, SelectItem } from '../../components/atoms/Select'
-import { useSettings } from '../../hooks/useSettings'
+import { RadioCard, RadioGroup } from '../../../components/atoms/RadioGroup'
+import { Select, SelectItem } from '../../../components/atoms/Select'
+import { useSettings } from '../../../hooks/useSettings'
 import {
   languages,
   themeSources,
   type Language,
   type ThemeSource
-} from '../../../../shared/settings'
+} from '../../../../../shared/settings'
 
 function AppearanceSettings(): React.JSX.Element {
   const t = useTranslations('AppearanceSettings')

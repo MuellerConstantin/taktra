@@ -14,6 +14,8 @@ const api = {
       ipcRenderer.invoke('profiles:create', name, path),
     setActive: (path: string): Promise<ProfilesState> =>
       ipcRenderer.invoke('profiles:setActive', path),
+    rename: (path: string, name: string): Promise<ProfilesState> =>
+      ipcRenderer.invoke('profiles:rename', path, name),
     defaultPath: (name: string): Promise<string> =>
       ipcRenderer.invoke('profiles:defaultPath', name),
     choosePath: (defaultPath: string): Promise<string | null> =>

@@ -11,6 +11,7 @@
     "none": "Kein Profil",
     "missing": "{file} (nicht gefunden)",
     "profiles": "Profile",
+    "profileSettings": "Profileinstellungen…",
     "newProfile": "Neues Profil…"
   },
   "CreateProfileDialog": {
@@ -40,7 +41,7 @@
     "title": "Auswertung",
     "placeholder": "Auswertung nach Projekten und Tags"
   },
-  "SettingsView": {
+  "AppSettingsView": {
     "title": "Einstellungen",
     "appearance": "Darstellung"
   },
@@ -59,5 +60,17 @@
       "en": "English",
       "de": "Deutsch"
     }
+  },
+  "ProfileSettingsView": {
+    "title": "Profileinstellungen",
+    "general": "Allgemein",
+    "noProfile": "Kein Profil ausgewählt."
+  },
+  "ProfileGeneralSettings": {
+    "nameLabel": "Name",
+    "nameDescription": "Wird in der Profildatei gespeichert. Umbenennen ändert den Dateinamen nicht.",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "save": "Speichern",
+    "renameFailed": "Das Profil konnte nicht umbenannt werden."
   }
 }

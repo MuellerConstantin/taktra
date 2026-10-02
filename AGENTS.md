@@ -83,8 +83,11 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │           ├── main.tsx              # React entry point
 │           ├── main.css              # Tailwind entry, plugins and theme tokens
 │           ├── router.tsx            # Route definitions
-│           ├── views/                # One component per route; nested routes in subfolders (settings/)
-│           ├── contexts/             # Context objects and providers (settings, locale)
+│           ├── views/                # One component per route; nested routes in subfolders
+│           │   └── settings/
+│           │       ├── app/          # App settings (/settings): theme, language
+│           │       └── profile/      # Settings of the active profile (/profile): name, …
+│           ├── contexts/             # Context objects and providers (settings, locale, profiles)
 │           ├── hooks/                # React hooks (e.g. useSettings reading the settings context)
 │           ├── messages/             # Translations (en.json, de.json)
 │           ├── i18n.d.ts             # Types translation keys against en.json
@@ -92,7 +95,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │               ├── atoms/            # Styled react-aria wrappers (Button, Field, Menu, Select, …), utils.ts and shared tv styles in styles.ts
 │               ├── molecules/        # Composed components (ViewHeader, ProfileSwitcher, CreateProfileDialog, …)
 │               ├── organisms/        # Full sections (Sidebar)
-│               └── templates/        # Layouts (AppTemplate: sidebar + route outlet)
+│               └── templates/        # Layouts (AppTemplate: sidebar + outlet, TabViewTemplate: header + tabs + outlet)
 ├── build/                            # Build resources for electron-builder (icons)
 ├── resources/                        # Runtime assets shipped with the app
 ├── electron.vite.config.ts

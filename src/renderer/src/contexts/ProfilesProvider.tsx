@@ -21,15 +21,20 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
     setState(await window.api.profiles.setActive(path))
   }, [])
 
+  const renameProfile = useCallback(async (path: string, name: string) => {
+    setState(await window.api.profiles.rename(path, name))
+  }, [])
+
   const value = useMemo(
     () =>
       state && {
         profiles: state.profiles,
         activeProfile: state.profiles.find((profile) => profile.path === state.activePath) ?? null,
         createProfile,
-        setActiveProfile
+        setActiveProfile,
+        renameProfile
       },
-    [state, createProfile, setActiveProfile]
+    [state, createProfile, setActiveProfile, renameProfile]
   )
 
   if (!value) return null

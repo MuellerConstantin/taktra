@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RiAddLine, RiExpandUpDownLine } from '@remixicon/react'
+import { RiAddLine, RiExpandUpDownLine, RiSettings3Line } from '@remixicon/react'
 import { Button } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../shared/profiles'
@@ -66,6 +66,12 @@ export function ProfileSwitcher(): React.JSX.Element {
               </MenuSection>
               <MenuSeparator />
             </>
+          )}
+          {activeProfile?.isAvailable && (
+            <MenuItem href="/profile" textValue={t('profileSettings')}>
+              <RiSettings3Line aria-hidden className="size-4" />
+              {t('profileSettings')}
+            </MenuItem>
           )}
           <MenuItem onAction={() => setCreateOpen(true)} textValue={t('newProfile')}>
             <RiAddLine aria-hidden className="size-4" />
