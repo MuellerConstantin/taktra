@@ -104,13 +104,9 @@ export function renameProfile(path: string, name: string): ProfilesState {
   return getProfilesState()
 }
 
-export async function deleteProfile(path: string): Promise<ProfilesState> {
+export function removeProfile(path: string): ProfilesState {
   const paths = store.get('paths')
   if (!paths.includes(path)) throw new Error(`Unknown profile: ${path}`)
-
-  for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
-    if (existsSync(file)) await shell.trashItem(file)
-  }
 
   const remaining = paths.filter((known) => known !== path)
   const activePath = store.get('activePath')
@@ -121,6 +117,16 @@ export async function deleteProfile(path: string): Promise<ProfilesState> {
 
   store.set({ paths: remaining, activePath: nextActivePath })
   return getProfilesState()
+}
+
+export async function deleteProfile(path: string): Promise<ProfilesState> {
+  if (!store.get('paths').includes(path)) throw new Error(`Unknown profile: ${path}`)
+
+  for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
+    if (existsSync(file)) await shell.trashItem(file)
+  }
+
+  return removeProfile(path)
 }
 
 export function setActiveProfile(path: string): ProfilesState {
@@ -195,6 +201,7 @@ export function initProfiles(): void {
   ipcMain.handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
   ipcMain.handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
   ipcMain.handle('profiles:delete', (_, path: string) => deleteProfile(path))
+  ipcMain.handle('profiles:remove', (_, path: string) => removeProfile(path))
   ipcMain.handle('profiles:open', (event) =>
     openProfile(BrowserWindow.fromWebContents(event.sender))
   )

@@ -8,6 +8,7 @@ export interface ProfilesContextValue {
   readonly setActiveProfile: (path: string) => Promise<void>
   readonly renameProfile: (path: string, name: string) => Promise<void>
   readonly deleteProfile: (path: string) => Promise<void>
+  readonly removeProfile: (path: string) => Promise<void>
   readonly openProfile: () => Promise<OpenProfileResult['status']>
 }
 

@@ -9,7 +9,7 @@ import logo from '../../../../resources/icon.svg'
 
 function WelcomeView(): React.JSX.Element {
   const t = useTranslations('WelcomeView')
-  const { activeProfile, openProfile } = useProfiles()
+  const { activeProfile, openProfile, removeProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isInvalidOpen, setInvalidOpen] = useState(false)
 
@@ -37,6 +37,16 @@ function WelcomeView(): React.JSX.Element {
             {t('open')}
           </Button>
         </div>
+        {activeProfile && (
+          <div className="flex flex-col items-center gap-2">
+            <p className="font-mono text-xs break-all text-muted-foreground">
+              {activeProfile.path}
+            </p>
+            <Button variant="secondary" onPress={() => removeProfile(activeProfile.path)}>
+              {t('removeFromList')}
+            </Button>
+          </div>
+        )}
       </div>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
       <InvalidProfileAlert isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} />

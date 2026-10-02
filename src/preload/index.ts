@@ -17,6 +17,7 @@ const api = {
     rename: (path: string, name: string): Promise<ProfilesState> =>
       ipcRenderer.invoke('profiles:rename', path, name),
     delete: (path: string): Promise<ProfilesState> => ipcRenderer.invoke('profiles:delete', path),
+    remove: (path: string): Promise<ProfilesState> => ipcRenderer.invoke('profiles:remove', path),
     open: (): Promise<OpenProfileResult> => ipcRenderer.invoke('profiles:open'),
     defaultPath: (name: string): Promise<string> =>
       ipcRenderer.invoke('profiles:defaultPath', name),

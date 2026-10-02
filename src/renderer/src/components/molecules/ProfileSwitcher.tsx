@@ -8,6 +8,7 @@ import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atom
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
 import { InvalidProfileAlert } from './InvalidProfileAlert'
+import { UnavailableProfileDialog } from './UnavailableProfileDialog'
 
 function fileName(path: string): string {
   return path.split(/[\\/]/).pop() ?? path
@@ -18,6 +19,7 @@ export function ProfileSwitcher(): React.JSX.Element {
   const { profiles, activeProfile, setActiveProfile, openProfile } = useProfiles()
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [isInvalidOpen, setInvalidOpen] = useState(false)
+  const [unavailablePath, setUnavailablePath] = useState<string | null>(null)
 
   const handleOpen = async (): Promise<void> => {
     if ((await openProfile()) === 'invalid') setInvalidOpen(true)
@@ -57,16 +59,23 @@ export function ProfileSwitcher(): React.JSX.Element {
                 selectedKeys={activeProfile ? [activeProfile.path] : []}
                 onSelectionChange={(keys) => {
                   const [key] = keys === 'all' ? [] : [...keys]
-                  if (key !== undefined) setActiveProfile(String(key))
+                  if (key === undefined) return
+                  const profile = profiles.find((candidate) => candidate.path === key)
+                  if (profile?.isAvailable) setActiveProfile(profile.path)
+                  else setUnavailablePath(String(key))
                 }}
               >
                 {(profile) => (
-                  <MenuItem
-                    id={profile.path}
-                    textValue={label(profile)}
-                    isDisabled={!profile.isAvailable}
-                  >
-                    {label(profile)}
+                  <MenuItem id={profile.path} textValue={label(profile)}>
+                    <span
+                      className={
+                        profile.isAvailable
+                          ? undefined
+                          : 'text-muted-foreground group-focus:text-primary-foreground'
+                      }
+                    >
+                      {label(profile)}
+                    </span>
                   </MenuItem>
                 )}
               </MenuSection>
@@ -91,6 +100,7 @@ export function ProfileSwitcher(): React.JSX.Element {
       </MenuTrigger>
       <CreateProfileDialog isOpen={isCreateOpen} onOpenChange={setCreateOpen} />
       <InvalidProfileAlert isOpen={isInvalidOpen} onOpenChange={setInvalidOpen} />
+      <UnavailableProfileDialog path={unavailablePath} onClose={() => setUnavailablePath(null)} />
     </>
   )
 }

@@ -9,7 +9,7 @@
   "ProfileSwitcher": {
     "label": "Profil",
     "none": "Kein Profil",
-    "missing": "{file} (nicht gefunden)",
+    "missing": "{file} (nicht verfügbar)",
     "profiles": "Profile",
     "profileSettings": "Profileinstellungen…",
     "newProfile": "Neues Profil…",
@@ -31,12 +31,19 @@
     "text": "Die ausgewählte Datei konnte nicht als Taktra-Profil geöffnet werden.",
     "ok": "OK"
   },
+  "UnavailableProfileDialog": {
+    "title": "Profil nicht verfügbar",
+    "text": "Die Profildatei wurde nicht gefunden oder ist kein gültiges Taktra-Profil. Das Entfernen aus der Liste verändert keine Datei.",
+    "remove": "Aus Liste entfernen",
+    "cancel": "Abbrechen"
+  },
   "WelcomeView": {
     "title": "Willkommen bei Taktra",
     "text": "Lege ein Profil an, um deine Zeiten zu erfassen, oder öffne eine vorhandene Profildatei.",
-    "missingText": "Die Datei des ausgewählten Profils wurde nicht gefunden. Lege ein neues Profil an, öffne eine Profildatei oder wähle in der Sidebar ein anderes Profil.",
+    "missingText": "Die Datei des ausgewählten Profils wurde nicht gefunden oder lässt sich nicht öffnen. Lege ein neues Profil an, öffne eine Profildatei oder entferne das Profil aus der Liste.",
     "create": "Profil anlegen",
-    "open": "Profil öffnen"
+    "open": "Profil öffnen",
+    "removeFromList": "Aus Liste entfernen"
   },
   "TrackingView": {
     "title": "Erfassung",

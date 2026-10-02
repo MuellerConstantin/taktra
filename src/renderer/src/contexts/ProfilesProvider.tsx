@@ -29,6 +29,10 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
     setState(await window.api.profiles.delete(path))
   }, [])
 
+  const removeProfile = useCallback(async (path: string) => {
+    setState(await window.api.profiles.remove(path))
+  }, [])
+
   const openProfile = useCallback(async () => {
     const result = await window.api.profiles.open()
     if (result.status === 'opened') setState(result.state)
@@ -44,9 +48,18 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
         setActiveProfile,
         renameProfile,
         deleteProfile,
+        removeProfile,
         openProfile
       },
-    [state, createProfile, setActiveProfile, renameProfile, deleteProfile, openProfile]
+    [
+      state,
+      createProfile,
+      setActiveProfile,
+      renameProfile,
+      deleteProfile,
+      removeProfile,
+      openProfile
+    ]
   )
 
   if (!value) return null
