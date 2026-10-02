@@ -15,9 +15,14 @@ can copy, back up or move like any other document.
 Similar to KeePass, a user can work with several independent profiles — for
 example one for work and one for private projects. Each profile is a single
 SQLite file (`*.taktra`) at a location of the user's choice, by default
-`%APPDATA%\taktra\profiles\`. The app remembers the known profiles and the
+`profiles/` in the user data directory. The app remembers the known profiles and the
 active one; the files themselves are self-contained. A profile whose file was
 moved or deleted stays listed but disabled.
+
+Profile name and file name are independent, as in KeePass. When creating a
+profile, the file name is only a suggestion — a slug of the profile name — and
+can be changed freely. Renaming a profile later only changes the name stored in
+the file; the file itself is never renamed or moved by the app.
 
 **Projects & Activities**
 Projects group activities. An activity is the thing time is booked on (e.g.
@@ -65,7 +70,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 ├── src/
 │   ├── main/                         # Electron main process
 │   │   ├── index.ts                  # App lifecycle, window creation
-│   │   ├── constants.ts              # Main-process constants (application id, schema version)
+│   │   ├── constants.ts              # Main-process constants (application id, schema version, …)
 │   │   ├── profiles.ts               # Known profiles store, profile file creation, IPC handlers
 │   │   └── settings.ts               # App settings store, IPC handlers, theme
 │   ├── preload/                      # Bridge between main and renderer
@@ -109,7 +114,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   "TAKT"), the schema version is tracked with `PRAGMA user_version`. A
   key/value table `meta` holds file-level data such as the profile name, so a
   copied or renamed file keeps its name. Which profiles exist and which one is
-  active is app state in `%APPDATA%\taktra\profiles.json` (own
+  active is app state in `profiles.json` in the user data directory (own
   `electron-store`, separate from user settings), never inside a profile.
 - **`node:sqlite` instead of a native module**: SQLite is accessed through
   Node's built-in `node:sqlite` (release candidate since Node 25.7), which
@@ -118,7 +123,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   code.
 - **App settings outside the database**: Preferences that belong to the
   installation (theme, language, later window state) live in
-  `%APPDATA%\taktra\settings.json`, not in a database file. They are owned by
+  `settings.json` in the user data directory, not in a database file. They are owned by
   the main process via `electron-store` (JSON schema validation, defaults,
   atomic writes, version migrations) and reach the renderer only through
   `window.api.settings`. The `Settings` type lives in `src/shared/` and is used
@@ -139,8 +144,12 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   without an end, so it survives crashes, restarts and standby.
 - **Archive instead of delete**: Anything with booked time is archived, never
   deleted, so historic reports stay complete.
-- **Windows first**: The app is built and tested for Windows. macOS and Linux
-  packaging is not configured.
+- **Cross-platform code, Windows packaging first**: Code must not assume a
+  specific OS — paths come from Electron (`app.getPath('userData')` is
+  `%APPDATA%\taktra` on Windows, `~/Library/Application Support/taktra` on
+  macOS, `~/.config/taktra` on Linux) and generated file names avoid anything
+  invalid on any of the three systems. Only packaging is configured for Windows
+  so far.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk. React Router therefore uses a
   hash router. react-aria's `RouterProvider` is wired to React Router in
@@ -172,7 +181,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   `dark`, default `system`) is applied in the main process through
   `nativeTheme.themeSource`. That drives `prefers-color-scheme` in the
   renderer as well as native UI (menus, dialogs, scrollbars), and `system`
-  follows Windows live. The renderer never toggles classes itself. The window's
+  follows the operating system live. The renderer never toggles classes itself. The window's
   `backgroundColor` matches the theme so there is no light flash on startup.
 
 ## Coding Principles

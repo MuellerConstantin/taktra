@@ -4,7 +4,7 @@ import { DatabaseSync } from 'node:sqlite'
 import { app, BrowserWindow, dialog, ipcMain } from 'electron'
 import Store from 'electron-store'
 import { profileFileExtension, type ProfilesState } from '../shared/profiles'
-import { APPLICATION_ID, SCHEMA_VERSION } from './constants'
+import { APPLICATION_ID, SCHEMA_VERSION, RESERVED_FILE_NAMES } from './constants'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -86,17 +86,26 @@ export function setActiveProfile(path: string): ProfilesState {
   return getProfilesState()
 }
 
+function slugify(value: string): string {
+  const slug = value
+    .replace(/ß/g, 'ss')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  if (!slug) return 'profile'
+  return RESERVED_FILE_NAMES.test(slug) ? `${slug}-profile` : slug
+}
+
 export function getDefaultProfilePath(name: string): string {
   const directory = join(app.getPath('userData'), 'profiles')
-  const baseName =
-    name
-      .trim()
-      .replace(/[<>:"/\\|?*]/g, '')
-      .trim() || 'profile'
+  const slug = slugify(name)
 
-  let candidate = join(directory, `${baseName}.${profileFileExtension}`)
+  let candidate = join(directory, `${slug}.${profileFileExtension}`)
   for (let counter = 2; existsSync(candidate); counter++) {
-    candidate = join(directory, `${baseName} (${counter}).${profileFileExtension}`)
+    candidate = join(directory, `${slug}-${counter}.${profileFileExtension}`)
   }
 
   return candidate
