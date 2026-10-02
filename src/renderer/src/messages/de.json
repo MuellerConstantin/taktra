@@ -276,7 +276,7 @@
     },
     "miniTimer": {
       "label": "Mini-Timer",
-      "description": "Zeigt ein kleines Fenster im Vordergrund mit dem laufenden Timer, solange Taktra minimiert ist."
+      "description": "Zeigt ein kleines Fenster im Vordergrund mit dem laufenden Timer, solange Taktra minimiert oder von anderen Fenstern verdeckt ist."
     }
   },
   "ProfileSettingsView": {

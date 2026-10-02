@@ -276,7 +276,7 @@
     },
     "miniTimer": {
       "label": "Mini timer",
-      "description": "Shows a small always-on-top window with the running timer while Taktra is minimized."
+      "description": "Shows a small always-on-top window with the running timer while Taktra is minimized or covered by other windows."
     }
   },
   "ProfileSettingsView": {

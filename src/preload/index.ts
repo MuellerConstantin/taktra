@@ -90,7 +90,8 @@ const api = {
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
   },
   app: {
-    showMainWindow: () => invoke<void>('app:showMainWindow')
+    showMainWindow: () => invoke<void>('app:showMainWindow'),
+    setMainVisible: (visible: boolean) => invoke<void>('app:setMainVisible', visible)
   },
   events: {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback)

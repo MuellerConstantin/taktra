@@ -1,5 +1,6 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
 import Store from 'electron-store'
+import { AppError } from '../shared/errors'
 import { handle } from './ipc'
 import { getSettings } from './settings'
 import { hasRunningTimer, onTimerChanged } from './timer'
@@ -30,6 +31,7 @@ const store = new Store<{ position: Position | null }>({
 let mainWindow: BrowserWindow | null = null
 let miniWindow: BrowserWindow | null = null
 let isMiniReady = false
+let isMainVisible = true
 
 function contains(area: Rectangle, { x, y }: Position): boolean {
   return (
@@ -96,7 +98,8 @@ function createMiniWindow(): BrowserWindow {
 function updateMiniTimer(): void {
   if (!mainWindow || mainWindow.isDestroyed()) return
 
-  const shouldShow = getSettings().miniTimer && mainWindow.isMinimized() && hasRunningTimer()
+  const isMainHidden = mainWindow.isMinimized() || !isMainVisible
+  const shouldShow = getSettings().miniTimer && isMainHidden && hasRunningTimer()
   if (!shouldShow) {
     miniWindow?.hide()
     return
@@ -128,4 +131,10 @@ export function attachMiniTimer(window: BrowserWindow): void {
 export function initMiniTimer(): void {
   onTimerChanged(updateMiniTimer)
   handle('app:showMainWindow', () => showMainWindow())
+  handle('app:setMainVisible', (event, visible: boolean) => {
+    if (typeof visible !== 'boolean') throw new AppError('VALIDATION_FAILED', 'Invalid visibility')
+    if (event.sender !== mainWindow?.webContents) return
+    isMainVisible = visible
+    updateMiniTimer()
+  })
 }
