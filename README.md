@@ -21,6 +21,8 @@
   - [Database Migrations](#database-migrations)
   - [Checks](#checks)
 - [Build](#build)
+- [License](#license)
+  - [Forbidden](#forbidden)
 
 ## Introduction
 
@@ -99,3 +101,15 @@ npm run build:win
 
 `npm run build:unpack` builds an unpacked app directory instead, which is handy for a quick test of the
 production build.
+
+## License
+
+Copyright (c) 2026 Constantin Müller
+
+[GNU AFFERO GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/) or [LICENSE](./LICENSE.md) for
+more details.
+
+### Forbidden
+
+**Hold Liable**: Software is provided without warranty and the software
+author/license owner cannot be held liable for damages.
