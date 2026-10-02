@@ -2,8 +2,9 @@ import { RiArchiveLine, RiInboxUnarchiveLine, RiPencilLine } from '@remixicon/re
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
-import type { ActivitySummary } from '../../../shared/activities'
+import type { ActivityRef } from '../../../shared/activities'
 import type { Project } from '../../../shared/projects'
+import type { AggregateRow } from '../../../shared/reports'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { ActivityDialog } from '../components/molecules/ActivityDialog'
@@ -20,23 +21,29 @@ function ProjectDetailView(): React.JSX.Element {
   const errorMessage = useErrorMessage()
   const projectId = Number(useParams().projectId)
   const [project, setProject] = useState<Project | null>(null)
-  const [activities, setActivities] = useState<readonly ActivitySummary[] | null>(null)
+  const [rows, setRows] = useState<readonly AggregateRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [isProjectDialogOpen, setProjectDialogOpen] = useState(false)
-  const [activityToEdit, setActivityToEdit] = useState<ActivitySummary | null>(null)
+  const [activityToEdit, setActivityToEdit] = useState<ActivityRef | null>(null)
 
   const reload = (): void => setReloadCount((count) => count + 1)
-  const total = (activities ?? []).reduce((sum, activity) => sum + activity.totalSec, 0)
+  const total = (rows ?? []).reduce((sum, row) => sum + row.totalSec, 0)
+  const activities = (rows ?? []).flatMap(({ activity, totalSec, entryCount }) =>
+    activity ? [{ id: activity.id, activity, totalSec, entryCount }] : []
+  )
 
   useEffect(() => {
     let isCurrent = true
-    Promise.all([api.projects.get(projectId), api.activities.summarize(projectId)])
-      .then(([loadedProject, loadedActivities]) => {
+    Promise.all([
+      api.projects.get(projectId),
+      api.reports.aggregate({ projectIds: [projectId] }, ['activity'])
+    ])
+      .then(([loadedProject, loadedRows]) => {
         if (!isCurrent) return
         setProject(loadedProject)
-        setActivities(loadedActivities)
+        setRows(loadedRows)
         setError(null)
       })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
@@ -57,7 +64,7 @@ function ProjectDetailView(): React.JSX.Element {
   }
 
   if (error) return <p className="p-8 text-sm text-destructive">{error}</p>
-  if (!project || !activities) return <div />
+  if (!project || !rows) return <div />
 
   return (
     <div className="flex h-full flex-col">
@@ -115,17 +122,15 @@ function ProjectDetailView(): React.JSX.Element {
           )
         }
       >
-        {(activity) => (
+        {({ activity, totalSec, entryCount }) => (
           <GridListItem textValue={activity.name} className="h-auto">
             <div className="flex min-w-0 flex-1 flex-col py-3">
               <span className="truncate font-medium">{activity.name}</span>
               {activity.tags.length > 0 && <TagBadges tags={activity.tags} className="mt-2" />}
             </div>
-            <span className="text-muted-foreground">
-              {t('entryCount', { count: activity.entryCount })}
-            </span>
+            <span className="text-muted-foreground">{t('entryCount', { count: entryCount })}</span>
             <span className="w-14 text-right font-medium tabular-nums">
-              {formatDuration(activity.totalSec)}
+              {formatDuration(totalSec)}
             </span>
             <Button
               variant="icon"

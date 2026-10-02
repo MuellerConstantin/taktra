@@ -22,7 +22,7 @@ function invalid(message: string): AppError {
   return new AppError('VALIDATION_FAILED', message)
 }
 
-function assertLocalDate(date: string): void {
+export function assertLocalDate(date: string): void {
   const parsed = new Date(`${date}T00:00:00Z`)
   if (
     !LOCAL_DATE.test(date) ||

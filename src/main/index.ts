@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { initActivities } from './activities'
 import { initProfiles } from './profiles'
 import { initProjects } from './projects'
+import { initReports } from './reports'
 import { initSettings } from './settings'
 import { initTags } from './tags'
 import { initTimeEntries } from './timeEntries'
@@ -50,6 +51,7 @@ app.whenReady().then(() => {
   initTags()
   initActivities()
   initTimeEntries()
+  initReports()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

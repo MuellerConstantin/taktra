@@ -8,10 +8,10 @@ export type ActivityTag = Pick<Tag, 'id' | 'name' | 'color'>
 
 export type ActivityWithTags = Activity & { readonly tagIds: readonly number[] }
 
-export type ActivitySummary = Activity & {
+export interface ActivityRef {
+  readonly id: number
+  readonly name: string
   readonly tags: readonly ActivityTag[]
-  readonly totalSec: number
-  readonly entryCount: number
 }
 
 export interface ActivityInput {

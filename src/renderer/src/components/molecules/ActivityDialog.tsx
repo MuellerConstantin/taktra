@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivitySummary } from '../../../../shared/activities'
+import type { ActivityRef } from '../../../../shared/activities'
 import type { Tag } from '../../../../shared/tags'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -12,7 +12,7 @@ import { TextField } from '../atoms/TextField'
 import { TagPicker } from './TagPicker'
 
 interface ActivityDialogProps {
-  readonly activity: ActivitySummary
+  readonly activity: ActivityRef
   readonly onClose: () => void
   readonly onSaved: () => void
 }

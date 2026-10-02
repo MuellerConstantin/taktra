@@ -1,13 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type {
-  Activity,
-  ActivityInput,
-  ActivitySummary,
-  ActivityWithTags
-} from '../shared/activities'
+import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
+import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings } from '../shared/settings'
 import type { Tag, TagInput } from '../shared/tags'
 import type {
@@ -56,7 +52,6 @@ const api = {
   activities: {
     list: (options?: { projectId?: number; includeArchived?: boolean }) =>
       invoke<ActivityWithTags[]>('activities:list', options),
-    summarize: (projectId: number) => invoke<ActivitySummary[]>('activities:summarize', projectId),
     create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
     rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
     setArchived: (id: number, archived: boolean) =>
@@ -64,6 +59,10 @@ const api = {
     setTags: (id: number, tagIds: readonly number[]) =>
       invoke<void>('activities:setTags', id, tagIds),
     delete: (id: number) => invoke<void>('activities:delete', id)
+  },
+  reports: {
+    aggregate: (filter: TimeFilter, groupBy: readonly Grouping[]) =>
+      invoke<AggregateRow[]>('reports:aggregate', filter, groupBy)
   },
   timeEntries: {
     list: (range: TimeEntryRange) => invoke<TimeEntryDetails[]>('timeEntries:list', range),
