@@ -15,7 +15,11 @@
     "profileSettings": "Profile settings…",
     "newProfile": "New profile…",
     "openProfile": "Open profile…",
-    "newerVersion": "{file} (newer version)"
+    "newerVersion": "{file} (newer version)",
+    "runningTimerTitle": "Stop the running timer?",
+    "runningTimerText": "The timer for “{name}” is stopped and booked before the profile changes.",
+    "runningTimerAction": "Stop and continue",
+    "cancel": "Cancel"
   },
   "CreateProfileDialog": {
     "title": "New profile",

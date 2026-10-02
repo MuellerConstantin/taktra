@@ -18,6 +18,7 @@ import {
 } from './db/database'
 import { SAMPLE_PROFILE_NAME, seedSampleData } from './db/sample'
 import { handle } from './ipc'
+import { stopTimer } from './timer'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -64,6 +65,9 @@ function syncActiveDatabase(): void {
 }
 
 function updateKnownProfiles(paths: string[], activePath: string | null): void {
+  const previousPath = store.get('activePath')
+  if (previousPath && previousPath !== activePath && isActiveDatabase(previousPath)) stopTimer()
+
   store.set({ paths, activePath })
   syncActiveDatabase()
 }

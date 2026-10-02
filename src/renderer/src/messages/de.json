@@ -15,7 +15,11 @@
     "profileSettings": "Profileinstellungen…",
     "newProfile": "Neues Profil…",
     "openProfile": "Profil öffnen…",
-    "newerVersion": "{file} (neuere Version)"
+    "newerVersion": "{file} (neuere Version)",
+    "runningTimerTitle": "Laufenden Timer stoppen?",
+    "runningTimerText": "Der Timer für „{name}“ wird gestoppt und gebucht, bevor das Profil wechselt.",
+    "runningTimerAction": "Stoppen und fortfahren",
+    "cancel": "Abbrechen"
   },
   "CreateProfileDialog": {
     "title": "Neues Profil",

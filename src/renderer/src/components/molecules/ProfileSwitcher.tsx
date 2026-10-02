@@ -4,7 +4,10 @@ import { Button } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ProfileSummary } from '../../../../shared/profiles'
 import { useProfiles } from '../../hooks/useProfiles'
+import { useTimer } from '../../hooks/useTimer'
+import { AlertDialog } from '../atoms/AlertDialog'
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../atoms/Menu'
+import { Modal } from '../atoms/Modal'
 import { focusRing } from '../atoms/utils'
 import { CreateProfileDialog } from './CreateProfileDialog'
 import { OpenProfileErrorAlert } from './OpenProfileErrorAlert'
@@ -20,6 +23,13 @@ export function ProfileSwitcher(): React.JSX.Element {
   const [isCreateOpen, setCreateOpen] = useState(false)
   const [openError, setOpenError] = useState<unknown>(null)
   const [unavailableProfile, setUnavailableProfile] = useState<ProfileSummary | null>(null)
+  const { running } = useTimer()
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null)
+
+  const confirmIfRunning = (action: () => void): void => {
+    if (running) setPendingAction(() => action)
+    else action()
+  }
 
   const handleOpen = async (): Promise<void> => {
     try {
@@ -66,7 +76,8 @@ export function ProfileSwitcher(): React.JSX.Element {
                   const [key] = keys === 'all' ? [] : [...keys]
                   if (key === undefined) return
                   const profile = profiles.find((candidate) => candidate.path === key)
-                  if (profile?.isAvailable) setActiveProfile(profile.path)
+                  if (profile?.isAvailable && profile.path !== activeProfile?.path)
+                    confirmIfRunning(() => setActiveProfile(profile.path))
                 }}
               >
                 {(profile) => (
@@ -96,11 +107,14 @@ export function ProfileSwitcher(): React.JSX.Element {
               {t('profileSettings')}
             </MenuItem>
           )}
-          <MenuItem onAction={() => setCreateOpen(true)} textValue={t('newProfile')}>
+          <MenuItem
+            onAction={() => confirmIfRunning(() => setCreateOpen(true))}
+            textValue={t('newProfile')}
+          >
             <RiAddLine aria-hidden className="size-4" />
             {t('newProfile')}
           </MenuItem>
-          <MenuItem onAction={handleOpen} textValue={t('openProfile')}>
+          <MenuItem onAction={() => confirmIfRunning(handleOpen)} textValue={t('openProfile')}>
             <RiFolderOpenLine aria-hidden className="size-4" />
             {t('openProfile')}
           </MenuItem>
@@ -112,6 +126,22 @@ export function ProfileSwitcher(): React.JSX.Element {
         profile={unavailableProfile}
         onClose={() => setUnavailableProfile(null)}
       />
+      <Modal
+        isOpen={pendingAction !== null}
+        onOpenChange={(isOpen) => !isOpen && setPendingAction(null)}
+        isDismissable
+      >
+        {running && (
+          <AlertDialog
+            title={t('runningTimerTitle')}
+            actionLabel={t('runningTimerAction')}
+            cancelLabel={t('cancel')}
+            onAction={() => pendingAction?.()}
+          >
+            {t('runningTimerText', { name: running.activity.name })}
+          </AlertDialog>
+        )}
+      </Modal>
     </>
   )
 }
