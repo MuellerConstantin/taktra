@@ -89,12 +89,17 @@ const api = {
     discard: () => invoke<void>('timer:discard'),
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
   },
+  quick: {
+    hide: () => invoke<void>('quick:hide'),
+    resize: (height: number) => invoke<void>('quick:resize', height)
+  },
   app: {
     showMainWindow: () => invoke<void>('app:showMainWindow'),
     setMainVisible: (visible: boolean) => invoke<void>('app:setMainVisible', visible)
   },
   events: {
-    onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback)
+    onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback),
+    onQuickShown: (callback: () => void) => subscribe('quick:shown', callback)
   }
 }
 

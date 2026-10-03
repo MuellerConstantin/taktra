@@ -80,6 +80,15 @@
     "open": "Taktra öffnen",
     "stop": "Timer stoppen"
   },
+  "QuickStartView": {
+    "search": "Tätigkeiten suchen",
+    "placeholder": "Timer starten für…",
+    "recent": "Zuletzt verwendet",
+    "activities": "Tätigkeiten",
+    "noMatch": "Keine passende Tätigkeit.",
+    "noRecent": "Tippen, um alle Tätigkeiten zu durchsuchen.",
+    "stop": "Timer stoppen"
+  },
   "StartTimerDialog": {
     "title": "Timer starten",
     "projectLabel": "Projekt",

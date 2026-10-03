@@ -165,6 +165,6 @@ body {
   color: var(--foreground);
 }
 
-body:has(.mini-timer) {
+body:has(.transparent-window) {
   background: transparent;
 }

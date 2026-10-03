@@ -13,7 +13,7 @@ function MiniTimerView(): React.JSX.Element {
   const now = useNow(running !== null)
 
   return (
-    <div className="mini-timer h-screen p-1 select-none [-webkit-app-region:drag]">
+    <div className="transparent-window h-screen p-1 select-none [-webkit-app-region:drag]">
       {running?.entry.startedAt && (
         <div className="flex h-full items-center gap-3 rounded-xl border border-border bg-card pr-2 pl-4 text-card-foreground shadow-sm">
           <span

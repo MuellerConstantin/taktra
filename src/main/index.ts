@@ -10,6 +10,7 @@ import { initSettings } from './settings'
 import { initTags } from './tags'
 import { initTimeEntries } from './timeEntries'
 import { initTimer } from './timer'
+import { initQuickStart } from './quickStart'
 import { initTray } from './tray'
 import { createRendererWindow, hasMainWindow, setMainWindow, showMainWindow } from './windows'
 
@@ -66,6 +67,7 @@ function start(): void {
   })
 
   createWindow()
+  initQuickStart()
   initTray(openMainWindow)
 
   app.on('activate', openMainWindow)
