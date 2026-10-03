@@ -7,6 +7,7 @@ import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { notifyTimerChanged } from './timerEvents'
 
 export function findProject(id: number): Project {
   const project = getActiveDatabase().select().from(projects).where(eq(projects.id, id)).get()
@@ -38,12 +39,14 @@ export function updateProject(id: number, patch: Partial<ProjectData>): Project 
   findProject(id)
 
   try {
-    return getActiveDatabase()
+    const project = getActiveDatabase()
       .update(projects)
       .set(patch)
       .where(eq(projects.id, id))
       .returning()
       .get()
+    notifyTimerChanged()
+    return project
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
     throw error

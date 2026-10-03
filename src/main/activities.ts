@@ -8,6 +8,7 @@ import { isUniqueViolation } from './db/errors'
 import { activities, activityTags, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
 import { findProject } from './projects'
+import { notifyTimerChanged } from './timerEvents'
 
 export function findActivity(id: number): Activity {
   const activity = getActiveDatabase().select().from(activities).where(eq(activities.id, id)).get()
@@ -76,12 +77,14 @@ export function renameActivity(id: number, name: string): Activity {
   findActivity(id)
 
   try {
-    return getActiveDatabase()
+    const activity = getActiveDatabase()
       .update(activities)
       .set({ name })
       .where(eq(activities.id, id))
       .returning()
       .get()
+    notifyTimerChanged()
+    return activity
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
     throw error
@@ -115,6 +118,7 @@ export function setActivityTags(id: number, tagIds: readonly number[]): void {
         .values(uniqueIds.map((tagId) => ({ activityId: id, tagId })))
         .run()
   })
+  notifyTimerChanged()
 }
 
 function hasTimeEntries(id: number): boolean {

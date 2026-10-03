@@ -1,5 +1,4 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
-import { BrowserWindow } from 'electron'
 import { z } from 'zod'
 import { AppError, isAppError } from '../shared/errors'
 import { id } from '../shared/validation'
@@ -10,23 +9,13 @@ import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
 import { findProject } from './projects'
 import { deleteTimeEntry, selectTimeEntryDetails } from './timeEntries'
+import { notifyTimerChanged } from './timerEvents'
 
 const isRunning = and(isNotNull(timeEntries.startedAt), isNull(timeEntries.endedAt))
 
 function toLocalDate(date: Date): string {
   const pad = (value: number): string => String(value).padStart(2, '0')
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
-}
-
-const listeners = new Set<() => void>()
-
-export function onTimerChanged(listener: () => void): void {
-  listeners.add(listener)
-}
-
-function notifyTimerChanged(): void {
-  for (const window of BrowserWindow.getAllWindows()) window.webContents.send('timer:changed')
-  for (const listener of listeners) listener()
 }
 
 function stopRunning(now: Date): void {

@@ -106,7 +106,8 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │   │   ├── profiles.ts               # Known profiles store, profile lifecycle, IPC handlers
 │   │   ├── projects.ts, activities.ts, tags.ts, timeEntries.ts, reports.ts
 │   │   │                             # Queries on the active profile, IPC handlers
-│   │   ├── timer.ts                  # Running timer, timer:changed broadcast, recent activities
+│   │   ├── timer.ts                  # Running timer, recent activities
+│   │   ├── timerEvents.ts            # timer:changed broadcast to all windows and main listeners
 │   │   ├── miniTimer.ts              # Mini timer window shown while the main window is hidden
 │   │   ├── quickStart.ts             # Quick start window (tray click, global shortcut)
 │   │   ├── tray.ts                   # Tray icon and menu
@@ -240,9 +241,10 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   without an end, so it survives crashes, restarts and standby. It counts
   towards the day it was started and cannot be edited while it runs. The main
   process enforces one running timer across profiles by stopping it before
-  the active profile changes. After every change it sends `timer:changed` to
-  all windows (`events.onTimerChanged` in the renderer), so the main window,
-  the mini timer and the quick start stay in sync.
+  the active profile changes. After every change to the timer, and to the
+  names, colors and tags it displays, it sends `timer:changed` to all windows
+  (`events.onTimerChanged` in the renderer), so the main window, the mini
+  timer and the quick start stay in sync.
 - **Several windows, one renderer**: The mini timer (`/mini`) and the quick
   start (`/quick`) are routes of the same renderer, opened as small frameless
   windows through `createRendererWindow()` with the same preload and sandbox

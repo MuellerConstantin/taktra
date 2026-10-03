@@ -3,7 +3,8 @@ import Store from 'electron-store'
 import { z } from 'zod'
 import { handle } from './ipc'
 import { getSettings } from './settings'
-import { hasRunningTimer, onTimerChanged } from './timer'
+import { hasRunningTimer } from './timer'
+import { onTimerChanged } from './timerEvents'
 import { createRendererWindow, showMainWindow } from './windows'
 
 const WIDTH = 300

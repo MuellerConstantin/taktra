@@ -7,6 +7,7 @@ import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { tags } from './db/schema'
 import { handle } from './ipc'
+import { notifyTimerChanged } from './timerEvents'
 
 function findTag(id: number): Tag {
   const tag = getActiveDatabase().select().from(tags).where(eq(tags.id, id)).get()
@@ -35,7 +36,9 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
   findTag(id)
 
   try {
-    return getActiveDatabase().update(tags).set(patch).where(eq(tags.id, id)).returning().get()
+    const tag = getActiveDatabase().update(tags).set(patch).where(eq(tags.id, id)).returning().get()
+    notifyTimerChanged()
+    return tag
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('TAG_NAME_TAKEN', String(error))
     throw error
@@ -45,6 +48,7 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
 export function deleteTag(id: number): void {
   findTag(id)
   getActiveDatabase().delete(tags).where(eq(tags.id, id)).run()
+  notifyTimerChanged()
 }
 
 export function initTags(): void {
