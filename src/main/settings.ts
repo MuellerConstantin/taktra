@@ -14,6 +14,12 @@ const store = new Store<Settings>({
   clearInvalidConfig: true
 })
 
+const listeners = new Set<() => void>()
+
+export function onSettingsChanged(listener: () => void): void {
+  listeners.add(listener)
+}
+
 function applyTheme(): void {
   nativeTheme.themeSource = store.get('theme')
 }
@@ -29,6 +35,7 @@ export function updateSettings(patch: Partial<Settings>): Settings {
     throw new AppError('VALIDATION_FAILED', String(error))
   }
   applyTheme()
+  for (const listener of listeners) listener()
   return store.store
 }
 

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, nativeTheme } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initActivities } from './activities'
@@ -10,7 +10,10 @@ import { initSettings } from './settings'
 import { initTags } from './tags'
 import { initTimeEntries } from './timeEntries'
 import { initTimer } from './timer'
-import { createRendererWindow } from './windows'
+import { initTray } from './tray'
+import { createRendererWindow, hasMainWindow, setMainWindow, showMainWindow } from './windows'
+
+let isQuitting = false
 
 function createWindow(): void {
   const mainWindow = createRendererWindow(
@@ -31,7 +34,19 @@ function createWindow(): void {
     mainWindow.show()
   })
 
+  mainWindow.on('close', (event) => {
+    if (isQuitting) return
+    event.preventDefault()
+    mainWindow.hide()
+  })
+
+  setMainWindow(mainWindow)
   attachMiniTimer(mainWindow)
+}
+
+function openMainWindow(): void {
+  if (hasMainWindow()) showMainWindow()
+  else createWindow()
 }
 
 app.whenReady().then(() => {
@@ -51,10 +66,13 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  initTray(openMainWindow)
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+  app.on('activate', openMainWindow)
+})
+
+app.on('before-quit', () => {
+  isQuitting = true
 })
 
 app.on('window-all-closed', () => {

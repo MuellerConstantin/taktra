@@ -4,7 +4,7 @@ import { AppError } from '../shared/errors'
 import { handle } from './ipc'
 import { getSettings } from './settings'
 import { hasRunningTimer, onTimerChanged } from './timer'
-import { createRendererWindow } from './windows'
+import { createRendererWindow, showMainWindow } from './windows'
 
 const WIDTH = 300
 const HEIGHT = 64
@@ -107,13 +107,6 @@ function updateMiniTimer(): void {
 
   miniWindow ??= createMiniWindow()
   if (isMiniReady && !miniWindow.isVisible()) miniWindow.showInactive()
-}
-
-function showMainWindow(): void {
-  if (!mainWindow || mainWindow.isDestroyed()) return
-  if (mainWindow.isMinimized()) mainWindow.restore()
-  mainWindow.show()
-  mainWindow.focus()
 }
 
 export function attachMiniTimer(window: BrowserWindow): void {

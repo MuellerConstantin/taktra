@@ -2,6 +2,26 @@ import { BrowserWindow, shell, type BrowserWindowConstructorOptions } from 'elec
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
+let mainWindow: BrowserWindow | null = null
+
+export function setMainWindow(window: BrowserWindow): void {
+  mainWindow = window
+  window.on('closed', () => {
+    if (mainWindow === window) mainWindow = null
+  })
+}
+
+export function hasMainWindow(): boolean {
+  return mainWindow !== null && !mainWindow.isDestroyed()
+}
+
+export function showMainWindow(): void {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.show()
+  mainWindow.focus()
+}
+
 export function createRendererWindow(
   options: BrowserWindowConstructorOptions,
   route: string
