@@ -49,7 +49,7 @@ function openMainWindow(): void {
   else createWindow()
 }
 
-app.whenReady().then(() => {
+function start(): void {
   electronApp.setAppUserModelId('app.taktra')
   initSettings()
   initProfiles()
@@ -69,7 +69,14 @@ app.whenReady().then(() => {
   initTray(openMainWindow)
 
   app.on('activate', openMainWindow)
-})
+}
+
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', openMainWindow)
+  app.whenReady().then(start)
+} else {
+  app.quit()
+}
 
 app.on('before-quit', () => {
   isQuitting = true
