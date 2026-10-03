@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8114e09c-168b-41d1-86b5-b29081526555",
+  "id": "0c9679e2-b295-45f2-b65a-2a03817c5020",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activities": {
@@ -91,7 +91,12 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "activities_name_length": {
+          "name": "activities_name_length",
+          "value": "length(\"activities\".\"name\") <= 100"
+        }
+      }
     },
     "activity_tags": {
       "name": "activity_tags",
@@ -263,7 +268,16 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "projects_name_length": {
+          "name": "projects_name_length",
+          "value": "length(\"projects\".\"name\") <= 100"
+        },
+        "projects_description_length": {
+          "name": "projects_description_length",
+          "value": "length(\"projects\".\"description\") <= 500"
+        }
+      }
     },
     "tags": {
       "name": "tags",
@@ -330,7 +344,12 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {}
+      "checkConstraints": {
+        "tags_name_length": {
+          "name": "tags_name_length",
+          "value": "length(\"tags\".\"name\") <= 100"
+        }
+      }
     },
     "time_entries": {
       "name": "time_entries",
@@ -454,6 +473,10 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
+        "time_entries_note_length": {
+          "name": "time_entries_note_length",
+          "value": "length(\"time_entries\".\"note\") <= 2000"
+        },
         "time_entries_kind": {
           "name": "time_entries_kind",
           "value": "(\"time_entries\".\"started_at\" IS NULL AND \"time_entries\".\"ended_at\" IS NULL AND \"time_entries\".\"timezone\" IS NULL AND \"time_entries\".\"duration_sec\" IS NOT NULL AND \"time_entries\".\"duration_sec\" > 0)\n        OR (\"time_entries\".\"started_at\" IS NOT NULL AND \"time_entries\".\"timezone\" IS NOT NULL AND \"time_entries\".\"ended_at\" IS NULL AND \"time_entries\".\"duration_sec\" IS NULL)\n        OR (\"time_entries\".\"started_at\" IS NOT NULL AND \"time_entries\".\"timezone\" IS NOT NULL AND \"time_entries\".\"ended_at\" IS NOT NULL AND \"time_entries\".\"ended_at\" > \"time_entries\".\"started_at\" AND \"time_entries\".\"duration_sec\" IS NOT NULL AND \"time_entries\".\"duration_sec\" > 0)"

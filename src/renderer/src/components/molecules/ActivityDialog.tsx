@@ -10,6 +10,7 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { TagPicker } from './TagPicker'
+import { MAX_NAME_LENGTH } from '../../../../shared/limits'
 
 interface ActivityDialogProps {
   readonly activity: ActivityRef
@@ -63,6 +64,7 @@ export function ActivityDialog({
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <DialogHeading>{t('title')}</DialogHeading>
             <TextField
+              maxLength={MAX_NAME_LENGTH}
               label={t('nameLabel')}
               value={name}
               onChange={setName}

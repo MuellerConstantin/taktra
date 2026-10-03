@@ -1,16 +1,20 @@
 import { eq, sql } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import type { Tag, TagInput } from '../shared/tags'
+import { MAX_NAME_LENGTH } from '../shared/limits'
 import { normalizeColor } from './colors'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { tags } from './db/schema'
 import { handle } from './ipc'
+import { assertMaxLength } from './validation'
 
 function normalize(input: Partial<TagInput>): Partial<TagInput> {
   const name = input.name?.trim()
   if (input.name !== undefined && !name)
     throw new AppError('VALIDATION_FAILED', 'Tag name must not be empty')
+
+  assertMaxLength(name, MAX_NAME_LENGTH, 'Tag name')
 
   return { name, color: normalizeColor(input.color) }
 }

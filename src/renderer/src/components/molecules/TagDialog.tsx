@@ -10,6 +10,7 @@ import { ColorSwatchPicker } from '../atoms/ColorSwatchPicker'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
+import { MAX_NAME_LENGTH } from '../../../../shared/limits'
 
 interface TagDialogProps {
   readonly tag?: Tag
@@ -53,6 +54,7 @@ export function TagDialog({
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <DialogHeading>{tag ? t('editTitle') : t('createTitle')}</DialogHeading>
             <TextField
+              maxLength={MAX_NAME_LENGTH}
               label={t('nameLabel')}
               value={name}
               onChange={setName}

@@ -1,11 +1,13 @@
 import { eq, isNull, sql } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import type { Project, ProjectInput } from '../shared/projects'
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../shared/limits'
 import { normalizeColor } from './colors'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { assertMaxLength } from './validation'
 
 interface ListOptions {
   readonly includeArchived?: boolean
@@ -19,9 +21,13 @@ function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
   if (input.name !== undefined && !name)
     throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
 
+  const description = optional(input.description)
+  assertMaxLength(name, MAX_NAME_LENGTH, 'Project name')
+  assertMaxLength(description, MAX_DESCRIPTION_LENGTH, 'Project description')
+
   return {
     name,
-    description: optional(input.description),
+    description,
     color: normalizeColor(input.color)
   }
 }

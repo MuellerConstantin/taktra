@@ -80,7 +80,9 @@ function ProjectDetailView(): React.JSX.Element {
               className="size-3.5 shrink-0 rounded-full bg-muted"
               style={project.color ? { backgroundColor: project.color } : undefined}
             />
-            {project.name}
+            <span className="line-clamp-2 break-words" title={project.name}>
+              {project.name}
+            </span>
           </span>
         }
         subtitle={t('subtitle')}

@@ -1,5 +1,6 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
+import { MAX_NOTE_LENGTH } from '../shared/limits'
 import type {
   TimeEntry,
   TimeEntryDetails,
@@ -10,6 +11,7 @@ import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activiti
 import { getActiveDatabase } from './db/database'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { assertMaxLength } from './validation'
 
 const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -48,11 +50,9 @@ function toValues(input: TimeEntryInput): TimeEntryValues {
   assertLocalDate(input.date)
   findActivity(input.activityId)
 
-  const common = {
-    activityId: input.activityId,
-    date: input.date,
-    note: input.note?.trim() || null
-  }
+  const note = input.note?.trim() || null
+  assertMaxLength(note, MAX_NOTE_LENGTH, 'Note')
+  const common = { activityId: input.activityId, date: input.date, note }
 
   if ('durationSec' in input) {
     if (!Number.isInteger(input.durationSec) || input.durationSec <= 0)

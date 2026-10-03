@@ -8,6 +8,7 @@ import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
+import { MAX_NAME_LENGTH } from '../../../../shared/limits'
 
 interface CreateProfileDialogProps {
   readonly isOpen: boolean
@@ -72,6 +73,7 @@ export function CreateProfileDialog({
               <p className="text-sm text-muted-foreground">{t('description')}</p>
             </div>
             <TextField
+              maxLength={MAX_NAME_LENGTH}
               label={t('nameLabel')}
               value={name}
               onChange={setName}

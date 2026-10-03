@@ -21,16 +21,23 @@ export interface ComboBoxProps<
   readonly label?: string
   readonly description?: string
   readonly placeholder?: string
+  readonly maxLength?: number
   readonly errorMessage?: string | ((validation: ValidationResult) => string)
   readonly children: React.ReactNode | ((item: T) => React.ReactNode)
 }
 
-function ComboBoxInput({ placeholder }: { readonly placeholder?: string }): React.JSX.Element {
+interface ComboBoxInputProps {
+  readonly placeholder?: string
+  readonly maxLength?: number
+}
+
+function ComboBoxInput({ placeholder, maxLength }: ComboBoxInputProps): React.JSX.Element {
   const state = useContext(ComboBoxStateContext)
 
   return (
     <Input
       placeholder={placeholder}
+      maxLength={maxLength}
       className="ps-3 pe-1"
       onClick={() => state && !state.isOpen && state.open(null, 'manual')}
     />
@@ -41,6 +48,7 @@ export function ComboBox<T extends object, M extends 'single' | 'multiple' = 'si
   label,
   description,
   placeholder,
+  maxLength,
   errorMessage,
   children,
   items,
@@ -54,7 +62,7 @@ export function ComboBox<T extends object, M extends 'single' | 'multiple' = 'si
     >
       {label && <Label>{label}</Label>}
       <FieldGroup>
-        <ComboBoxInput placeholder={placeholder} />
+        <ComboBoxInput placeholder={placeholder} maxLength={maxLength} />
         <FieldButton className="mr-1 w-6 outline-offset-0">
           <RiArrowDownSLine aria-hidden className="size-4" />
         </FieldButton>

@@ -92,7 +92,9 @@ function TagDetailView(): React.JSX.Element {
               className="size-3.5 shrink-0 rounded-full bg-muted"
               style={tag.color ? { backgroundColor: tag.color } : undefined}
             />
-            {tag.name}
+            <span className="line-clamp-2 break-words" title={tag.name}>
+              {tag.name}
+            </span>
           </span>
         }
         subtitle={t('subtitle')}

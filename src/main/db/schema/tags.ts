@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
-import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import { MAX_NAME_LENGTH } from '../../../shared/limits'
 
 export const tags = sqliteTable(
   'tags',
@@ -20,5 +21,8 @@ export const tags = sqliteTable(
       .$defaultFn(() => new Date())
       .$onUpdateFn(() => new Date())
   },
-  (table) => [uniqueIndex('tags_name_unique').on(sql`lower(${table.name})`)]
+  (table) => [
+    uniqueIndex('tags_name_unique').on(sql`lower(${table.name})`),
+    check('tags_name_length', sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`)
+  ]
 )

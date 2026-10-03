@@ -10,6 +10,7 @@ import { ColorSwatchPicker } from '../atoms/ColorSwatchPicker'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/limits'
 
 interface ProjectDialogProps {
   /** The project to edit; without one, a new project is created. */
@@ -57,6 +58,7 @@ export function ProjectDialog({
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <DialogHeading>{project ? t('editTitle') : t('createTitle')}</DialogHeading>
             <TextField
+              maxLength={MAX_NAME_LENGTH}
               label={t('nameLabel')}
               value={name}
               onChange={setName}
@@ -65,6 +67,7 @@ export function ProjectDialog({
               validate={(value) => (value.trim() ? null : t('nameRequired'))}
             />
             <TextField
+              maxLength={MAX_DESCRIPTION_LENGTH}
               label={t('descriptionLabel')}
               value={description}
               onChange={setDescription}

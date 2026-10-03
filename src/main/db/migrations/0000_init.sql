@@ -6,7 +6,8 @@ CREATE TABLE `activities` (
 	`archived_at` integer,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON UPDATE no action ON DELETE cascade,
+	CONSTRAINT "activities_name_length" CHECK(length("activities"."name") <= 100)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `activities_uid_unique` ON `activities` (`uid`);--> statement-breakpoint
@@ -33,7 +34,9 @@ CREATE TABLE `projects` (
 	`color` text,
 	`archived_at` integer,
 	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL
+	`updated_at` integer NOT NULL,
+	CONSTRAINT "projects_name_length" CHECK(length("projects"."name") <= 100),
+	CONSTRAINT "projects_description_length" CHECK(length("projects"."description") <= 500)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `projects_uid_unique` ON `projects` (`uid`);--> statement-breakpoint
@@ -44,7 +47,8 @@ CREATE TABLE `tags` (
 	`name` text NOT NULL,
 	`color` text,
 	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL
+	`updated_at` integer NOT NULL,
+	CONSTRAINT "tags_name_length" CHECK(length("tags"."name") <= 100)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `tags_uid_unique` ON `tags` (`uid`);--> statement-breakpoint
@@ -62,6 +66,7 @@ CREATE TABLE `time_entries` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`activity_id`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE restrict,
+	CONSTRAINT "time_entries_note_length" CHECK(length("time_entries"."note") <= 2000),
 	CONSTRAINT "time_entries_kind" CHECK(("time_entries"."started_at" IS NULL AND "time_entries"."ended_at" IS NULL AND "time_entries"."timezone" IS NULL AND "time_entries"."duration_sec" IS NOT NULL AND "time_entries"."duration_sec" > 0)
         OR ("time_entries"."started_at" IS NOT NULL AND "time_entries"."timezone" IS NOT NULL AND "time_entries"."ended_at" IS NULL AND "time_entries"."duration_sec" IS NULL)
         OR ("time_entries"."started_at" IS NOT NULL AND "time_entries"."timezone" IS NOT NULL AND "time_entries"."ended_at" IS NOT NULL AND "time_entries"."ended_at" > "time_entries"."started_at" AND "time_entries"."duration_sec" IS NOT NULL AND "time_entries"."duration_sec" > 0))

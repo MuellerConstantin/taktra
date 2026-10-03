@@ -7,6 +7,7 @@ import { TextField } from '../../../components/atoms/TextField'
 import { DeleteProfileSection } from '../../../components/molecules/DeleteProfileSection'
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
+import { MAX_NAME_LENGTH } from '../../../../../shared/limits'
 
 interface ProfileNameFormProps {
   readonly profile: ProfileSummary
@@ -40,6 +41,7 @@ function ProfileNameForm({ profile, currentName }: ProfileNameFormProps): React.
     <Form onSubmit={handleSubmit} className="flex max-w-xl flex-col gap-4">
       <div className="flex items-start gap-2">
         <TextField
+          maxLength={MAX_NAME_LENGTH}
           label={t('nameLabel')}
           description={t('nameDescription')}
           value={name}

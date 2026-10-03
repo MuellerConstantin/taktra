@@ -11,6 +11,7 @@ import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
+import { MAX_NAME_LENGTH } from '../../../../shared/limits'
 
 interface ActivityOption {
   readonly id: number | 'new'
@@ -118,6 +119,7 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
               inputValue={activityName}
               onInputChange={setActivityName}
               allowsCustomValue
+              maxLength={MAX_NAME_LENGTH}
               allowsEmptyCollection
               isRequired
               isDisabled={projectId === null}

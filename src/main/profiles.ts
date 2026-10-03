@@ -5,6 +5,7 @@ import { app, BrowserWindow, dialog, shell } from 'electron'
 import Store from 'electron-store'
 import { profileFileExtension, type ProfilesState } from '../shared/profiles'
 import { AppError, isAppError } from '../shared/errors'
+import { MAX_NAME_LENGTH } from '../shared/limits'
 import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
 import {
   activateDatabase,
@@ -19,6 +20,7 @@ import {
 import { SAMPLE_PROFILE_NAME, seedSampleData } from './db/sample'
 import { handle } from './ipc'
 import { stopTimer } from './timer'
+import { assertMaxLength } from './validation'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -90,6 +92,7 @@ export function createProfile(
 ): ProfilesState {
   const trimmedName = name.trim()
   if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
+  assertMaxLength(trimmedName, MAX_NAME_LENGTH, 'Profile name')
   if (existsSync(path)) throw new AppError('PROFILE_FILE_EXISTS', path)
 
   mkdirSync(dirname(path), { recursive: true })
@@ -127,6 +130,7 @@ export function createSampleProfile(): ProfilesState {
 export function renameProfile(path: string, name: string): ProfilesState {
   const trimmedName = name.trim()
   if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
+  assertMaxLength(trimmedName, MAX_NAME_LENGTH, 'Profile name')
   if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
   if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 

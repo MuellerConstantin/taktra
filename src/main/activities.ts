@@ -1,11 +1,13 @@
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import type { Activity, ActivityInput, ActivityTag, ActivityWithTags } from '../shared/activities'
 import { AppError } from '../shared/errors'
+import { MAX_NAME_LENGTH } from '../shared/limits'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, activityTags, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
 import { findProject } from './projects'
+import { assertMaxLength } from './validation'
 
 interface ListOptions {
   readonly projectId?: number
@@ -15,6 +17,7 @@ interface ListOptions {
 function normalizeName(name: string): string {
   const trimmed = name.trim()
   if (!trimmed) throw new AppError('VALIDATION_FAILED', 'Activity name must not be empty')
+  assertMaxLength(trimmed, MAX_NAME_LENGTH, 'Activity name')
   return trimmed
 }
 

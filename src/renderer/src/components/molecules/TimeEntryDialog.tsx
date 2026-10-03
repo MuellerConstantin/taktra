@@ -26,6 +26,7 @@ import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { ToggleButtonGroup } from '../atoms/ToggleButtonGroup'
 import { TagPicker } from './TagPicker'
+import { MAX_NAME_LENGTH, MAX_NOTE_LENGTH } from '../../../../shared/limits'
 
 type Mode = 'range' | 'duration'
 
@@ -191,6 +192,7 @@ export function TimeEntryDialog({
               onInputChange={setActivityName}
               onSelectionChange={(key) => typeof key === 'number' && setChosenTagIds(null)}
               allowsCustomValue
+              maxLength={MAX_NAME_LENGTH}
               allowsEmptyCollection
               isRequired
               isDisabled={projectId === null}
@@ -253,7 +255,13 @@ export function TimeEntryDialog({
                 validate={(value) => (parseDuration(value) === null ? t('durationInvalid') : null)}
               />
             )}
-            <TextField label={t('noteLabel')} value={note} onChange={setNote} multiline />
+            <TextField
+              label={t('noteLabel')}
+              value={note}
+              onChange={setNote}
+              maxLength={MAX_NOTE_LENGTH}
+              multiline
+            />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>

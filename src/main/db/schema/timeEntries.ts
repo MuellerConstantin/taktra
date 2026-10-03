@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { MAX_NOTE_LENGTH } from '../../../shared/limits'
 import { activities } from './activities'
 
 export const timeEntries = sqliteTable(
@@ -31,6 +32,10 @@ export const timeEntries = sqliteTable(
   (table) => [
     index('time_entries_date_idx').on(table.date),
     index('time_entries_activity_idx').on(table.activityId),
+    check(
+      'time_entries_note_length',
+      sql`length(${table.note}) <= ${sql.raw(String(MAX_NOTE_LENGTH))}`
+    ),
     check(
       'time_entries_kind',
       sql`(${table.startedAt} IS NULL AND ${table.endedAt} IS NULL AND ${table.timezone} IS NULL AND ${table.durationSec} IS NOT NULL AND ${table.durationSec} > 0)
