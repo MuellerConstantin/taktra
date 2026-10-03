@@ -32,10 +32,15 @@ function MiniTimerView(): React.JSX.Element {
             </span>
           </div>
           <div className="flex items-center [-webkit-app-region:no-drag]">
-            <Button variant="icon" aria-label={t('open')} onPress={() => api.app.showMainWindow()}>
+            <Button
+              variant="icon"
+              tooltip={false}
+              aria-label={t('open')}
+              onPress={() => api.app.showMainWindow()}
+            >
               <RiExternalLinkLine className="size-4" />
             </Button>
-            <Button variant="icon" aria-label={t('stop')} onPress={() => stop()}>
+            <Button variant="icon" tooltip={false} aria-label={t('stop')} onPress={() => stop()}>
               <RiStopFill className="size-4" />
             </Button>
           </div>

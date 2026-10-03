@@ -1,13 +1,18 @@
 import {
   Button as RACButton,
+  TooltipTrigger,
   composeRenderProps,
   type ButtonProps as RACButtonProps
 } from 'react-aria-components'
 import { tv } from 'tailwind-variants'
+import { Tooltip } from './Tooltip'
 import { focusRing } from './utils'
+
+const TOOLTIP_DELAY = 500
 
 export interface ButtonProps extends RACButtonProps {
   readonly variant?: 'primary' | 'secondary' | 'destructive' | 'icon'
+  readonly tooltip?: boolean
 }
 
 const button = tv({
@@ -38,13 +43,23 @@ const button = tv({
   ]
 })
 
-export function Button(props: ButtonProps): React.JSX.Element {
-  return (
+export function Button({ tooltip = true, ...props }: ButtonProps): React.JSX.Element {
+  const label = props['aria-label']
+  const element = (
     <RACButton
       {...props}
       className={composeRenderProps(props.className, (className, renderProps) =>
         button({ ...renderProps, variant: props.variant, className })
       )}
     />
+  )
+
+  if (props.variant !== 'icon' || !label || !tooltip) return element
+
+  return (
+    <TooltipTrigger delay={TOOLTIP_DELAY}>
+      {element}
+      <Tooltip>{label}</Tooltip>
+    </TooltipTrigger>
   )
 }
