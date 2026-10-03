@@ -32,6 +32,11 @@ start and end time or as a plain duration. Tags such as `meeting` or `support` a
 cut across projects, so every entry inherits the tags of its activity. Reports evaluate the tracked time over
 any period, grouped by project, by tag, or by both.
 
+Starting a timer takes a click: from the recently used activities on the start page, or from a quick start
+search that opens from the tray icon or a global shortcut. Taktra keeps running in the
+tray when its window is closed, and a small always-on-top mini timer shows what is being tracked while the
+window is out of sight.
+
 There is no server, no account and no sync. Everything runs on your machine, and your data is a plain file
 you own.
 
