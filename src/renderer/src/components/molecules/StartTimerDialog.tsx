@@ -56,7 +56,9 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
   const existingActivity = activities.find(
     (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
   )
-  const matchingActivities = activities.filter((activity) => contains(activity.name, trimmedName))
+  const matchingActivities = existingActivity
+    ? activities
+    : activities.filter((activity) => contains(activity.name, trimmedName))
   const activityOptions: readonly ActivityOption[] =
     trimmedName && !existingActivity
       ? [...matchingActivities, { id: 'new', name: trimmedName }]

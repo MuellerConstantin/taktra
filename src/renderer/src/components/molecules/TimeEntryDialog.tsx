@@ -98,7 +98,9 @@ export function TimeEntryDialog({
     (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
   )
   const tagIds = chosenTagIds ?? existingActivity?.tagIds ?? []
-  const matchingActivities = activities.filter((activity) => contains(activity.name, trimmedName))
+  const matchingActivities = existingActivity
+    ? activities
+    : activities.filter((activity) => contains(activity.name, trimmedName))
   const activityOptions: readonly ActivityOption[] =
     trimmedName && !existingActivity
       ? [...matchingActivities, { id: 'new', name: trimmedName }]
