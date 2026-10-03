@@ -6,6 +6,7 @@ import { findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { findProject } from './projects'
 import { deleteTimeEntry, selectTimeEntryDetails } from './timeEntries'
 
 const isRunning = and(isNotNull(timeEntries.startedAt), isNull(timeEntries.endedAt))
@@ -54,7 +55,8 @@ export function hasRunningTimer(): boolean {
 
 export function startTimer(activityId: number): TimeEntryDetails {
   const activity = findActivity(activityId)
-  if (activity.archivedAt) throw new AppError('VALIDATION_FAILED', 'Activity is archived')
+  if (activity.archivedAt || findProject(activity.projectId).archivedAt)
+    throw new AppError('VALIDATION_FAILED', 'Activity or project is archived')
 
   const db = getActiveDatabase()
   const now = new Date()
@@ -93,8 +95,13 @@ export function listRecentActivities(limit: number): ActivityDetails[] {
 
   const rows = getActiveDatabase()
     .select({
-      activity: { id: activities.id, name: activities.name },
-      project: { id: projects.id, name: projects.name, color: projects.color }
+      activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
+      project: {
+        id: projects.id,
+        name: projects.name,
+        color: projects.color,
+        archivedAt: projects.archivedAt
+      }
     })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))

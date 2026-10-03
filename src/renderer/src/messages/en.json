@@ -102,7 +102,9 @@
     "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel",
-    "runningSince": "Running since {time}"
+    "runningSince": "Running since {time}",
+    "continue": "Start timer for {name}",
+    "stop": "Stop timer for {name}"
   },
   "DayNavigator": {
     "previous": "Previous day",

@@ -102,7 +102,9 @@
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen",
-    "runningSince": "Läuft seit {time}"
+    "runningSince": "Läuft seit {time}",
+    "continue": "Timer für {name} starten",
+    "stop": "Timer für {name} stoppen"
   },
   "DayNavigator": {
     "previous": "Vorheriger Tag",

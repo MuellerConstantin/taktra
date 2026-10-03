@@ -6,7 +6,7 @@ import {
   today,
   type CalendarDate
 } from '@internationalized/date'
-import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
+import { RiAddLine, RiDeleteBinLine, RiPencilLine, RiPlayFill, RiStopFill } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { useLocale } from 'react-aria-components'
@@ -51,7 +51,7 @@ function TrackingView(): React.JSX.Element {
   const [reloadCount, setReloadCount] = useState(0)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  const { running, revision, discard } = useTimer()
+  const { running, revision, start, stop, discard } = useTimer()
   const isRunningShown =
     running !== null && (entries ?? []).some(({ entry }) => entry.id === running.entry.id)
   const now = useNow(isRunningShown)
@@ -88,6 +88,15 @@ function TrackingView(): React.JSX.Element {
 
   const changeDay = (next: CalendarDate): void => {
     setSearchParams(isSameDay(next, todayDate) ? {} : { date: next.toString() })
+  }
+
+  const runTimer = async (action: () => Promise<void>): Promise<void> => {
+    setDeleteError(null)
+    try {
+      await action()
+    } catch (caught) {
+      setDeleteError(errorMessage(caught))
+    }
   }
 
   const handleDelete = async (entryId: number): Promise<void> => {
@@ -135,6 +144,8 @@ function TrackingView(): React.JSX.Element {
         >
           {(details) => {
             const { entry, activity, project, tags } = details
+            const isRunning = entry.startedAt !== null && entry.endedAt === null
+            const canContinue = !activity.archivedAt && !project.archivedAt
             return (
               <GridListItem
                 id={entry.id}
@@ -171,11 +182,29 @@ function TrackingView(): React.JSX.Element {
                 <span className="w-14 text-right font-medium tabular-nums">
                   {formatDuration(durationOf(entry))}
                 </span>
+                {isRunning ? (
+                  <Button
+                    variant="icon"
+                    aria-label={t('stop', { name: activity.name })}
+                    onPress={() => runTimer(stop)}
+                  >
+                    <RiStopFill className="size-4 text-primary" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="icon"
+                    aria-label={t('continue', { name: activity.name })}
+                    onPress={() => runTimer(() => start(activity.id))}
+                    isDisabled={!canContinue}
+                  >
+                    <RiPlayFill className="size-4" />
+                  </Button>
+                )}
                 <Button
                   variant="icon"
                   aria-label={t('edit', { name: activity.name })}
                   onPress={() => setDialog({ details })}
-                  isDisabled={entry.startedAt !== null && entry.endedAt === null}
+                  isDisabled={isRunning}
                 >
                   <RiPencilLine className="size-4" />
                 </Button>

@@ -17,8 +17,8 @@ export type TimeEntryInput = {
 
 export interface TimeEntryDetails {
   readonly entry: TimeEntry
-  readonly activity: Pick<Activity, 'id' | 'name'>
-  readonly project: Pick<Project, 'id' | 'name' | 'color'>
+  readonly activity: Pick<Activity, 'id' | 'name' | 'archivedAt'>
+  readonly project: Pick<Project, 'id' | 'name' | 'color' | 'archivedAt'>
   readonly tags: readonly ActivityTag[]
 }
 

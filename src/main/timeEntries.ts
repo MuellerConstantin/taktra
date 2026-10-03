@@ -91,8 +91,13 @@ export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails
   const rows = getActiveDatabase()
     .select({
       entry: timeEntries,
-      activity: { id: activities.id, name: activities.name },
-      project: { id: projects.id, name: projects.name, color: projects.color }
+      activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
+      project: {
+        id: projects.id,
+        name: projects.name,
+        color: projects.color,
+        archivedAt: projects.archivedAt
+      }
     })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
