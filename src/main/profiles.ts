@@ -3,9 +3,10 @@ import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 import Store from 'electron-store'
+import { z } from 'zod'
 import { profileFileExtension, type ProfilesState } from '../shared/profiles'
 import { AppError, isAppError } from '../shared/errors'
-import { MAX_NAME_LENGTH } from '../shared/limits'
+import { filePath, name } from '../shared/validation'
 import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
 import {
   activateDatabase,
@@ -20,7 +21,6 @@ import {
 import { SAMPLE_PROFILE_NAME, seedSampleData } from './db/sample'
 import { handle } from './ipc'
 import { stopTimer } from './timer'
-import { assertMaxLength } from './validation'
 
 interface KnownProfiles {
   readonly paths: string[]
@@ -90,9 +90,6 @@ export function createProfile(
   path: string,
   populate?: (db: ProfileDatabase) => void
 ): ProfilesState {
-  const trimmedName = name.trim()
-  if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
-  assertMaxLength(trimmedName, MAX_NAME_LENGTH, 'Profile name')
   if (existsSync(path)) throw new AppError('PROFILE_FILE_EXISTS', path)
 
   mkdirSync(dirname(path), { recursive: true })
@@ -102,7 +99,7 @@ export function createProfile(
     try {
       db.transaction(() => {
         writeProperty(db, 'uid', randomUUID())
-        writeProperty(db, 'name', trimmedName)
+        writeProperty(db, 'name', name)
         populate?.(db)
       })
     } finally {
@@ -128,13 +125,10 @@ export function createSampleProfile(): ProfilesState {
 }
 
 export function renameProfile(path: string, name: string): ProfilesState {
-  const trimmedName = name.trim()
-  if (!trimmedName) throw new AppError('VALIDATION_FAILED', 'Profile name must not be empty')
-  assertMaxLength(trimmedName, MAX_NAME_LENGTH, 'Profile name')
   if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
   if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 
-  withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', trimmedName))
+  withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', name))
 
   return getProfilesState()
 }
@@ -245,16 +239,24 @@ export function initProfiles(): void {
   syncActiveDatabase()
   app.on('will-quit', closeActiveDatabase)
 
-  handle('profiles:get', () => getProfilesState())
-  handle('profiles:create', (_, name: string, path: string) => createProfile(name, path))
-  handle('profiles:createSample', () => createSampleProfile())
-  handle('profiles:setActive', (_, path: string) => setActiveProfile(path))
-  handle('profiles:rename', (_, path: string, name: string) => renameProfile(path, name))
-  handle('profiles:delete', (_, path: string) => deleteProfile(path))
-  handle('profiles:remove', (_, path: string) => removeProfile(path))
-  handle('profiles:open', (event) => openProfile(BrowserWindow.fromWebContents(event.sender)))
-  handle('profiles:defaultPath', (_, name: string) => getDefaultProfilePath(name))
-  handle('profiles:choosePath', (event, defaultPath: string) =>
+  handle('profiles:get', z.tuple([]), () => getProfilesState())
+  handle('profiles:create', z.tuple([name, filePath]), (_, profileName, path) =>
+    createProfile(profileName, path)
+  )
+  handle('profiles:createSample', z.tuple([]), () => createSampleProfile())
+  handle('profiles:setActive', z.tuple([filePath]), (_, path) => setActiveProfile(path))
+  handle('profiles:rename', z.tuple([filePath, name]), (_, path, profileName) =>
+    renameProfile(path, profileName)
+  )
+  handle('profiles:delete', z.tuple([filePath]), (_, path) => deleteProfile(path))
+  handle('profiles:remove', z.tuple([filePath]), (_, path) => removeProfile(path))
+  handle('profiles:open', z.tuple([]), (event) =>
+    openProfile(BrowserWindow.fromWebContents(event.sender))
+  )
+  handle('profiles:defaultPath', z.tuple([z.string()]), (_, profileName) =>
+    getDefaultProfilePath(profileName)
+  )
+  handle('profiles:choosePath', z.tuple([filePath]), (event, defaultPath) =>
     chooseProfilePath(BrowserWindow.fromWebContents(event.sender), defaultPath)
   )
 }

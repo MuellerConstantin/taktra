@@ -1,26 +1,13 @@
 import { and, asc, count, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm'
-import { AppError } from '../shared/errors'
+import { z } from 'zod'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
+import { grouping, timeFilter } from '../shared/validation'
 import { tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, activityTags, projects, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
-import { assertLocalDate } from './timeEntries'
-
-const GROUPINGS: readonly Grouping[] = ['date', 'project', 'activity', 'tag']
-
-function assertIds(ids: readonly number[] | undefined, field: string): void {
-  if (ids && !(Array.isArray(ids) && ids.every(Number.isInteger)))
-    throw new AppError('VALIDATION_FAILED', `Invalid ${field}`)
-}
 
 function conditions(filter: TimeFilter): SQL | undefined {
-  if (filter.from !== undefined) assertLocalDate(filter.from)
-  if (filter.to !== undefined) assertLocalDate(filter.to)
-  assertIds(filter.projectIds, 'projectIds')
-  assertIds(filter.activityIds, 'activityIds')
-  assertIds(filter.tagIds, 'tagIds')
-
   const tagged = filter.tagIds
     ? getActiveDatabase()
         .select({ activityId: activityTags.activityId })
@@ -38,9 +25,6 @@ function conditions(filter: TimeFilter): SQL | undefined {
 }
 
 export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): AggregateRow[] {
-  if (!groupBy.every((grouping) => GROUPINGS.includes(grouping)))
-    throw new AppError('VALIDATION_FAILED', `Invalid grouping: ${groupBy}`)
-
   const byDate = groupBy.includes('date')
   const byActivity = groupBy.includes('activity')
   const byProject = byActivity || groupBy.includes('project')
@@ -121,7 +105,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
 }
 
 export function initReports(): void {
-  handle('reports:aggregate', (_, filter: TimeFilter, groupBy: readonly Grouping[]) =>
+  handle('reports:aggregate', z.tuple([timeFilter, grouping]), (_, filter, groupBy) =>
     aggregate(filter, groupBy)
   )
 }

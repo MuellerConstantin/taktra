@@ -1,5 +1,6 @@
 import { nativeTheme } from 'electron'
 import Store from 'electron-store'
+import { z } from 'zod'
 import { AppError } from '../shared/errors'
 import {
   DEFAULT_QUICK_START_SHORTCUT,
@@ -7,6 +8,7 @@ import {
   themeSources,
   type Settings
 } from '../shared/settings'
+import { settingsPatch } from '../shared/validation'
 import { handle } from './ipc'
 
 const store = new Store<Settings>({
@@ -48,6 +50,6 @@ export function updateSettings(patch: Partial<Settings>): Settings {
 
 export function initSettings(): void {
   applyTheme()
-  handle('settings:get', () => getSettings())
-  handle('settings:update', (_, patch: Partial<Settings>) => updateSettings(patch))
+  handle('settings:get', z.tuple([]), () => getSettings())
+  handle('settings:update', z.tuple([settingsPatch]), (_, patch) => updateSettings(patch))
 }

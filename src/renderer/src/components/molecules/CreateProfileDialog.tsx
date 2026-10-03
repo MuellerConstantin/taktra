@@ -8,7 +8,7 @@ import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
-import { MAX_NAME_LENGTH } from '../../../../shared/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface CreateProfileDialogProps {
   readonly isOpen: boolean

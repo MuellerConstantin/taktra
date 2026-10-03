@@ -26,7 +26,7 @@ import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { ToggleButtonGroup } from '../atoms/ToggleButtonGroup'
 import { TagPicker } from './TagPicker'
-import { MAX_NAME_LENGTH, MAX_NOTE_LENGTH } from '../../../../shared/limits'
+import { MAX_NAME_LENGTH, MAX_NOTE_LENGTH } from '../../../../shared/validation/limits'
 
 type Mode = 'range' | 'duration'
 

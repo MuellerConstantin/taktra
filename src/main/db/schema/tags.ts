@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { MAX_NAME_LENGTH } from '../../../shared/limits'
+import { MAX_NAME_LENGTH } from '../../../shared/validation/limits'
 
 export const tags = sqliteTable(
   'tags',

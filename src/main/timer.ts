@@ -1,6 +1,8 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
 import { BrowserWindow } from 'electron'
+import { z } from 'zod'
 import { AppError, isAppError } from '../shared/errors'
+import { id } from '../shared/validation'
 import type { ActivityDetails, TimeEntryDetails } from '../shared/timeEntries'
 import { findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
@@ -90,9 +92,6 @@ export function discardTimer(): void {
 }
 
 export function listRecentActivities(limit: number): ActivityDetails[] {
-  if (!Number.isInteger(limit) || limit <= 0)
-    throw new AppError('VALIDATION_FAILED', `Invalid limit: ${limit}`)
-
   const rows = getActiveDatabase()
     .select({
       activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
@@ -120,9 +119,9 @@ export function listRecentActivities(limit: number): ActivityDetails[] {
 }
 
 export function initTimer(): void {
-  handle('timer:get', () => getRunningTimer())
-  handle('timer:start', (_, activityId: number) => startTimer(activityId))
-  handle('timer:stop', () => stopTimer())
-  handle('timer:discard', () => discardTimer())
-  handle('timer:recent', (_, limit: number) => listRecentActivities(limit))
+  handle('timer:get', z.tuple([]), () => getRunningTimer())
+  handle('timer:start', z.tuple([id]), (_, activityId) => startTimer(activityId))
+  handle('timer:stop', z.tuple([]), () => stopTimer())
+  handle('timer:discard', z.tuple([]), () => discardTimer())
+  handle('timer:recent', z.tuple([id.max(50)]), (_, limit) => listRecentActivities(limit))
 }

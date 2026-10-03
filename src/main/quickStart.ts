@@ -1,5 +1,5 @@
 import { screen, type BrowserWindow } from 'electron'
-import { AppError } from '../shared/errors'
+import { z } from 'zod'
 import { handle } from './ipc'
 import { createRendererWindow } from './windows'
 
@@ -72,10 +72,9 @@ export function toggleQuickStart(): void {
 export function initQuickStart(): void {
   quickWindow = createQuickWindow()
 
-  handle('quick:hide', () => hideQuickStart())
-  handle('quick:toggle', () => toggleQuickStart())
-  handle('quick:resize', (event, height: number) => {
-    if (!Number.isFinite(height)) throw new AppError('VALIDATION_FAILED', 'Invalid height')
+  handle('quick:hide', z.tuple([]), () => hideQuickStart())
+  handle('quick:toggle', z.tuple([]), () => toggleQuickStart())
+  handle('quick:resize', z.tuple([z.number().positive()]), (event, height) => {
     if (!quickWindow || event.sender !== quickWindow.webContents) return
     quickWindow.setSize(WIDTH, Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, Math.ceil(height))))
   })

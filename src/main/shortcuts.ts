@@ -1,5 +1,7 @@
 import { app, globalShortcut } from 'electron'
+import { z } from 'zod'
 import { AppError } from '../shared/errors'
+import { accelerator } from '../shared/validation'
 import type { Settings, ShortcutStatus } from '../shared/settings'
 import { handle } from './ipc'
 import { toggleQuickStart } from './quickStart'
@@ -39,8 +41,6 @@ function getStatus(): ShortcutStatus {
 }
 
 function setQuickStartShortcut(accelerator: string): Settings {
-  if (typeof accelerator !== 'string' || !accelerator.includes('+'))
-    throw new AppError('VALIDATION_FAILED', `Invalid accelerator: ${accelerator}`)
   if (accelerator === getSettings().quickStartShortcut) return getSettings()
 
   if (getSettings().quickStartShortcutEnabled && !isSuspended) {
@@ -56,10 +56,11 @@ export function initShortcuts(): void {
   onSettingsChanged(applyShortcut)
   app.on('will-quit', () => globalShortcut.unregisterAll())
 
-  handle('shortcuts:status', () => getStatus())
-  handle('shortcuts:setQuickStart', (_, accelerator: string) => setQuickStartShortcut(accelerator))
-  handle('shortcuts:setRecording', (_, recording: boolean) => {
-    if (typeof recording !== 'boolean') throw new AppError('VALIDATION_FAILED', 'Invalid flag')
+  handle('shortcuts:status', z.tuple([]), () => getStatus())
+  handle('shortcuts:setQuickStart', z.tuple([accelerator]), (_, value) =>
+    setQuickStartShortcut(value)
+  )
+  handle('shortcuts:setRecording', z.tuple([z.boolean()]), (_, recording) => {
     isSuspended = recording
     applyShortcut()
   })

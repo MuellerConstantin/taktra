@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { MAX_NOTE_LENGTH } from '../../../shared/limits'
+import { MAX_NOTE_LENGTH } from '../../../shared/validation/limits'
 import { activities } from './activities'
 
 export const timeEntries = sqliteTable(

@@ -7,7 +7,7 @@ import { TextField } from '../../../components/atoms/TextField'
 import { DeleteProfileSection } from '../../../components/molecules/DeleteProfileSection'
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
-import { MAX_NAME_LENGTH } from '../../../../../shared/limits'
+import { MAX_NAME_LENGTH } from '../../../../../shared/validation/limits'
 
 interface ProfileNameFormProps {
   readonly profile: ProfileSummary

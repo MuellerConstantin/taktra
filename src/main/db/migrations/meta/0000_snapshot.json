@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0c9679e2-b295-45f2-b65a-2a03817c5020",
+  "id": "241dfefd-0766-46af-8f17-27a4dd26d157",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activities": {
@@ -94,7 +94,7 @@
       "checkConstraints": {
         "activities_name_length": {
           "name": "activities_name_length",
-          "value": "length(\"activities\".\"name\") <= 100"
+          "value": "length(\"activities\".\"name\") <= 50"
         }
       }
     },
@@ -271,7 +271,7 @@
       "checkConstraints": {
         "projects_name_length": {
           "name": "projects_name_length",
-          "value": "length(\"projects\".\"name\") <= 100"
+          "value": "length(\"projects\".\"name\") <= 50"
         },
         "projects_description_length": {
           "name": "projects_description_length",
@@ -347,7 +347,7 @@
       "checkConstraints": {
         "tags_name_length": {
           "name": "tags_name_length",
-          "value": "length(\"tags\".\"name\") <= 100"
+          "value": "length(\"tags\".\"name\") <= 50"
         }
       }
     },

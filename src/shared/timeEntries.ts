@@ -1,7 +1,9 @@
 import type { InferSelectModel } from 'drizzle-orm'
+import type { z } from 'zod'
 import type { timeEntries } from '../main/db/schema/timeEntries'
 import type { Activity, ActivityTag } from './activities'
 import type { Project } from './projects'
+import type { timeEntryInput } from './validation/timeEntries'
 
 export type TimeEntry = InferSelectModel<typeof timeEntries>
 
@@ -9,11 +11,9 @@ export type TimeEntryTimes =
   | { readonly startedAt: Date; readonly endedAt: Date; readonly timezone: string }
   | { readonly durationSec: number }
 
-export type TimeEntryInput = {
-  readonly activityId: number
-  readonly date: string
-  readonly note?: string | null
-} & TimeEntryTimes
+export type TimeEntryInput = z.input<typeof timeEntryInput>
+
+export type TimeEntryData = z.output<typeof timeEntryInput>
 
 export interface TimeEntryDetails {
   readonly entry: TimeEntry

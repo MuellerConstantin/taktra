@@ -1,62 +1,24 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
+import { z } from 'zod'
 import { AppError } from '../shared/errors'
-import { MAX_NOTE_LENGTH } from '../shared/limits'
-import type {
-  TimeEntry,
-  TimeEntryDetails,
-  TimeEntryInput,
-  TimeEntryRange
-} from '../shared/timeEntries'
+import { id, timeEntryInput, timeEntryRange } from '../shared/validation'
+import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../shared/timeEntries'
 import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
-import { assertMaxLength } from './validation'
-
-const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/
 
 type TimeEntryValues = Pick<
   TimeEntry,
   'activityId' | 'date' | 'startedAt' | 'endedAt' | 'timezone' | 'durationSec' | 'note'
 >
 
-function invalid(message: string): AppError {
-  return new AppError('VALIDATION_FAILED', message)
-}
-
-export function assertLocalDate(date: string): void {
-  const parsed = new Date(`${date}T00:00:00Z`)
-  if (
-    !LOCAL_DATE.test(date) ||
-    Number.isNaN(parsed.getTime()) ||
-    !parsed.toISOString().startsWith(date)
-  )
-    throw invalid(`Invalid date: ${date}`)
-}
-
-function assertTimezone(timezone: string): void {
-  try {
-    new Intl.DateTimeFormat('en', { timeZone: timezone })
-  } catch {
-    throw invalid(`Invalid timezone: ${timezone}`)
-  }
-}
-
-function assertValidDate(value: Date, field: string): void {
-  if (!(value instanceof Date) || Number.isNaN(value.getTime())) throw invalid(`Invalid ${field}`)
-}
-
-function toValues(input: TimeEntryInput): TimeEntryValues {
-  assertLocalDate(input.date)
+function toValues(input: TimeEntryData): TimeEntryValues {
   findActivity(input.activityId)
 
-  const note = input.note?.trim() || null
-  assertMaxLength(note, MAX_NOTE_LENGTH, 'Note')
-  const common = { activityId: input.activityId, date: input.date, note }
+  const common = { activityId: input.activityId, date: input.date, note: input.note ?? null }
 
   if ('durationSec' in input) {
-    if (!Number.isInteger(input.durationSec) || input.durationSec <= 0)
-      throw invalid(`Invalid duration: ${input.durationSec}`)
     return {
       ...common,
       startedAt: null,
@@ -66,11 +28,8 @@ function toValues(input: TimeEntryInput): TimeEntryValues {
     }
   }
 
-  assertValidDate(input.startedAt, 'start')
-  assertValidDate(input.endedAt, 'end')
-  assertTimezone(input.timezone)
   const durationSec = Math.round((input.endedAt.getTime() - input.startedAt.getTime()) / 1000)
-  if (durationSec <= 0) throw invalid('End must be after start')
+  if (durationSec <= 0) throw new AppError('VALIDATION_FAILED', 'End must be after start')
 
   return {
     ...common,
@@ -110,17 +69,15 @@ export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails
   return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
 }
 
-export function listTimeEntries({ from, to }: TimeEntryRange): TimeEntryDetails[] {
-  assertLocalDate(from)
-  assertLocalDate(to)
+export function listTimeEntries({ from, to }: z.output<typeof timeEntryRange>): TimeEntryDetails[] {
   return selectTimeEntryDetails(and(gte(timeEntries.date, from), lte(timeEntries.date, to)))
 }
 
-export function createTimeEntry(input: TimeEntryInput): TimeEntry {
+export function createTimeEntry(input: TimeEntryData): TimeEntry {
   return getActiveDatabase().insert(timeEntries).values(toValues(input)).returning().get()
 }
 
-export function updateTimeEntry(id: number, input: TimeEntryInput): TimeEntry {
+export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
   const previous = findTimeEntry(id)
   const values = toValues(input)
   const db = getActiveDatabase()
@@ -143,8 +100,10 @@ export function deleteTimeEntry(id: number): void {
 }
 
 export function initTimeEntries(): void {
-  handle('timeEntries:list', (_, range: TimeEntryRange) => listTimeEntries(range))
-  handle('timeEntries:create', (_, input: TimeEntryInput) => createTimeEntry(input))
-  handle('timeEntries:update', (_, id: number, input: TimeEntryInput) => updateTimeEntry(id, input))
-  handle('timeEntries:delete', (_, id: number) => deleteTimeEntry(id))
+  handle('timeEntries:list', z.tuple([timeEntryRange]), (_, range) => listTimeEntries(range))
+  handle('timeEntries:create', z.tuple([timeEntryInput]), (_, input) => createTimeEntry(input))
+  handle('timeEntries:update', z.tuple([id, timeEntryInput]), (_, entryId, input) =>
+    updateTimeEntry(entryId, input)
+  )
+  handle('timeEntries:delete', z.tuple([id]), (_, entryId) => deleteTimeEntry(entryId))
 }

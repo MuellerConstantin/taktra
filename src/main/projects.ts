@@ -1,36 +1,12 @@
 import { eq, isNull, sql } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
-import type { Project, ProjectInput } from '../shared/projects'
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../shared/limits'
-import { normalizeColor } from './colors'
+import { z } from 'zod'
+import type { Project, ProjectData } from '../shared/projects'
+import { id, listOptions, projectInput } from '../shared/validation'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
-import { assertMaxLength } from './validation'
-
-interface ListOptions {
-  readonly includeArchived?: boolean
-}
-
-function normalize(input: Partial<ProjectInput>): Partial<ProjectInput> {
-  const optional = (value: string | null | undefined): string | null | undefined =>
-    value === undefined ? undefined : value?.trim() || null
-
-  const name = input.name?.trim()
-  if (input.name !== undefined && !name)
-    throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
-
-  const description = optional(input.description)
-  assertMaxLength(name, MAX_NAME_LENGTH, 'Project name')
-  assertMaxLength(description, MAX_DESCRIPTION_LENGTH, 'Project description')
-
-  return {
-    name,
-    description,
-    color: normalizeColor(input.color)
-  }
-}
 
 export function findProject(id: number): Project {
   const project = getActiveDatabase().select().from(projects).where(eq(projects.id, id)).get()
@@ -38,7 +14,9 @@ export function findProject(id: number): Project {
   return project
 }
 
-export function listProjects({ includeArchived = false }: ListOptions = {}): Project[] {
+export function listProjects({
+  includeArchived = false
+}: z.output<typeof listOptions> = {}): Project[] {
   return getActiveDatabase()
     .select()
     .from(projects)
@@ -47,30 +25,22 @@ export function listProjects({ includeArchived = false }: ListOptions = {}): Pro
     .all()
 }
 
-export function createProject(input: ProjectInput): Project {
-  const db = getActiveDatabase()
-  const { name, ...values } = normalize(input)
-  if (!name) throw new AppError('VALIDATION_FAILED', 'Project name must not be empty')
-
+export function createProject(input: ProjectData): Project {
   try {
-    return db
-      .insert(projects)
-      .values({ ...values, name })
-      .returning()
-      .get()
+    return getActiveDatabase().insert(projects).values(input).returning().get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
     throw error
   }
 }
 
-export function updateProject(id: number, patch: Partial<ProjectInput>): Project {
+export function updateProject(id: number, patch: Partial<ProjectData>): Project {
   findProject(id)
 
   try {
     return getActiveDatabase()
       .update(projects)
-      .set(normalize(patch))
+      .set(patch)
       .where(eq(projects.id, id))
       .returning()
       .get()
@@ -108,14 +78,14 @@ export function deleteProject(id: number): void {
 }
 
 export function initProjects(): void {
-  handle('projects:list', (_, options?: ListOptions) => listProjects(options))
-  handle('projects:get', (_, id: number) => findProject(id))
-  handle('projects:create', (_, input: ProjectInput) => createProject(input))
-  handle('projects:update', (_, id: number, patch: Partial<ProjectInput>) =>
-    updateProject(id, patch)
+  handle('projects:list', z.tuple([listOptions]), (_, options) => listProjects(options))
+  handle('projects:get', z.tuple([id]), (_, projectId) => findProject(projectId))
+  handle('projects:create', z.tuple([projectInput]), (_, input) => createProject(input))
+  handle('projects:update', z.tuple([id, projectInput.partial()]), (_, projectId, patch) =>
+    updateProject(projectId, patch)
   )
-  handle('projects:setArchived', (_, id: number, archived: boolean) =>
-    setProjectArchived(id, archived)
+  handle('projects:setArchived', z.tuple([id, z.boolean()]), (_, projectId, archived) =>
+    setProjectArchived(projectId, archived)
   )
-  handle('projects:delete', (_, id: number) => deleteProject(id))
+  handle('projects:delete', z.tuple([id]), (_, projectId) => deleteProject(projectId))
 }

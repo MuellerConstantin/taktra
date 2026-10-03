@@ -10,7 +10,7 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { TagPicker } from './TagPicker'
-import { MAX_NAME_LENGTH } from '../../../../shared/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface ActivityDialogProps {
   readonly activity: ActivityRef

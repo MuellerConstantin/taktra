@@ -9,7 +9,9 @@ export interface TimeFilter {
   readonly tagIds?: readonly number[]
 }
 
-export type Grouping = 'date' | 'project' | 'activity' | 'tag'
+export const groupings = ['date', 'project', 'activity', 'tag'] as const
+
+export type Grouping = (typeof groupings)[number]
 
 export interface AggregateRow {
   readonly date: string | null

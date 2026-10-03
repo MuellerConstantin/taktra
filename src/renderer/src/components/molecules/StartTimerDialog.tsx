@@ -11,7 +11,7 @@ import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
-import { MAX_NAME_LENGTH } from '../../../../shared/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface ActivityOption {
   readonly id: number | 'new'

@@ -1,6 +1,6 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
 import Store from 'electron-store'
-import { AppError } from '../shared/errors'
+import { z } from 'zod'
 import { handle } from './ipc'
 import { getSettings } from './settings'
 import { hasRunningTimer, onTimerChanged } from './timer'
@@ -123,9 +123,8 @@ export function attachMiniTimer(window: BrowserWindow): void {
 
 export function initMiniTimer(): void {
   onTimerChanged(updateMiniTimer)
-  handle('app:showMainWindow', () => showMainWindow())
-  handle('app:setMainVisible', (event, visible: boolean) => {
-    if (typeof visible !== 'boolean') throw new AppError('VALIDATION_FAILED', 'Invalid visibility')
+  handle('app:showMainWindow', z.tuple([]), () => showMainWindow())
+  handle('app:setMainVisible', z.tuple([z.boolean()]), (event, visible) => {
     if (event.sender !== mainWindow?.webContents) return
     isMainVisible = visible
     updateMiniTimer()

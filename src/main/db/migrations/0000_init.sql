@@ -7,7 +7,7 @@ CREATE TABLE `activities` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON UPDATE no action ON DELETE cascade,
-	CONSTRAINT "activities_name_length" CHECK(length("activities"."name") <= 100)
+	CONSTRAINT "activities_name_length" CHECK(length("activities"."name") <= 50)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `activities_uid_unique` ON `activities` (`uid`);--> statement-breakpoint
@@ -35,7 +35,7 @@ CREATE TABLE `projects` (
 	`archived_at` integer,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	CONSTRAINT "projects_name_length" CHECK(length("projects"."name") <= 100),
+	CONSTRAINT "projects_name_length" CHECK(length("projects"."name") <= 50),
 	CONSTRAINT "projects_description_length" CHECK(length("projects"."description") <= 500)
 );
 --> statement-breakpoint
@@ -48,7 +48,7 @@ CREATE TABLE `tags` (
 	`color` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
-	CONSTRAINT "tags_name_length" CHECK(length("tags"."name") <= 100)
+	CONSTRAINT "tags_name_length" CHECK(length("tags"."name") <= 50)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `tags_uid_unique` ON `tags` (`uid`);--> statement-breakpoint

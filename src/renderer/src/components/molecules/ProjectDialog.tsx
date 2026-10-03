@@ -10,7 +10,7 @@ import { ColorSwatchPicker } from '../atoms/ColorSwatchPicker'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/limits'
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface ProjectDialogProps {
   /** The project to edit; without one, a new project is created. */

@@ -1,25 +1,13 @@
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
-import type { Activity, ActivityInput, ActivityTag, ActivityWithTags } from '../shared/activities'
+import { z } from 'zod'
+import type { Activity, ActivityTag, ActivityWithTags } from '../shared/activities'
 import { AppError } from '../shared/errors'
-import { MAX_NAME_LENGTH } from '../shared/limits'
+import { activityInput, activityListOptions, id, name } from '../shared/validation'
 import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, activityTags, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
 import { findProject } from './projects'
-import { assertMaxLength } from './validation'
-
-interface ListOptions {
-  readonly projectId?: number
-  readonly includeArchived?: boolean
-}
-
-function normalizeName(name: string): string {
-  const trimmed = name.trim()
-  if (!trimmed) throw new AppError('VALIDATION_FAILED', 'Activity name must not be empty')
-  assertMaxLength(trimmed, MAX_NAME_LENGTH, 'Activity name')
-  return trimmed
-}
 
 export function findActivity(id: number): Activity {
   const activity = getActiveDatabase().select().from(activities).where(eq(activities.id, id)).get()
@@ -53,7 +41,7 @@ export function tagsByActivity(activityIds: readonly number[]): Map<number, Acti
 export function listActivities({
   projectId,
   includeArchived = false
-}: ListOptions = {}): ActivityWithTags[] {
+}: z.output<typeof activityListOptions> = {}): ActivityWithTags[] {
   const rows = getActiveDatabase()
     .select()
     .from(activities)
@@ -73,15 +61,11 @@ export function listActivities({
   }))
 }
 
-export function createActivity(input: ActivityInput): Activity {
+export function createActivity(input: z.output<typeof activityInput>): Activity {
   findProject(input.projectId)
 
   try {
-    return getActiveDatabase()
-      .insert(activities)
-      .values({ projectId: input.projectId, name: normalizeName(input.name) })
-      .returning()
-      .get()
+    return getActiveDatabase().insert(activities).values(input).returning().get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
     throw error
@@ -94,7 +78,7 @@ export function renameActivity(id: number, name: string): Activity {
   try {
     return getActiveDatabase()
       .update(activities)
-      .set({ name: normalizeName(name) })
+      .set({ name })
       .where(eq(activities.id, id))
       .returning()
       .get()
@@ -118,8 +102,6 @@ export function setActivityArchived(id: number, archived: boolean): Activity {
 export function setActivityTags(id: number, tagIds: readonly number[]): void {
   findActivity(id)
   const uniqueIds = [...new Set(tagIds)]
-  if (!uniqueIds.every(Number.isInteger))
-    throw new AppError('VALIDATION_FAILED', `Invalid tag ids: ${tagIds}`)
 
   const db = getActiveDatabase()
   db.transaction((tx) => {
@@ -155,14 +137,16 @@ export function deleteActivity(id: number): void {
 }
 
 export function initActivities(): void {
-  handle('activities:list', (_, options?: ListOptions) => listActivities(options))
-  handle('activities:create', (_, input: ActivityInput) => createActivity(input))
-  handle('activities:rename', (_, id: number, name: string) => renameActivity(id, name))
-  handle('activities:setArchived', (_, id: number, archived: boolean) =>
-    setActivityArchived(id, archived)
+  handle('activities:list', z.tuple([activityListOptions]), (_, options) => listActivities(options))
+  handle('activities:create', z.tuple([activityInput]), (_, input) => createActivity(input))
+  handle('activities:rename', z.tuple([id, name]), (_, activityId, newName) =>
+    renameActivity(activityId, newName)
   )
-  handle('activities:setTags', (_, id: number, tagIds: readonly number[]) =>
-    setActivityTags(id, tagIds)
+  handle('activities:setArchived', z.tuple([id, z.boolean()]), (_, activityId, archived) =>
+    setActivityArchived(activityId, archived)
   )
-  handle('activities:delete', (_, id: number) => deleteActivity(id))
+  handle('activities:setTags', z.tuple([id, z.array(id)]), (_, activityId, tagIds) =>
+    setActivityTags(activityId, tagIds)
+  )
+  handle('activities:delete', z.tuple([id]), (_, activityId) => deleteActivity(activityId))
 }
