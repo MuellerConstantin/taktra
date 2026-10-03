@@ -1,7 +1,12 @@
 import { nativeTheme } from 'electron'
 import Store from 'electron-store'
 import { AppError } from '../shared/errors'
-import { languages, themeSources, type Settings } from '../shared/settings'
+import {
+  DEFAULT_QUICK_START_SHORTCUT,
+  languages,
+  themeSources,
+  type Settings
+} from '../shared/settings'
 import { handle } from './ipc'
 
 const store = new Store<Settings>({
@@ -9,7 +14,9 @@ const store = new Store<Settings>({
   schema: {
     theme: { type: 'string', enum: [...themeSources], default: 'system' },
     language: { type: 'string', enum: [...languages], default: 'en' },
-    miniTimer: { type: 'boolean', default: true }
+    miniTimer: { type: 'boolean', default: true },
+    quickStartShortcutEnabled: { type: 'boolean', default: true },
+    quickStartShortcut: { type: 'string', minLength: 1, default: DEFAULT_QUICK_START_SHORTCUT }
   },
   clearInvalidConfig: true
 })

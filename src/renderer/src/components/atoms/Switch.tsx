@@ -27,7 +27,7 @@ const handle = tv({
 })
 
 export interface SwitchProps extends Omit<RACSwitchProps, 'children'> {
-  readonly children: React.ReactNode
+  readonly children?: React.ReactNode
 }
 
 export function Switch({ children, ...props }: SwitchProps): React.JSX.Element {

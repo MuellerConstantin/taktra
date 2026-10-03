@@ -269,7 +269,8 @@
   },
   "AppSettingsView": {
     "title": "Settings",
-    "appearance": "Appearance"
+    "appearance": "Appearance",
+    "controls": "Controls"
   },
   "AppearanceSettings": {
     "theme": {
@@ -285,11 +286,29 @@
       "label": "Language",
       "en": "English",
       "de": "Deutsch"
-    },
-    "miniTimer": {
-      "label": "Mini timer",
-      "description": "Shows a small always-on-top window with the running timer while Taktra is minimized or covered by other windows."
     }
+  },
+  "ControlsSettings": {
+    "miniTimer": {
+      "title": "Mini timer",
+      "label": "Show mini timer",
+      "description": "Shows a small always-on-top window with the running timer while Taktra is minimized or covered by other windows."
+    },
+    "global": {
+      "title": "Global shortcuts",
+      "description": "Work in every app, also while Taktra runs in the background.",
+      "quickStart": "Open quick start",
+      "quickStartDescription": "Search an activity and start its timer.",
+      "record": "Record shortcut for quick start",
+      "reset": "Reset to default",
+      "enabled": "Enable quick start shortcut",
+      "unavailable": "This shortcut is already used by another app or the system. Record a different one."
+    }
+  },
+  "ShortcutRecorder": {
+    "recording": "Press keys…",
+    "ctrl": "Ctrl",
+    "space": "Space"
   },
   "ProfileSettingsView": {
     "title": "Profile settings",
@@ -327,6 +346,7 @@
     "TAG_NOT_FOUND": "The tag no longer exists.",
     "TAG_NAME_TAKEN": "A tag with this name already exists.",
     "VALIDATION_FAILED": "The input is invalid.",
-    "UNKNOWN": "Something went wrong. Please try again."
+    "UNKNOWN": "Something went wrong. Please try again.",
+    "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system."
   }
 }

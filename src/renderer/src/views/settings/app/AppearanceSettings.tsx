@@ -1,7 +1,6 @@
 import { useTranslations } from 'use-intl'
 import { RadioCard, RadioGroup } from '../../../components/atoms/RadioGroup'
 import { Select, SelectItem } from '../../../components/atoms/Select'
-import { Switch } from '../../../components/atoms/Switch'
 import { useSettings } from '../../../hooks/useSettings'
 import {
   languages,
@@ -44,16 +43,6 @@ function AppearanceSettings(): React.JSX.Element {
           </SelectItem>
         ))}
       </Select>
-
-      <div className="flex flex-col gap-1">
-        <Switch
-          isSelected={settings.miniTimer}
-          onChange={(miniTimer) => updateSettings({ miniTimer })}
-        >
-          {t('miniTimer.label')}
-        </Switch>
-        <p className="pl-12 text-sm text-muted-foreground">{t('miniTimer.description')}</p>
-      </div>
     </div>
   )
 }

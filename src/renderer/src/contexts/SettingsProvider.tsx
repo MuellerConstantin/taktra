@@ -18,9 +18,13 @@ function SettingsProvider({ children }: SettingsProviderProps): React.JSX.Elemen
     setSettings(await api.settings.update(patch))
   }, [])
 
+  const setQuickStartShortcut = useCallback(async (accelerator: string) => {
+    setSettings(await api.shortcuts.setQuickStart(accelerator))
+  }, [])
+
   const value = useMemo(
-    () => (settings ? { settings, updateSettings } : null),
-    [settings, updateSettings]
+    () => (settings ? { settings, updateSettings, setQuickStartShortcut } : null),
+    [settings, updateSettings, setQuickStartShortcut]
   )
 
   if (!value) return null

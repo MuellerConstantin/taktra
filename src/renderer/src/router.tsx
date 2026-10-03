@@ -12,6 +12,7 @@ import TagDetailView from './views/TagDetailView'
 import ReportsView from './views/ReportsView'
 import AppSettingsView from './views/settings/app/AppSettingsView'
 import AppearanceSettings from './views/settings/app/AppearanceSettings'
+import ControlsSettings from './views/settings/app/ControlsSettings'
 import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
 import ProfileGeneralSettings from './views/settings/profile/ProfileGeneralSettings'
 
@@ -48,7 +49,8 @@ export const router = createHashRouter([
         element: <AppSettingsView />,
         children: [
           { index: true, element: <Navigate to="appearance" replace /> },
-          { path: 'appearance', element: <AppearanceSettings /> }
+          { path: 'appearance', element: <AppearanceSettings /> },
+          { path: 'controls', element: <ControlsSettings /> }
         ]
       }
     ]

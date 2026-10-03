@@ -7,7 +7,10 @@ function AppSettingsView(): React.JSX.Element {
   return (
     <TabViewTemplate
       title={t('title')}
-      sections={[{ path: '/settings/appearance', label: t('appearance') }]}
+      sections={[
+        { path: '/settings/appearance', label: t('appearance') },
+        { path: '/settings/controls', label: t('controls') }
+      ]}
     />
   )
 }

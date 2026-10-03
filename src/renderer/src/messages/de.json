@@ -269,7 +269,8 @@
   },
   "AppSettingsView": {
     "title": "Einstellungen",
-    "appearance": "Darstellung"
+    "appearance": "Darstellung",
+    "controls": "Bedienung"
   },
   "AppearanceSettings": {
     "theme": {
@@ -285,11 +286,29 @@
       "label": "Sprache",
       "en": "English",
       "de": "Deutsch"
-    },
-    "miniTimer": {
-      "label": "Mini-Timer",
-      "description": "Zeigt ein kleines Fenster im Vordergrund mit dem laufenden Timer, solange Taktra minimiert oder von anderen Fenstern verdeckt ist."
     }
+  },
+  "ControlsSettings": {
+    "miniTimer": {
+      "title": "Mini-Timer",
+      "label": "Mini-Timer anzeigen",
+      "description": "Zeigt ein kleines Fenster im Vordergrund mit dem laufenden Timer, solange Taktra minimiert oder von anderen Fenstern verdeckt ist."
+    },
+    "global": {
+      "title": "Globale Kürzel",
+      "description": "Funktionieren in jeder App, auch wenn Taktra im Hintergrund läuft.",
+      "quickStart": "Schnellstart öffnen",
+      "quickStartDescription": "Tätigkeit suchen und ihren Timer starten.",
+      "record": "Kürzel für Schnellstart aufnehmen",
+      "reset": "Auf Standard zurücksetzen",
+      "enabled": "Kürzel für Schnellstart aktivieren",
+      "unavailable": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt. Nimm ein anderes auf."
+    }
+  },
+  "ShortcutRecorder": {
+    "recording": "Tasten drücken…",
+    "ctrl": "Strg",
+    "space": "Leertaste"
   },
   "ProfileSettingsView": {
     "title": "Profileinstellungen",
@@ -327,6 +346,7 @@
     "TAG_NOT_FOUND": "Der Tag existiert nicht mehr.",
     "TAG_NAME_TAKEN": "Ein Tag mit diesem Namen existiert bereits.",
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
-    "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt."
   }
 }

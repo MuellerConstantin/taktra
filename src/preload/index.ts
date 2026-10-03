@@ -4,7 +4,7 @@ import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
-import type { Settings } from '../shared/settings'
+import type { Settings, ShortcutStatus } from '../shared/settings'
 import type { Tag, TagInput } from '../shared/tags'
 import type {
   ActivityDetails,
@@ -88,6 +88,12 @@ const api = {
     stop: () => invoke<void>('timer:stop'),
     discard: () => invoke<void>('timer:discard'),
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
+  },
+  shortcuts: {
+    status: () => invoke<ShortcutStatus>('shortcuts:status'),
+    setQuickStart: (accelerator: string) =>
+      invoke<Settings>('shortcuts:setQuickStart', accelerator),
+    setRecording: (recording: boolean) => invoke<void>('shortcuts:setRecording', recording)
   },
   quick: {
     hide: () => invoke<void>('quick:hide'),
