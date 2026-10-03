@@ -1,7 +1,7 @@
 {
   "Navigation": {
     "timer": "Timer",
-    "tracking": "Erfassung",
+    "tracking": "Einträge",
     "projects": "Projekte",
     "tags": "Tags",
     "reports": "Auswertung",
@@ -23,7 +23,7 @@
   },
   "CreateProfileDialog": {
     "title": "Neues Profil",
-    "description": "Jedes Profil hat eigene Projekte, Activities und Zeiteinträge.",
+    "description": "Jedes Profil hat eigene Projekte, Tätigkeiten und Zeiteinträge.",
     "nameLabel": "Name",
     "nameRequired": "Bitte einen Namen eingeben.",
     "locationLabel": "Speicherort",
@@ -56,7 +56,7 @@
   },
   "TimerView": {
     "title": "Timer",
-    "switch": "Activity wechseln",
+    "switch": "Tätigkeit wechseln",
     "todayTotal": "Heute {duration}",
     "since": "Läuft seit {time}",
     "stop": "Stoppen",
@@ -64,7 +64,7 @@
     "idle": "Kein Timer aktiv.",
     "start": "Timer starten",
     "recent": "Zuletzt verwendet",
-    "recentEmpty": "Activities, auf die du Zeit buchst, erscheinen hier zum schnellen Starten.",
+    "recentEmpty": "Tätigkeiten, auf die du Zeit buchst, erscheinen hier zum schnellen Starten.",
     "startActivity": "Timer für {name} starten",
     "stopActivity": "Timer für {name} stoppen",
     "discardConfirmTitle": "Laufenden Timer verwerfen?",
@@ -84,7 +84,7 @@
     "title": "Timer starten",
     "projectLabel": "Projekt",
     "projectPlaceholder": "Projekt auswählen",
-    "activityLabel": "Activity",
+    "activityLabel": "Tätigkeit",
     "createActivity": "„{name}“ anlegen",
     "cancel": "Abbrechen",
     "start": "Starten"
@@ -128,7 +128,7 @@
     "editTitle": "Eintrag bearbeiten",
     "projectLabel": "Projekt",
     "projectPlaceholder": "Projekt auswählen",
-    "activityLabel": "Activity",
+    "activityLabel": "Tätigkeit",
     "createActivity": "„{name}“ anlegen",
     "modeLabel": "Zeitangabe",
     "modeRange": "Beginn und Ende",
@@ -143,11 +143,11 @@
     "cancel": "Abbrechen",
     "create": "Anlegen",
     "save": "Speichern",
-    "newActivityTags": "Tags für die neue Activity „{name}“. Sie gelten für alle ihre Einträge."
+    "newActivityTags": "Tags für die neue Tätigkeit „{name}“. Sie gelten für alle ihre Einträge."
   },
   "TagPicker": {
     "label": "Tags",
-    "description": "Tags gehören zur Activity und gelten für alle ihre Einträge.",
+    "description": "Tags gehören zur Tätigkeit und gelten für alle ihre Einträge.",
     "placeholder": "Tags suchen",
     "selected": "Ausgewählte Tags"
   },
@@ -173,14 +173,14 @@
     "unarchive": "Wiederherstellen",
     "archived": "Archiviert",
     "total": "Gesamt {duration}",
-    "activities": "Activities",
-    "empty": "Noch keine Activities. Activities entstehen beim Erfassen von Zeit.",
+    "activities": "Tätigkeiten",
+    "empty": "Noch keine Tätigkeiten. Tätigkeiten entstehen beim Erfassen von Zeit.",
     "emptyPeriod": "In diesem Zeitraum wurde keine Zeit erfasst.",
     "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
     "editActivity": "{name} bearbeiten"
   },
   "ActivityDialog": {
-    "title": "Activity bearbeiten",
+    "title": "Tätigkeit bearbeiten",
     "nameLabel": "Name",
     "nameRequired": "Bitte einen Namen eingeben.",
     "cancel": "Abbrechen",
@@ -214,9 +214,9 @@
     "subtitle": "Tag",
     "edit": "Bearbeiten",
     "total": "Gesamt {duration}",
-    "empty": "Auf Activities mit diesem Tag wurde noch keine Zeit erfasst.",
-    "emptyPeriod": "In diesem Zeitraum wurde auf Activities mit diesem Tag keine Zeit erfasst.",
-    "activityCount": "{count, plural, one {# Activity} other {# Activities}}",
+    "empty": "Auf Tätigkeiten mit diesem Tag wurde noch keine Zeit erfasst.",
+    "emptyPeriod": "In diesem Zeitraum wurde auf Tätigkeiten mit diesem Tag keine Zeit erfasst.",
+    "activityCount": "{count, plural, one {# Tätigkeit} other {# Tätigkeiten}}",
     "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
     "editActivity": "{name} bearbeiten"
   },
@@ -254,7 +254,7 @@
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
-    "overlap": "Ein Eintrag zählt bei jedem Tag seiner Activity mit. Die Anteile der Tags können sich daher überschneiden und zusammen mehr als 100 % ergeben."
+    "overlap": "Ein Eintrag zählt bei jedem Tag seiner Tätigkeit mit. Die Anteile der Tags können sich daher überschneiden und zusammen mehr als 100 % ergeben."
   },
   "AppSettingsView": {
     "title": "Einstellungen",
@@ -309,9 +309,9 @@
     "PROJECT_NOT_FOUND": "Das Projekt existiert nicht mehr.",
     "PROJECT_NAME_TAKEN": "Ein Projekt mit diesem Namen existiert bereits.",
     "PROJECT_HAS_TIME_ENTRIES": "Auf dem Projekt ist Zeit erfasst, es kann nicht gelöscht werden. Archiviere es stattdessen.",
-    "ACTIVITY_NOT_FOUND": "Die Activity existiert nicht mehr.",
-    "ACTIVITY_NAME_TAKEN": "In diesem Projekt gibt es bereits eine Activity mit diesem Namen.",
-    "ACTIVITY_HAS_TIME_ENTRIES": "Auf der Activity ist Zeit erfasst, sie kann nicht gelöscht werden. Archiviere sie stattdessen.",
+    "ACTIVITY_NOT_FOUND": "Die Tätigkeit existiert nicht mehr.",
+    "ACTIVITY_NAME_TAKEN": "In diesem Projekt gibt es bereits eine Tätigkeit mit diesem Namen.",
+    "ACTIVITY_HAS_TIME_ENTRIES": "Auf der Tätigkeit ist Zeit erfasst, sie kann nicht gelöscht werden. Archiviere sie stattdessen.",
     "TIME_ENTRY_NOT_FOUND": "Der Zeiteintrag existiert nicht mehr.",
     "TAG_NOT_FOUND": "Der Tag existiert nicht mehr.",
     "TAG_NAME_TAKEN": "Ein Tag mit diesem Namen existiert bereits.",
