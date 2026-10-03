@@ -253,7 +253,7 @@ export function TimeEntryDialog({
                 validate={(value) => (parseDuration(value) === null ? t('durationInvalid') : null)}
               />
             )}
-            <TextField label={t('noteLabel')} value={note} onChange={setNote} />
+            <TextField label={t('noteLabel')} value={note} onChange={setNote} multiline />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>

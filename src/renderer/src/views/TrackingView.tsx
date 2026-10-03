@@ -152,7 +152,9 @@ function TrackingView(): React.JSX.Element {
                     <span className="text-muted-foreground"> · {project.name}</span>
                   </span>
                   {entry.note && (
-                    <span className="truncate text-xs text-muted-foreground">{entry.note}</span>
+                    <span className="line-clamp-2 text-xs whitespace-pre-line text-muted-foreground">
+                      {entry.note}
+                    </span>
                   )}
                   {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                 </div>
