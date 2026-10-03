@@ -142,7 +142,8 @@
     "endBeforeStart": "The end must be after the start.",
     "cancel": "Cancel",
     "create": "Create",
-    "save": "Save"
+    "save": "Save",
+    "newActivityTags": "Tags for the new activity “{name}”. They apply to all of its entries."
   },
   "TagPicker": {
     "label": "Tags",

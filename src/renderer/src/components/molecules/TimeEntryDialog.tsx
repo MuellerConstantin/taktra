@@ -97,7 +97,7 @@ export function TimeEntryDialog({
   const existingActivity = activities.find(
     (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
   )
-  const tagIds = chosenTagIds ?? existingActivity?.tagIds ?? []
+  const isNewActivity = trimmedName !== '' && !existingActivity
   const matchingActivities = existingActivity
     ? activities
     : activities.filter((activity) => contains(activity.name, trimmedName))
@@ -144,7 +144,8 @@ export function TimeEntryDialog({
       const activity =
         existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
       if (!existingActivity) setActivities((current) => [...current, { ...activity, tagIds: [] }])
-      if (chosenTagIds !== null) await api.activities.setTags(activity.id, chosenTagIds)
+      if (!existingActivity && chosenTagIds && chosenTagIds.length > 0)
+        await api.activities.setTags(activity.id, chosenTagIds)
       const input = { activityId: activity.id, date: date.toString(), note, ...times }
       if (details) await api.timeEntries.update(details.entry.id, input)
       else await api.timeEntries.create(input)
@@ -200,12 +201,14 @@ export function TimeEntryDialog({
                 </ComboBoxItem>
               )}
             </ComboBox>
-            <TagPicker
-              tags={tags}
-              value={tagIds}
-              onChange={setChosenTagIds}
-              isDisabled={!trimmedName}
-            />
+            {isNewActivity && (
+              <TagPicker
+                tags={tags}
+                value={chosenTagIds ?? []}
+                onChange={setChosenTagIds}
+                description={t('newActivityTags', { name: trimmedName })}
+              />
+            )}
             <ToggleButtonGroup
               aria-label={t('modeLabel')}
               selectionMode="single"

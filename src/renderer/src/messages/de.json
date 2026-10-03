@@ -142,7 +142,8 @@
     "endBeforeStart": "Das Ende muss nach dem Beginn liegen.",
     "cancel": "Abbrechen",
     "create": "Anlegen",
-    "save": "Speichern"
+    "save": "Speichern",
+    "newActivityTags": "Tags für die neue Activity „{name}“. Sie gelten für alle ihre Einträge."
   },
   "TagPicker": {
     "label": "Tags",

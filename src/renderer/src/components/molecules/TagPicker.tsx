@@ -8,13 +8,15 @@ interface TagPickerProps {
   readonly value: readonly number[]
   readonly onChange: (value: readonly number[]) => void
   readonly isDisabled?: boolean
+  readonly description?: string
 }
 
 export function TagPicker({
   tags,
   value,
   onChange,
-  isDisabled
+  isDisabled,
+  description
 }: TagPickerProps): React.JSX.Element {
   const t = useTranslations('TagPicker')
   const selectedTags = tags.filter((tag) => value.includes(tag.id))
@@ -23,7 +25,7 @@ export function TagPicker({
     <div className="flex flex-col gap-2">
       <ComboBox
         label={t('label')}
-        description={t('description')}
+        description={description ?? t('description')}
         placeholder={t('placeholder')}
         selectionMode="multiple"
         defaultItems={tags}
