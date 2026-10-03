@@ -18,9 +18,14 @@ const groupStyles = tv({
 
 interface SearchFieldProps extends RACSearchFieldProps {
   readonly placeholder?: string
+  readonly inputRef?: React.Ref<HTMLInputElement>
 }
 
-export function SearchField({ placeholder, ...props }: SearchFieldProps): React.JSX.Element {
+export function SearchField({
+  placeholder,
+  inputRef,
+  ...props
+}: SearchFieldProps): React.JSX.Element {
   return (
     <RACSearchField
       {...props}
@@ -29,6 +34,7 @@ export function SearchField({ placeholder, ...props }: SearchFieldProps): React.
       <Group className={groupStyles}>
         <RiSearchLine aria-hidden className="size-4 shrink-0 text-muted-foreground" />
         <Input
+          ref={inputRef}
           placeholder={placeholder}
           className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
         />

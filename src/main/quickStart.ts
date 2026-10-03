@@ -73,6 +73,7 @@ export function initQuickStart(): void {
   quickWindow = createQuickWindow()
 
   handle('quick:hide', () => hideQuickStart())
+  handle('quick:toggle', () => toggleQuickStart())
   handle('quick:resize', (event, height: number) => {
     if (!Number.isFinite(height)) throw new AppError('VALIDATION_FAILED', 'Invalid height')
     if (!quickWindow || event.sender !== quickWindow.webContents) return

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
 import { api } from '../../lib/api'
-import { acceleratorFromEvent, formatAccelerator } from '../../lib/shortcuts'
+import { acceleratorFromEvent } from '../../lib/shortcuts'
 import { Button } from '../atoms/Button'
+import { KeyCombo } from '../atoms/KeyCombo'
 
 interface ShortcutRecorderProps {
   readonly value: string
@@ -19,7 +20,6 @@ export function ShortcutRecorder({
 }: ShortcutRecorderProps): React.JSX.Element {
   const t = useTranslations('ShortcutRecorder')
   const [isRecording, setRecording] = useState(false)
-  const keys = formatAccelerator(value, { ctrl: t('ctrl'), space: t('space') })
 
   useEffect(() => {
     if (!isRecording) return
@@ -56,16 +56,7 @@ export function ShortcutRecorder({
       {isRecording ? (
         <span className="text-muted-foreground">{t('recording')}</span>
       ) : (
-        <span className="flex items-center gap-1">
-          {keys.map((key) => (
-            <kbd
-              key={key}
-              className="rounded border border-border bg-background px-1.5 py-0.5 font-sans text-xs"
-            >
-              {key}
-            </kbd>
-          ))}
-        </span>
+        <KeyCombo accelerator={value} size="md" />
       )}
     </Button>
   )

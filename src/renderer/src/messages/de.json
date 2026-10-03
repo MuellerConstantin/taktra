@@ -303,10 +303,29 @@
       "reset": "Auf Standard zurücksetzen",
       "enabled": "Kürzel für Schnellstart aktivieren",
       "unavailable": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt. Nimm ein anderes auf."
+    },
+    "app": {
+      "title": "App-Kürzel",
+      "description": "Funktionieren, solange ein Taktra-Fenster aktiv ist. Einzelne Tasten werden beim Tippen ignoriert.",
+      "timer": "Zum Timer",
+      "entries": "Zu den Einträgen",
+      "projects": "Zu den Projekten",
+      "tags": "Zu den Tags",
+      "reports": "Zur Auswertung",
+      "settings": "Einstellungen öffnen",
+      "quickStart": "Schnellstart öffnen",
+      "stopTimer": "Laufenden Timer stoppen",
+      "create": "Neuer Eintrag, neues Projekt oder neuer Tag",
+      "search": "Projekte oder Tags durchsuchen",
+      "previousDay": "Vorheriger Tag",
+      "nextDay": "Nächster Tag",
+      "today": "Zu heute"
     }
   },
   "ShortcutRecorder": {
-    "recording": "Tasten drücken…",
+    "recording": "Tasten drücken…"
+  },
+  "Keys": {
     "ctrl": "Strg",
     "space": "Leertaste"
   },

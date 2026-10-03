@@ -18,6 +18,7 @@ import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration, formatElapsed } from '../lib/duration'
 import { NEUTRAL_COLOR } from '../lib/report'
+import { appShortcuts } from '../lib/shortcuts'
 
 const RECENT_LIMIT = 8
 
@@ -110,7 +111,7 @@ function TimerView(): React.JSX.Element {
                 </span>
               </div>
               <div className="flex gap-2">
-                <Button onPress={() => run(stop)}>
+                <Button onPress={() => run(stop)} shortcut={appShortcuts.stopTimer}>
                   <RiStopFill className="size-4" />
                   {t('stop')}
                 </Button>

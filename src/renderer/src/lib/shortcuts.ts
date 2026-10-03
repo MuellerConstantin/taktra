@@ -76,3 +76,41 @@ export function formatAccelerator(accelerator: string, labels: KeyLabels): strin
   }
   return accelerator.split('+').map((part) => symbols[part] ?? keys[part] ?? part)
 }
+
+export const appShortcuts = {
+  timer: 'CommandOrControl+1',
+  entries: 'CommandOrControl+2',
+  projects: 'CommandOrControl+3',
+  tags: 'CommandOrControl+4',
+  reports: 'CommandOrControl+5',
+  settings: 'CommandOrControl+,',
+  quickStart: 'CommandOrControl+K',
+  stopTimer: 'CommandOrControl+Shift+Space',
+  create: 'CommandOrControl+N',
+  search: 'CommandOrControl+F',
+  previousDay: 'Left',
+  nextDay: 'Right',
+  today: 'T'
+} as const
+
+export type AppShortcut = keyof typeof appShortcuts
+
+export function matchesAccelerator(event: KeyEvent, accelerator: string): boolean {
+  const parts = accelerator.split('+')
+  const key = parts.pop()
+  const wanted = { ctrl: false, meta: false, alt: false, shift: false }
+  for (const part of parts) {
+    if (part === 'CommandOrControl') wanted[isMac ? 'meta' : 'ctrl'] = true
+    else if (part === 'Control') wanted.ctrl = true
+    else if (part === 'Command' || part === 'Super') wanted.meta = true
+    else if (part === 'Alt') wanted.alt = true
+    else if (part === 'Shift') wanted.shift = true
+  }
+  return (
+    keyFromCode(event.code) === key &&
+    event.ctrlKey === wanted.ctrl &&
+    event.metaKey === wanted.meta &&
+    event.altKey === wanted.alt &&
+    event.shiftKey === wanted.shift
+  )
+}

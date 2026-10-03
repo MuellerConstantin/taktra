@@ -23,9 +23,11 @@ import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'
 import { useProfiles } from '../hooks/useProfiles'
+import { useShortcut } from '../hooks/useShortcut'
 import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
+import { appShortcuts } from '../lib/shortcuts'
 
 function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
   if (!value) return fallback
@@ -90,6 +92,8 @@ function TrackingView(): React.JSX.Element {
     setSearchParams(isSameDay(next, todayDate) ? {} : { date: next.toString() })
   }
 
+  useShortcut(appShortcuts.create, () => setDialog({}))
+
   const runTimer = async (action: () => Promise<void>): Promise<void> => {
     setDeleteError(null)
     try {
@@ -116,7 +120,7 @@ function TrackingView(): React.JSX.Element {
         title={title}
         subtitle={dayFormatter.format(date.toDate(getLocalTimeZone()))}
         actions={
-          <Button onPress={() => setDialog({})}>
+          <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />
             {t('create')}
           </Button>

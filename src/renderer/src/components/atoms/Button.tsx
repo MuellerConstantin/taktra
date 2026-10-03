@@ -1,3 +1,4 @@
+import { Children, isValidElement } from 'react'
 import {
   Button as RACButton,
   TooltipTrigger,
@@ -5,6 +6,7 @@ import {
   type ButtonProps as RACButtonProps
 } from 'react-aria-components'
 import { tv } from 'tailwind-variants'
+import { KeyCombo } from './KeyCombo'
 import { Tooltip } from './Tooltip'
 import { focusRing } from './utils'
 
@@ -13,6 +15,7 @@ const TOOLTIP_DELAY = 500
 export interface ButtonProps extends RACButtonProps {
   readonly variant?: 'primary' | 'secondary' | 'destructive' | 'icon'
   readonly tooltip?: boolean
+  readonly shortcut?: string
 }
 
 const button = tv({
@@ -43,8 +46,26 @@ const button = tv({
   ]
 })
 
-export function Button({ tooltip = true, ...props }: ButtonProps): React.JSX.Element {
-  const label = props['aria-label']
+function textOf(node: React.ReactNode): string {
+  return Children.toArray(node)
+    .map((child) =>
+      typeof child === 'string' || typeof child === 'number'
+        ? String(child)
+        : isValidElement<{ children?: React.ReactNode }>(child)
+          ? textOf(child.props.children)
+          : ''
+    )
+    .join('')
+    .trim()
+}
+
+export function Button({ tooltip = true, shortcut, ...props }: ButtonProps): React.JSX.Element {
+  const label =
+    props.variant === 'icon'
+      ? props['aria-label']
+      : shortcut && typeof props.children !== 'function'
+        ? props['aria-label'] || textOf(props.children)
+        : undefined
   const element = (
     <RACButton
       {...props}
@@ -54,12 +75,17 @@ export function Button({ tooltip = true, ...props }: ButtonProps): React.JSX.Ele
     />
   )
 
-  if (props.variant !== 'icon' || !label || !tooltip) return element
+  if (!tooltip || (!label && !shortcut)) return element
 
   return (
     <TooltipTrigger delay={TOOLTIP_DELAY}>
       {element}
-      <Tooltip>{label}</Tooltip>
+      <Tooltip>
+        <span className="flex items-center gap-2">
+          {label}
+          {shortcut && <KeyCombo accelerator={shortcut} />}
+        </span>
+      </Tooltip>
     </TooltipTrigger>
   )
 }

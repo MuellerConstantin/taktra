@@ -303,10 +303,29 @@
       "reset": "Reset to default",
       "enabled": "Enable quick start shortcut",
       "unavailable": "This shortcut is already used by another app or the system. Record a different one."
+    },
+    "app": {
+      "title": "App shortcuts",
+      "description": "Work while a Taktra window is focused. Single keys are ignored while typing.",
+      "timer": "Go to timer",
+      "entries": "Go to entries",
+      "projects": "Go to projects",
+      "tags": "Go to tags",
+      "reports": "Go to reports",
+      "settings": "Open settings",
+      "quickStart": "Open quick start",
+      "stopTimer": "Stop running timer",
+      "create": "New entry, project or tag",
+      "search": "Search projects or tags",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "today": "Go to today"
     }
   },
   "ShortcutRecorder": {
-    "recording": "Press keys…",
+    "recording": "Press keys…"
+  },
+  "Keys": {
     "ctrl": "Ctrl",
     "space": "Space"
   },

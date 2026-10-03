@@ -97,6 +97,7 @@ const api = {
   },
   quick: {
     hide: () => invoke<void>('quick:hide'),
+    toggle: () => invoke<void>('quick:toggle'),
     resize: (height: number) => invoke<void>('quick:resize', height)
   },
   app: {

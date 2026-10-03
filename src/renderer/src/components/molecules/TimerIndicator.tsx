@@ -7,6 +7,7 @@ import { useNow } from '../../hooks/useNow'
 import { useTimer } from '../../hooks/useTimer'
 import { elapsedSeconds, formatElapsed } from '../../lib/duration'
 import { NEUTRAL_COLOR } from '../../lib/report'
+import { appShortcuts } from '../../lib/shortcuts'
 import { Button } from '../atoms/Button'
 
 export function TimerIndicator(): React.JSX.Element | null {
@@ -48,7 +49,12 @@ export function TimerIndicator(): React.JSX.Element | null {
             </span>
           </span>
         </Link>
-        <Button variant="icon" aria-label={t('stop')} onPress={handleStop}>
+        <Button
+          variant="icon"
+          aria-label={t('stop')}
+          shortcut={appShortcuts.stopTimer}
+          onPress={handleStop}
+        >
           <RiStopFill className="size-4" />
         </Button>
       </div>

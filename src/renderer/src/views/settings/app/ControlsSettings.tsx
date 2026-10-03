@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
 import { DEFAULT_QUICK_START_SHORTCUT, type ShortcutStatus } from '../../../../../shared/settings'
 import { Button } from '../../../components/atoms/Button'
+import { KeyCombo } from '../../../components/atoms/KeyCombo'
 import { Switch } from '../../../components/atoms/Switch'
 import { ShortcutRecorder } from '../../../components/molecules/ShortcutRecorder'
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useSettings } from '../../../hooks/useSettings'
 import { api } from '../../../lib/api'
+import { appShortcuts, type AppShortcut } from '../../../lib/shortcuts'
 
 function ControlsSettings(): React.JSX.Element {
   const t = useTranslations('ControlsSettings')
@@ -98,6 +100,21 @@ function ControlsSettings(): React.JSX.Element {
           )}
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-sm font-semibold">{t('app.title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('app.description')}</p>
+        </div>
+        <ul className="divide-y divide-border rounded-xl border border-border bg-card">
+          {(Object.keys(appShortcuts) as AppShortcut[]).map((shortcut) => (
+            <li key={shortcut} className="flex items-center justify-between gap-4 px-4 py-2.5">
+              <span className="text-sm">{t(`app.${shortcut}`)}</span>
+              <KeyCombo accelerator={appShortcuts[shortcut]} size="md" />
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   )

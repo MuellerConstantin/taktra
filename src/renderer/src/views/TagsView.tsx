@@ -1,5 +1,5 @@
 import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
@@ -13,8 +13,10 @@ import { SearchField } from '../components/atoms/SearchField'
 import { TagDialog } from '../components/molecules/TagDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
+import { useShortcut } from '../hooks/useShortcut'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
+import { appShortcuts } from '../lib/shortcuts'
 import { suggestColor } from '../lib/colors'
 
 function TagsView(): React.JSX.Element {
@@ -29,6 +31,7 @@ function TagsView(): React.JSX.Element {
   const [tagToDelete, setTagToDelete] = useState<Tag | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
   const { contains } = useFilter({ sensitivity: 'base' })
 
   const visibleTags = (tags ?? []).filter((tag) => contains(tag.name, query))
@@ -58,12 +61,15 @@ function TagsView(): React.JSX.Element {
     setReloadCount((count) => count + 1)
   }
 
+  useShortcut(appShortcuts.create, () => setDialog({}))
+  useShortcut(appShortcuts.search, () => searchRef.current?.focus())
+
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
         title={t('title')}
         actions={
-          <Button onPress={() => setDialog({})}>
+          <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />
             {t('create')}
           </Button>
@@ -71,6 +77,7 @@ function TagsView(): React.JSX.Element {
       >
         <div className="flex items-center gap-2 pb-4">
           <SearchField
+            inputRef={searchRef}
             aria-label={t('search')}
             placeholder={t('search')}
             value={query}

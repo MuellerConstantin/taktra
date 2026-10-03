@@ -7,6 +7,8 @@ import { Button } from '../atoms/Button'
 import { Calendar } from '../atoms/Calendar'
 import { Dialog } from '../atoms/Dialog'
 import { Popover } from '../atoms/Popover'
+import { useShortcut } from '../../hooks/useShortcut'
+import { appShortcuts } from '../../lib/shortcuts'
 
 interface DayNavigatorProps {
   readonly date: CalendarDate
@@ -21,11 +23,16 @@ export function DayNavigator({ date, today, onChange }: DayNavigatorProps): Reac
 
   const formatter = new DateFormatter(locale, { dateStyle: 'medium' })
 
+  useShortcut(appShortcuts.previousDay, () => onChange(date.subtract({ days: 1 })))
+  useShortcut(appShortcuts.nextDay, () => onChange(date.add({ days: 1 })))
+  useShortcut(appShortcuts.today, () => onChange(today))
+
   return (
     <div className="flex items-center gap-1">
       <Button
         variant="icon"
         aria-label={t('previous')}
+        shortcut={appShortcuts.previousDay}
         onPress={() => onChange(date.subtract({ days: 1 }))}
       >
         <RiArrowLeftSLine className="size-5" />
@@ -48,11 +55,16 @@ export function DayNavigator({ date, today, onChange }: DayNavigatorProps): Reac
           </Dialog>
         </Popover>
       </DialogTrigger>
-      <Button variant="icon" aria-label={t('next')} onPress={() => onChange(date.add({ days: 1 }))}>
+      <Button
+        variant="icon"
+        aria-label={t('next')}
+        shortcut={appShortcuts.nextDay}
+        onPress={() => onChange(date.add({ days: 1 }))}
+      >
         <RiArrowRightSLine className="size-5" />
       </Button>
       {date.compare(today) !== 0 && (
-        <Button variant="secondary" onPress={() => onChange(today)}>
+        <Button variant="secondary" shortcut={appShortcuts.today} onPress={() => onChange(today)}>
           {t('today')}
         </Button>
       )}
