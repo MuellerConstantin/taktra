@@ -2,6 +2,7 @@ import './identity'
 import { app, nativeTheme } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { initAbout } from './desktop/about'
 import { attachMiniTimer, initMiniTimer } from './desktop/miniTimer'
 import { initQuickStart } from './desktop/quickStart'
 import { initQuit } from './desktop/quit'
@@ -72,6 +73,7 @@ function start(): void {
   initReports()
   initExport()
   initQuit()
+  initAbout()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

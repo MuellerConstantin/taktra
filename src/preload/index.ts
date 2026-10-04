@@ -3,6 +3,7 @@ import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activi
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
+import type { AppInfo } from '../shared/about'
 import type { ExportPreview } from '../shared/export'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
@@ -108,12 +109,15 @@ const api = {
   app: {
     showMainWindow: () => invoke<void>('app:showMainWindow'),
     quit: () => invoke<void>('app:quit'),
+    info: () => invoke<AppInfo>('app:info'),
+    openDataFolder: () => invoke<void>('app:openDataFolder'),
     setMainVisible: (visible: boolean) => invoke<void>('app:setMainVisible', visible)
   },
   events: {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback),
     onSettingsChanged: (callback: () => void) => subscribe('settings:changed', callback),
-    onQuickShown: (callback: () => void) => subscribe('quick:shown', callback)
+    onQuickShown: (callback: () => void) => subscribe('quick:shown', callback),
+    onShowAbout: (callback: () => void) => subscribe('about:show', callback)
   }
 }
 

@@ -7,7 +7,19 @@
     "reports": "Auswertung",
     "export": "Export",
     "settings": "Einstellungen",
-    "quit": "Beenden"
+    "quit": "Beenden",
+    "about": "Über Taktra"
+  },
+  "AboutDialog": {
+    "version": "Version {version}",
+    "description": "Lokale Zeiterfassung ohne Ballast.",
+    "copyright": "© {year} {author}",
+    "license": "Freie Software unter der GNU AGPL-3.0",
+    "repository": "GitHub",
+    "dataFolder": "Datenordner öffnen",
+    "copy": "Infos kopieren",
+    "copied": "Kopiert",
+    "close": "Schließen"
   },
   "ProfileSwitcher": {
     "label": "Profil",
@@ -290,7 +302,8 @@
   "AppSettingsView": {
     "title": "Einstellungen",
     "appearance": "Darstellung",
-    "controls": "Bedienung"
+    "controls": "Bedienung",
+    "about": "Über Taktra"
   },
   "AppearanceSettings": {
     "theme": {

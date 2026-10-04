@@ -3,7 +3,7 @@
   <h1 align="center">Taktra</h1>
 </p>
 <p align="center">
-  Local time tracking app.
+  Local time tracking without the overhead.
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Electron-44-47848F?logo=electron" />

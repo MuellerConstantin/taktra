@@ -2,8 +2,12 @@
   "name": "taktra",
   "version": "0.1.0",
   "private": true,
-  "description": "Local time tracking app",
+  "description": "Local time tracking without the overhead.",
   "license": "AGPL-3.0-only",
+  "author": {
+    "name": "Constantin Müller",
+    "url": "https://github.com/MuellerConstantin"
+  },
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",

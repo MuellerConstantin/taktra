@@ -22,6 +22,11 @@ export function showMainWindow(): void {
   mainWindow.focus()
 }
 
+export function sendToMainWindow(channel: string): void {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  mainWindow.webContents.send(channel)
+}
+
 export function createRendererWindow(
   options: BrowserWindowConstructorOptions,
   route: string

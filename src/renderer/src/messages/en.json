@@ -7,7 +7,19 @@
     "reports": "Reports",
     "export": "Export",
     "settings": "Settings",
-    "quit": "Quit"
+    "quit": "Quit",
+    "about": "About Taktra"
+  },
+  "AboutDialog": {
+    "version": "Version {version}",
+    "description": "Local time tracking without the overhead.",
+    "copyright": "© {year} {author}",
+    "license": "Free software under the GNU AGPL-3.0",
+    "repository": "GitHub",
+    "dataFolder": "Open data folder",
+    "copy": "Copy info",
+    "copied": "Copied",
+    "close": "Close"
   },
   "ProfileSwitcher": {
     "label": "Profile",
@@ -290,7 +302,8 @@
   "AppSettingsView": {
     "title": "Settings",
     "appearance": "Appearance",
-    "controls": "Controls"
+    "controls": "Controls",
+    "about": "About Taktra"
   },
   "AppearanceSettings": {
     "theme": {

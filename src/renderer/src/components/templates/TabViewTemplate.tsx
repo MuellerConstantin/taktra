@@ -11,18 +11,20 @@ interface TabViewTemplateProps {
   readonly title: string
   readonly subtitle?: string
   readonly sections: readonly TabViewSection[]
+  readonly actions?: React.ReactNode
 }
 
 export function TabViewTemplate({
   title,
   subtitle,
-  sections
+  sections,
+  actions
 }: TabViewTemplateProps): React.JSX.Element {
   const { pathname } = useLocation()
 
   return (
     <Tabs selectedKey={pathname} className="flex h-full flex-col">
-      <ViewHeader title={title} subtitle={subtitle}>
+      <ViewHeader title={title} subtitle={subtitle} actions={actions}>
         <TabList aria-label={title} className="flex gap-4">
           {sections.map(({ path, label }) => (
             <Tab

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { RouterProvider } from 'react-aria-components'
 import { Outlet, useHref, useNavigate } from 'react-router'
+import AboutProvider from '../../contexts/AboutProvider'
 import { useProfiles } from '../../hooks/useProfiles'
 import { useShortcut } from '../../hooks/useShortcut'
 import { useTimer } from '../../hooks/useTimer'
@@ -35,12 +36,14 @@ export function AppTemplate(): React.JSX.Element {
 
   return (
     <RouterProvider navigate={navigate} useHref={useHref}>
-      <div className="flex h-screen bg-background text-foreground">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+      <AboutProvider>
+        <div className="flex h-screen bg-background text-foreground">
+          <Sidebar />
+          <main className="flex-1 overflow-y-auto">
+            <Outlet />
+          </main>
+        </div>
+      </AboutProvider>
     </RouterProvider>
   )
 }
