@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm'
+import { and, count, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import { grouping, timeFilter } from '../shared/validation'
@@ -6,6 +6,7 @@ import { tagsByActivity } from './activities'
 import { getActiveDatabase } from './db/database'
 import { activities, activityTags, projects, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { compareNames } from './names'
 
 function conditions(filter: TimeFilter): SQL | undefined {
   const tagged = filter.tagIds
@@ -21,6 +22,16 @@ function conditions(filter: TimeFilter): SQL | undefined {
     filter.projectIds ? inArray(projects.id, [...filter.projectIds]) : undefined,
     filter.activityIds ? inArray(activities.id, [...filter.activityIds]) : undefined,
     tagged ? inArray(timeEntries.activityId, tagged) : undefined
+  )
+}
+
+function compareRows(a: AggregateRow, b: AggregateRow): number {
+  if (a.date !== b.date) return (a.date ?? '') < (b.date ?? '') ? -1 : 1
+  return (
+    compareNames(a.project?.name ?? '', b.project?.name ?? '') ||
+    compareNames(a.activity?.name ?? '', b.activity?.name ?? '') ||
+    Number(a.tag === null) - Number(b.tag === null) ||
+    compareNames(a.tag?.name ?? '', b.tag?.name ?? '')
   )
 }
 
@@ -69,21 +80,13 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
     ...(byActivity ? [activities.id] : []),
     ...(byTag ? [tags.id] : [])
   ]
-  const orderColumns = [
-    ...(byDate ? [asc(timeEntries.date)] : []),
-    ...(byProject ? [asc(sql`lower(${projects.name})`)] : []),
-    ...(byActivity ? [asc(sql`lower(${activities.name})`)] : []),
-    ...(byTag ? [sql`${tags.id} is null`, asc(sql`lower(${tags.name})`)] : [])
-  ]
-  const rows = (groupColumns.length > 0 ? filtered.groupBy(...groupColumns) : filtered)
-    .orderBy(...orderColumns)
-    .all()
+  const rows = (groupColumns.length > 0 ? filtered.groupBy(...groupColumns) : filtered).all()
 
   const tagMap = byActivity
     ? tagsByActivity(rows.map((row) => row.activityId).filter((id): id is number => id !== null))
     : new Map()
 
-  return rows.map((row) => ({
+  const result: AggregateRow[] = rows.map((row) => ({
     date: row.date,
     project:
       row.projectId === null
@@ -102,6 +105,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
     totalSec: row.totalSec,
     entryCount: row.entryCount
   }))
+  return result.sort(compareRows)
 }
 
 export function initReports(): void {

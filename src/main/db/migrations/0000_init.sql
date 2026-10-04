@@ -3,6 +3,7 @@ CREATE TABLE `activities` (
 	`uid` text NOT NULL,
 	`project_id` integer NOT NULL,
 	`name` text NOT NULL,
+	`name_key` text NOT NULL,
 	`archived_at` integer,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -11,7 +12,7 @@ CREATE TABLE `activities` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `activities_uid_unique` ON `activities` (`uid`);--> statement-breakpoint
-CREATE UNIQUE INDEX `activities_project_name_unique` ON `activities` (`project_id`,lower("name"));--> statement-breakpoint
+CREATE UNIQUE INDEX `activities_project_name_unique` ON `activities` (`project_id`,`name_key`);--> statement-breakpoint
 CREATE TABLE `activity_tags` (
 	`activity_id` integer NOT NULL,
 	`tag_id` integer NOT NULL,
@@ -30,6 +31,7 @@ CREATE TABLE `projects` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uid` text NOT NULL,
 	`name` text NOT NULL,
+	`name_key` text NOT NULL,
 	`description` text,
 	`color` text,
 	`archived_at` integer,
@@ -40,11 +42,12 @@ CREATE TABLE `projects` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `projects_uid_unique` ON `projects` (`uid`);--> statement-breakpoint
-CREATE UNIQUE INDEX `projects_name_unique` ON `projects` (lower("name"));--> statement-breakpoint
+CREATE UNIQUE INDEX `projects_name_unique` ON `projects` (`name_key`);--> statement-breakpoint
 CREATE TABLE `tags` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uid` text NOT NULL,
 	`name` text NOT NULL,
+	`name_key` text NOT NULL,
 	`color` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -52,7 +55,7 @@ CREATE TABLE `tags` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `tags_uid_unique` ON `tags` (`uid`);--> statement-breakpoint
-CREATE UNIQUE INDEX `tags_name_unique` ON `tags` (lower("name"));--> statement-breakpoint
+CREATE UNIQUE INDEX `tags_name_unique` ON `tags` (`name_key`);--> statement-breakpoint
 CREATE TABLE `time_entries` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uid` text NOT NULL,

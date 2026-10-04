@@ -1,3 +1,4 @@
+import { toNameKey } from '../names'
 import type { ProfileDatabase } from './database'
 import { activities, activityTags, projects, tags, timeEntries } from './schema'
 
@@ -195,7 +196,11 @@ export function seedSampleData(db: ProfileDatabase): void {
   const tagIds = new Map(
     sampleTags.map(([name, color]) => [
       name,
-      db.insert(tags).values({ name, color }).returning({ id: tags.id }).get().id
+      db
+        .insert(tags)
+        .values({ name, nameKey: toNameKey(name), color })
+        .returning({ id: tags.id })
+        .get().id
     ])
   )
 
@@ -205,6 +210,7 @@ export function seedSampleData(db: ProfileDatabase): void {
       .insert(projects)
       .values({
         name: project.name,
+        nameKey: toNameKey(project.name),
         description: project.description,
         color: project.color,
         archivedAt: project.archived ? now : null
@@ -215,7 +221,7 @@ export function seedSampleData(db: ProfileDatabase): void {
     for (const [name, tagNames] of project.activities) {
       const activityId = db
         .insert(activities)
-        .values({ projectId, name })
+        .values({ projectId, name, nameKey: toNameKey(name) })
         .returning({ id: activities.id })
         .get().id
       for (const tagName of tagNames) {

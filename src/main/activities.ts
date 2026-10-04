@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import type { Activity, ActivityTag, ActivityWithTags } from '../shared/activities'
 import { AppError } from '../shared/errors'
@@ -7,6 +7,7 @@ import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, activityTags, tags, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { sortByName, toNameKey } from './names'
 import { findProject } from './projects'
 import { notifyTimerChanged } from './timerEvents'
 
@@ -30,10 +31,9 @@ export function tagsByActivity(activityIds: readonly number[]): Map<number, Acti
     .from(activityTags)
     .innerJoin(tags, eq(activityTags.tagId, tags.id))
     .where(inArray(activityTags.activityId, [...activityIds]))
-    .orderBy(sql`lower(${tags.name})`)
     .all()
 
-  for (const { activityId, ...tag } of rows) {
+  for (const { activityId, ...tag } of sortByName(rows)) {
     result.set(activityId, [...(result.get(activityId) ?? []), tag])
   }
   return result
@@ -43,17 +43,18 @@ export function listActivities({
   projectId,
   includeArchived = false
 }: z.output<typeof activityListOptions> = {}): ActivityWithTags[] {
-  const rows = getActiveDatabase()
-    .select()
-    .from(activities)
-    .where(
-      and(
-        projectId === undefined ? undefined : eq(activities.projectId, projectId),
-        includeArchived ? undefined : isNull(activities.archivedAt)
+  const rows = sortByName(
+    getActiveDatabase()
+      .select()
+      .from(activities)
+      .where(
+        and(
+          projectId === undefined ? undefined : eq(activities.projectId, projectId),
+          includeArchived ? undefined : isNull(activities.archivedAt)
+        )
       )
-    )
-    .orderBy(sql`lower(${activities.name})`)
-    .all()
+      .all()
+  )
 
   const tagMap = tagsByActivity(rows.map((activity) => activity.id))
   return rows.map((activity) => ({
@@ -66,7 +67,11 @@ export function createActivity(input: z.output<typeof activityInput>): Activity 
   findProject(input.projectId)
 
   try {
-    return getActiveDatabase().insert(activities).values(input).returning().get()
+    return getActiveDatabase()
+      .insert(activities)
+      .values({ ...input, nameKey: toNameKey(input.name) })
+      .returning()
+      .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
     throw error
@@ -79,7 +84,7 @@ export function renameActivity(id: number, name: string): Activity {
   try {
     const activity = getActiveDatabase()
       .update(activities)
-      .set({ name })
+      .set({ name, nameKey: toNameKey(name) })
       .where(eq(activities.id, id))
       .returning()
       .get()

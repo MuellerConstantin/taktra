@@ -12,6 +12,7 @@ export const projects = sqliteTable(
       .unique()
       .$defaultFn(() => randomUUID()),
     name: text().notNull(),
+    nameKey: text().notNull(),
     description: text(),
     color: text(),
     archivedAt: integer({ mode: 'timestamp_ms' }),
@@ -24,7 +25,7 @@ export const projects = sqliteTable(
       .$onUpdateFn(() => new Date())
   },
   (table) => [
-    uniqueIndex('projects_name_unique').on(sql`lower(${table.name})`),
+    uniqueIndex('projects_name_unique').on(table.nameKey),
     check(
       'projects_name_length',
       sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`

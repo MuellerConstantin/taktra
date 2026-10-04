@@ -109,6 +109,7 @@ several tags, per-tag sums may overlap and must not be added up to a total.
 │   │   │                             # Queries on the active profile, IPC handlers
 │   │   ├── timer.ts                  # Running timer, recent activities
 │   │   ├── timerEvents.ts            # timer:changed broadcast to all windows and main listeners
+│   │   ├── names.ts                  # Name keys for case-insensitive uniqueness, sorting by app language
 │   │   ├── miniTimer.ts              # Mini timer window shown while the main window is hidden
 │   │   ├── quickStart.ts             # Quick start window (tray click, global shortcut)
 │   │   ├── tray.ts                   # Tray icon and menu
@@ -185,9 +186,8 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   written to `backups/<profile uid>/` in the user data directory via
   `VACUUM INTO`, keeping the newest three per profile, so a migration that
   succeeds but damages data can be undone by opening or copying the backup.
-  drizzle-kit also quotes expression indexes such as `lower("name")` as column
-  names when it rebuilds a table, so generated rebuilds must be checked before
-  they are committed.
+  Indexes on expressions are avoided: drizzle-kit quotes them as column names
+  when it rebuilds a table, which breaks the generated migration.
 - **Migration state is the file format version**: There is no separate
   version number. A profile that contains a migration newer than the newest
   one this app knows was written by a newer Taktra version; it is refused
@@ -270,6 +270,13 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   dialog open) and shown in tooltips via the button's `shortcut` prop. The
   only global shortcut opens the quick start; it can be turned off and
   re-recorded, and a new one is saved only if it can be registered.
+- **Names compared in JavaScript, not SQLite**: SQLite's `lower()` and
+  `NOCASE` only fold ASCII, so "Ärger" and "ärger" would count as different
+  names and sort after "Zoo". Projects, activities and tags therefore store a
+  `nameKey` (`toNameKey()` in `names.ts`: NFC, lower case, independent of the
+  app language), and their unique indexes are on that column. Every write of a
+  name sets it. Lists sorted by name are sorted in the main process with an
+  `Intl.Collator` for the app language instead of `ORDER BY`.
 - **Archive instead of delete**: Anything with booked time is archived, never
   deleted, so historic reports stay complete.
 - **Cross-platform code, Windows packaging first**: Code must not assume a

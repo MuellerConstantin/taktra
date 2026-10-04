@@ -1,4 +1,4 @@
-import { eq, isNull, sql } from 'drizzle-orm'
+import { eq, isNull } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import { z } from 'zod'
 import type { Project, ProjectData } from '../shared/projects'
@@ -7,6 +7,7 @@ import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { activities, projects, timeEntries } from './db/schema'
 import { handle } from './ipc'
+import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
 export function findProject(id: number): Project {
@@ -18,17 +19,22 @@ export function findProject(id: number): Project {
 export function listProjects({
   includeArchived = false
 }: z.output<typeof listOptions> = {}): Project[] {
-  return getActiveDatabase()
-    .select()
-    .from(projects)
-    .where(includeArchived ? undefined : isNull(projects.archivedAt))
-    .orderBy(sql`lower(${projects.name})`)
-    .all()
+  return sortByName(
+    getActiveDatabase()
+      .select()
+      .from(projects)
+      .where(includeArchived ? undefined : isNull(projects.archivedAt))
+      .all()
+  )
 }
 
 export function createProject(input: ProjectData): Project {
   try {
-    return getActiveDatabase().insert(projects).values(input).returning().get()
+    return getActiveDatabase()
+      .insert(projects)
+      .values({ ...input, nameKey: toNameKey(input.name) })
+      .returning()
+      .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
     throw error
@@ -41,7 +47,7 @@ export function updateProject(id: number, patch: Partial<ProjectData>): Project 
   try {
     const project = getActiveDatabase()
       .update(projects)
-      .set(patch)
+      .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
       .where(eq(projects.id, id))
       .returning()
       .get()

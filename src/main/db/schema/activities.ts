@@ -16,6 +16,7 @@ export const activities = sqliteTable(
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
     name: text().notNull(),
+    nameKey: text().notNull(),
     archivedAt: integer({ mode: 'timestamp_ms' }),
     createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()
@@ -26,7 +27,7 @@ export const activities = sqliteTable(
       .$onUpdateFn(() => new Date())
   },
   (table) => [
-    uniqueIndex('activities_project_name_unique').on(table.projectId, sql`lower(${table.name})`),
+    uniqueIndex('activities_project_name_unique').on(table.projectId, table.nameKey),
     check(
       'activities_name_length',
       sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`

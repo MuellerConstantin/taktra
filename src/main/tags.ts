@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { AppError } from '../shared/errors'
 import { z } from 'zod'
 import { id, tagInput } from '../shared/validation'
@@ -7,6 +7,7 @@ import { getActiveDatabase } from './db/database'
 import { isUniqueViolation } from './db/errors'
 import { tags } from './db/schema'
 import { handle } from './ipc'
+import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
 function findTag(id: number): Tag {
@@ -16,16 +17,16 @@ function findTag(id: number): Tag {
 }
 
 export function listTags(): Tag[] {
-  return getActiveDatabase()
-    .select()
-    .from(tags)
-    .orderBy(sql`lower(${tags.name})`)
-    .all()
+  return sortByName(getActiveDatabase().select().from(tags).all())
 }
 
 export function createTag(input: TagData): Tag {
   try {
-    return getActiveDatabase().insert(tags).values(input).returning().get()
+    return getActiveDatabase()
+      .insert(tags)
+      .values({ ...input, nameKey: toNameKey(input.name) })
+      .returning()
+      .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('TAG_NAME_TAKEN', String(error))
     throw error
@@ -36,7 +37,12 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
   findTag(id)
 
   try {
-    const tag = getActiveDatabase().update(tags).set(patch).where(eq(tags.id, id)).returning().get()
+    const tag = getActiveDatabase()
+      .update(tags)
+      .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
+      .where(eq(tags.id, id))
+      .returning()
+      .get()
     notifyTimerChanged()
     return tag
   } catch (error) {
