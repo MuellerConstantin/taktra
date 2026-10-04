@@ -1,11 +1,11 @@
 # Project Overview
 
-**taktra** is a local, single-user time tracking desktop application. Users
+**Taktra** is a local, single-user time tracking desktop application. Users
 organize their work into projects and activities, book time on them — either
 manually or via a start/stop timer — and evaluate the tracked time by project,
 by tag, or by both.
 
-taktra runs entirely on the user's machine. There is no server, no web app, no
+Taktra runs entirely on the user's machine. There is no server, no web app, no
 account and no sync. Data lives in local files that the user owns and can copy,
 back up or move like any other document.
 
@@ -173,6 +173,11 @@ in `src/main/`.
   question is not hooked into `before-quit`, which also fires on OS shutdown,
   where a dialog would block it. A second start brings the running instance to
   the front, so two instances never work on the same files.
+- **Two names**: "Taktra" is the display name (window and dialog titles,
+  installer, UI text), "taktra" the technical one (package, executable, app id,
+  user data folder, generated file names). The user data folder is pinned to
+  `taktra` because it would otherwise follow the display name, which on Linux
+  is a different folder.
 - **Cross-platform code, Windows packaging first**: Code must not assume an OS:
   paths come from Electron and generated file names are valid on Windows, macOS
   and Linux. Only packaging is configured for Windows so far.

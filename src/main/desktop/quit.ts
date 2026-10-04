@@ -52,7 +52,6 @@ export async function requestQuit(window: BrowserWindow | null): Promise<void> {
   const text = labels[getSettings().language]
   const options: MessageBoxOptions = {
     type: 'question',
-    title: 'Taktra',
     message: text.message(running.activity.name),
     detail: text.detail,
     buttons: [text.stop, text.keep, text.cancel],

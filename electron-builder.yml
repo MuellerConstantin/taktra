@@ -1,5 +1,5 @@
 appId: app.taktra
-productName: taktra
+productName: Taktra
 directories:
   buildResources: build
 files:
