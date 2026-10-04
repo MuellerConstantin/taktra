@@ -131,7 +131,13 @@ export function openProfileDatabase(path: string, options: OpenOptions = {}): Pr
     }
 
     assertKnownSchema(client, path)
-    if (!options.readOnly) migrate(client)
+    if (!options.readOnly) {
+      try {
+        migrate(client)
+      } catch (error) {
+        throw new AppError('PROFILE_MIGRATION_FAILED', `${path}: ${String(error)}`)
+      }
+    }
     client.pragma('foreign_keys = ON')
 
     return drizzle({ client, schema, casing: 'snake_case' })

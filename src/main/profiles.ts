@@ -4,7 +4,11 @@ import { dirname, join } from 'node:path'
 import { app, BrowserWindow, dialog, shell } from 'electron'
 import Store from 'electron-store'
 import { z } from 'zod'
-import { profileFileExtension, type ProfilesState } from '../shared/profiles'
+import {
+  profileFileExtension,
+  type ProfilesState,
+  type UnavailableReason
+} from '../shared/profiles'
 import { AppError, isAppError } from '../shared/errors'
 import { filePath, name } from '../shared/validation'
 import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
@@ -56,15 +60,31 @@ function readProfileName(path: string): string | null {
   return inspectProfile(path).name
 }
 
+let failedMigrationPath: string | null = null
+
 function syncActiveDatabase(): void {
   const activePath = store.get('activePath')
+  failedMigrationPath = null
 
   try {
     activateDatabase(activePath && existsSync(activePath) ? activePath : null)
   } catch (error) {
     console.error(`Could not open profile "${activePath}"`, error)
+    if (isAppError(error, 'PROFILE_MIGRATION_FAILED')) failedMigrationPath = activePath
     activateDatabase(null)
   }
+}
+
+function unavailableReasonOf(
+  path: string,
+  activePath: string | null,
+  { name, isNewerVersion }: ProfileInspection
+): UnavailableReason | null {
+  if (isNewerVersion) return 'newerVersion'
+  if (path === failedMigrationPath) return 'migrationFailed'
+  if (name === null) return 'missing'
+  if (path === activePath && !isActiveDatabase(path)) return 'missing'
+  return null
 }
 
 function updateKnownProfiles(paths: string[], activePath: string | null): void {
@@ -78,9 +98,14 @@ function updateKnownProfiles(paths: string[], activePath: string | null): void {
 export function getProfilesState(): ProfilesState {
   const activePath = store.get('activePath')
   const profiles = store.get('paths').map((path) => {
-    const { name, isNewerVersion } = inspectProfile(path)
-    const isOpenable = path === activePath ? isActiveDatabase(path) : true
-    return { path, name, isAvailable: name !== null && isOpenable, isNewerVersion }
+    const inspection = inspectProfile(path)
+    const unavailableReason = unavailableReasonOf(path, activePath, inspection)
+    return {
+      path,
+      name: inspection.name,
+      isAvailable: unavailableReason === null,
+      unavailableReason
+    }
   })
 
   return { profiles, activePath }

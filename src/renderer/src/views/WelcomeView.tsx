@@ -28,11 +28,9 @@ function WelcomeView(): React.JSX.Element {
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-semibold">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">
-            {activeProfile?.isNewerVersion
-              ? t('newerVersionText')
-              : activeProfile
-                ? t('missingText')
-                : t('text')}
+            {activeProfile?.unavailableReason
+              ? t(`${activeProfile.unavailableReason}Text`)
+              : t('text')}
           </p>
         </div>
         <div className="flex gap-2">

@@ -15,16 +15,17 @@ export function UnavailableProfileDialog({
 }: UnavailableProfileDialogProps): React.JSX.Element {
   const t = useTranslations('UnavailableProfileDialog')
   const { removeProfile } = useProfiles()
+  const reason = profile?.unavailableReason ?? 'missing'
 
   return (
     <Modal isOpen={profile !== null} onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
       <AlertDialog
-        title={profile?.isNewerVersion ? t('newerVersionTitle') : t('title')}
+        title={t(`${reason}Title`)}
         actionLabel={t('remove')}
         cancelLabel={t('cancel')}
         onAction={() => profile && removeProfile(profile.path)}
       >
-        <p>{profile?.isNewerVersion ? t('newerVersionText') : t('text')}</p>
+        <p>{t(`${reason}Text`)}</p>
         <p className="mt-2 font-mono text-xs break-all text-foreground">{profile?.path}</p>
       </AlertDialog>
     </Modal>

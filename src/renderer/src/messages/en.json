@@ -19,7 +19,8 @@
     "runningTimerTitle": "Stop the running timer?",
     "runningTimerText": "The timer for “{name}” is stopped and booked before the profile changes.",
     "runningTimerAction": "Stop and continue",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "migrationFailed": "{file} (update failed)"
   },
   "CreateProfileDialog": {
     "title": "New profile",
@@ -36,12 +37,14 @@
     "ok": "OK"
   },
   "UnavailableProfileDialog": {
-    "title": "Profile unavailable",
-    "text": "The profile file could not be found or is not a valid Taktra profile. Removing the profile from the list does not touch any file.",
+    "missingTitle": "Profile unavailable",
+    "missingText": "The profile file could not be found or is not a valid Taktra profile. Removing the profile from the list does not touch any file.",
     "remove": "Remove from list",
     "cancel": "Cancel",
     "newerVersionTitle": "Profile from a newer version",
-    "newerVersionText": "This profile was created or updated by a newer version of Taktra and cannot be opened by this version. Update Taktra to use it again. Removing the profile from the list does not touch any file."
+    "newerVersionText": "This profile was created or updated by a newer version of Taktra and cannot be opened by this version. Update Taktra to use it again. Removing the profile from the list does not touch any file.",
+    "migrationFailedTitle": "Profile could not be updated",
+    "migrationFailedText": "This version of Taktra could not update the profile to its file format. The file was not changed, so the previous version of Taktra can still open it. Removing the profile from the list does not touch any file."
   },
   "WelcomeView": {
     "title": "Welcome to Taktra",
@@ -52,7 +55,8 @@
     "sampleText": "Just want to look around first?",
     "sample": "Try sample profile",
     "removeFromList": "Remove from list",
-    "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list."
+    "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list.",
+    "migrationFailedText": "The selected profile could not be updated to the file format of this Taktra version. The file was not changed. Choose another profile, keep using it with the previous Taktra version, or remove it from the list."
   },
   "TimerView": {
     "title": "Timer",
@@ -355,6 +359,7 @@
     "PROFILE_FILE_EXISTS": "A file already exists at this location.",
     "PROFILE_INVALID": "The file is not a valid Taktra profile.",
     "PROFILE_NEWER_VERSION": "The profile was created or updated by a newer version of Taktra. Update Taktra to open it.",
+    "PROFILE_MIGRATION_FAILED": "The profile could not be updated to the file format of this Taktra version. The file was not changed.",
     "PROJECT_NOT_FOUND": "The project no longer exists.",
     "PROJECT_NAME_TAKEN": "A project with this name already exists.",
     "PROJECT_HAS_TIME_ENTRIES": "The project has tracked time and cannot be deleted. Archive it instead.",

@@ -39,9 +39,10 @@ export function ProfileSwitcher(): React.JSX.Element {
     }
   }
 
-  const label = (profile: ProfileSummary): string =>
-    profile.name ??
-    t(profile.isNewerVersion ? 'newerVersion' : 'missing', { file: fileName(profile.path) })
+  const label = (profile: ProfileSummary): string => {
+    const name = profile.name ?? fileName(profile.path)
+    return profile.unavailableReason ? t(profile.unavailableReason, { file: name }) : name
+  }
 
   return (
     <>

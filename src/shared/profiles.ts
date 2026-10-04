@@ -1,10 +1,12 @@
 export const profileFileExtension = 'taktra'
 
+export type UnavailableReason = 'missing' | 'newerVersion' | 'migrationFailed'
+
 export interface ProfileSummary {
   readonly path: string
   readonly name: string | null
   readonly isAvailable: boolean
-  readonly isNewerVersion: boolean
+  readonly unavailableReason: UnavailableReason | null
 }
 
 export interface ProfilesState {
