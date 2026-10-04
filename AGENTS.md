@@ -208,7 +208,9 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   `settings.json` in the user data directory, not in a database file. They are owned by
   the main process via `electron-store` (JSON schema validation, defaults,
   atomic writes, version migrations) and reach the renderer only through
-  `window.api.settings`. The `Settings` type lives in `src/shared/` and is used
+  `window.api.settings`. Every change is sent as `settings:changed` to all
+  windows (`events.onSettingsChanged`), so the mini timer and the quick start
+  follow a new language. The `Settings` type lives in `src/shared/` and is used
   by main, preload and renderer alike. `electron-store` is ESM-only and is
   therefore bundled into the CJS main build (`externalizeDeps.exclude`). The
   mini timer position is window state in its own `mini-timer.json`.

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Settings } from '../../../shared/settings'
-import { api } from '../lib/api'
+import { api, events } from '../lib/api'
 import { SettingsContext } from './SettingsContext'
 
 interface SettingsProviderProps {
@@ -11,7 +11,9 @@ function SettingsProvider({ children }: SettingsProviderProps): React.JSX.Elemen
   const [settings, setSettings] = useState<Settings | null>(null)
 
   useEffect(() => {
-    api.settings.get().then(setSettings)
+    const load = (): void => void api.settings.get().then(setSettings)
+    load()
+    return events.onSettingsChanged(load)
   }, [])
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {

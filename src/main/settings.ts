@@ -1,4 +1,4 @@
-import { nativeTheme } from 'electron'
+import { BrowserWindow, nativeTheme } from 'electron'
 import Store from 'electron-store'
 import { z } from 'zod'
 import { AppError } from '../shared/errors'
@@ -44,6 +44,7 @@ export function updateSettings(patch: Partial<Settings>): Settings {
     throw new AppError('VALIDATION_FAILED', String(error))
   }
   applyTheme()
+  for (const window of BrowserWindow.getAllWindows()) window.webContents.send('settings:changed')
   for (const listener of listeners) listener()
   return store.store
 }
