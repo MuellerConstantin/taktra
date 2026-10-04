@@ -1,17 +1,20 @@
 import { RiArrowDownSLine } from '@remixicon/react'
 import {
+  Autocomplete,
   Button,
   ListBox,
   Select as RACSelect,
   SelectValue,
   type ListBoxItemProps,
   type SelectProps as RACSelectProps,
-  type ValidationResult
+  type ValidationResult,
+  useFilter
 } from 'react-aria-components'
 import { tv } from 'tailwind-variants'
 import { Description, FieldError, Label } from './Field'
 import { DropdownItem } from './ListBox'
 import { Popover } from './Popover'
+import { SearchField } from './SearchField'
 import { composeTailwindRenderProps, focusRing } from './utils'
 
 const styles = tv({
@@ -34,6 +37,8 @@ export interface SelectProps<T extends object, M extends 'single' | 'multiple'> 
   readonly description?: string
   readonly errorMessage?: string | ((validation: ValidationResult) => string)
   readonly items?: Iterable<T>
+  /** Adds a search field above the options, for long lists. */
+  readonly search?: { readonly label: string; readonly empty: string }
   readonly children: React.ReactNode | ((item: T) => React.ReactNode)
 }
 
@@ -43,8 +48,25 @@ export function Select<T extends object, M extends 'single' | 'multiple' = 'sing
   errorMessage,
   children,
   items,
+  search,
   ...props
 }: SelectProps<T, M>): React.JSX.Element {
+  const { contains } = useFilter({ sensitivity: 'base' })
+
+  const listBox = (
+    <ListBox
+      items={items}
+      renderEmptyState={
+        search
+          ? () => <p className="px-3 py-2 text-sm text-muted-foreground">{search.empty}</p>
+          : undefined
+      }
+      className="box-border min-h-0 flex-1 overflow-auto p-1 outline-hidden [clip-path:inset(0_0_0_0_round_.75rem)]"
+    >
+      {children}
+    </ListBox>
+  )
+
   return (
     <RACSelect
       {...props}
@@ -62,13 +84,20 @@ export function Select<T extends object, M extends 'single' | 'multiple' = 'sing
       </Button>
       {description && <Description>{description}</Description>}
       <FieldError>{errorMessage}</FieldError>
-      <Popover className="min-w-(--trigger-width)">
-        <ListBox
-          items={items}
-          className="box-border max-h-[inherit] overflow-auto p-1 outline-hidden [clip-path:inset(0_0_0_0_round_.75rem)]"
-        >
-          {children}
-        </ListBox>
+      <Popover className="flex min-w-(--trigger-width) flex-col">
+        {search ? (
+          <Autocomplete filter={contains}>
+            <SearchField
+              aria-label={search.label}
+              placeholder={search.label}
+              autoFocus
+              className="m-1 mb-0"
+            />
+            {listBox}
+          </Autocomplete>
+        ) : (
+          listBox
+        )}
       </Popover>
     </RACSelect>
   )

@@ -95,6 +95,7 @@ function ExportView(): React.JSX.Element {
           <Select
             aria-label={t('projects')}
             placeholder={t('allProjects')}
+            search={{ label: t('searchProjects'), empty: t('noMatches') }}
             selectionMode="multiple"
             value={[...projectIds]}
             onChange={(keys) => setProjectIds(keys.map(Number))}
@@ -109,6 +110,7 @@ function ExportView(): React.JSX.Element {
           <Select
             aria-label={t('tags')}
             placeholder={t('allTags')}
+            search={{ label: t('searchTags'), empty: t('noMatches') }}
             selectionMode="multiple"
             value={[...tagIds]}
             onChange={(keys) => setTagIds(keys.map(Number))}

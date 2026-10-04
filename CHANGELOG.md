@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The project and tag filters in reports and export can be searched.
+
 ## [0.1.1] - 2026-10-04
 
 ### Fixed
