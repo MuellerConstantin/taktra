@@ -1,0 +1,5 @@
+# LF everywhere, independent of core.autocrlf: Prettier checks for LF, also in CI.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
