@@ -17,8 +17,14 @@ asarUnpack:
   - resources/**
 win:
   executableName: taktra
+  target: [nsis, zip]
+  artifactName: ${name}-${version}-portable.${ext}
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  runAfterFinish: true
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
