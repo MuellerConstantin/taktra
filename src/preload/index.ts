@@ -107,6 +107,7 @@ const api = {
   },
   app: {
     showMainWindow: () => invoke<void>('app:showMainWindow'),
+    quit: () => invoke<void>('app:quit'),
     setMainVisible: (visible: boolean) => invoke<void>('app:setMainVisible', visible)
   },
   events: {

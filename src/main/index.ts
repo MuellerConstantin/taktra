@@ -1,5 +1,6 @@
 import { app, nativeTheme } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
+import { z } from 'zod'
 import icon from '../../resources/icon.png?asset'
 import { attachMiniTimer, initMiniTimer } from './desktop/miniTimer'
 import { initQuickStart } from './desktop/quickStart'
@@ -18,6 +19,7 @@ import { initReports } from './domain/reports'
 import { initTags } from './domain/tags'
 import { initTimeEntries } from './domain/timeEntries'
 import { initTimer } from './domain/timer'
+import { handle } from './ipc'
 import { initProfiles } from './profiles'
 import { initSettings } from './settings'
 
@@ -69,6 +71,7 @@ function start(): void {
   initMiniTimer()
   initReports()
   initExport()
+  handle('app:quit', z.tuple([]), () => app.quit())
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

@@ -5,19 +5,24 @@ import {
   RiFolderLine,
   RiPriceTag3Line,
   RiSettings3Line,
+  RiShutDownLine,
   RiTimerLine,
   type RemixiconComponentType
 } from '@remixicon/react'
-import { Link, TooltipTrigger } from 'react-aria-components'
+import { Button, Link, TooltipTrigger } from 'react-aria-components'
 import { useMatch } from 'react-router'
 import { useTranslations } from 'use-intl'
 import { useProfiles } from '../../hooks/useProfiles'
+import { api } from '../../lib/api'
 import { appShortcuts } from '../../lib/shortcuts'
 import { KeyCombo } from '../atoms/KeyCombo'
 import { Tooltip } from '../atoms/Tooltip'
 import { ProfileSwitcher } from '../molecules/ProfileSwitcher'
 import { TimerIndicator } from '../molecules/TimerIndicator'
 import logo from '../../../../../resources/icon.svg'
+
+const navItemClassName =
+  'flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50 aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground'
 
 interface NavItemProps {
   readonly to: string
@@ -36,7 +41,7 @@ function NavItem({ to, label, icon: Icon, shortcut, isDisabled }: NavItemProps):
         href={to}
         isDisabled={isDisabled}
         aria-current={isActive ? 'page' : undefined}
-        className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50 aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground"
+        className={navItemClassName}
       >
         <Icon aria-hidden className="size-4 shrink-0" />
         {label}
@@ -110,13 +115,20 @@ export function Sidebar(): React.JSX.Element {
           isDisabled={!hasProfile}
         />
       </nav>
-      <nav className="border-t border-sidebar-border px-3 py-3">
+      <nav className="flex flex-col gap-1 border-t border-sidebar-border px-3 py-3">
         <NavItem
           to="/settings"
           shortcut={appShortcuts.settings}
           label={t('settings')}
           icon={RiSettings3Line}
         />
+        <Button
+          onPress={() => api.app.quit().catch(console.error)}
+          className={`${navItemClassName} w-full cursor-pointer`}
+        >
+          <RiShutDownLine aria-hidden className="size-4 shrink-0" />
+          {t('quit')}
+        </Button>
       </nav>
     </aside>
   )

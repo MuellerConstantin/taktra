@@ -6,7 +6,8 @@
     "tags": "Tags",
     "reports": "Auswertung",
     "export": "Export",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "quit": "Beenden"
   },
   "ProfileSwitcher": {
     "label": "Profil",
