@@ -8,9 +8,12 @@ import { initQuickStart } from './desktop/quickStart'
 import { initQuit } from './desktop/quit'
 import { initShortcuts } from './desktop/shortcuts'
 import { initTray } from './desktop/tray'
+import { initUpdates } from './desktop/updates'
 import {
   createRendererWindow,
   hasMainWindow,
+  isQuitting,
+  prepareQuit,
   setMainWindow,
   showMainWindow
 } from './desktop/windows'
@@ -23,8 +26,6 @@ import { initTimeEntries } from './domain/timeEntries'
 import { initTimer } from './domain/timer'
 import { initProfiles } from './profiles'
 import { initSettings } from './settings'
-
-let isQuitting = false
 
 function createWindow(): void {
   const mainWindow = createRendererWindow(
@@ -46,7 +47,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('close', (event) => {
-    if (isQuitting) return
+    if (isQuitting()) return
     event.preventDefault()
     mainWindow.hide()
   })
@@ -74,6 +75,7 @@ function start(): void {
   initExport()
   initQuit()
   initAbout()
+  initUpdates()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
@@ -94,9 +96,7 @@ if (app.requestSingleInstanceLock()) {
   app.quit()
 }
 
-app.on('before-quit', () => {
-  isQuitting = true
-})
+app.on('before-quit', prepareQuit)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

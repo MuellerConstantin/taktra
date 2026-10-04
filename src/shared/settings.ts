@@ -16,4 +16,5 @@ export interface Settings {
   readonly miniTimer: boolean
   readonly quickStartShortcutEnabled: boolean
   readonly quickStartShortcut: string
+  readonly autoUpdate: boolean
 }

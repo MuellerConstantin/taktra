@@ -64,6 +64,7 @@ development.
 - **Charts**: nivo
 - **App settings**: `electron-store`
 - **Export**: `csv-stringify` (main process only)
+- **Updates**: `electron-updater` with GitHub releases
 
 ## Project Structure
 
@@ -173,6 +174,13 @@ in `src/main/`.
   question is not hooked into `before-quit`, which also fires on OS shutdown,
   where a dialog would block it. A second start brings the running instance to
   the front, so two instances never work on the same files.
+- **Updates from GitHub releases, optional**: The installed app checks the
+  latest published release at start and every few hours, downloads in the
+  background and installs on quit or on request. It is the only network access
+  and can be turned off; without a connection nothing changes. The portable zip
+  never updates itself (the updater would run the installer and leave a second
+  copy), it only points to the download. Releases are created as drafts, so
+  nothing reaches installed apps before it is published by hand.
 - **Two names**: "Taktra" is the display name (window and dialog titles,
   installer, UI text), "taktra" the technical one (package, executable, app id,
   user data folder, generated file names). The user data folder is pinned to

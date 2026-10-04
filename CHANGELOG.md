@@ -22,3 +22,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   durations in minutes) with a preview.
 - English and German, light and dark theme, in-app keyboard shortcuts.
 - Windows installer and portable zip.
+- Automatic updates from GitHub releases for the installed app, with a manual check in the about dialog.

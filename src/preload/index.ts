@@ -5,6 +5,7 @@ import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AppInfo } from '../shared/about'
 import type { ExportPreview } from '../shared/export'
+import type { UpdateStatus } from '../shared/updates'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
 import type { Tag, TagInput } from '../shared/tags'
@@ -77,6 +78,11 @@ const api = {
     aggregate: (filter: TimeFilter, groupBy: readonly Grouping[]) =>
       invoke<AggregateRow[]>('reports:aggregate', filter, groupBy)
   },
+  updates: {
+    status: () => invoke<UpdateStatus>('updates:status'),
+    check: () => invoke<void>('updates:check'),
+    install: () => invoke<void>('updates:install')
+  },
   export: {
     preview: (filter: TimeFilter) => invoke<ExportPreview>('export:preview', filter),
     csv: (filter: TimeFilter) => invoke<string | null>('export:csv', filter)
@@ -117,7 +123,8 @@ const api = {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback),
     onSettingsChanged: (callback: () => void) => subscribe('settings:changed', callback),
     onQuickShown: (callback: () => void) => subscribe('quick:shown', callback),
-    onShowAbout: (callback: () => void) => subscribe('about:show', callback)
+    onShowAbout: (callback: () => void) => subscribe('about:show', callback),
+    onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback)
   }
 }
 

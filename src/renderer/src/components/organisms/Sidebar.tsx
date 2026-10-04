@@ -20,6 +20,7 @@ import { KeyCombo } from '../atoms/KeyCombo'
 import { Tooltip } from '../atoms/Tooltip'
 import { ProfileSwitcher } from '../molecules/ProfileSwitcher'
 import { TimerIndicator } from '../molecules/TimerIndicator'
+import { UpdateNotice } from '../molecules/UpdateNotice'
 import logo from '../../../../../resources/icon.svg'
 
 const navItemClassName =
@@ -123,6 +124,9 @@ export function Sidebar(): React.JSX.Element {
           isDisabled={!hasProfile}
         />
       </nav>
+      <div className="px-3 pb-3">
+        <UpdateNotice />
+      </div>
       <nav className="flex flex-col gap-1 border-t border-sidebar-border px-3 py-3">
         <NavItem
           to="/settings"

@@ -13,7 +13,8 @@ function AppSettingsView(): React.JSX.Element {
       title={t('title')}
       sections={[
         { path: '/settings/appearance', label: t('appearance') },
-        { path: '/settings/controls', label: t('controls') }
+        { path: '/settings/controls', label: t('controls') },
+        { path: '/settings/updates', label: t('updates') }
       ]}
       actions={
         <Button variant="secondary" onPress={showAbout}>

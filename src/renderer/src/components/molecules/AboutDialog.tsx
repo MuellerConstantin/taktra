@@ -1,8 +1,18 @@
-import { RiCheckLine, RiFileCopyLine, RiFolderOpenLine, RiGithubLine } from '@remixicon/react'
+import {
+  RiCheckLine,
+  RiDownload2Line,
+  RiFileCopyLine,
+  RiFolderOpenLine,
+  RiGithubLine,
+  RiRefreshLine,
+  RiRestartLine
+} from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import { REPOSITORY_URL, type AppInfo } from '../../../../shared/about'
+import { RELEASES_URL, REPOSITORY_URL, type AppInfo } from '../../../../shared/about'
+import type { UpdateStatus } from '../../../../shared/updates'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
+import { useUpdates } from '../../hooks/useUpdates'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
@@ -22,9 +32,34 @@ function infoText(info: AppInfo): string {
   ].join('\n')
 }
 
+function updateMessage(
+  status: UpdateStatus,
+  t: ReturnType<typeof useTranslations<'AboutDialog'>>
+): string | null {
+  switch (status.state) {
+    case 'unsupported':
+      return t('updates.unsupported')
+    case 'checking':
+      return t('updates.checking')
+    case 'upToDate':
+      return t('updates.upToDate')
+    case 'downloading':
+      return t('updates.downloading', { version: status.version, percent: status.percent })
+    case 'ready':
+      return t('updates.ready', { version: status.version })
+    case 'available':
+      return t('updates.available', { version: status.version })
+    case 'error':
+      return t('updates.error')
+    case 'idle':
+      return null
+  }
+}
+
 export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.JSX.Element {
   const t = useTranslations('AboutDialog')
   const errorMessage = useErrorMessage()
+  const updates = useUpdates()
   const [info, setInfo] = useState<AppInfo | null>(null)
   const [isCopied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -78,6 +113,35 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
               <p>{t('license')}</p>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
+            <div className="flex w-full flex-col items-center gap-2 rounded-lg border border-border p-3">
+              {updateMessage(updates.status, t) && (
+                <p className="text-sm text-muted-foreground" aria-live="polite">
+                  {updateMessage(updates.status, t)}
+                </p>
+              )}
+              {updates.status.state === 'ready' ? (
+                <Button onPress={() => updates.install().catch(console.error)}>
+                  <RiRestartLine aria-hidden className="size-4" />
+                  {t('updates.restart')}
+                </Button>
+              ) : updates.status.state === 'available' ? (
+                <Button variant="secondary" onPress={() => window.open(RELEASES_URL, '_blank')}>
+                  <RiDownload2Line aria-hidden className="size-4" />
+                  {t('updates.download')}
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  onPress={() => updates.check().catch(console.error)}
+                  isDisabled={['unsupported', 'checking', 'downloading'].includes(
+                    updates.status.state
+                  )}
+                >
+                  <RiRefreshLine aria-hidden className="size-4" />
+                  {t('updates.check')}
+                </Button>
+              )}
+            </div>
             <div className="flex flex-wrap justify-center gap-2">
               <Button variant="secondary" onPress={() => window.open(REPOSITORY_URL, '_blank')}>
                 <RiGithubLine aria-hidden className="size-4" />

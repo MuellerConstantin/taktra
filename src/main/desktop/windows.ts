@@ -3,6 +3,16 @@ import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
 let mainWindow: BrowserWindow | null = null
+let quitting = false
+
+/** From here on, closing the main window closes it instead of hiding it in the tray. */
+export function prepareQuit(): void {
+  quitting = true
+}
+
+export function isQuitting(): boolean {
+  return quitting
+}
 
 export function setMainWindow(window: BrowserWindow): void {
   mainWindow = window

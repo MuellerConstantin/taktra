@@ -19,7 +19,25 @@
     "dataFolder": "Open data folder",
     "copy": "Copy info",
     "copied": "Copied",
-    "close": "Close"
+    "close": "Close",
+    "updates": {
+      "check": "Check for updates",
+      "restart": "Restart now",
+      "download": "Download",
+      "unsupported": "Updates are only available in the packaged app.",
+      "checking": "Checking for updates…",
+      "upToDate": "Taktra is up to date.",
+      "downloading": "Downloading version {version}… {percent} %",
+      "ready": "Version {version} is ready to install.",
+      "available": "Version {version} is available. The portable version is updated by downloading it again.",
+      "error": "The update check failed. Are you offline?"
+    }
+  },
+  "UpdateNotice": {
+    "ready": "Version {version} is ready to install.",
+    "available": "Version {version} is available.",
+    "restart": "Restart now",
+    "download": "Download"
   },
   "ProfileSwitcher": {
     "label": "Profile",
@@ -303,7 +321,8 @@
     "title": "Settings",
     "appearance": "Appearance",
     "controls": "Controls",
-    "about": "About Taktra"
+    "about": "About Taktra",
+    "updates": "Updates"
   },
   "AppearanceSettings": {
     "theme": {
@@ -355,6 +374,11 @@
       "nextDay": "Next day",
       "today": "Go to today"
     }
+  },
+  "UpdatesSettings": {
+    "title": "Updates",
+    "label": "Check for updates automatically",
+    "description": "Looks for new versions on GitHub at start and every few hours. Updates are downloaded in the background and installed when you quit Taktra. Without a connection, nothing happens."
   },
   "ShortcutRecorder": {
     "recording": "Press keys…"

@@ -7,7 +7,8 @@ export const settingsPatch = z
     language: z.enum(languages),
     miniTimer: z.boolean(),
     quickStartShortcutEnabled: z.boolean(),
-    quickStartShortcut: z.string().min(1)
+    quickStartShortcut: z.string().min(1),
+    autoUpdate: z.boolean()
   })
   .partial()
   .strict()

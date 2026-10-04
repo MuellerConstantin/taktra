@@ -19,7 +19,25 @@
     "dataFolder": "Datenordner öffnen",
     "copy": "Infos kopieren",
     "copied": "Kopiert",
-    "close": "Schließen"
+    "close": "Schließen",
+    "updates": {
+      "check": "Nach Updates suchen",
+      "restart": "Jetzt neu starten",
+      "download": "Herunterladen",
+      "unsupported": "Updates gibt es nur in der gepackten App.",
+      "checking": "Suche nach Updates …",
+      "upToDate": "Taktra ist auf dem neuesten Stand.",
+      "downloading": "Lade Version {version} … {percent} %",
+      "ready": "Version {version} ist bereit zur Installation.",
+      "available": "Version {version} ist verfügbar. Die portable Version aktualisierst du, indem du sie neu herunterlädst.",
+      "error": "Die Suche nach Updates ist fehlgeschlagen. Bist du offline?"
+    }
+  },
+  "UpdateNotice": {
+    "ready": "Version {version} ist bereit zur Installation.",
+    "available": "Version {version} ist verfügbar.",
+    "restart": "Jetzt neu starten",
+    "download": "Herunterladen"
   },
   "ProfileSwitcher": {
     "label": "Profil",
@@ -303,7 +321,8 @@
     "title": "Einstellungen",
     "appearance": "Darstellung",
     "controls": "Bedienung",
-    "about": "Über Taktra"
+    "about": "Über Taktra",
+    "updates": "Updates"
   },
   "AppearanceSettings": {
     "theme": {
@@ -355,6 +374,11 @@
       "nextDay": "Nächster Tag",
       "today": "Zu heute"
     }
+  },
+  "UpdatesSettings": {
+    "title": "Updates",
+    "label": "Automatisch nach Updates suchen",
+    "description": "Sucht beim Start und alle paar Stunden auf GitHub nach neuen Versionen. Updates werden im Hintergrund geladen und beim Beenden von Taktra installiert. Ohne Verbindung passiert nichts."
   },
   "ShortcutRecorder": {
     "recording": "Tasten drücken…"
