@@ -1,15 +1,17 @@
 import {
+  RiBugLine,
   RiCheckLine,
   RiDownload2Line,
   RiFileCopyLine,
   RiFolderOpenLine,
   RiGithubLine,
+  RiLightbulbLine,
   RiRefreshLine,
   RiRestartLine
 } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import { RELEASES_URL, REPOSITORY_URL, type AppInfo } from '../../../../shared/about'
+import { NEW_ISSUE_URL, RELEASES_URL, REPOSITORY_URL, type AppInfo } from '../../../../shared/about'
 import type { UpdateStatus } from '../../../../shared/updates'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useUpdates } from '../../hooks/useUpdates'
@@ -85,6 +87,16 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
     setCopied(true)
   }
 
+  const reportBug = (): void => {
+    if (!info) return
+    const query = new URLSearchParams({ template: 'bug_report.yml', environment: infoText(info) })
+    window.open(`${NEW_ISSUE_URL}?${query}`, '_blank')
+  }
+
+  const suggestFeature = (): void => {
+    window.open(`${NEW_ISSUE_URL}?template=feature_request.yml`, '_blank')
+  }
+
   const openDataFolder = async (): Promise<void> => {
     try {
       await api.app.openDataFolder()
@@ -141,6 +153,16 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
                   {t('updates.check')}
                 </Button>
               )}
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button variant="secondary" onPress={reportBug} isDisabled={!info}>
+                <RiBugLine aria-hidden className="size-4" />
+                {t('reportBug')}
+              </Button>
+              <Button variant="secondary" onPress={suggestFeature}>
+                <RiLightbulbLine aria-hidden className="size-4" />
+                {t('suggestFeature')}
+              </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               <Button variant="secondary" onPress={() => window.open(REPOSITORY_URL, '_blank')}>

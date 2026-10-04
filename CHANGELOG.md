@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The project and tag filters in reports and export can be searched.
+- Report a bug or suggest an idea from the about dialog. Bug reports open on GitHub with the
+  version and system already filled in.
 
 ## [0.1.1] - 2026-10-04
 
