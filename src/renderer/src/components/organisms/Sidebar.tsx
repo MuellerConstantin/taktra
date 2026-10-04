@@ -24,7 +24,7 @@ import { UpdateNotice } from '../molecules/UpdateNotice'
 import logo from '../../../../../resources/icon.svg'
 
 const navItemClassName =
-  'flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50 aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground'
+  'flex cursor-default items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring disabled:opacity-50 aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground'
 
 interface NavItemProps {
   readonly to: string
@@ -70,7 +70,7 @@ export function Sidebar(): React.JSX.Element {
         <Button
           onPress={showAbout}
           aria-label={t('about')}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          className="flex w-full cursor-default items-center gap-2 rounded-md px-2 py-2 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           <img src={logo} alt="" className="size-7 rounded-md" />
           <span className="text-lg font-semibold">Taktra</span>
@@ -136,7 +136,7 @@ export function Sidebar(): React.JSX.Element {
         />
         <Button
           onPress={() => api.app.quit().catch(console.error)}
-          className={`${navItemClassName} w-full cursor-pointer`}
+          className={`${navItemClassName} w-full`}
         >
           <RiShutDownLine aria-hidden className="size-4 shrink-0" />
           {t('quit')}

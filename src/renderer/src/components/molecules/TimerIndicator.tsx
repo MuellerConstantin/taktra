@@ -35,7 +35,7 @@ export function TimerIndicator(): React.JSX.Element | null {
         <Link
           href="/timer"
           aria-label={t('open', { name: activity.name })}
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          className="flex min-w-0 flex-1 cursor-default items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           <span
             aria-hidden

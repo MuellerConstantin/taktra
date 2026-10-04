@@ -213,6 +213,8 @@ in `src/main/`.
   exports.
 - **Context, provider and hook in separate files**: The `react-refresh` lint
   rule allows only component exports per file.
+- **Desktop cursor**: Every control shows the arrow cursor, links included, as
+  in native desktop apps. The pointing hand is not used.
 - **Shortcuts**: In-app shortcuts are a static, non-configurable list shown in
   tooltips and the controls settings. The only global shortcut opens the quick
   start; it can be turned off and re-recorded.
