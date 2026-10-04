@@ -28,7 +28,8 @@ activity, retroactively included.
 
 **Time entries**
 An entry is recorded with start and end, with a duration only, or by the timer.
-The timer books the elapsed time rounded to whole minutes (at least one). Only
+The timer rounds start and end to whole minutes and books the difference (at
+least one minute), so back-to-back timers meet on the same minute. Only
 one timer runs at a time, across all profiles.
 
 **Quick access to the timer**

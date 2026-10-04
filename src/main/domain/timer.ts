@@ -18,15 +18,36 @@ function toLocalDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
+const MINUTE_MS = 60_000
+
+function roundToMinute(date: Date): Date {
+  return new Date(Math.round(date.getTime() / MINUTE_MS) * MINUTE_MS)
+}
+
+/**
+ * Rounds the clock times rather than the duration, so the end of a stopped timer and the start
+ * of the one started in the same moment fall on the same minute instead of overlapping.
+ */
+function bookedTimes(
+  startedAt: Date,
+  stoppedAt: Date
+): { readonly startedAt: Date; readonly endedAt: Date; readonly durationSec: number } {
+  const start = roundToMinute(startedAt)
+  const end = new Date(Math.max(roundToMinute(stoppedAt).getTime(), start.getTime() + MINUTE_MS))
+  return {
+    startedAt: start,
+    endedAt: end,
+    durationSec: (end.getTime() - start.getTime()) / 1000
+  }
+}
+
 function stopRunning(now: Date): void {
   const db = getActiveDatabase()
   const entry = db.select().from(timeEntries).where(isRunning).get()
   if (!entry?.startedAt) return
 
-  const durationSec =
-    Math.max(1, Math.round((now.getTime() - entry.startedAt.getTime()) / 60_000)) * 60
   db.update(timeEntries)
-    .set({ endedAt: new Date(entry.startedAt.getTime() + durationSec * 1000), durationSec })
+    .set(bookedTimes(entry.startedAt, now))
     .where(eq(timeEntries.id, entry.id))
     .run()
 }

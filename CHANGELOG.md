@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The sidebar and the timer indicator show the arrow cursor like every other control.
+- A stopped timer rounds its start and end to whole minutes instead of its duration, so an entry
+  and the timer started right after it no longer seem to overlap by a minute.
 
 ## [0.1.0] - 2026-10-04
 
