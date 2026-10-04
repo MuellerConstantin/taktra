@@ -43,6 +43,11 @@ Tracked time is evaluated over a date range, filtered and grouped by project,
 by tag, or both. Because an activity can carry several tags, per-tag sums may
 overlap and must not be added up to a total.
 
+**Export**
+A separate export view writes the completed entries of a period, filtered by
+project and tag, to a file (CSV for now) for billing and other systems, with a
+preview of what the file will contain.
+
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
 development.

@@ -83,6 +83,7 @@ export const appShortcuts = {
   projects: 'CommandOrControl+3',
   tags: 'CommandOrControl+4',
   reports: 'CommandOrControl+5',
+  export: 'CommandOrControl+6',
   settings: 'CommandOrControl+,',
   quickStart: 'CommandOrControl+K',
   stopTimer: 'CommandOrControl+Shift+Space',

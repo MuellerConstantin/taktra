@@ -5,6 +5,7 @@ import { and, isNotNull } from 'drizzle-orm'
 import { app, BrowserWindow, dialog } from 'electron'
 import { z } from 'zod'
 import { AppError } from '../../shared/errors'
+import { exportColumns, type ExportPreview, type ExportRow } from '../../shared/export'
 import type { TimeFilter } from '../../shared/reports'
 import type { TimeEntryDetails } from '../../shared/timeEntries'
 import { timeFilter } from '../../shared/validation'
@@ -13,19 +14,7 @@ import { handle } from '../ipc'
 import { conditions } from './reports'
 import { selectTimeEntryDetails } from './timeEntries'
 
-/** Column names are part of the file format other systems import, so they never change. */
-const columns = [
-  'date',
-  'project',
-  'activity',
-  'tags',
-  'start',
-  'end',
-  'duration_min',
-  'note'
-] as const
-
-type ExportRow = Readonly<Record<(typeof columns)[number], string | number | null>>
+const PREVIEW_ROWS = 10
 
 const timeFormats = new Map<string, Intl.DateTimeFormat>()
 
@@ -66,7 +55,20 @@ export function listExportRows(filter: TimeFilter): ExportRow[] {
 
 /** RFC 4180: comma, quoted fields where needed, CRLF line endings, no BOM. */
 export function toCsv(rows: readonly ExportRow[]): string {
-  return stringify([...rows], { header: true, columns: [...columns], record_delimiter: 'windows' })
+  return stringify([...rows], {
+    header: true,
+    columns: [...exportColumns],
+    record_delimiter: 'windows'
+  })
+}
+
+export function previewExport(filter: TimeFilter): ExportPreview {
+  const rows = listExportRows(filter)
+  return {
+    rows: rows.slice(0, PREVIEW_ROWS),
+    count: rows.length,
+    totalMin: rows.reduce((sum, row) => sum + Number(row.duration_min), 0)
+  }
 }
 
 function defaultFileName({ from, to }: TimeFilter): string {
@@ -93,6 +95,7 @@ async function exportCsv(window: BrowserWindow | null, filter: TimeFilter): Prom
 }
 
 export function initExport(): void {
+  handle('export:preview', z.tuple([timeFilter]), (_, filter) => previewExport(filter))
   handle('export:csv', z.tuple([timeFilter]), (event, filter) =>
     exportCsv(BrowserWindow.fromWebContents(event.sender), filter)
   )

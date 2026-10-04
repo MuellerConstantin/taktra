@@ -5,6 +5,7 @@
     "projects": "Projekte",
     "tags": "Tags",
     "reports": "Auswertung",
+    "export": "Export",
     "settings": "Einstellungen"
   },
   "ProfileSwitcher": {
@@ -254,7 +255,6 @@
     "allProjects": "Alle Projekte",
     "tags": "Tags",
     "allTags": "Alle Tags",
-    "exportCsv": "CSV exportieren",
     "total": "Gesamtzeit",
     "trackedDays": "Erfasste Tage",
     "average": "Ø pro erfasstem Tag",
@@ -267,6 +267,20 @@
       "tag": "Tag",
       "projectTag": "Projekt × Tag"
     }
+  },
+  "ExportView": {
+    "title": "Export",
+    "export": "Exportieren…",
+    "projects": "Projekte",
+    "allProjects": "Alle Projekte",
+    "tags": "Tags",
+    "allTags": "Alle Tags",
+    "format": "Format",
+    "csv": "CSV (RFC 4180, UTF-8)",
+    "entries": "Einträge",
+    "total": "Gesamtzeit",
+    "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum.",
+    "preview": "Vorschau: die ersten {shown} von {count} Einträgen"
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
@@ -317,6 +331,7 @@
       "projects": "Zu den Projekten",
       "tags": "Zu den Tags",
       "reports": "Zur Auswertung",
+      "export": "Zum Export",
       "settings": "Einstellungen öffnen",
       "quickStart": "Schnellstart öffnen",
       "stopTimer": "Laufenden Timer stoppen",

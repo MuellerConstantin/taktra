@@ -19,6 +19,7 @@ export function AppTemplate(): React.JSX.Element {
   useShortcut(appShortcuts.projects, () => navigate('/projects'), hasProfile)
   useShortcut(appShortcuts.tags, () => navigate('/tags'), hasProfile)
   useShortcut(appShortcuts.reports, () => navigate('/reports'), hasProfile)
+  useShortcut(appShortcuts.export, () => navigate('/export'), hasProfile)
   useShortcut(appShortcuts.settings, () => navigate('/settings'))
   useShortcut(appShortcuts.quickStart, () => api.quick.toggle().catch(console.error), hasProfile)
   useShortcut(appShortcuts.stopTimer, () => stop().catch(console.error), running !== null)

@@ -1,12 +1,10 @@
 import { getLocalTimeZone, today } from '@internationalized/date'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
-import { RiDownload2Line } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow, Grouping } from '../../../shared/reports'
 import type { Tag } from '../../../shared/tags'
-import { Button } from '../components/atoms/Button'
 import { Select, SelectItem } from '../components/atoms/Select'
 import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ToggleButtonGroup } from '../components/atoms/ToggleButtonGroup'
@@ -109,27 +107,11 @@ function ReportsView(): React.JSX.Element {
   }, [activeProfile?.path, filter, breakdown, errorMessage])
 
   const kpis = computeKpis(data?.timeline ?? [])
-
-  const exportCsv = async (): Promise<void> => {
-    try {
-      await api.export.csv(filter)
-    } catch (caught) {
-      setError(errorMessage(caught))
-    }
-  }
   const chartRange = period.range ?? dataRange(data?.timeline ?? [])
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader
-        title={t('title')}
-        actions={
-          <Button variant="secondary" onPress={exportCsv} isDisabled={kpis.totalSec === 0}>
-            <RiDownload2Line className="size-4" />
-            {t('exportCsv')}
-          </Button>
-        }
-      >
+      <ViewHeader title={t('title')}>
         <div className="flex flex-wrap items-center gap-2 pb-4">
           <Select
             aria-label={t('projects')}

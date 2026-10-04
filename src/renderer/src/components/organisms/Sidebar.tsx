@@ -1,6 +1,7 @@
 import {
   RiBarChartBoxLine,
   RiCalendarCheckLine,
+  RiDownload2Line,
   RiFolderLine,
   RiPriceTag3Line,
   RiSettings3Line,
@@ -99,6 +100,13 @@ export function Sidebar(): React.JSX.Element {
           shortcut={appShortcuts.reports}
           label={t('reports')}
           icon={RiBarChartBoxLine}
+          isDisabled={!hasProfile}
+        />
+        <NavItem
+          to="/export"
+          shortcut={appShortcuts.export}
+          label={t('export')}
+          icon={RiDownload2Line}
           isDisabled={!hasProfile}
         />
       </nav>

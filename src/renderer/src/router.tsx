@@ -10,6 +10,7 @@ import ProjectDetailView from './views/ProjectDetailView'
 import TagsView from './views/TagsView'
 import TagDetailView from './views/TagDetailView'
 import ReportsView from './views/ReportsView'
+import ExportView from './views/ExportView'
 import AppSettingsView from './views/settings/app/AppSettingsView'
 import AppearanceSettings from './views/settings/app/AppearanceSettings'
 import ControlsSettings from './views/settings/app/ControlsSettings'
@@ -34,6 +35,7 @@ export const router = createHashRouter([
           { path: 'tags', element: <TagsView /> },
           { path: 'tags/:tagId', element: <TagDetailView /> },
           { path: 'reports', element: <ReportsView /> },
+          { path: 'export', element: <ExportView /> },
           {
             path: 'profile',
             element: <ProfileSettingsView />,
