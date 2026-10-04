@@ -6,6 +6,7 @@ import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator'
 import { app } from 'electron'
 import { AppError } from '../../shared/errors'
 import { APPLICATION_ID } from '../constants'
+import { backupBeforeMigration } from './backup'
 import * as schema from './schema'
 
 export type ProfileDatabase = BetterSQLite3Database<typeof schema> & {
@@ -66,8 +67,11 @@ function assertKnownSchema(client: Database.Database, path: string): void {
  * `__drizzle_migrations` table are relied on, the same ones `assertKnownSchema`
  * uses. Profiles stay compatible with drizzle's own migrator.
  *
- * @throws if a statement fails or the result violates a foreign key; the transaction
- * is rolled back and the file stays unchanged.
+ * Existing profiles are backed up first (see `backupBeforeMigration`); new ones have
+ * nothing to lose.
+ *
+ * @throws if the backup fails, a statement fails or the result violates a foreign key;
+ * the transaction is rolled back and the file stays unchanged.
  */
 function migrate(client: Database.Database): void {
   // Same rule as drizzle: everything newer than the latest applied migration is pending.
@@ -76,6 +80,8 @@ function migrate(client: Database.Database): void {
     (migration) => latest === null || migration.folderMillis > latest
   )
   if (pending.length === 0) return
+
+  if (latest !== null) backupBeforeMigration(client)
 
   /*
    * Must happen outside the transaction, otherwise SQLite silently ignores it.
