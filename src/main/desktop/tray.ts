@@ -1,8 +1,9 @@
-import { app, Menu, nativeImage, Tray } from 'electron'
+import { Menu, nativeImage, Tray } from 'electron'
 import icon from '../../../resources/icon.png?asset'
 import type { Language } from '../../shared/settings'
 import { getSettings, onSettingsChanged } from '../settings'
 import { toggleQuickStart } from './quickStart'
+import { requestQuit } from './quit'
 
 const ICON_SIZE = 16
 
@@ -22,7 +23,7 @@ function buildMenu(openApp: () => void): Menu {
     { label: text.quickStart, click: toggleQuickStart },
     { label: text.open, click: openApp },
     { type: 'separator' },
-    { label: text.quit, click: () => app.quit() }
+    { label: text.quit, click: () => void requestQuit(null) }
   ])
 }
 

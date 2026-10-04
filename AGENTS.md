@@ -169,8 +169,10 @@ in `src/main/`.
   routes of the same renderer, opened as small frameless windows with the same
   preload and sandbox settings as the main window.
 - **Tray app, single instance**: Closing the main window hides it; the app
-  quits from the tray. A second start brings the running instance to the
-  front, so two instances never work on the same files.
+  quits from the tray or the sidebar, asking first while a timer runs. The
+  question is not hooked into `before-quit`, which also fires on OS shutdown,
+  where a dialog would block it. A second start brings the running instance to
+  the front, so two instances never work on the same files.
 - **Cross-platform code, Windows packaging first**: Code must not assume an OS:
   paths come from Electron and generated file names are valid on Windows, macOS
   and Linux. Only packaging is configured for Windows so far.
