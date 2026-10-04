@@ -21,6 +21,7 @@
   - [Database Migrations](#database-migrations)
   - [Checks](#checks)
 - [Build](#build)
+  - [Release](#release)
 - [License](#license)
   - [Forbidden](#forbidden)
 
@@ -87,7 +88,8 @@ npm run db:generate -- --name <what_changed>
 
 ### Checks
 
-Type checking, linting and formatting must pass before a change is done.
+Type checking, linting and formatting must pass before a change is done. CI runs them on every push and
+pull request.
 
 ```bash
 npm run typecheck
@@ -98,14 +100,37 @@ npm run format
 ## Build
 
 Packaging is configured for Windows so far. The build runs the type check, bundles the app with
-electron-vite and creates an NSIS installer in `dist/`.
+electron-vite and creates two packages in `dist/`: an installer (`taktra-<version>-setup.exe`) that
+installs per user without admin rights and lets you choose the folder, and a portable zip
+(`taktra-<version>-portable.zip`) that runs without installation.
 
 ```bash
-npm run build:win
+npm run build:windows
 ```
 
 `npm run build:unpack` builds an unpacked app directory instead, which is handy for a quick test of the
 production build.
+
+### Release
+
+Releases are built by GitHub Actions. Pushing a tag `v<version>` that matches the version in
+`package.json` builds both packages on Windows and creates a draft GitHub release. Its notes are taken
+from the matching section in `CHANGELOG.md`, so that section has to exist before tagging. The draft is
+only visible once it is published by hand.
+
+1. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [<version>] - <date>` and add a new empty
+   `## [Unreleased]` above it.
+2. Commit, tag and push.
+
+   ```bash
+   git tag v<version>
+   git push origin main v<version>
+   ```
+
+3. Check the draft release on GitHub and publish it.
+
+Running the release workflow manually rehearses the same steps from the `[Unreleased]` section without
+creating a release; the packages are kept as workflow artifacts.
 
 ## License
 
