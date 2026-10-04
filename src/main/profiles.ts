@@ -61,7 +61,8 @@ function syncActiveDatabase(): void {
 
   try {
     activateDatabase(activePath && existsSync(activePath) ? activePath : null)
-  } catch {
+  } catch (error) {
+    console.error(`Could not open profile "${activePath}"`, error)
     activateDatabase(null)
   }
 }

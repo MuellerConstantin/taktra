@@ -173,11 +173,16 @@ several tags, per-tag sums may overlap and must not be added up to a total.
   hand; until the first release they may be squashed into a single `init`
   migration, afterwards they are immutable. Every profile is migrated when it
   is opened; packaged builds ship the migrations as an extra resource.
-  Migrations that rebuild a table (e.g. to add a check constraint) currently
-  fail: drizzle-kit emits `PRAGMA foreign_keys=OFF`, which has no effect inside
-  the migrator's transaction, so dropping a referenced table is refused. Before
-  the first release, `database.ts` has to switch foreign keys off around the
-  migration and run `PRAGMA foreign_key_check` afterwards.
+  Migrations are not run by drizzle's `migrate()`: it executes them inside a
+  transaction, where the `PRAGMA foreign_keys=OFF` emitted by drizzle-kit for
+  table rebuilds has no effect, so dropping the old table would cascade deletes
+  into child tables. `database.ts` follows SQLite's procedure for schema
+  changes instead: foreign keys off before the transaction, all pending
+  migrations in one transaction, `PRAGMA foreign_key_check` before the commit,
+  bookkeeping in drizzle's `__drizzle_migrations` table. A failed migration
+  leaves the file unchanged. drizzle-kit also quotes expression indexes such as
+  `lower("name")` as column names when it rebuilds a table, so generated
+  rebuilds must be checked before they are committed.
 - **Migration state is the file format version**: There is no separate
   version number. A profile that contains a migration newer than the newest
   one this app knows was written by a newer Taktra version; it is refused

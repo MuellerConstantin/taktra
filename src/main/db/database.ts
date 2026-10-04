@@ -2,8 +2,7 @@ import { join } from 'node:path'
 import Database from 'better-sqlite3'
 import { eq } from 'drizzle-orm'
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
-import { readMigrationFiles } from 'drizzle-orm/migrator'
+import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator'
 import { app } from 'electron'
 import { AppError } from '../../shared/errors'
 import { APPLICATION_ID } from '../constants'
@@ -24,29 +23,92 @@ function migrationsFolder(): string {
     : join(app.getAppPath(), 'src', 'main', 'db', 'migrations')
 }
 
-let latestKnownMigration: number | null = null
+let knownMigrations: MigrationMeta[] | null = null
 
-function getLatestKnownMigration(): number {
-  latestKnownMigration ??= Math.max(
-    0,
-    ...readMigrationFiles({ migrationsFolder: migrationsFolder() }).map((m) => m.folderMillis)
-  )
-  return latestKnownMigration
+function getKnownMigrations(): MigrationMeta[] {
+  knownMigrations ??= readMigrationFiles({ migrationsFolder: migrationsFolder() })
+  return knownMigrations
 }
 
-function assertKnownSchema(client: Database.Database, path: string): void {
+function getLatestKnownMigration(): number {
+  return Math.max(0, ...getKnownMigrations().map((migration) => migration.folderMillis))
+}
+
+function readLatestMigration(client: Database.Database): number | null {
   const hasMigrationsTable = client
     .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '__drizzle_migrations'")
     .get()
-  if (!hasMigrationsTable) return
+  if (!hasMigrationsTable) return null
 
   const { latest } = client
     .prepare('SELECT max(created_at) AS latest FROM __drizzle_migrations')
     .get() as { latest: number | null }
+  return latest
+}
 
+function assertKnownSchema(client: Database.Database, path: string): void {
+  const latest = readLatestMigration(client)
   if (latest !== null && latest > getLatestKnownMigration()) {
     throw new AppError('PROFILE_NEWER_VERSION', path)
   }
+}
+
+/**
+ * Applies all pending migrations to a profile. Replaces drizzle's `migrate()`.
+ *
+ * drizzle's migrator runs the migrations inside a transaction. There, the
+ * `PRAGMA foreign_keys=OFF` that drizzle-kit emits for table rebuilds has no effect
+ * (SQLite ignores it within a transaction), so dropping the old table would cascade
+ * deletes into child tables. This follows SQLite's procedure for schema changes
+ * instead: https://www.sqlite.org/lang_altertable.html#otheralter
+ *
+ * Only the public `readMigrationFiles()` and the layout of drizzle's
+ * `__drizzle_migrations` table are relied on, the same ones `assertKnownSchema`
+ * uses. Profiles stay compatible with drizzle's own migrator.
+ *
+ * @throws if a statement fails or the result violates a foreign key; the transaction
+ * is rolled back and the file stays unchanged.
+ */
+function migrate(client: Database.Database): void {
+  // Same rule as drizzle: everything newer than the latest applied migration is pending.
+  const latest = readLatestMigration(client)
+  const pending = getKnownMigrations().filter(
+    (migration) => latest === null || migration.folderMillis > latest
+  )
+  if (pending.length === 0) return
+
+  /*
+   * Must happen outside the transaction, otherwise SQLite silently ignores it.
+   * openProfileDatabase switches foreign keys back on afterwards.
+   */
+  client.pragma('foreign_keys = OFF')
+
+  // One transaction for all pending migrations: either all are applied or none.
+  client.transaction(() => {
+    client.exec(
+      'CREATE TABLE IF NOT EXISTS __drizzle_migrations (id SERIAL PRIMARY KEY, hash text NOT NULL, created_at numeric)'
+    )
+    const record = client.prepare(
+      'INSERT INTO __drizzle_migrations (hash, created_at) VALUES (?, ?)'
+    )
+
+    /*
+     * drizzle-kit splits each migration file at its statement breakpoints. The PRAGMA
+     * statements it contains run as no-ops here.
+     */
+    for (const migration of pending) {
+      for (const statement of migration.sql) {
+        if (statement.trim()) client.exec(statement)
+      }
+      record.run(migration.hash, migration.folderMillis)
+    }
+
+    // With foreign keys off nothing was checked so far; throwing rolls everything back.
+    const violations = client.pragma('foreign_key_check') as unknown[]
+    if (violations.length > 0) {
+      throw new Error(`Migration violates foreign keys: ${JSON.stringify(violations)}`)
+    }
+  })()
 }
 
 export function openProfileDatabase(path: string, options: OpenOptions = {}): ProfileDatabase {
@@ -63,12 +125,10 @@ export function openProfileDatabase(path: string, options: OpenOptions = {}): Pr
     }
 
     assertKnownSchema(client, path)
+    if (!options.readOnly) migrate(client)
     client.pragma('foreign_keys = ON')
 
-    const db = drizzle({ client, schema, casing: 'snake_case' })
-    if (!options.readOnly) migrate(db, { migrationsFolder: migrationsFolder() })
-
-    return db
+    return drizzle({ client, schema, casing: 'snake_case' })
   } catch (error) {
     client.close()
     throw error
