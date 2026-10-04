@@ -28,4 +28,8 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+publish:
+  provider: github
+  owner: MuellerConstantin
+  repo: taktra
 npmRebuild: false

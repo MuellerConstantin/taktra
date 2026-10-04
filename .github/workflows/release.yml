@@ -1,0 +1,139 @@
+name: Release
+
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch'
+      && format('Rehearsal (dry run) — {0}', github.ref_name)
+      || format('Release — {0}', github.ref_name) }}
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [ "$TAG_VERSION" != "$VERSION" ]; then
+              echo "::error::Tag version ($TAG_VERSION) does not match package.json ($VERSION)"
+              exit 1
+            fi
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          case "$VERSION" in
+            *-*) echo "prerelease=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Extract changelog section
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          PRERELEASE: ${{ steps.meta.outputs.prerelease }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          # A prerelease or a rehearsal ships whatever is currently unreleased; the final
+          # tag then freezes that same content under its own version heading.
+          if [ "$PRERELEASE" = "true" ] || [ "$EVENT" = "workflow_dispatch" ]; then
+            SECTION="Unreleased"
+          else
+            SECTION="$VERSION"
+          fi
+          awk -v head="## [$SECTION]" '
+            index($0, head) == 1 { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md | sed -e '/./,$!d' > "$RUNNER_TEMP/release-notes.md"
+          if [ ! -s "$RUNNER_TEMP/release-notes.md" ]; then
+            echo "::error::CHANGELOG.md has no '## [$SECTION]' section"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Check formatting
+        run: npm run format
+
+      - name: Build
+        run: npx electron-vite build
+
+      - name: Package
+        run: npx electron-builder --win --publish never
+
+      - name: Write run summary
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            MODE='Release — creates a draft GitHub release'
+          else
+            MODE='Rehearsal — dry run, packages are kept as workflow artifacts'
+          fi
+          {
+            echo "## Taktra $VERSION"
+            echo ""
+            echo "- **Mode:** $MODE"
+            echo ""
+            echo "### Release notes"
+            echo ""
+            cat "$RUNNER_TEMP/release-notes.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep packages
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: taktra-${{ steps.meta.outputs.version }}-windows
+          path: |
+            dist/*-setup.exe
+            dist/*-setup.exe.blockmap
+            dist/latest.yml
+            dist/*-portable.zip
+          if-no-files-found: error
+
+      - name: Create draft GitHub release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Taktra ${{ steps.meta.outputs.version }}
+          draft: true
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          body_path: ${{ runner.temp }}/release-notes.md
+          fail_on_unmatched_files: true
+          files: |
+            dist/*-setup.exe
+            dist/*-setup.exe.blockmap
+            dist/latest.yml
+            dist/*-portable.zip
