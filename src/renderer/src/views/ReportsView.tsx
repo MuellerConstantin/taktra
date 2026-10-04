@@ -1,10 +1,12 @@
 import { getLocalTimeZone, today } from '@internationalized/date'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
+import { RiDownload2Line } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow, Grouping } from '../../../shared/reports'
 import type { Tag } from '../../../shared/tags'
+import { Button } from '../components/atoms/Button'
 import { Select, SelectItem } from '../components/atoms/Select'
 import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ToggleButtonGroup } from '../components/atoms/ToggleButtonGroup'
@@ -65,6 +67,15 @@ function ReportsView(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null)
 
   const { from, to } = periodFilter(period)
+  const filter = useMemo(
+    () => ({
+      from,
+      to,
+      projectIds: projectIds.length > 0 ? projectIds : undefined,
+      tagIds: tagIds.length > 0 ? tagIds : undefined
+    }),
+    [from, to, projectIds, tagIds]
+  )
 
   useEffect(() => {
     let isCurrent = true
@@ -82,12 +93,6 @@ function ReportsView(): React.JSX.Element {
 
   useEffect(() => {
     let isCurrent = true
-    const filter = {
-      from,
-      to,
-      projectIds: projectIds.length > 0 ? projectIds : undefined,
-      tagIds: tagIds.length > 0 ? tagIds : undefined
-    }
     Promise.all([
       api.reports.aggregate(filter, ['date', 'project']),
       api.reports.aggregate(filter, breakdownGrouping[breakdown])
@@ -101,14 +106,30 @@ function ReportsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, from, to, projectIds, tagIds, breakdown, errorMessage])
+  }, [activeProfile?.path, filter, breakdown, errorMessage])
 
   const kpis = computeKpis(data?.timeline ?? [])
+
+  const exportCsv = async (): Promise<void> => {
+    try {
+      await api.export.csv(filter)
+    } catch (caught) {
+      setError(errorMessage(caught))
+    }
+  }
   const chartRange = period.range ?? dataRange(data?.timeline ?? [])
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t('title')}>
+      <ViewHeader
+        title={t('title')}
+        actions={
+          <Button variant="secondary" onPress={exportCsv} isDisabled={kpis.totalSec === 0}>
+            <RiDownload2Line className="size-4" />
+            {t('exportCsv')}
+          </Button>
+        }
+      >
         <div className="flex flex-wrap items-center gap-2 pb-4">
           <Select
             aria-label={t('projects')}

@@ -8,7 +8,7 @@ import { handle } from '../ipc'
 import { tagsByActivity } from './activities'
 import { compareNames } from './names'
 
-function conditions(filter: TimeFilter): SQL | undefined {
+export function conditions(filter: TimeFilter): SQL | undefined {
   const tagged = filter.tagIds
     ? getActiveDatabase()
         .select({ activityId: activityTags.activityId })

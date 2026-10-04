@@ -12,6 +12,7 @@ import {
   showMainWindow
 } from './desktop/windows'
 import { initActivities } from './domain/activities'
+import { initExport } from './domain/export'
 import { initProjects } from './domain/projects'
 import { initReports } from './domain/reports'
 import { initTags } from './domain/tags'
@@ -67,6 +68,7 @@ function start(): void {
   initTimer()
   initMiniTimer()
   initReports()
+  initExport()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

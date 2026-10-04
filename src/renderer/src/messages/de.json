@@ -254,6 +254,7 @@
     "allProjects": "Alle Projekte",
     "tags": "Tags",
     "allTags": "Alle Tags",
+    "exportCsv": "CSV exportieren",
     "total": "Gesamtzeit",
     "trackedDays": "Erfasste Tage",
     "average": "Ø pro erfasstem Tag",
@@ -371,6 +372,7 @@
     "TAG_NAME_TAKEN": "Ein Tag mit diesem Namen existiert bereits.",
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt."
+    "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
+    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?"
   }
 }

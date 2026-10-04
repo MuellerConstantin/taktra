@@ -75,6 +75,9 @@ const api = {
     aggregate: (filter: TimeFilter, groupBy: readonly Grouping[]) =>
       invoke<AggregateRow[]>('reports:aggregate', filter, groupBy)
   },
+  export: {
+    csv: (filter: TimeFilter) => invoke<string | null>('export:csv', filter)
+  },
   timeEntries: {
     list: (range: TimeEntryRange) => invoke<TimeEntryDetails[]>('timeEntries:list', range),
     create: (input: TimeEntryInput) => invoke<TimeEntry>('timeEntries:create', input),

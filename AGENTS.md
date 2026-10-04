@@ -58,6 +58,7 @@ development.
 - **Validation**: Zod (main process only)
 - **Charts**: nivo
 - **App settings**: `electron-store`
+- **Export**: `csv-stringify` (main process only)
 
 ## Project Structure
 
@@ -127,6 +128,12 @@ in `src/main/`.
 - **Text length limits on three levels**: Inputs set `maxLength`, the Zod
   schemas reject longer values, and check constraints in the database are the
   last line of defence. The limits are defined once in `shared/validation/`.
+- **Exports are a stable file format**: Exports contain a cleaned view (one
+  row per entry, names instead of ids, local clock times, durations in whole
+  minutes), never the tables, so the schema stays free to change. Column names
+  are English and never change, because other systems import them. CSV follows
+  RFC 4180 strictly (comma, CRLF, no BOM) through a library; further formats
+  get their own writer for the same rows.
 - **App settings outside the database**: Preferences of the installation
   (theme, language, mini timer, global shortcut) live in an `electron-store` in
   the user data directory and reach the renderer only through the API.

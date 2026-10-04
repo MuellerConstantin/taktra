@@ -254,6 +254,7 @@
     "allProjects": "All projects",
     "tags": "Tags",
     "allTags": "All tags",
+    "exportCsv": "Export CSV",
     "total": "Total time",
     "trackedDays": "Tracked days",
     "average": "Average per tracked day",
@@ -371,6 +372,7 @@
     "TAG_NAME_TAKEN": "A tag with this name already exists.",
     "VALIDATION_FAILED": "The input is invalid.",
     "UNKNOWN": "Something went wrong. Please try again.",
-    "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system."
+    "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
+    "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?"
   }
 }

@@ -16,6 +16,7 @@ export const errorCodes = [
   'TAG_NOT_FOUND',
   'TAG_NAME_TAKEN',
   'SHORTCUT_UNAVAILABLE',
+  'EXPORT_WRITE_FAILED',
   'VALIDATION_FAILED',
   'UNKNOWN'
 ] as const
