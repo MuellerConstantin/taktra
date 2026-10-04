@@ -1,10 +1,10 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
 import Store from 'electron-store'
 import { z } from 'zod'
-import { handle } from './ipc'
-import { getSettings } from './settings'
-import { hasRunningTimer } from './timer'
-import { onTimerChanged } from './timerEvents'
+import { hasRunningTimer } from '../domain/timer'
+import { onTimerChanged } from '../domain/timerEvents'
+import { handle } from '../ipc'
+import { getSettings } from '../settings'
 import { createRendererWindow, showMainWindow } from './windows'
 
 const WIDTH = 300

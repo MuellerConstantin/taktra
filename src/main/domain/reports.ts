@@ -1,11 +1,11 @@
 import { and, count, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
-import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
-import { grouping, timeFilter } from '../shared/validation'
+import type { AggregateRow, Grouping, TimeFilter } from '../../shared/reports'
+import { grouping, timeFilter } from '../../shared/validation'
+import { getActiveDatabase } from '../db/database'
+import { activities, activityTags, projects, tags, timeEntries } from '../db/schema'
+import { handle } from '../ipc'
 import { tagsByActivity } from './activities'
-import { getActiveDatabase } from './db/database'
-import { activities, activityTags, projects, tags, timeEntries } from './db/schema'
-import { handle } from './ipc'
 import { compareNames } from './names'
 
 function conditions(filter: TimeFilter): SQL | undefined {

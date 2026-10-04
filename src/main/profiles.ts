@@ -19,8 +19,8 @@ import {
   type ProfileDatabase
 } from './db/database'
 import { SAMPLE_PROFILE_NAME, seedSampleData } from './db/sample'
+import { stopTimer } from './domain/timer'
 import { handle } from './ipc'
-import { stopTimer } from './timer'
 
 interface KnownProfiles {
   readonly paths: string[]

@@ -1,5 +1,5 @@
-import type { Language } from '../shared/settings'
-import { getSettings } from './settings'
+import type { Language } from '../../shared/settings'
+import { getSettings } from '../settings'
 
 /**
  * Key that makes names unique regardless of case. Computed here instead of with SQLite's

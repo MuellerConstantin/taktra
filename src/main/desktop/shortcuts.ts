@@ -1,11 +1,11 @@
 import { app, globalShortcut } from 'electron'
 import { z } from 'zod'
-import { AppError } from '../shared/errors'
-import { accelerator } from '../shared/validation'
-import type { Settings, ShortcutStatus } from '../shared/settings'
-import { handle } from './ipc'
+import { AppError } from '../../shared/errors'
+import { accelerator } from '../../shared/validation'
+import type { Settings, ShortcutStatus } from '../../shared/settings'
+import { handle } from '../ipc'
+import { getSettings, onSettingsChanged, updateSettings } from '../settings'
 import { toggleQuickStart } from './quickStart'
-import { getSettings, onSettingsChanged, updateSettings } from './settings'
 
 let registered: string | null = null
 let isSuspended = false

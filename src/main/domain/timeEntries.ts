@@ -1,12 +1,12 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
-import { AppError } from '../shared/errors'
-import { id, timeEntryInput, timeEntryRange } from '../shared/validation'
-import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../shared/timeEntries'
+import { AppError } from '../../shared/errors'
+import { id, timeEntryInput, timeEntryRange } from '../../shared/validation'
+import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../shared/timeEntries'
+import { getActiveDatabase } from '../db/database'
+import { activities, projects, timeEntries } from '../db/schema'
+import { handle } from '../ipc'
 import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activities'
-import { getActiveDatabase } from './db/database'
-import { activities, projects, timeEntries } from './db/schema'
-import { handle } from './ipc'
 
 type TimeEntryValues = Pick<
   TimeEntry,

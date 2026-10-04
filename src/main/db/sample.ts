@@ -1,4 +1,4 @@
-import { toNameKey } from '../names'
+import { toNameKey } from '../domain/names'
 import type { ProfileDatabase } from './database'
 import { activities, activityTags, projects, tags, timeEntries } from './schema'
 

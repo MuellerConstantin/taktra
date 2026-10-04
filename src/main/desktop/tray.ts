@@ -1,8 +1,8 @@
 import { app, Menu, nativeImage, Tray } from 'electron'
-import icon from '../../resources/icon.png?asset'
-import type { Language } from '../shared/settings'
+import icon from '../../../resources/icon.png?asset'
+import type { Language } from '../../shared/settings'
+import { getSettings, onSettingsChanged } from '../settings'
 import { toggleQuickStart } from './quickStart'
-import { getSettings, onSettingsChanged } from './settings'
 
 const ICON_SIZE = 16
 

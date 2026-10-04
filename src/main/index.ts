@@ -1,19 +1,24 @@
 import { app, nativeTheme } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initActivities } from './activities'
-import { attachMiniTimer, initMiniTimer } from './miniTimer'
+import { attachMiniTimer, initMiniTimer } from './desktop/miniTimer'
+import { initQuickStart } from './desktop/quickStart'
+import { initShortcuts } from './desktop/shortcuts'
+import { initTray } from './desktop/tray'
+import {
+  createRendererWindow,
+  hasMainWindow,
+  setMainWindow,
+  showMainWindow
+} from './desktop/windows'
+import { initActivities } from './domain/activities'
+import { initProjects } from './domain/projects'
+import { initReports } from './domain/reports'
+import { initTags } from './domain/tags'
+import { initTimeEntries } from './domain/timeEntries'
+import { initTimer } from './domain/timer'
 import { initProfiles } from './profiles'
-import { initProjects } from './projects'
-import { initReports } from './reports'
 import { initSettings } from './settings'
-import { initTags } from './tags'
-import { initTimeEntries } from './timeEntries'
-import { initTimer } from './timer'
-import { initQuickStart } from './quickStart'
-import { initShortcuts } from './shortcuts'
-import { initTray } from './tray'
-import { createRendererWindow, hasMainWindow, setMainWindow, showMainWindow } from './windows'
 
 let isQuitting = false
 

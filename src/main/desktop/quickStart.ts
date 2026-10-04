@@ -1,6 +1,6 @@
 import { screen, type BrowserWindow } from 'electron'
 import { z } from 'zod'
-import { handle } from './ipc'
+import { handle } from '../ipc'
 import { createRendererWindow } from './windows'
 
 const WIDTH = 560
