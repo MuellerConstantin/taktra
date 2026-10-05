@@ -224,7 +224,7 @@ function ActivityDetailView(): React.JSX.Element {
           return (
             <GridListItem
               textValue={date}
-              className={isEntryRunning ? 'h-auto bg-primary/10' : 'h-auto'}
+              className={isEntryRunning ? 'h-auto items-start bg-primary/10' : 'h-auto items-start'}
             >
               <div className="flex w-36 shrink-0 flex-col self-start py-3 tabular-nums">
                 <span className="font-medium">{date}</span>
@@ -238,11 +238,12 @@ function ActivityDetailView(): React.JSX.Element {
               <div className="min-w-0 flex-1 self-start py-3 text-muted-foreground">
                 {entry.note && <ExpandableNote text={entry.note} />}
               </div>
-              <span className="w-14 text-right font-medium tabular-nums">
+              <span className="w-14 py-3 text-right font-medium tabular-nums">
                 {formatDuration(durationOf(entry))}
               </span>
               <Button
                 variant="icon"
+                className="mt-2.5"
                 aria-label={t('editEntry', { date })}
                 onPress={() => setEntryToEdit(row)}
                 isDisabled={isEntryRunning}
@@ -251,6 +252,7 @@ function ActivityDetailView(): React.JSX.Element {
               </Button>
               <Button
                 variant="icon"
+                className="mt-2.5"
                 aria-label={t('deleteEntry', { date })}
                 onPress={() => setEntryToDelete(row)}
               >

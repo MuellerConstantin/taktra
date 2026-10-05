@@ -216,7 +216,7 @@ function TrackingView(): React.JSX.Element {
               <GridListItem
                 id={entry.id}
                 textValue={`${activity.name} ${project.name}`}
-                className={isRunning ? 'h-auto bg-primary/10' : 'h-auto'}
+                className={isRunning ? 'h-auto items-start bg-primary/10' : 'h-auto items-start'}
               >
                 {showsTimes && (
                   <div className="flex w-16 shrink-0 flex-col self-start py-3 tabular-nums">
@@ -249,12 +249,13 @@ function TrackingView(): React.JSX.Element {
                   )}
                   {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                 </div>
-                <span className="w-14 text-right font-medium tabular-nums">
+                <span className="w-14 py-3 text-right font-medium tabular-nums">
                   {formatDuration(durationOf(entry))}
                 </span>
                 {isRunning ? (
                   <Button
                     variant="icon"
+                    className="mt-2.5"
                     aria-label={t('stop', { name: activity.name })}
                     onPress={() => runTimer(stop)}
                   >
@@ -263,6 +264,7 @@ function TrackingView(): React.JSX.Element {
                 ) : (
                   <Button
                     variant="icon"
+                    className="mt-2.5"
                     aria-label={t('continue', { name: activity.name })}
                     onPress={() => runTimer(() => start(activity.id))}
                     isDisabled={!canContinue}
@@ -272,6 +274,7 @@ function TrackingView(): React.JSX.Element {
                 )}
                 <Button
                   variant="icon"
+                  className="mt-2.5"
                   aria-label={t('edit', { name: activity.name })}
                   onPress={() => setDialog({ details })}
                   isDisabled={isRunning}
@@ -280,6 +283,7 @@ function TrackingView(): React.JSX.Element {
                 </Button>
                 <Button
                   variant="icon"
+                  className="mt-2.5"
                   aria-label={t('delete', { name: activity.name })}
                   onPress={() => setEntryToDelete(details)}
                 >
