@@ -91,7 +91,7 @@ export function Sidebar(): React.JSX.Element {
         <ProfileSwitcher />
         <TimerIndicator />
       </div>
-      <nav className="flex flex-1 flex-col gap-1 px-3">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3">
         <NavItem
           to="/timer"
           shortcut={appShortcuts.timer}

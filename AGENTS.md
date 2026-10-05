@@ -235,6 +235,12 @@ in `src/main/`.
   exports.
 - **Context, provider and hook in separate files**: The `react-refresh` lint
   rule allows only component exports per file.
+- **Responsive down to the minimum window size**: Every view, dialog and
+  window must work at any size the window allows (the main window down to
+  800×600), without horizontal scrolling or clipped content. Where space runs
+  out, rows wrap onto the next line; text inside buttons, badges and other
+  controls never breaks and is never cut off. Only wide data tables (such as
+  the export preview) may scroll horizontally, inside their own container.
 - **Desktop cursor**: Every control shows the arrow cursor, links included, as
   in native desktop apps. The pointing hand is not used.
 - **Shortcuts**: In-app shortcuts are a static, non-configurable list shown in
