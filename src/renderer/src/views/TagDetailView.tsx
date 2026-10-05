@@ -12,7 +12,7 @@ import {
   DisclosureHeader,
   DisclosurePanel
 } from '../components/atoms/Disclosure'
-import { ActivityDialog } from '../components/molecules/ActivityDialog'
+import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TagDialog } from '../components/molecules/TagDialog'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
@@ -53,7 +53,6 @@ function TagDetailView(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [isTagDialogOpen, setTagDialogOpen] = useState(false)
-  const [activityToEdit, setActivityToEdit] = useState<ActivityRef | null>(null)
   const [period, setPeriod] = useState<Period>(allTime)
   const { from, to } = periodFilter(period)
 
@@ -157,13 +156,7 @@ function TagDetailView(): React.JSX.Element {
                     <span className="w-14 text-right tabular-nums">
                       {formatDuration(activitySec)}
                     </span>
-                    <Button
-                      variant="icon"
-                      aria-label={t('editActivity', { name: activity.name })}
-                      onPress={() => setActivityToEdit(activity)}
-                    >
-                      <RiPencilLine className="size-4" />
-                    </Button>
+                    <ActivityMenu activity={activity} onChanged={reload} />
                   </div>
                 ))}
               </DisclosurePanel>
@@ -176,13 +169,6 @@ function TagDetailView(): React.JSX.Element {
           tag={tag}
           defaultColor={tag.color ?? suggestColor([])}
           onClose={() => setTagDialogOpen(false)}
-          onSaved={reload}
-        />
-      )}
-      {activityToEdit && (
-        <ActivityDialog
-          activity={activityToEdit}
-          onClose={() => setActivityToEdit(null)}
           onSaved={reload}
         />
       )}

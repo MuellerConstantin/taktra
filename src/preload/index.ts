@@ -68,6 +68,8 @@ const api = {
       invoke<ActivityWithTags[]>('activities:list', options),
     create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
     rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
+    move: (id: number, projectId: number, name: string) =>
+      invoke<Activity>('activities:move', id, projectId, name),
     setArchived: (id: number, archived: boolean) =>
       invoke<Activity>('activities:setArchived', id, archived),
     setTags: (id: number, tagIds: readonly number[]) =>

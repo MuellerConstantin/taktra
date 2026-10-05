@@ -225,8 +225,7 @@
     "activities": "Activities",
     "empty": "No activities yet. Activities are created when you track time.",
     "emptyPeriod": "No time tracked in this period.",
-    "entryCount": "{count, plural, one {# entry} other {# entries}}",
-    "editActivity": "Edit {name}"
+    "entryCount": "{count, plural, one {# entry} other {# entries}}"
   },
   "ActivityDialog": {
     "title": "Edit activity",
@@ -234,6 +233,24 @@
     "nameRequired": "Please enter a name.",
     "cancel": "Cancel",
     "save": "Save"
+  },
+  "ActivityMenu": {
+    "label": "Actions for {name}",
+    "edit": "Edit",
+    "move": "Move to project…"
+  },
+  "MoveActivityDialog": {
+    "title": "Move “{name}”",
+    "projectLabel": "Target project",
+    "projectPlaceholder": "Choose a project",
+    "searchProjects": "Search projects",
+    "noProjects": "No projects found.",
+    "nameLabel": "Name",
+    "nameDescription": "Must be unique in the target project.",
+    "nameRequired": "Please enter a name.",
+    "hint": "All time entries of this activity move along. Reports and totals of both projects change accordingly, also for past periods.",
+    "cancel": "Cancel",
+    "move": "Move"
   },
   "ProjectDialog": {
     "createTitle": "New project",
@@ -266,8 +283,7 @@
     "empty": "No time has been tracked on activities with this tag yet.",
     "emptyPeriod": "No time tracked on activities with this tag in this period.",
     "activityCount": "{count, plural, one {# activity} other {# activities}}",
-    "entryCount": "{count, plural, one {# entry} other {# entries}}",
-    "editActivity": "Edit {name}"
+    "entryCount": "{count, plural, one {# entry} other {# entries}}"
   },
   "TagBadges": {
     "more": "{count, plural, one {# more tag} other {# more tags}}"

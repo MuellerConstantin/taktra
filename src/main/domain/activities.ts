@@ -96,6 +96,26 @@ export function renameActivity(id: number, name: string): Activity {
   }
 }
 
+/** Moves the activity with its time entries to another project, renamed in the same step. */
+export function moveActivity(id: number, projectId: number, name: string): Activity {
+  findActivity(id)
+  findProject(projectId)
+
+  try {
+    const activity = getActiveDatabase()
+      .update(activities)
+      .set({ projectId, name, nameKey: toNameKey(name) })
+      .where(eq(activities.id, id))
+      .returning()
+      .get()
+    notifyTimerChanged()
+    return activity
+  } catch (error) {
+    if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
+    throw error
+  }
+}
+
 export function setActivityArchived(id: number, archived: boolean): Activity {
   findActivity(id)
 
@@ -150,6 +170,9 @@ export function initActivities(): void {
   handle('activities:create', z.tuple([activityInput]), (_, input) => createActivity(input))
   handle('activities:rename', z.tuple([id, name]), (_, activityId, newName) =>
     renameActivity(activityId, newName)
+  )
+  handle('activities:move', z.tuple([id, id, name]), (_, activityId, projectId, newName) =>
+    moveActivity(activityId, projectId, newName)
   )
   handle('activities:setArchived', z.tuple([id, z.boolean()]), (_, activityId, archived) =>
     setActivityArchived(activityId, archived)

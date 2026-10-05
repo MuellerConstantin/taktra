@@ -12,6 +12,7 @@ export type ActivityWithTags = Activity & { readonly tagIds: readonly number[] }
 
 export interface ActivityRef {
   readonly id: number
+  readonly projectId: number
   readonly name: string
   readonly tags: readonly ActivityTag[]
 }

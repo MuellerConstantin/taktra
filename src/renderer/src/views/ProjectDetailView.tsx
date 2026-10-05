@@ -2,12 +2,11 @@ import { RiArchiveLine, RiInboxUnarchiveLine, RiPencilLine } from '@remixicon/re
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
-import type { ActivityRef } from '../../../shared/activities'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow } from '../../../shared/reports'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
-import { ActivityDialog } from '../components/molecules/ActivityDialog'
+import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
@@ -28,7 +27,6 @@ function ProjectDetailView(): React.JSX.Element {
   const [actionError, setActionError] = useState<string | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [isProjectDialogOpen, setProjectDialogOpen] = useState(false)
-  const [activityToEdit, setActivityToEdit] = useState<ActivityRef | null>(null)
   const [period, setPeriod] = useState<Period>(allTime)
   const { from, to } = periodFilter(period)
 
@@ -141,13 +139,7 @@ function ProjectDetailView(): React.JSX.Element {
             <span className="w-14 text-right font-medium tabular-nums">
               {formatDuration(totalSec)}
             </span>
-            <Button
-              variant="icon"
-              aria-label={t('editActivity', { name: activity.name })}
-              onPress={() => setActivityToEdit(activity)}
-            >
-              <RiPencilLine className="size-4" />
-            </Button>
+            <ActivityMenu activity={activity} onChanged={reload} />
           </GridListItem>
         )}
       </GridList>
@@ -156,13 +148,6 @@ function ProjectDetailView(): React.JSX.Element {
           project={project}
           defaultColor={project.color ?? suggestColor([])}
           onClose={() => setProjectDialogOpen(false)}
-          onSaved={reload}
-        />
-      )}
-      {activityToEdit && (
-        <ActivityDialog
-          activity={activityToEdit}
-          onClose={() => setActivityToEdit(null)}
           onSaved={reload}
         />
       )}

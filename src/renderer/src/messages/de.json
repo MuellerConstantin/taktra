@@ -225,8 +225,7 @@
     "activities": "Tätigkeiten",
     "empty": "Noch keine Tätigkeiten. Tätigkeiten entstehen beim Erfassen von Zeit.",
     "emptyPeriod": "In diesem Zeitraum wurde keine Zeit erfasst.",
-    "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
-    "editActivity": "{name} bearbeiten"
+    "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}"
   },
   "ActivityDialog": {
     "title": "Tätigkeit bearbeiten",
@@ -234,6 +233,24 @@
     "nameRequired": "Bitte einen Namen eingeben.",
     "cancel": "Abbrechen",
     "save": "Speichern"
+  },
+  "ActivityMenu": {
+    "label": "Aktionen für {name}",
+    "edit": "Bearbeiten",
+    "move": "In Projekt verschieben…"
+  },
+  "MoveActivityDialog": {
+    "title": "„{name}“ verschieben",
+    "projectLabel": "Zielprojekt",
+    "projectPlaceholder": "Projekt auswählen",
+    "searchProjects": "Projekte durchsuchen",
+    "noProjects": "Keine Projekte gefunden.",
+    "nameLabel": "Name",
+    "nameDescription": "Muss im Zielprojekt eindeutig sein.",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "hint": "Alle Zeitbuchungen dieser Tätigkeit wandern mit. Berichte und Summen beider Projekte ändern sich entsprechend, auch für vergangene Zeiträume.",
+    "cancel": "Abbrechen",
+    "move": "Verschieben"
   },
   "ProjectDialog": {
     "createTitle": "Neues Projekt",
@@ -266,8 +283,7 @@
     "empty": "Auf Tätigkeiten mit diesem Tag wurde noch keine Zeit erfasst.",
     "emptyPeriod": "In diesem Zeitraum wurde auf Tätigkeiten mit diesem Tag keine Zeit erfasst.",
     "activityCount": "{count, plural, one {# Tätigkeit} other {# Tätigkeiten}}",
-    "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}",
-    "editActivity": "{name} bearbeiten"
+    "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}"
   },
   "TagBadges": {
     "more": "{count, plural, one {# weiterer Tag} other {# weitere Tags}}"

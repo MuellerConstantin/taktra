@@ -49,6 +49,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
       projectName: byProject ? projects.name : none,
       projectColor: byProject ? projects.color : none,
       activityId: byActivity ? activities.id : none,
+      activityProjectId: byActivity ? activities.projectId : none,
       activityName: byActivity ? activities.name : none,
       tagId: byTag ? tags.id : none,
       tagName: byTag ? tags.name : none,
@@ -97,6 +98,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
         ? null
         : {
             id: row.activityId,
+            projectId: row.activityProjectId ?? 0,
             name: row.activityName ?? '',
             tags: tagMap.get(row.activityId) ?? []
           },
