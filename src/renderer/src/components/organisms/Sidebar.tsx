@@ -96,6 +96,7 @@ export function Sidebar(): React.JSX.Element {
           icon={RiCalendarCheckLine}
           isDisabled={!hasProfile}
         />
+        <hr className="mx-3 my-2 border-sidebar-border" />
         <NavItem
           to="/projects"
           shortcut={appShortcuts.projects}
@@ -117,6 +118,7 @@ export function Sidebar(): React.JSX.Element {
           icon={RiPriceTag3Line}
           isDisabled={!hasProfile}
         />
+        <hr className="mx-3 my-2 border-sidebar-border" />
         <NavItem
           to="/reports"
           shortcut={appShortcuts.reports}
