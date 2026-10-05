@@ -162,9 +162,13 @@ function TrackingView(): React.JSX.Element {
                   style={project.color ? { backgroundColor: project.color } : undefined}
                 />
                 <div className="flex min-w-0 flex-1 flex-col py-3">
-                  <span className="truncate">
-                    <span className="font-medium">{activity.name}</span>
-                    <span className="text-muted-foreground"> · {project.name}</span>
+                  <span className="flex flex-wrap gap-x-2">
+                    <span className="truncate font-medium" title={activity.name}>
+                      {activity.name}
+                    </span>
+                    <span className="truncate text-muted-foreground" title={project.name}>
+                      {project.name}
+                    </span>
                   </span>
                   {entry.note && (
                     <span className="line-clamp-2 text-xs whitespace-pre-line text-muted-foreground">
