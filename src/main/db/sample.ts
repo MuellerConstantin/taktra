@@ -1,13 +1,19 @@
 import { toNameKey } from '../domain/names'
 import type { ProfileDatabase } from './database'
-import { activities, activityTags, projects, tags, timeEntries } from './schema'
+import { activities, activityTags, clients, projects, tags, timeEntries } from './schema'
 
-type SampleActivity = readonly [name: string, tags: readonly string[], weight: number]
+type SampleActivity = readonly [
+  name: string,
+  tags: readonly string[],
+  weight: number,
+  client?: string
+]
 
 interface SampleProject {
   readonly name: string
   readonly description: string | null
   readonly color: string
+  readonly client?: string
   readonly archived?: boolean
   readonly activeMonthsAgo: readonly [from: number, to: number]
   readonly weight: number
@@ -33,15 +39,26 @@ const sampleTags: readonly (readonly [name: string, color: string | null])[] = [
   ['data', '#6366f1'],
   ['ops', '#f97316'],
   ['documentation', null],
-  ['security', '#dc2626'],
-  ['customer', '#f59e0b']
+  ['security', '#dc2626']
+]
+
+const sampleClients: readonly (readonly [name: string, archived: boolean])[] = [
+  ['Northwind Traders', false],
+  ['Adventure Works', false],
+  ['Contoso', false],
+  ['Fabrikam', false],
+  ['Tailspin Toys', false],
+  ['Woodgrove Bank', false],
+  ['Litware', true],
+  ['Human Resources', false]
 ]
 
 const sampleProjects: readonly SampleProject[] = [
   {
-    name: 'Customer Northwind',
+    name: 'Customer Portal',
     description: 'Maintenance and development of the customer portal',
     color: '#0ea5e9',
+    client: 'Northwind Traders',
     activeMonthsAgo: [24, 0],
     weight: 3,
     activities: [
@@ -56,6 +73,7 @@ const sampleProjects: readonly SampleProject[] = [
     name: 'Webshop Relaunch',
     description: null,
     color: '#f97316',
+    client: 'Adventure Works',
     activeMonthsAgo: [9, 0],
     weight: 3,
     activities: [
@@ -63,12 +81,12 @@ const sampleProjects: readonly SampleProject[] = [
       ['UX Design', ['design'], 2],
       ['Frontend', ['development', 'frontend'], 4],
       ['Backend', ['development', 'backend'], 3],
-      ['Customer Alignment', ['meeting', 'customer'], 1]
+      ['Client Alignment', ['meeting'], 1]
     ]
   },
   {
     name: 'Internal',
-    description: 'Everything not assigned to a customer',
+    description: 'Everything not assigned to a client',
     color: '#a855f7',
     activeMonthsAgo: [24, 0],
     weight: 0.5,
@@ -76,13 +94,28 @@ const sampleProjects: readonly SampleProject[] = [
       ['Team Meeting', ['meeting', 'organization'], 0],
       ['Training', [], 0],
       ['Administration', ['organization'], 1],
-      ['Recruiting', ['organization', 'meeting'], 1]
+      ['Recruiting', ['organization', 'meeting'], 1, 'Human Resources']
     ]
   },
   {
-    name: 'Mobile App Contoso',
+    name: 'Booking Platform',
+    description: 'Standard product, customized per client',
+    color: '#14b8a6',
+    activeMonthsAgo: [12, 0],
+    weight: 2,
+    activities: [
+      ['Core Development', ['development', 'backend'], 4],
+      ['Release', ['ops'], 1],
+      ['Customizing Northwind', ['development'], 2, 'Northwind Traders'],
+      ['Consulting Contoso', ['meeting'], 1, 'Contoso'],
+      ['Onboarding Tailspin', ['meeting', 'documentation'], 1, 'Tailspin Toys']
+    ]
+  },
+  {
+    name: 'Mobile App',
     description: 'iOS and Android app for field staff',
     color: '#22c55e',
+    client: 'Contoso',
     activeMonthsAgo: [14, 0],
     weight: 2,
     activities: [
@@ -93,26 +126,28 @@ const sampleProjects: readonly SampleProject[] = [
     ]
   },
   {
-    name: 'Data Platform Fabrikam',
+    name: 'Data Platform',
     description: 'Ingestion pipelines and reporting data model',
     color: '#6366f1',
+    client: 'Fabrikam',
     activeMonthsAgo: [18, 3],
     weight: 2,
     activities: [
       ['Pipeline Development', ['development', 'backend', 'data'], 4],
       ['Data Modeling', ['data'], 2],
-      ['Workshops', ['meeting', 'customer'], 1],
+      ['Workshops', ['meeting'], 1],
       ['Monitoring', ['ops'], 1]
     ]
   },
   {
-    name: 'Support Retainer Tailspin',
+    name: 'Support Retainer',
     description: 'Monthly support contract',
     color: '#ef4444',
+    client: 'Tailspin Toys',
     activeMonthsAgo: [24, 0],
     weight: 1,
     activities: [
-      ['Ticket Handling', ['support', 'customer'], 3],
+      ['Ticket Handling', ['support'], 3],
       ['Hotfixes', ['development', 'support'], 1],
       ['Monthly Report', ['documentation'], 0]
     ]
@@ -130,9 +165,10 @@ const sampleProjects: readonly SampleProject[] = [
     ]
   },
   {
-    name: 'Security Audit Woodgrove',
+    name: 'Security Audit',
     description: 'Penetration test follow-up and hardening',
     color: '#f59e0b',
+    client: 'Woodgrove Bank',
     activeMonthsAgo: [4, 1],
     weight: 2,
     activities: [
@@ -154,9 +190,10 @@ const sampleProjects: readonly SampleProject[] = [
     ]
   },
   {
-    name: 'Intranet Redesign Litware',
+    name: 'Intranet Redesign',
     description: 'Completed',
     color: '#ec4899',
+    client: 'Litware',
     archived: true,
     activeMonthsAgo: [20, 12],
     weight: 2,
@@ -168,7 +205,7 @@ const sampleProjects: readonly SampleProject[] = [
   }
 ]
 
-const notes = ['Follow-up', 'Pairing with Lea', 'Ticket #142', 'Ticket #317', 'Call with customer']
+const notes = ['Follow-up', 'Pairing with Lea', 'Ticket #142', 'Ticket #317', 'Call with client']
 
 function createRandom(seed: number): () => number {
   let state = seed
@@ -204,6 +241,18 @@ export function seedSampleData(db: ProfileDatabase): void {
     ])
   )
 
+  const clientIds = new Map(
+    sampleClients.map(([name, archived]) => [
+      name,
+      db
+        .insert(clients)
+        .values({ name, nameKey: toNameKey(name), archivedAt: archived ? now : null })
+        .returning({ id: clients.id })
+        .get().id
+    ])
+  )
+  const clientIdOf = (name?: string): number | null => (name ? clientIds.get(name)! : null)
+
   const activityIds = new Map<string, number>()
   for (const project of sampleProjects) {
     const projectId = db
@@ -213,15 +262,16 @@ export function seedSampleData(db: ProfileDatabase): void {
         nameKey: toNameKey(project.name),
         description: project.description,
         color: project.color,
+        clientId: clientIdOf(project.client),
         archivedAt: project.archived ? now : null
       })
       .returning({ id: projects.id })
       .get().id
 
-    for (const [name, tagNames] of project.activities) {
+    for (const [name, tagNames, , client] of project.activities) {
       const activityId = db
         .insert(activities)
-        .values({ projectId, name, nameKey: toNameKey(name) })
+        .values({ projectId, name, nameKey: toNameKey(name), clientId: clientIdOf(client) })
         .returning({ id: activities.id })
         .get().id
       for (const tagName of tagNames) {
@@ -271,8 +321,8 @@ export function seedSampleData(db: ProfileDatabase): void {
     let minute = 8 * 60 + Math.floor(random() * 5) * 15
     let worked = 0
 
-    if (active.some((project) => project.name === 'Customer Northwind')) {
-      clock(day, idOf('Customer Northwind', 'Daily Standup'), 9 * 60, 15)
+    if (active.some((project) => project.name === 'Customer Portal')) {
+      clock(day, idOf('Customer Portal', 'Daily Standup'), 9 * 60, 15)
       minute = Math.max(minute, 9 * 60 + 15)
       worked += 15
     }
@@ -306,7 +356,7 @@ export function seedSampleData(db: ProfileDatabase): void {
     if (weekday === 5) duration(day, idOf('Internal', 'Training'), 90, 'Read technical articles')
     if (random() < 0.15) duration(day, idOf('Internal', 'Administration'), 30, 'Timesheets, emails')
     if (isFirstWorkdayOfMonth) {
-      duration(day, idOf('Support Retainer Tailspin', 'Monthly Report'), 60, null)
+      duration(day, idOf('Support Retainer', 'Monthly Report'), 60, null)
       isFirstWorkdayOfMonth = false
     }
   }
