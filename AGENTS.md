@@ -22,9 +22,19 @@ unavailable. Deleting a profile moves its file to the operating system's trash.
 
 **Projects, activities, tags**
 Projects group activities; an activity is what time is booked on. Recurring
-work needs no special modeling — it is the same activity booked again. Tags are
+work needs no special modeling — it is the same activity booked again. An
+activity can be moved to another project together with its entries. Tags are
 global and attached to activities only; every entry inherits the tags of its
-activity, retroactively included.
+activity, retroactively included. Tags describe the kind of work (meeting,
+support), not who it is for.
+
+**Clients**
+A client (de: "Leistungsempfänger") is who the work is for — a customer or an
+internal department. Clients are profile-wide and managed in their own view.
+A client is set on a project for all its activities, or on single activities
+of a project without one (e.g. a standard product with client-specific
+customizing). It is never chosen when booking. An activity has at most one
+effective client, so per-client sums add up.
 
 **Time entries**
 An entry is recorded with start and end, with a duration only, or by the timer.
@@ -40,14 +50,15 @@ the tray; the tray icon and a configurable global shortcut open a quick start
 window to search an activity and start it.
 
 **Reports**
-Tracked time is evaluated over a date range, filtered and grouped by project,
-by tag, or both. Because an activity can carry several tags, per-tag sums may
-overlap and must not be added up to a total.
+Tracked time is evaluated over a date range, filtered by project, tag and
+client and grouped by project, tag, both, or client. Because an activity can
+carry several tags, per-tag sums may overlap and must not be added up to a
+total; per-client sums do add up.
 
 **Export**
 A separate export view writes the completed entries of a period, filtered by
-project and tag, to a file (CSV for now) for billing and other systems, with a
-preview of what the file will contain.
+project, tag and client, to a file (CSV for now) for billing and other systems,
+with a preview of what the file will contain.
 
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
@@ -106,8 +117,8 @@ in `src/main/`.
   per table, snake_case columns); row and input types are inferred, never
   written by hand. Schema changes go through
   `npm run db:generate -- --name <what_changed>`. Generated migrations are
-  committed and never edited by hand. Until the first release they may be
-  squashed into a single `init` migration; afterwards they are immutable.
+  committed, never edited by hand and never squashed: released profiles with
+  real data depend on every migration.
 - **Own migration runner instead of drizzle's `migrate()`**: drizzle runs
   migrations inside a transaction, where the `PRAGMA foreign_keys=OFF` that
   drizzle-kit emits for table rebuilds has no effect, so rebuilds would cascade
@@ -117,6 +128,9 @@ in `src/main/`.
   file unchanged; existing profiles are backed up before they are migrated.
 - **No indexes on expressions**: drizzle-kit writes them as column names when it
   rebuilds a table, which breaks the generated migration.
+- **Added foreign key columns have no ON DELETE action**: drizzle-kit drops it
+  when a column is added to an existing table, so code that deletes the
+  referenced row clears such references itself first.
 - **Migration state is the file format version**: A profile with a migration
   newer than this app knows is refused instead of opened, because an older app
   could corrupt a schema it does not know.
@@ -132,6 +146,13 @@ in `src/main/`.
   while it runs and is stopped before the active profile changes.
 - **Archive instead of delete**: Anything with booked time is archived, never
   deleted, so historic reports stay complete.
+- **Project wins over activity**: The effective client of an activity is the
+  project's, else its own. A project with a client leaves its activities
+  without one: setting it clears theirs, removing it hands it down to them, and
+  moving an activity keeps the client of its former project unless the new one
+  has its own. Each change applies retroactively to booked time, so the UI warns
+  when it replaces a different client of an activity. A client is attached to
+  activities, never to entries, and is a single value, unlike tags.
 - **Text length limits on three levels**: Inputs set `maxLength`, the Zod
   schemas reject longer values, and check constraints in the database are the
   last line of defence. The limits are defined once in `shared/validation/`.
