@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-05
+
 ### Added
 
 - Clients: a profile-wide list of who the work is for, managed in its own view. A client is set
@@ -16,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Reports get a client breakdown whose shares add up, and the export a `client` column at the end.
   The sample profile includes clients.
 - Move an activity with its time entries to another project.
+- A detail view for each activity with its client, total and time entries, where the timer can be
+  started and entries can be edited or deleted.
+- Notes support a small subset of Markdown: lists, bold, italic, code and links. The entry dialog
+  has a preview, and long notes are collapsed. Notes are exported as written.
 - The project and tag filters in reports and export can be searched.
 - Report a bug or suggest an idea from the about dialog. Bug reports open on GitHub with the
   version and system already filled in.
@@ -30,7 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - In time entry rows, the project moves to its own line when the activity name is long, and
   shortened names show in full on hover.
-- Tooltips no longer open by themselves when the window is focused again.
+- Tooltips no longer open by themselves when the window is focused again, and tooltips that could
+  not be positioned no longer show up.
+- View headers and the sidebar stay usable at the minimum window size; header actions wrap onto
+  the next line when space runs out.
 
 ## [0.1.1] - 2026-10-04
 
