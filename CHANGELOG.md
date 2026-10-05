@@ -9,9 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Clients: a profile-wide list of who the work is for, managed in its own view. A client is set
+  on a project for all its activities, or on single activities of a project without one, e.g. a
+  standard product with client-specific customizing. The timer and quick start show the client,
+  the quick start also finds activities by it, and reports and export can be filtered by client.
+  Reports get a client breakdown whose shares add up, and the export a `client` column at the end.
+  The sample profile includes clients.
+- Move an activity with its time entries to another project.
 - The project and tag filters in reports and export can be searched.
 - Report a bug or suggest an idea from the about dialog. Bug reports open on GitHub with the
   version and system already filled in.
+
+### Changed
+
+- The entries view shows the day as a timeline.
+- The sidebar groups tracking, managing and evaluating views. The shortcuts for tags, reports and
+  export move to Ctrl+5, Ctrl+6 and Ctrl+7, as clients take Ctrl+4.
+
+### Fixed
+
+- In time entry rows, the project moves to its own line when the activity name is long, and
+  shortened names show in full on hover.
+- Tooltips no longer open by themselves when the window is focused again.
 
 ## [0.1.1] - 2026-10-04
 
