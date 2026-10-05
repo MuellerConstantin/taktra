@@ -1,11 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../shared/validation/limits'
-import { customers } from './customers'
+import { MAX_NAME_LENGTH } from '../../../shared/validation/limits'
 
-export const projects = sqliteTable(
-  'projects',
+export const customers = sqliteTable(
+  'customers',
   {
     id: integer().primaryKey({ autoIncrement: true }),
     uid: text()
@@ -14,9 +13,6 @@ export const projects = sqliteTable(
       .$defaultFn(() => randomUUID()),
     name: text().notNull(),
     nameKey: text().notNull(),
-    description: text(),
-    color: text(),
-    customerId: integer().references(() => customers.id),
     archivedAt: integer({ mode: 'timestamp_ms' }),
     createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()
@@ -27,14 +23,10 @@ export const projects = sqliteTable(
       .$onUpdateFn(() => new Date())
   },
   (table) => [
-    uniqueIndex('projects_name_unique').on(table.nameKey),
+    uniqueIndex('customers_name_unique').on(table.nameKey),
     check(
-      'projects_name_length',
+      'customers_name_length',
       sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`
-    ),
-    check(
-      'projects_description_length',
-      sql`length(${table.description}) <= ${sql.raw(String(MAX_DESCRIPTION_LENGTH))}`
     )
   ]
 )
