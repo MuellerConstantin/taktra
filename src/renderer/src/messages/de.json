@@ -234,6 +234,7 @@
     "title": "Tätigkeit bearbeiten",
     "nameLabel": "Name",
     "nameRequired": "Bitte einen Namen eingeben.",
+    "clientFromProject": "Vom Projekt vorgegeben.",
     "cancel": "Abbrechen",
     "save": "Speichern"
   },
@@ -252,8 +253,15 @@
     "nameDescription": "Muss im Zielprojekt eindeutig sein.",
     "nameRequired": "Bitte einen Namen eingeben.",
     "hint": "Alle Zeitbuchungen dieser Tätigkeit wandern mit. Berichte und Summen beider Projekte ändern sich entsprechend, auch für vergangene Zeiträume.",
+    "clientReplaced": "Das Zielprojekt gibt einen eigenen Leistungsempfänger vor: „{from}“ wird durch „{to}“ ersetzt, auch für bereits erfasste Zeit.",
     "cancel": "Abbrechen",
     "move": "Verschieben"
+  },
+  "ClientSelect": {
+    "label": "Leistungsempfänger",
+    "none": "Kein Leistungsempfänger",
+    "search": "Leistungsempfänger suchen",
+    "empty": "Keine Leistungsempfänger gefunden."
   },
   "ProjectDialog": {
     "createTitle": "Neues Projekt",
@@ -262,6 +270,8 @@
     "nameRequired": "Bitte einen Namen eingeben.",
     "descriptionLabel": "Beschreibung",
     "colorLabel": "Farbe",
+    "clientDescription": "Gilt für alle Tätigkeiten des Projekts, auch für bereits erfasste Zeit.",
+    "clientReplaces": "{count, plural, one {# Tätigkeit hat} other {# Tätigkeiten haben}} einen anderen Leistungsempfänger. Er wird durch den des Projekts ersetzt, auch für bereits erfasste Zeit.",
     "cancel": "Abbrechen",
     "create": "Anlegen",
     "save": "Speichern"

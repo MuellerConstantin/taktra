@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ActivityRef } from '../../../../shared/activities'
+import type { Client } from '../../../../shared/clients'
 import type { Tag } from '../../../../shared/tags'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -9,6 +10,7 @@ import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
+import { ClientSelect } from './ClientSelect'
 import { TagPicker } from './TagPicker'
 import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
@@ -28,15 +30,30 @@ export function ActivityDialog({
   const [tags, setTags] = useState<readonly Tag[]>([])
   const [name, setName] = useState(activity.name)
   const [tagIds, setTagIds] = useState<readonly number[]>(() => activity.tags.map((tag) => tag.id))
+  const [clients, setClients] = useState<readonly Client[]>([])
+  const [projectClientId, setProjectClientId] = useState<number | null>(null)
+  const [initialClientId, setInitialClientId] = useState<number | null>(null)
+  const [clientId, setClientId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
 
   useEffect(() => {
-    api.tags
-      .list()
-      .then(setTags)
+    Promise.all([
+      api.tags.list(),
+      api.clients.list({ includeArchived: true }),
+      api.projects.get(activity.projectId),
+      api.activities.list({ projectId: activity.projectId, includeArchived: true })
+    ])
+      .then(([loadedTags, loadedClients, project, activities]) => {
+        const ownClientId = activities.find((other) => other.id === activity.id)?.clientId ?? null
+        setTags(loadedTags)
+        setClients(loadedClients)
+        setProjectClientId(project.clientId)
+        setInitialClientId(ownClientId)
+        setClientId(ownClientId)
+      })
       .catch((caught) => setError(errorMessage(caught)))
-  }, [errorMessage])
+  }, [activity.id, activity.projectId, errorMessage])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -48,6 +65,8 @@ export function ActivityDialog({
       const tagsChanged =
         tagIds.length !== previousIds.length || tagIds.some((id) => !previousIds.includes(id))
       if (tagsChanged) await api.activities.setTags(activity.id, tagIds)
+      if (projectClientId === null && clientId !== initialClientId)
+        await api.activities.setClient(activity.id, clientId)
       onSaved()
       onClose()
     } catch (caught) {
@@ -71,6 +90,13 @@ export function ActivityDialog({
               isRequired
               autoFocus
               validate={(value) => (value.trim() ? null : t('nameRequired'))}
+            />
+            <ClientSelect
+              clients={clients}
+              value={projectClientId ?? clientId}
+              onChange={setClientId}
+              description={projectClientId === null ? undefined : t('clientFromProject')}
+              isDisabled={projectClientId !== null}
             />
             <TagPicker tags={tags} value={tagIds} onChange={setTagIds} />
             {error && <p className="text-sm text-destructive">{error}</p>}

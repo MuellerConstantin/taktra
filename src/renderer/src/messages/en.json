@@ -234,6 +234,7 @@
     "title": "Edit activity",
     "nameLabel": "Name",
     "nameRequired": "Please enter a name.",
+    "clientFromProject": "Set by the project.",
     "cancel": "Cancel",
     "save": "Save"
   },
@@ -252,8 +253,15 @@
     "nameDescription": "Must be unique in the target project.",
     "nameRequired": "Please enter a name.",
     "hint": "All time entries of this activity move along. Reports and totals of both projects change accordingly, also for past periods.",
+    "clientReplaced": "The target project sets its own client: “{from}” is replaced by “{to}”, including time already tracked.",
     "cancel": "Cancel",
     "move": "Move"
+  },
+  "ClientSelect": {
+    "label": "Client",
+    "none": "No client",
+    "search": "Search clients",
+    "empty": "No clients found."
   },
   "ProjectDialog": {
     "createTitle": "New project",
@@ -262,6 +270,8 @@
     "nameRequired": "Please enter a name.",
     "descriptionLabel": "Description",
     "colorLabel": "Color",
+    "clientDescription": "Applies to all activities of the project, including time already tracked.",
+    "clientReplaces": "{count, plural, one {# activity has} other {# activities have}} a different client. It is replaced by the client of the project, including time already tracked.",
     "cancel": "Cancel",
     "create": "Create",
     "save": "Save"
