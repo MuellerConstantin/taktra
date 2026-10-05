@@ -205,7 +205,16 @@ const sampleProjects: readonly SampleProject[] = [
   }
 ]
 
-const notes = ['Follow-up', 'Pairing with Lea', 'Ticket #142', 'Ticket #317', 'Call with client']
+const notes = [
+  'Follow-up',
+  'Pairing with Lea',
+  'Ticket #142',
+  'Ticket #317',
+  'Call with client',
+  'Sprint review with the client\n- Demo of the **new search**\n- Feedback: filters should be kept per user\n- *Open:* access to the staging system',
+  'Fixed the login timeout\n- Session refresh in `auth.ts`\n- Regression test added\n- Details: https://example.com/issues/317',
+  'Workshop on the data model\n1. Agreed on the entity names\n2. Archived records stay read-only\n\nMinutes go out to all participants by Friday.'
+]
 
 function createRandom(seed: number): () => number {
   let state = seed
