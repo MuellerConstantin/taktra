@@ -1,5 +1,6 @@
 import {
   RiBarChartBoxLine,
+  RiBuilding2Line,
   RiCalendarCheckLine,
   RiDownload2Line,
   RiFolderLine,
@@ -100,6 +101,13 @@ export function Sidebar(): React.JSX.Element {
           shortcut={appShortcuts.projects}
           label={t('projects')}
           icon={RiFolderLine}
+          isDisabled={!hasProfile}
+        />
+        <NavItem
+          to="/clients"
+          shortcut={appShortcuts.clients}
+          label={t('clients')}
+          icon={RiBuilding2Line}
           isDisabled={!hasProfile}
         />
         <NavItem
