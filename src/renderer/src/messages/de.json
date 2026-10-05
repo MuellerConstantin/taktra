@@ -149,7 +149,9 @@
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen",
-    "runningSince": "Läuft seit {time}",
+    "now": "jetzt",
+    "gap": "{duration} nicht erfasst",
+    "withoutTimes": "Ohne Uhrzeit",
     "continue": "Timer für {name} starten",
     "stop": "Timer für {name} stoppen"
   },

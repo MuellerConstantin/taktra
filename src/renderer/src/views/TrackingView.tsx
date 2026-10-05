@@ -38,6 +38,39 @@ function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
   }
 }
 
+type Row =
+  | { readonly kind: 'entry'; readonly id: number; readonly details: TimeEntryDetails }
+  | { readonly kind: 'gap'; readonly id: string; readonly seconds: number }
+  | { readonly kind: 'withoutTimes'; readonly id: string }
+
+/**
+ * Lists the entries with clock times by start, with the untracked time between them, and the
+ * entries with a duration only as a block after them.
+ */
+function toRows(entries: readonly TimeEntryDetails[], now: number): Row[] {
+  const timed = entries.filter(({ entry }) => entry.startedAt)
+  const untimed = entries.filter(({ entry }) => !entry.startedAt)
+
+  let lastEnd: number | null = null
+  const timedRows = timed.flatMap((details): Row[] => {
+    const { id, startedAt, endedAt } = details.entry
+    const entryRow: Row = { kind: 'entry', id, details }
+    const start = startedAt?.getTime() ?? 0
+    const gapSec = lastEnd === null ? 0 : Math.floor((start - lastEnd) / 1000)
+    lastEnd = Math.max(lastEnd ?? 0, endedAt?.getTime() ?? now)
+    return gapSec >= 60 ? [{ kind: 'gap', id: `gap-${id}`, seconds: gapSec }, entryRow] : [entryRow]
+  })
+  const untimedRows = untimed.map((details): Row => ({
+    kind: 'entry',
+    id: details.entry.id,
+    details
+  }))
+
+  if (timedRows.length === 0) return untimedRows
+  if (untimedRows.length === 0) return timedRows
+  return [...timedRows, { kind: 'withoutTimes', id: 'withoutTimes' }, ...untimedRows]
+}
+
 function TrackingView(): React.JSX.Element {
   const t = useTranslations('TrackingView')
   const errorMessage = useErrorMessage()
@@ -64,6 +97,8 @@ function TrackingView(): React.JSX.Element {
   const weekdayFormatter = new DateFormatter(locale, { weekday: 'long' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
   const total = (entries ?? []).reduce((sum, { entry }) => sum + durationOf(entry), 0)
+  const rows = toRows(entries ?? [], now)
+  const showsTimes = (entries ?? []).some(({ entry }) => entry.startedAt)
 
   useEffect(() => {
     let isCurrent = true
@@ -138,7 +173,8 @@ function TrackingView(): React.JSX.Element {
       {!error && entries && (
         <GridList
           aria-label={title}
-          items={entries}
+          items={rows}
+          disabledKeys={rows.flatMap((row) => (row.kind === 'entry' ? [] : [row.id]))}
           className="min-h-0 flex-1"
           renderEmptyState={() =>
             entries.length === 0 && (
@@ -146,7 +182,32 @@ function TrackingView(): React.JSX.Element {
             )
           }
         >
-          {(details) => {
+          {(row) => {
+            if (row.kind === 'gap') {
+              const label = t('gap', { duration: formatDuration(row.seconds) })
+              return (
+                <GridListItem id={row.id} textValue={label} className="h-auto">
+                  <span aria-hidden className="w-16 shrink-0" />
+                  <span
+                    aria-hidden
+                    className="ml-px w-1 shrink-0 self-stretch border-l-2 border-dashed border-border"
+                  />
+                  <span className="py-1.5 text-xs text-muted-foreground">{label}</span>
+                </GridListItem>
+              )
+            }
+
+            if (row.kind === 'withoutTimes') {
+              return (
+                <GridListItem id={row.id} textValue={t('withoutTimes')} className="h-auto">
+                  <span className="pt-4 pb-1.5 text-xs font-medium text-muted-foreground">
+                    {t('withoutTimes')}
+                  </span>
+                </GridListItem>
+              )
+            }
+
+            const { details } = row
             const { entry, activity, project, tags } = details
             const isRunning = entry.startedAt !== null && entry.endedAt === null
             const canContinue = !activity.archivedAt && !project.archivedAt
@@ -154,11 +215,23 @@ function TrackingView(): React.JSX.Element {
               <GridListItem
                 id={entry.id}
                 textValue={`${activity.name} ${project.name}`}
-                className="h-auto"
+                className={isRunning ? 'h-auto bg-primary/10' : 'h-auto'}
               >
+                {showsTimes && (
+                  <div className="flex w-16 shrink-0 flex-col self-start py-3 tabular-nums">
+                    {entry.startedAt && (
+                      <>
+                        <span className="font-medium">{timeFormatter.format(entry.startedAt)}</span>
+                        <span className={isRunning ? 'text-primary' : 'text-muted-foreground'}>
+                          {entry.endedAt ? timeFormatter.format(entry.endedAt) : t('now')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
                 <span
                   aria-hidden
-                  className="mt-4 size-3 shrink-0 self-start rounded-full bg-muted"
+                  className="my-2 w-1 shrink-0 self-stretch rounded-full bg-muted"
                   style={project.color ? { backgroundColor: project.color } : undefined}
                 />
                 <div className="flex min-w-0 flex-1 flex-col py-3">
@@ -177,16 +250,6 @@ function TrackingView(): React.JSX.Element {
                   )}
                   {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                 </div>
-                {entry.startedAt && entry.endedAt && (
-                  <span className="text-muted-foreground tabular-nums">
-                    {timeFormatter.formatRange(entry.startedAt, entry.endedAt)}
-                  </span>
-                )}
-                {entry.startedAt && !entry.endedAt && (
-                  <span className="text-muted-foreground tabular-nums">
-                    {t('runningSince', { time: timeFormatter.format(entry.startedAt) })}
-                  </span>
-                )}
                 <span className="w-14 text-right font-medium tabular-nums">
                   {formatDuration(durationOf(entry))}
                 </span>
