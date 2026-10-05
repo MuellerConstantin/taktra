@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
+import type { Customer, CustomerInput } from '../shared/customers'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
@@ -56,6 +57,17 @@ const api = {
       invoke<Project>('projects:setArchived', id, archived),
     delete: (id: number) => invoke<void>('projects:delete', id)
   },
+  customers: {
+    list: (options?: { includeArchived?: boolean }) =>
+      invoke<Customer[]>('customers:list', options),
+    get: (id: number) => invoke<Customer>('customers:get', id),
+    create: (input: CustomerInput) => invoke<Customer>('customers:create', input),
+    update: (id: number, patch: Partial<CustomerInput>) =>
+      invoke<Customer>('customers:update', id, patch),
+    setArchived: (id: number, archived: boolean) =>
+      invoke<Customer>('customers:setArchived', id, archived),
+    delete: (id: number) => invoke<void>('customers:delete', id)
+  },
   tags: {
     list: () => invoke<Tag[]>('tags:list'),
     get: (id: number) => invoke<Tag>('tags:get', id),
@@ -72,6 +84,8 @@ const api = {
       invoke<Activity>('activities:move', id, projectId, name),
     setArchived: (id: number, archived: boolean) =>
       invoke<Activity>('activities:setArchived', id, archived),
+    setCustomer: (id: number, customerId: number | null) =>
+      invoke<Activity>('activities:setCustomer', id, customerId),
     setTags: (id: number, tagIds: readonly number[]) =>
       invoke<void>('activities:setTags', id, tagIds),
     delete: (id: number) => invoke<void>('activities:delete', id)

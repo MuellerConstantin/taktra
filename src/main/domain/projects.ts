@@ -7,6 +7,7 @@ import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { activities, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
+import { findCustomer } from './customers'
 import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
@@ -29,6 +30,8 @@ export function listProjects({
 }
 
 export function createProject(input: ProjectData): Project {
+  if (input.customerId) findCustomer(input.customerId)
+
   try {
     return getActiveDatabase()
       .insert(projects)
@@ -41,16 +44,29 @@ export function createProject(input: ProjectData): Project {
   }
 }
 
+/**
+ * A customer on the project replaces the customers of its activities. Removing it hands it down
+ * to the activities, so the time booked on them keeps counting towards that customer.
+ */
 export function updateProject(id: number, patch: Partial<ProjectData>): Project {
-  findProject(id)
+  const previous = findProject(id)
+  if (patch.customerId) findCustomer(patch.customerId)
+  const customerChanged = patch.customerId !== undefined && patch.customerId !== previous.customerId
 
   try {
-    const project = getActiveDatabase()
-      .update(projects)
-      .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
-      .where(eq(projects.id, id))
-      .returning()
-      .get()
+    const project = getActiveDatabase().transaction((tx) => {
+      if (customerChanged)
+        tx.update(activities)
+          .set({ customerId: patch.customerId ? null : previous.customerId })
+          .where(eq(activities.projectId, id))
+          .run()
+      return tx
+        .update(projects)
+        .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
+        .where(eq(projects.id, id))
+        .returning()
+        .get()
+    })
     notifyTimerChanged()
     return project
   } catch (error) {

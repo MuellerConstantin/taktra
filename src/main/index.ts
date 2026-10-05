@@ -18,6 +18,7 @@ import {
   showMainWindow
 } from './desktop/windows'
 import { initActivities } from './domain/activities'
+import { initCustomers } from './domain/customers'
 import { initExport } from './domain/export'
 import { initProjects } from './domain/projects'
 import { initReports } from './domain/reports'
@@ -65,6 +66,7 @@ function start(): void {
   electronApp.setAppUserModelId('app.taktra')
   initSettings()
   initProfiles()
+  initCustomers()
   initProjects()
   initTags()
   initActivities()

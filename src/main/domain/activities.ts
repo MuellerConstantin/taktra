@@ -7,6 +7,7 @@ import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { activities, activityTags, tags, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
+import { findCustomer } from './customers'
 import { sortByName, toNameKey } from './names'
 import { findProject } from './projects'
 import { notifyTimerChanged } from './timerEvents'
@@ -63,8 +64,16 @@ export function listActivities({
   }))
 }
 
+function assertCustomerAssignable(projectId: number, customerId: number | null): void {
+  if (customerId === null) return
+  if (findProject(projectId).customerId !== null)
+    throw new AppError('CUSTOMER_SET_BY_PROJECT', String(projectId))
+  findCustomer(customerId)
+}
+
 export function createActivity(input: z.output<typeof activityInput>): Activity {
   findProject(input.projectId)
+  assertCustomerAssignable(input.projectId, input.customerId ?? null)
 
   try {
     return getActiveDatabase()
@@ -96,15 +105,20 @@ export function renameActivity(id: number, name: string): Activity {
   }
 }
 
-/** Moves the activity with its time entries to another project, renamed in the same step. */
+/**
+ * Moves the activity with its time entries to another project, renamed in the same step. A
+ * customer of the source project stays with the activity unless the target project sets its own.
+ */
 export function moveActivity(id: number, projectId: number, name: string): Activity {
-  findActivity(id)
-  findProject(projectId)
+  const previous = findActivity(id)
+  const source = findProject(previous.projectId)
+  const target = findProject(projectId)
+  const customerId = target.customerId === null ? (source.customerId ?? previous.customerId) : null
 
   try {
     const activity = getActiveDatabase()
       .update(activities)
-      .set({ projectId, name, nameKey: toNameKey(name) })
+      .set({ projectId, name, nameKey: toNameKey(name), customerId })
       .where(eq(activities.id, id))
       .returning()
       .get()
@@ -125,6 +139,20 @@ export function setActivityArchived(id: number, archived: boolean): Activity {
     .where(eq(activities.id, id))
     .returning()
     .get()
+}
+
+export function setActivityCustomer(id: number, customerId: number | null): Activity {
+  const { projectId } = findActivity(id)
+  assertCustomerAssignable(projectId, customerId)
+
+  const activity = getActiveDatabase()
+    .update(activities)
+    .set({ customerId })
+    .where(eq(activities.id, id))
+    .returning()
+    .get()
+  notifyTimerChanged()
+  return activity
 }
 
 export function setActivityTags(id: number, tagIds: readonly number[]): void {
@@ -176,6 +204,9 @@ export function initActivities(): void {
   )
   handle('activities:setArchived', z.tuple([id, z.boolean()]), (_, activityId, archived) =>
     setActivityArchived(activityId, archived)
+  )
+  handle('activities:setCustomer', z.tuple([id, id.nullable()]), (_, activityId, customerId) =>
+    setActivityCustomer(activityId, customerId)
   )
   handle('activities:setTags', z.tuple([id, z.array(id)]), (_, activityId, tagIds) =>
     setActivityTags(activityId, tagIds)
