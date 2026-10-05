@@ -3,9 +3,10 @@ import { z } from 'zod'
 import type { AggregateRow, Grouping, TimeFilter } from '../../shared/reports'
 import { grouping, timeFilter } from '../../shared/validation'
 import { getActiveDatabase } from '../db/database'
-import { activities, activityTags, projects, tags, timeEntries } from '../db/schema'
+import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { tagsByActivity } from './activities'
+import { effectiveClientId, effectiveClientJoin } from './clients'
 import { compareNames } from './names'
 
 export function conditions(filter: TimeFilter): SQL | undefined {
@@ -19,6 +20,7 @@ export function conditions(filter: TimeFilter): SQL | undefined {
   return and(
     filter.from === undefined ? undefined : gte(timeEntries.date, filter.from),
     filter.to === undefined ? undefined : lte(timeEntries.date, filter.to),
+    filter.clientIds ? inArray(effectiveClientId, [...filter.clientIds]) : undefined,
     filter.projectIds ? inArray(projects.id, [...filter.projectIds]) : undefined,
     filter.activityIds ? inArray(activities.id, [...filter.activityIds]) : undefined,
     tagged ? inArray(timeEntries.activityId, tagged) : undefined
@@ -28,6 +30,8 @@ export function conditions(filter: TimeFilter): SQL | undefined {
 function compareRows(a: AggregateRow, b: AggregateRow): number {
   if (a.date !== b.date) return (a.date ?? '') < (b.date ?? '') ? -1 : 1
   return (
+    Number(a.client === null) - Number(b.client === null) ||
+    compareNames(a.client?.name ?? '', b.client?.name ?? '') ||
     compareNames(a.project?.name ?? '', b.project?.name ?? '') ||
     compareNames(a.activity?.name ?? '', b.activity?.name ?? '') ||
     Number(a.tag === null) - Number(b.tag === null) ||
@@ -37,6 +41,7 @@ function compareRows(a: AggregateRow, b: AggregateRow): number {
 
 export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): AggregateRow[] {
   const byDate = groupBy.includes('date')
+  const byClient = groupBy.includes('client')
   const byActivity = groupBy.includes('activity')
   const byProject = byActivity || groupBy.includes('project')
   const byTag = groupBy.includes('tag')
@@ -45,6 +50,8 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
   const query = getActiveDatabase()
     .select({
       date: byDate ? timeEntries.date : none,
+      clientId: byClient ? clients.id : none,
+      clientName: byClient ? clients.name : none,
       projectId: byProject ? projects.id : none,
       projectName: byProject ? projects.name : none,
       projectColor: byProject ? projects.color : none,
@@ -62,8 +69,9 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
     .innerJoin(projects, eq(activities.projectId, projects.id))
     .$dynamic()
 
+  const withClients = byClient ? query.leftJoin(clients, effectiveClientJoin) : query
   const joined = byTag
-    ? query
+    ? withClients
         .leftJoin(
           activityTags,
           and(
@@ -72,11 +80,12 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
           )
         )
         .leftJoin(tags, eq(tags.id, activityTags.tagId))
-    : query
+    : withClients
   const filtered = joined.where(conditions(filter))
 
   const groupColumns = [
     ...(byDate ? [timeEntries.date] : []),
+    ...(byClient ? [clients.id] : []),
     ...(byProject ? [projects.id] : []),
     ...(byActivity ? [activities.id] : []),
     ...(byTag ? [tags.id] : [])
@@ -89,6 +98,7 @@ export function aggregate(filter: TimeFilter, groupBy: readonly Grouping[]): Agg
 
   const result: AggregateRow[] = rows.map((row) => ({
     date: row.date,
+    client: row.clientId === null ? null : { id: row.clientId, name: row.clientName ?? '' },
     project:
       row.projectId === null
         ? null

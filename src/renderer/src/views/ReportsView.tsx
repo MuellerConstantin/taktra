@@ -2,6 +2,7 @@ import { getLocalTimeZone, today } from '@internationalized/date'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
+import type { Client } from '../../../shared/clients'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow, Grouping } from '../../../shared/reports'
 import type { Tag } from '../../../shared/tags'
@@ -19,10 +20,11 @@ import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
 import { computeKpis, dataRange } from '../lib/report'
 
-const breakdowns: readonly Breakdown[] = ['project', 'tag', 'projectTag']
+const breakdowns: readonly Breakdown[] = ['project', 'client', 'tag', 'projectTag']
 
 const breakdownGrouping: Record<Breakdown, readonly Grouping[]> = {
   project: ['project', 'activity'],
+  client: ['client', 'project'],
   tag: ['tag'],
   projectTag: ['project', 'tag']
 }
@@ -57,8 +59,10 @@ function ReportsView(): React.JSX.Element {
     range: presetRange('thisMonth', today(getLocalTimeZone()), locale)
   }))
   const [breakdown, setBreakdown] = useState<Breakdown>('project')
+  const [clientIds, setClientIds] = useState<readonly number[]>([])
   const [projectIds, setProjectIds] = useState<readonly number[]>([])
   const [tagIds, setTagIds] = useState<readonly number[]>([])
+  const [clients, setClients] = useState<readonly Client[]>([])
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [tags, setTags] = useState<readonly Tag[]>([])
   const [data, setData] = useState<ReportData | null>(null)
@@ -69,17 +73,23 @@ function ReportsView(): React.JSX.Element {
     () => ({
       from,
       to,
+      clientIds: clientIds.length > 0 ? clientIds : undefined,
       projectIds: projectIds.length > 0 ? projectIds : undefined,
       tagIds: tagIds.length > 0 ? tagIds : undefined
     }),
-    [from, to, projectIds, tagIds]
+    [from, to, clientIds, projectIds, tagIds]
   )
 
   useEffect(() => {
     let isCurrent = true
-    Promise.all([api.projects.list({ includeArchived: true }), api.tags.list()])
-      .then(([loadedProjects, loadedTags]) => {
+    Promise.all([
+      api.clients.list({ includeArchived: true }),
+      api.projects.list({ includeArchived: true }),
+      api.tags.list()
+    ])
+      .then(([loadedClients, loadedProjects, loadedTags]) => {
         if (!isCurrent) return
+        setClients(loadedClients)
         setProjects(loadedProjects)
         setTags(loadedTags)
       })
@@ -125,6 +135,21 @@ function ReportsView(): React.JSX.Element {
             {projects.map((project) => (
               <SelectItem key={project.id} id={project.id} textValue={project.name}>
                 {project.name}
+              </SelectItem>
+            ))}
+          </Select>
+          <Select
+            aria-label={t('clients')}
+            placeholder={t('allClients')}
+            search={{ label: t('searchClients'), empty: t('noMatches') }}
+            selectionMode="multiple"
+            value={[...clientIds]}
+            onChange={(keys) => setClientIds(keys.map(Number))}
+            className="w-60"
+          >
+            {clients.map((client) => (
+              <SelectItem key={client.id} id={client.id} textValue={client.name}>
+                {client.name}
               </SelectItem>
             ))}
           </Select>

@@ -339,6 +339,9 @@
   },
   "ReportsView": {
     "title": "Auswertung",
+    "clients": "Leistungsempfänger",
+    "allClients": "Alle Leistungsempfänger",
+    "searchClients": "Leistungsempfänger suchen",
     "projects": "Projekte",
     "allProjects": "Alle Projekte",
     "tags": "Tags",
@@ -355,6 +358,7 @@
     "breakdown": "Gruppieren nach",
     "breakdowns": {
       "project": "Projekt",
+      "client": "Leistungsempfänger",
       "tag": "Tag",
       "projectTag": "Projekt × Tag"
     }
@@ -362,6 +366,9 @@
   "ExportView": {
     "title": "Export",
     "export": "Exportieren…",
+    "clients": "Leistungsempfänger",
+    "allClients": "Alle Leistungsempfänger",
+    "searchClients": "Leistungsempfänger suchen",
     "projects": "Projekte",
     "allProjects": "Alle Projekte",
     "tags": "Tags",
@@ -378,6 +385,7 @@
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
+    "noClient": "Ohne Leistungsempfänger",
     "overlap": "Ein Eintrag zählt bei jedem Tag seiner Tätigkeit mit. Die Anteile der Tags können sich daher überschneiden und zusammen mehr als 100 % ergeben."
   },
   "AppSettingsView": {

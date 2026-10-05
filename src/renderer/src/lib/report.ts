@@ -1,5 +1,6 @@
 import { parseDate, startOfMonth, startOfWeek, type CalendarDate } from '@internationalized/date'
 import type { AggregateRow } from '../../../shared/reports'
+import { COLORS } from './colors'
 import type { DateRange } from './period'
 
 export type Bucket = 'day' | 'week' | 'month'
@@ -90,6 +91,40 @@ export function projectShares(
     groups.set(row.project.id, {
       ...group,
       children: child ? [...group.children, { ...child, children: [] }] : group.children
+    })
+  }
+  return [...groups.values()]
+    .map((group) => ({ ...group, children: [...group.children].sort(byTotal) }))
+    .sort(byTotal)
+}
+
+/** Clients have no color of their own; the id keeps a client's color stable across reports. */
+function clientColor(clientId: number): string {
+  return COLORS[(clientId - 1) % COLORS.length]
+}
+
+export function clientShares(rows: readonly AggregateRow[], noClientLabel: string): ShareItem[] {
+  const groups = new Map<number | null, ShareItem>()
+  for (const row of rows) {
+    const key = row.client?.id ?? null
+    const group = groups.get(key) ?? {
+      id: `client-${key ?? 'none'}`,
+      label: row.client?.name ?? noClientLabel,
+      color: row.client ? clientColor(row.client.id) : UNTAGGED_COLOR,
+      totalSec: 0,
+      children: []
+    }
+    const child = row.project && {
+      id: `project-${row.project.id}`,
+      label: row.project.name,
+      color: row.project.color ?? NEUTRAL_COLOR,
+      totalSec: row.totalSec,
+      children: []
+    }
+    groups.set(key, {
+      ...group,
+      totalSec: group.totalSec + row.totalSec,
+      children: child ? [...group.children, child] : group.children
     })
   }
   return [...groups.values()]

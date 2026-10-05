@@ -7,7 +7,8 @@ export const exportColumns = [
   'start',
   'end',
   'duration_min',
-  'note'
+  'note',
+  'client'
 ] as const
 
 export type ExportColumn = (typeof exportColumns)[number]

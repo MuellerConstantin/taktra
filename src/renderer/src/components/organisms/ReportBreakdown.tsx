@@ -4,6 +4,7 @@ import { useTranslations } from 'use-intl'
 import type { AggregateRow } from '../../../../shared/reports'
 import { formatDuration } from '../../lib/duration'
 import {
+  clientShares,
   NEUTRAL_COLOR,
   projectShares,
   projectTotals,
@@ -15,7 +16,7 @@ import { Disclosure, DisclosureGroup, DisclosureHeader, DisclosurePanel } from '
 import { ShareBarChart } from '../molecules/ShareBarChart'
 import { SharePieChart } from '../molecules/SharePieChart'
 
-export type Breakdown = 'project' | 'tag' | 'projectTag'
+export type Breakdown = 'project' | 'client' | 'tag' | 'projectTag'
 
 interface ShareCellsProps {
   readonly item: ShareItem
@@ -65,20 +66,24 @@ export function ReportBreakdown({
   const items =
     breakdown === 'tag'
       ? tagShares(rows, t('untagged'))
-      : projectShares(rows, projectTotals(timelineRows), (row) =>
-          breakdown === 'projectTag'
-            ? tagShare(row, t('untagged'))
-            : row.activity && {
-                id: `activity-${row.activity.id}`,
-                label: row.activity.name,
-                color: row.project?.color ?? NEUTRAL_COLOR,
-                totalSec: row.totalSec
-              }
-        )
+      : breakdown === 'client'
+        ? clientShares(rows, t('noClient'))
+        : projectShares(rows, projectTotals(timelineRows), (row) =>
+            breakdown === 'projectTag'
+              ? tagShare(row, t('untagged'))
+              : row.activity && {
+                  id: `activity-${row.activity.id}`,
+                  label: row.activity.name,
+                  color: row.project?.color ?? NEUTRAL_COLOR,
+                  totalSec: row.totalSec
+                }
+          )
 
   return (
     <div className="flex flex-col gap-4">
-      {breakdown !== 'project' && <p className="text-xs text-muted-foreground">{t('overlap')}</p>}
+      {(breakdown === 'tag' || breakdown === 'projectTag') && (
+        <p className="text-xs text-muted-foreground">{t('overlap')}</p>
+      )}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         <div className="lg:w-72 lg:shrink-0">
           {breakdown === 'tag' ? (
@@ -114,13 +119,13 @@ export function ReportBreakdown({
                         key={child.id}
                         className={twMerge(
                           'flex items-center gap-3 border-t border-border py-2 pr-4',
-                          breakdown === 'projectTag' ? 'pl-11' : 'pl-16.5'
+                          breakdown === 'project' ? 'pl-16.5' : 'pl-11'
                         )}
                       >
                         <ShareCells
                           item={child}
                           formatShare={formatShare}
-                          showColor={breakdown === 'projectTag'}
+                          showColor={breakdown !== 'project'}
                         />
                       </div>
                     ))}

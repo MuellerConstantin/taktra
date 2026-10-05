@@ -31,7 +31,7 @@ function formatTime(date: Date, timeZone: string): string {
   return format.format(date)
 }
 
-function toExportRow({ entry, project, activity, tags }: TimeEntryDetails): ExportRow {
+function toExportRow({ entry, project, activity, client, tags }: TimeEntryDetails): ExportRow {
   const { startedAt, endedAt, timezone } = entry
   return {
     date: entry.date,
@@ -42,7 +42,8 @@ function toExportRow({ entry, project, activity, tags }: TimeEntryDetails): Expo
     start: startedAt && timezone ? formatTime(startedAt, timezone) : null,
     end: endedAt && timezone ? formatTime(endedAt, timezone) : null,
     duration_min: Math.round((entry.durationSec ?? 0) / 60),
-    note: entry.note
+    note: entry.note,
+    client: client?.name ?? null
   }
 }
 

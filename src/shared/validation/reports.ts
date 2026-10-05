@@ -5,6 +5,7 @@ import { id, localDate } from './common'
 export const timeFilter = z.object({
   from: localDate.optional(),
   to: localDate.optional(),
+  clientIds: z.array(id).optional(),
   projectIds: z.array(id).optional(),
   activityIds: z.array(id).optional(),
   tagIds: z.array(id).optional()

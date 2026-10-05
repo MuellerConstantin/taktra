@@ -339,6 +339,9 @@
   },
   "ReportsView": {
     "title": "Reports",
+    "clients": "Clients",
+    "allClients": "All clients",
+    "searchClients": "Search clients",
     "projects": "Projects",
     "allProjects": "All projects",
     "tags": "Tags",
@@ -355,6 +358,7 @@
     "breakdown": "Group by",
     "breakdowns": {
       "project": "Project",
+      "client": "Client",
       "tag": "Tag",
       "projectTag": "Project × tag"
     }
@@ -362,6 +366,9 @@
   "ExportView": {
     "title": "Export",
     "export": "Export…",
+    "clients": "Clients",
+    "allClients": "All clients",
+    "searchClients": "Search clients",
     "projects": "Projects",
     "allProjects": "All projects",
     "tags": "Tags",
@@ -378,6 +385,7 @@
   },
   "ReportBreakdown": {
     "untagged": "No tag",
+    "noClient": "No client",
     "overlap": "An entry counts towards every tag of its activity, so tag shares can overlap and add up to more than 100 %."
   },
   "AppSettingsView": {

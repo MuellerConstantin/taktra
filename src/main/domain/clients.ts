@@ -10,11 +10,12 @@ import { handle } from '../ipc'
 import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
-/** Joins the client that counts for an activity: the one of its project, else its own. */
-export const effectiveClientJoin = eq(
-  clients.id,
-  sql`coalesce(${projects.clientId}, ${activities.clientId})`
-)
+/** The client that counts for an activity: the one of its project, else its own. */
+export const effectiveClientId = sql<
+  number | null
+>`coalesce(${projects.clientId}, ${activities.clientId})`
+
+export const effectiveClientJoin = eq(clients.id, effectiveClientId)
 
 export const clientRef = { id: clients.id, name: clients.name }
 
