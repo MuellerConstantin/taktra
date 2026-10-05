@@ -230,6 +230,28 @@
     "emptyPeriod": "No time tracked in this period.",
     "entryCount": "{count, plural, one {# entry} other {# entries}}"
   },
+  "ActivityDetailView": {
+    "projects": "Projects",
+    "edit": "Edit",
+    "move": "Move",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "archived": "Archived",
+    "start": "Start timer",
+    "stop": "Stop timer",
+    "client": "Client",
+    "total": "Total {duration}",
+    "entries": "Entries",
+    "empty": "No time tracked yet.",
+    "emptyPeriod": "No time tracked in this period.",
+    "now": "now",
+    "editEntry": "Edit entry of {date}",
+    "deleteEntry": "Delete entry of {date}",
+    "deleteConfirmTitle": "Delete entry of {date}?",
+    "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone. If it is the last entry of the activity, the activity is deleted too.",
+    "deleteConfirmAction": "Delete",
+    "cancel": "Cancel"
+  },
   "ActivityDialog": {
     "title": "Edit activity",
     "nameLabel": "Name",

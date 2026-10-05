@@ -32,11 +32,21 @@ interface NavItemProps {
   readonly label: string
   readonly icon: RemixiconComponentType
   readonly shortcut: string
+  readonly alsoActiveOn?: string
   readonly isDisabled?: boolean
 }
 
-function NavItem({ to, label, icon: Icon, shortcut, isDisabled }: NavItemProps): React.JSX.Element {
-  const isActive = useMatch({ path: to, end: false }) !== null && !isDisabled
+function NavItem({
+  to,
+  label,
+  icon: Icon,
+  shortcut,
+  alsoActiveOn,
+  isDisabled
+}: NavItemProps): React.JSX.Element {
+  const isMatch = useMatch({ path: to, end: false }) !== null
+  const isAlsoMatch = useMatch({ path: alsoActiveOn ?? to, end: false }) !== null
+  const isActive = (isMatch || isAlsoMatch) && !isDisabled
 
   return (
     <TooltipTrigger delay={500}>
@@ -99,6 +109,7 @@ export function Sidebar(): React.JSX.Element {
         <hr className="mx-3 my-2 border-sidebar-border" />
         <NavItem
           to="/projects"
+          alsoActiveOn="/activities"
           shortcut={appShortcuts.projects}
           label={t('projects')}
           icon={RiFolderLine}

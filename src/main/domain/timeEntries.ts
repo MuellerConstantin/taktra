@@ -1,13 +1,18 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
 import { AppError } from '../../shared/errors'
-import { id, timeEntryInput, timeEntryRange } from '../../shared/validation'
+import { id, timeEntryFilter, timeEntryInput } from '../../shared/validation'
 import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../shared/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
-import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activities'
-import { clientRef, effectiveClientJoin } from './clients'
+import {
+  activityDetailsColumns,
+  deleteActivityIfUnused,
+  findActivity,
+  tagsByActivity
+} from './activities'
+import { effectiveClientJoin } from './clients'
 
 type TimeEntryValues = Pick<
   TimeEntry,
@@ -49,17 +54,7 @@ function findTimeEntry(id: number): TimeEntry {
 
 export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails[] {
   const rows = getActiveDatabase()
-    .select({
-      entry: timeEntries,
-      activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
-      project: {
-        id: projects.id,
-        name: projects.name,
-        color: projects.color,
-        archivedAt: projects.archivedAt
-      },
-      client: clientRef
-    })
+    .select({ entry: timeEntries, ...activityDetailsColumns })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))
@@ -72,8 +67,18 @@ export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails
   return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
 }
 
-export function listTimeEntries({ from, to }: z.output<typeof timeEntryRange>): TimeEntryDetails[] {
-  return selectTimeEntryDetails(and(gte(timeEntries.date, from), lte(timeEntries.date, to)))
+export function listTimeEntries({
+  from,
+  to,
+  activityId
+}: z.output<typeof timeEntryFilter>): TimeEntryDetails[] {
+  return selectTimeEntryDetails(
+    and(
+      from === undefined ? undefined : gte(timeEntries.date, from),
+      to === undefined ? undefined : lte(timeEntries.date, to),
+      activityId === undefined ? undefined : eq(timeEntries.activityId, activityId)
+    )
+  )
 }
 
 export function createTimeEntry(input: TimeEntryData): TimeEntry {
@@ -103,7 +108,7 @@ export function deleteTimeEntry(id: number): void {
 }
 
 export function initTimeEntries(): void {
-  handle('timeEntries:list', z.tuple([timeEntryRange]), (_, range) => listTimeEntries(range))
+  handle('timeEntries:list', z.tuple([timeEntryFilter]), (_, filter) => listTimeEntries(filter))
   handle('timeEntries:create', z.tuple([timeEntryInput]), (_, input) => createTimeEntry(input))
   handle('timeEntries:update', z.tuple([id, timeEntryInput]), (_, entryId, input) =>
     updateTimeEntry(entryId, input)

@@ -1,13 +1,14 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import type { Activity, ActivityTag, ActivityWithTags } from '../../shared/activities'
+import type { ActivityDetails } from '../../shared/timeEntries'
 import { AppError } from '../../shared/errors'
 import { activityInput, activityListOptions, id, name } from '../../shared/validation'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
-import { activities, activityTags, tags, timeEntries } from '../db/schema'
+import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
-import { findClient } from './clients'
+import { clientRef, effectiveClientJoin, findClient } from './clients'
 import { sortByName, toNameKey } from './names'
 import { findProject } from './projects'
 import { notifyTimerChanged } from './timerEvents'
@@ -16,6 +17,17 @@ export function findActivity(id: number): Activity {
   const activity = getActiveDatabase().select().from(activities).where(eq(activities.id, id)).get()
   if (!activity) throw new AppError('ACTIVITY_NOT_FOUND', String(id))
   return activity
+}
+
+export const activityDetailsColumns = {
+  activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
+  project: {
+    id: projects.id,
+    name: projects.name,
+    color: projects.color,
+    archivedAt: projects.archivedAt
+  },
+  client: clientRef
 }
 
 export function tagsByActivity(activityIds: readonly number[]): Map<number, ActivityTag[]> {
@@ -62,6 +74,18 @@ export function listActivities({
     ...activity,
     tagIds: (tagMap.get(activity.id) ?? []).map((tag) => tag.id)
   }))
+}
+
+export function getActivityDetails(id: number): ActivityDetails {
+  const row = getActiveDatabase()
+    .select(activityDetailsColumns)
+    .from(activities)
+    .innerJoin(projects, eq(activities.projectId, projects.id))
+    .leftJoin(clients, effectiveClientJoin)
+    .where(eq(activities.id, id))
+    .get()
+  if (!row) throw new AppError('ACTIVITY_NOT_FOUND', String(id))
+  return { ...row, tags: tagsByActivity([id]).get(id) ?? [] }
 }
 
 function assertClientAssignable(projectId: number, clientId: number | null): void {
@@ -195,6 +219,7 @@ export function deleteActivity(id: number): void {
 
 export function initActivities(): void {
   handle('activities:list', z.tuple([activityListOptions]), (_, options) => listActivities(options))
+  handle('activities:get', z.tuple([id]), (_, activityId) => getActivityDetails(activityId))
   handle('activities:create', z.tuple([activityInput]), (_, input) => createActivity(input))
   handle('activities:rename', z.tuple([id, name]), (_, activityId, newName) =>
     renameActivity(activityId, newName)

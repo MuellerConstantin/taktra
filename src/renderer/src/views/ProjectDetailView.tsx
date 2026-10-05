@@ -1,6 +1,6 @@
 import { RiArchiveLine, RiInboxUnarchiveLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow } from '../../../shared/reports'
@@ -20,6 +20,7 @@ import { allTime, periodFilter, type Period } from '../lib/period'
 function ProjectDetailView(): React.JSX.Element {
   const t = useTranslations('ProjectDetailView')
   const errorMessage = useErrorMessage()
+  const navigate = useNavigate()
   const projectId = Number(useParams().projectId)
   const [project, setProject] = useState<Project | null>(null)
   const [rows, setRows] = useState<readonly AggregateRow[] | null>(null)
@@ -120,6 +121,7 @@ function ProjectDetailView(): React.JSX.Element {
       <GridList
         aria-label={t('activities')}
         items={activities}
+        onAction={(key) => navigate(`/activities/${key}`)}
         className="min-h-0 flex-1"
         renderEmptyState={() =>
           activities.length === 0 && (

@@ -230,6 +230,28 @@
     "emptyPeriod": "In diesem Zeitraum wurde keine Zeit erfasst.",
     "entryCount": "{count, plural, one {# Eintrag} other {# Einträge}}"
   },
+  "ActivityDetailView": {
+    "projects": "Projekte",
+    "edit": "Bearbeiten",
+    "move": "Verschieben",
+    "archive": "Archivieren",
+    "unarchive": "Wiederherstellen",
+    "archived": "Archiviert",
+    "start": "Timer starten",
+    "stop": "Timer stoppen",
+    "client": "Leistungsempfänger",
+    "total": "Gesamt {duration}",
+    "entries": "Einträge",
+    "empty": "Noch keine Zeit erfasst.",
+    "emptyPeriod": "In diesem Zeitraum wurde keine Zeit erfasst.",
+    "now": "jetzt",
+    "editEntry": "Eintrag vom {date} bearbeiten",
+    "deleteEntry": "Eintrag vom {date} löschen",
+    "deleteConfirmTitle": "Eintrag vom {date} löschen?",
+    "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden. Ist es der letzte Eintrag der Tätigkeit, wird auch die Tätigkeit gelöscht.",
+    "deleteConfirmAction": "Löschen",
+    "cancel": "Abbrechen"
+  },
   "ActivityDialog": {
     "title": "Tätigkeit bearbeiten",
     "nameLabel": "Name",

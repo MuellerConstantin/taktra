@@ -26,7 +26,8 @@ export interface TimeEntryDetails {
 
 export type ActivityDetails = Omit<TimeEntryDetails, 'entry'>
 
-export interface TimeEntryRange {
-  readonly from: string
-  readonly to: string
+export interface TimeEntryFilter {
+  readonly from?: string
+  readonly to?: string
+  readonly activityId?: number
 }

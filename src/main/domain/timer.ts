@@ -6,8 +6,8 @@ import type { ActivityDetails, TimeEntryDetails } from '../../shared/timeEntries
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
-import { findActivity, tagsByActivity } from './activities'
-import { clientRef, effectiveClientJoin } from './clients'
+import { activityDetailsColumns, findActivity, tagsByActivity } from './activities'
+import { effectiveClientJoin } from './clients'
 import { findProject } from './projects'
 import { deleteTimeEntry, selectTimeEntryDetails } from './timeEntries'
 import { notifyTimerChanged } from './timerEvents'
@@ -104,16 +104,7 @@ export function discardTimer(): void {
 
 export function listRecentActivities(limit: number): ActivityDetails[] {
   const rows = getActiveDatabase()
-    .select({
-      activity: { id: activities.id, name: activities.name, archivedAt: activities.archivedAt },
-      project: {
-        id: projects.id,
-        name: projects.name,
-        color: projects.color,
-        archivedAt: projects.archivedAt
-      },
-      client: clientRef
-    })
+    .select(activityDetailsColumns)
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))

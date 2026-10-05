@@ -28,4 +28,8 @@ export const timeEntryInput = z.union([
   z.object({ ...entryBase, startedAt: validDate, endedAt: validDate, timezone })
 ])
 
-export const timeEntryRange = z.object({ from: localDate, to: localDate })
+export const timeEntryFilter = z.object({
+  from: localDate.optional(),
+  to: localDate.optional(),
+  activityId: id.optional()
+})

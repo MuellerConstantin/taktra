@@ -1,11 +1,12 @@
 import { RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import type { ActivityRef } from '../../../shared/activities'
 import type { AggregateRow } from '../../../shared/reports'
 import type { Tag } from '../../../shared/tags'
 import { Button } from '../components/atoms/Button'
+import { GridList, GridListItem } from '../components/atoms/GridList'
 import {
   Disclosure,
   DisclosureGroup,
@@ -47,6 +48,7 @@ function groupByProject(rows: readonly AggregateRow[]): ProjectGroup[] {
 function TagDetailView(): React.JSX.Element {
   const t = useTranslations('TagDetailView')
   const errorMessage = useErrorMessage()
+  const navigate = useNavigate()
   const tagId = Number(useParams().tagId)
   const [tag, setTag] = useState<Tag | null>(null)
   const [rows, setRows] = useState<readonly AggregateRow[] | null>(null)
@@ -136,29 +138,35 @@ function TagDetailView(): React.JSX.Element {
                 <span aria-hidden className="w-6" />
               </DisclosureHeader>
               <DisclosurePanel>
-                {projectRows.map(({ activity, totalSec: activitySec, entryCount }) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-3 border-t border-border py-3 pr-8 pl-21 text-sm"
-                  >
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate">{activity.name}</span>
-                      {activity.tags.length > 1 && (
-                        <TagBadges
-                          tags={activity.tags.filter((other) => other.id !== tag.id)}
-                          className="mt-2"
-                        />
-                      )}
-                    </div>
-                    <span className="text-muted-foreground">
-                      {t('entryCount', { count: entryCount })}
-                    </span>
-                    <span className="w-14 text-right tabular-nums">
-                      {formatDuration(activitySec)}
-                    </span>
-                    <ActivityMenu activity={activity} onChanged={reload} />
-                  </div>
-                ))}
+                <GridList
+                  aria-label={project.name}
+                  items={projectRows.map((row) => ({ ...row, id: row.activity.id }))}
+                  onAction={(key) => navigate(`/activities/${key}`)}
+                >
+                  {({ activity, totalSec: activitySec, entryCount }) => (
+                    <GridListItem
+                      textValue={activity.name}
+                      className="h-auto border-t border-b-0 py-3 pr-8 pl-21"
+                    >
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate">{activity.name}</span>
+                        {activity.tags.length > 1 && (
+                          <TagBadges
+                            tags={activity.tags.filter((other) => other.id !== tag.id)}
+                            className="mt-2"
+                          />
+                        )}
+                      </div>
+                      <span className="text-muted-foreground">
+                        {t('entryCount', { count: entryCount })}
+                      </span>
+                      <span className="w-14 text-right tabular-nums">
+                        {formatDuration(activitySec)}
+                      </span>
+                      <ActivityMenu activity={activity} onChanged={reload} />
+                    </GridListItem>
+                  )}
+                </GridList>
               </DisclosurePanel>
             </Disclosure>
           ))}

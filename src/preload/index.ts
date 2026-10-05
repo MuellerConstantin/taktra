@@ -15,7 +15,7 @@ import type {
   TimeEntry,
   TimeEntryDetails,
   TimeEntryInput,
-  TimeEntryRange
+  TimeEntryFilter
 } from '../shared/timeEntries'
 
 function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
@@ -77,6 +77,7 @@ const api = {
   activities: {
     list: (options?: { projectId?: number; includeArchived?: boolean }) =>
       invoke<ActivityWithTags[]>('activities:list', options),
+    get: (id: number) => invoke<ActivityDetails>('activities:get', id),
     create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
     rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
     move: (id: number, projectId: number, name: string) =>
@@ -103,7 +104,7 @@ const api = {
     csv: (filter: TimeFilter) => invoke<string | null>('export:csv', filter)
   },
   timeEntries: {
-    list: (range: TimeEntryRange) => invoke<TimeEntryDetails[]>('timeEntries:list', range),
+    list: (filter: TimeEntryFilter) => invoke<TimeEntryDetails[]>('timeEntries:list', filter),
     create: (input: TimeEntryInput) => invoke<TimeEntry>('timeEntries:create', input),
     update: (id: number, input: TimeEntryInput) =>
       invoke<TimeEntry>('timeEntries:update', id, input),

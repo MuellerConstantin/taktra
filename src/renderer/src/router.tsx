@@ -7,6 +7,7 @@ import TimerView from './views/TimerView'
 import TrackingView from './views/TrackingView'
 import ProjectsView from './views/ProjectsView'
 import ProjectDetailView from './views/ProjectDetailView'
+import ActivityDetailView from './views/ActivityDetailView'
 import ClientsView from './views/ClientsView'
 import TagsView from './views/TagsView'
 import TagDetailView from './views/TagDetailView'
@@ -34,6 +35,7 @@ export const router = createHashRouter([
           { path: 'tracking', element: <TrackingView /> },
           { path: 'projects', element: <ProjectsView /> },
           { path: 'projects/:projectId', element: <ProjectDetailView /> },
+          { path: 'activities/:activityId', element: <ActivityDetailView /> },
           { path: 'clients', element: <ClientsView /> },
           { path: 'tags', element: <TagsView /> },
           { path: 'tags/:tagId', element: <TagDetailView /> },
