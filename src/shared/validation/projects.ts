@@ -8,5 +8,5 @@ export const projectInput = z.object({
   name,
   description: description.optional(),
   color: color.optional(),
-  customerId: id.nullable().optional()
+  clientId: id.nullable().optional()
 })

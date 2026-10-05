@@ -3,8 +3,8 @@ import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { MAX_NAME_LENGTH } from '../../../shared/validation/limits'
 
-export const customers = sqliteTable(
-  'customers',
+export const clients = sqliteTable(
+  'clients',
   {
     id: integer().primaryKey({ autoIncrement: true }),
     uid: text()
@@ -23,10 +23,7 @@ export const customers = sqliteTable(
       .$onUpdateFn(() => new Date())
   },
   (table) => [
-    uniqueIndex('customers_name_unique').on(table.nameKey),
-    check(
-      'customers_name_length',
-      sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`
-    )
+    uniqueIndex('clients_name_unique').on(table.nameKey),
+    check('clients_name_length', sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`)
   ]
 )

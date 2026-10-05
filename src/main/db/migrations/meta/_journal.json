@@ -12,8 +12,8 @@
     {
       "idx": 1,
       "version": "6",
-      "when": 1791216225329,
-      "tag": "0001_add_customers",
+      "when": 1791216876569,
+      "tag": "0001_add_clients",
       "breakpoints": true
     }
   ]

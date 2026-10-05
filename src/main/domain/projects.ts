@@ -7,7 +7,7 @@ import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { activities, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
-import { findCustomer } from './customers'
+import { findClient } from './clients'
 import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
@@ -30,7 +30,7 @@ export function listProjects({
 }
 
 export function createProject(input: ProjectData): Project {
-  if (input.customerId) findCustomer(input.customerId)
+  if (input.clientId) findClient(input.clientId)
 
   try {
     return getActiveDatabase()
@@ -45,19 +45,19 @@ export function createProject(input: ProjectData): Project {
 }
 
 /**
- * A customer on the project replaces the customers of its activities. Removing it hands it down
- * to the activities, so the time booked on them keeps counting towards that customer.
+ * A client on the project replaces the clients of its activities. Removing it hands it down
+ * to the activities, so the time booked on them keeps counting towards that client.
  */
 export function updateProject(id: number, patch: Partial<ProjectData>): Project {
   const previous = findProject(id)
-  if (patch.customerId) findCustomer(patch.customerId)
-  const customerChanged = patch.customerId !== undefined && patch.customerId !== previous.customerId
+  if (patch.clientId) findClient(patch.clientId)
+  const clientChanged = patch.clientId !== undefined && patch.clientId !== previous.clientId
 
   try {
     const project = getActiveDatabase().transaction((tx) => {
-      if (customerChanged)
+      if (clientChanged)
         tx.update(activities)
-          .set({ customerId: patch.customerId ? null : previous.customerId })
+          .set({ clientId: patch.clientId ? null : previous.clientId })
           .where(eq(activities.projectId, id))
           .run()
       return tx

@@ -1,6 +1,6 @@
 export * from './activities'
+export * from './clients'
 export * from './common'
-export * from './customers'
 export * from './limits'
 export * from './projects'
 export * from './reports'

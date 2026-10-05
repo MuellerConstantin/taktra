@@ -4,7 +4,7 @@ import { id, name } from './common'
 export const activityInput = z.object({
   projectId: id,
   name,
-  customerId: id.nullable().optional()
+  clientId: id.nullable().optional()
 })
 
 export const activityListOptions = z

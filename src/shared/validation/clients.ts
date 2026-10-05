@@ -1,4 +1,4 @@
 import { z } from 'zod'
 import { name } from './common'
 
-export const customerInput = z.object({ name })
+export const clientInput = z.object({ name })

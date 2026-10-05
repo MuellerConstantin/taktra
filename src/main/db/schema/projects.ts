@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../shared/validation/limits'
-import { customers } from './customers'
+import { clients } from './clients'
 
 export const projects = sqliteTable(
   'projects',
@@ -16,7 +16,7 @@ export const projects = sqliteTable(
     nameKey: text().notNull(),
     description: text(),
     color: text(),
-    customerId: integer().references(() => customers.id),
+    clientId: integer().references(() => clients.id),
     archivedAt: integer({ mode: 'timestamp_ms' }),
     createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()

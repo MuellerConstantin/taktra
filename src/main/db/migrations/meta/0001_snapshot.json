@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "20230bd9-6789-44d0-a157-1d0a08cb064d",
+  "id": "1d4e3ad8-e4aa-438c-8768-6a883eacb8e6",
   "prevId": "ddb82ca6-6fb1-4f3a-b0fb-15f55baf077c",
   "tables": {
     "activities": {
@@ -42,8 +42,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "customer_id": {
-          "name": "customer_id",
+        "client_id": {
+          "name": "client_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -102,12 +102,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "activities_customer_id_customers_id_fk": {
-          "name": "activities_customer_id_customers_id_fk",
+        "activities_client_id_clients_id_fk": {
+          "name": "activities_client_id_clients_id_fk",
           "tableFrom": "activities",
-          "tableTo": "customers",
+          "tableTo": "clients",
           "columnsFrom": [
-            "customer_id"
+            "client_id"
           ],
           "columnsTo": [
             "id"
@@ -192,8 +192,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "customers": {
-      "name": "customers",
+    "clients": {
+      "name": "clients",
       "columns": {
         "id": {
           "name": "id",
@@ -246,15 +246,15 @@
         }
       },
       "indexes": {
-        "customers_uid_unique": {
-          "name": "customers_uid_unique",
+        "clients_uid_unique": {
+          "name": "clients_uid_unique",
           "columns": [
             "uid"
           ],
           "isUnique": true
         },
-        "customers_name_unique": {
-          "name": "customers_name_unique",
+        "clients_name_unique": {
+          "name": "clients_name_unique",
           "columns": [
             "name_key"
           ],
@@ -265,9 +265,9 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
-        "customers_name_length": {
-          "name": "customers_name_length",
-          "value": "length(\"customers\".\"name\") <= 50"
+        "clients_name_length": {
+          "name": "clients_name_length",
+          "value": "length(\"clients\".\"name\") <= 50"
         }
       }
     },
@@ -340,8 +340,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "customer_id": {
-          "name": "customer_id",
+        "client_id": {
+          "name": "client_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -386,12 +386,12 @@
         }
       },
       "foreignKeys": {
-        "projects_customer_id_customers_id_fk": {
-          "name": "projects_customer_id_customers_id_fk",
+        "projects_client_id_clients_id_fk": {
+          "name": "projects_client_id_clients_id_fk",
           "tableFrom": "projects",
-          "tableTo": "customers",
+          "tableTo": "clients",
           "columnsFrom": [
-            "customer_id"
+            "client_id"
           ],
           "columnsTo": [
             "id"
