@@ -23,6 +23,7 @@ import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { ActivityDialog } from '../components/molecules/ActivityDialog'
 import { MoveActivityDialog } from '../components/molecules/MoveActivityDialog'
+import { ExpandableNote } from '../components/molecules/Note'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
@@ -234,9 +235,9 @@ function ActivityDetailView(): React.JSX.Element {
                   </span>
                 )}
               </div>
-              <span className="line-clamp-2 min-w-0 flex-1 py-3 whitespace-pre-line text-muted-foreground">
-                {entry.note}
-              </span>
+              <div className="min-w-0 flex-1 self-start py-3 text-muted-foreground">
+                {entry.note && <ExpandableNote text={entry.note} />}
+              </div>
               <span className="w-14 text-right font-medium tabular-nums">
                 {formatDuration(durationOf(entry))}
               </span>

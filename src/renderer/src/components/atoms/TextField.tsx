@@ -29,6 +29,7 @@ export interface TextFieldProps extends RACTextFieldProps {
   readonly placeholder?: string
   readonly errorMessage?: string | ((validation: ValidationResult) => string)
   readonly multiline?: boolean
+  readonly rows?: number
 }
 
 export function TextField({
@@ -37,6 +38,7 @@ export function TextField({
   errorMessage,
   placeholder,
   multiline = false,
+  rows = 3,
   ...props
 }: TextFieldProps): React.JSX.Element {
   return (
@@ -47,7 +49,7 @@ export function TextField({
       {label && <Label>{label}</Label>}
       {multiline ? (
         <TextArea
-          rows={3}
+          rows={rows}
           placeholder={placeholder}
           className={(renderProps) => inputStyles({ ...renderProps, multiline })}
         />

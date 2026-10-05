@@ -191,11 +191,18 @@
     "durationDescription": "For example 1:30, 1.5, 90m or 1h 30m",
     "durationInvalid": "Please enter a duration between 1 minute and 24 hours.",
     "noteLabel": "Note",
+    "noteDescription": "Markdown: lists, **bold**, *italic*, `code` and links",
+    "preview": "Preview",
+    "previewEmpty": "Nothing to preview yet.",
     "endBeforeStart": "The end must be after the start.",
     "cancel": "Cancel",
     "create": "Create",
     "save": "Save",
     "newActivityTags": "Tags for the new activity “{name}”. They apply to all of its entries."
+  },
+  "Note": {
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "TagPicker": {
     "label": "Tags",

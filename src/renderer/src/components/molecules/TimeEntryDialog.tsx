@@ -6,7 +6,8 @@ import {
   type Time,
   type CalendarDate
 } from '@internationalized/date'
-import { useEffect, useState } from 'react'
+import { RiEyeLine } from '@remixicon/react'
+import { useEffect, useId, useState } from 'react'
 import { Form, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ActivityWithTags } from '../../../../shared/activities'
@@ -25,6 +26,7 @@ import { TextField } from '../atoms/TextField'
 import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { ToggleButtonGroup } from '../atoms/ToggleButtonGroup'
+import { Note } from './Note'
 import { TagPicker } from './TagPicker'
 import { MAX_NAME_LENGTH, MAX_NOTE_LENGTH } from '../../../../shared/validation/limits'
 
@@ -69,6 +71,8 @@ export function TimeEntryDialog({
       : ''
   )
   const [note, setNote] = useState(details?.entry.note ?? '')
+  const [isPreview, setPreview] = useState(false)
+  const noteLabelId = useId()
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
   const { contains } = useFilter({ sensitivity: 'base' })
@@ -160,7 +164,7 @@ export function TimeEntryDialog({
   }
 
   return (
-    <Modal isOpen onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
+    <Modal size="wide" isOpen onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
       <Dialog>
         {({ close }) => (
           <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -255,13 +259,42 @@ export function TimeEntryDialog({
                 validate={(value) => (parseDuration(value) === null ? t('durationInvalid') : null)}
               />
             )}
-            <TextField
-              label={t('noteLabel')}
-              value={note}
-              onChange={setNote}
-              maxLength={MAX_NOTE_LENGTH}
-              multiline
-            />
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between gap-3">
+                <span id={noteLabelId} className="text-sm font-medium">
+                  {t('noteLabel')}
+                </span>
+                <ToggleButton
+                  isSelected={isPreview}
+                  onChange={setPreview}
+                  className="h-7 gap-1.5 px-2.5 text-xs"
+                >
+                  <RiEyeLine aria-hidden className="size-3.5" />
+                  {t('preview')}
+                </ToggleButton>
+              </div>
+              <div className="grid">
+                <TextField
+                  aria-labelledby={noteLabelId}
+                  description={t('noteDescription')}
+                  value={note}
+                  onChange={setNote}
+                  maxLength={MAX_NOTE_LENGTH}
+                  multiline
+                  rows={8}
+                  className={isPreview ? 'invisible [grid-area:1/1]' : '[grid-area:1/1]'}
+                />
+                {isPreview && (
+                  <div className="overflow-auto rounded-lg border border-border px-3 py-2 text-sm [grid-area:1/1]">
+                    {note.trim() ? (
+                      <Note text={note} />
+                    ) : (
+                      <span className="text-muted-foreground">{t('previewEmpty')}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>

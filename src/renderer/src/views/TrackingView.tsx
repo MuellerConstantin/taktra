@@ -17,6 +17,7 @@ import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { DayNavigator } from '../components/molecules/DayNavigator'
+import { ExpandableNote } from '../components/molecules/Note'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
@@ -244,9 +245,7 @@ function TrackingView(): React.JSX.Element {
                     </span>
                   </span>
                   {entry.note && (
-                    <span className="line-clamp-2 text-xs whitespace-pre-line text-muted-foreground">
-                      {entry.note}
-                    </span>
+                    <ExpandableNote text={entry.note} className="text-xs text-muted-foreground" />
                   )}
                   {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                 </div>
