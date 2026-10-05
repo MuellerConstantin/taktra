@@ -4,9 +4,10 @@ import { AppError } from '../../shared/errors'
 import { id, timeEntryInput, timeEntryRange } from '../../shared/validation'
 import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../shared/timeEntries'
 import { getActiveDatabase } from '../db/database'
-import { activities, projects, timeEntries } from '../db/schema'
+import { activities, clients, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { deleteActivityIfUnused, findActivity, tagsByActivity } from './activities'
+import { clientRef, effectiveClientJoin } from './clients'
 
 type TimeEntryValues = Pick<
   TimeEntry,
@@ -56,11 +57,13 @@ export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails
         name: projects.name,
         color: projects.color,
         archivedAt: projects.archivedAt
-      }
+      },
+      client: clientRef
     })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))
+    .leftJoin(clients, effectiveClientJoin)
     .where(where)
     .orderBy(asc(timeEntries.date), asc(timeEntries.startedAt), asc(timeEntries.createdAt))
     .all()

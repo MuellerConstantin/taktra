@@ -102,7 +102,11 @@ function TimerView(): React.JSX.Element {
                   />
                   <span className="truncate">
                     <span className="font-medium">{running.activity.name}</span>
-                    <span className="text-muted-foreground"> · {running.project.name}</span>
+                    <span className="text-muted-foreground">
+                      {' · '}
+                      {running.project.name}
+                      {running.client && ` · ${running.client.name}`}
+                    </span>
                   </span>
                 </span>
                 {running.tags.length > 0 && <TagBadges tags={running.tags} />}
@@ -144,10 +148,13 @@ function TimerView(): React.JSX.Element {
               items={recent.map((item) => ({ ...item, id: item.activity.id }))}
               className="rounded-xl border border-border bg-card"
             >
-              {({ activity, project, tags }) => {
+              {({ activity, project, client, tags }) => {
                 const isRunning = running?.activity.id === activity.id
                 return (
-                  <GridListItem textValue={`${activity.name} ${project.name}`} className="h-auto">
+                  <GridListItem
+                    textValue={`${activity.name} ${project.name} ${client?.name ?? ''}`}
+                    className="h-auto"
+                  >
                     <span
                       aria-hidden
                       className="size-3 shrink-0 rounded-full"
@@ -156,7 +163,11 @@ function TimerView(): React.JSX.Element {
                     <div className="flex min-w-0 flex-1 flex-col py-3">
                       <span className="truncate">
                         <span className="font-medium">{activity.name}</span>
-                        <span className="text-muted-foreground"> · {project.name}</span>
+                        <span className="text-muted-foreground">
+                          {' · '}
+                          {project.name}
+                          {client && ` · ${client.name}`}
+                        </span>
                       </span>
                       {tags.length > 0 && <TagBadges tags={tags} className="mt-2" />}
                     </div>

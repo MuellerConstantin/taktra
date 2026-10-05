@@ -63,15 +63,24 @@ function QuickStartView(): React.JSX.Element {
 
   useEffect(() => {
     let isCurrent = true
-    Promise.all([api.timer.recent(RECENT_LIMIT), api.activities.list(), api.projects.list()])
-      .then(([recentActivities, activities, projects]) => {
+    Promise.all([
+      api.timer.recent(RECENT_LIMIT),
+      api.activities.list(),
+      api.projects.list(),
+      api.clients.list({ includeArchived: true })
+    ])
+      .then(([recentActivities, activities, projects, clients]) => {
         if (!isCurrent) return
         const projectById = new Map(projects.map((project) => [project.id, project]))
+        const clientById = new Map(clients.map((client) => [client.id, client]))
         setRecent(recentActivities.map(toOption))
         setAll(
           activities.flatMap((activity) => {
             const project = projectById.get(activity.projectId)
-            return project ? [toOption({ activity, project, tags: [] })] : []
+            if (!project) return []
+            const clientId = project.clientId ?? activity.clientId
+            const client = clientId === null ? null : (clientById.get(clientId) ?? null)
+            return [toOption({ activity, project, client, tags: [] })]
           })
         )
       })
@@ -134,7 +143,11 @@ function QuickStartView(): React.JSX.Element {
               />
               <span className="min-w-0 flex-1 truncate">
                 <span className="font-medium">{running.activity.name}</span>
-                <span className="text-muted-foreground"> · {running.project.name}</span>
+                <span className="text-muted-foreground">
+                  {' · '}
+                  {running.project.name}
+                  {running.client && ` · ${running.client.name}`}
+                </span>
               </span>
               <span className="text-muted-foreground tabular-nums">
                 {formatElapsed(elapsedSeconds(running.entry.startedAt, now))}
@@ -164,8 +177,11 @@ function QuickStartView(): React.JSX.Element {
                 </p>
               )}
             >
-              {({ activity, project }) => (
-                <ListBoxItem textValue={`${activity.name} ${project.name}`} className={itemStyles}>
+              {({ activity, project, client }) => (
+                <ListBoxItem
+                  textValue={`${activity.name} ${project.name} ${client?.name ?? ''}`}
+                  className={itemStyles}
+                >
                   <span
                     aria-hidden
                     className="size-2.5 shrink-0 rounded-full"
@@ -173,7 +189,11 @@ function QuickStartView(): React.JSX.Element {
                   />
                   <span className="min-w-0 flex-1 truncate">
                     <span className="font-medium">{activity.name}</span>
-                    <span className="text-muted-foreground"> · {project.name}</span>
+                    <span className="text-muted-foreground">
+                      {' · '}
+                      {project.name}
+                      {client && ` · ${client.name}`}
+                    </span>
                   </span>
                 </ListBoxItem>
               )}

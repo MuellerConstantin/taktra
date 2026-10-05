@@ -1,4 +1,4 @@
-import { eq, isNull, or } from 'drizzle-orm'
+import { eq, isNull, or, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import type { Client, ClientData } from '../../shared/clients'
 import { AppError } from '../../shared/errors'
@@ -9,6 +9,14 @@ import { activities, clients, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { sortByName, toNameKey } from './names'
 import { notifyTimerChanged } from './timerEvents'
+
+/** Joins the client that counts for an activity: the one of its project, else its own. */
+export const effectiveClientJoin = eq(
+  clients.id,
+  sql`coalesce(${projects.clientId}, ${activities.clientId})`
+)
+
+export const clientRef = { id: clients.id, name: clients.name }
 
 export function findClient(id: number): Client {
   const client = getActiveDatabase().select().from(clients).where(eq(clients.id, id)).get()

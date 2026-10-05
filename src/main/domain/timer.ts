@@ -4,9 +4,10 @@ import { AppError, isAppError } from '../../shared/errors'
 import { id } from '../../shared/validation'
 import type { ActivityDetails, TimeEntryDetails } from '../../shared/timeEntries'
 import { getActiveDatabase } from '../db/database'
-import { activities, projects, timeEntries } from '../db/schema'
+import { activities, clients, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { findActivity, tagsByActivity } from './activities'
+import { clientRef, effectiveClientJoin } from './clients'
 import { findProject } from './projects'
 import { deleteTimeEntry, selectTimeEntryDetails } from './timeEntries'
 import { notifyTimerChanged } from './timerEvents'
@@ -110,11 +111,13 @@ export function listRecentActivities(limit: number): ActivityDetails[] {
         name: projects.name,
         color: projects.color,
         archivedAt: projects.archivedAt
-      }
+      },
+      client: clientRef
     })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))
+    .leftJoin(clients, effectiveClientJoin)
     .where(and(isNull(activities.archivedAt), isNull(projects.archivedAt)))
     .groupBy(activities.id)
     .orderBy(

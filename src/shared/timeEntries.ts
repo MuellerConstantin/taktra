@@ -2,6 +2,7 @@ import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
 import type { timeEntries } from '../main/db/schema/timeEntries'
 import type { Activity, ActivityTag } from './activities'
+import type { Client } from './clients'
 import type { Project } from './projects'
 import type { timeEntryInput } from './validation/timeEntries'
 
@@ -19,6 +20,7 @@ export interface TimeEntryDetails {
   readonly entry: TimeEntry
   readonly activity: Pick<Activity, 'id' | 'name' | 'archivedAt'>
   readonly project: Pick<Project, 'id' | 'name' | 'color' | 'archivedAt'>
+  readonly client: Pick<Client, 'id' | 'name'> | null
   readonly tags: readonly ActivityTag[]
 }
 
