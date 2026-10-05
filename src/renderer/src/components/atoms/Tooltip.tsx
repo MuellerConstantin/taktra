@@ -11,7 +11,7 @@ export interface TooltipProps extends Omit<RACTooltipProps, 'children'> {
 }
 
 const styles = tv({
-  base: 'group box-border rounded-md border border-border bg-popover px-3 py-1.5 text-xs text-popover-foreground shadow-md will-change-transform'
+  base: 'group box-border rounded-md border border-border bg-popover px-3 py-1.5 text-xs text-popover-foreground shadow-md will-change-transform not-data-placement:invisible'
 })
 
 export function Tooltip({ children, ...props }: TooltipProps): React.JSX.Element {
