@@ -440,7 +440,10 @@
     "searchTags": "Tags suchen",
     "noMatches": "Keine Treffer",
     "format": "Format",
-    "csv": "CSV (RFC 4180, UTF-8)",
+    "formats": {
+      "csv": "CSV (RFC 4180, UTF-8)",
+      "json": "JSON (UTF-8)"
+    },
     "entries": "Einträge",
     "total": "Gesamtzeit",
     "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum.",

@@ -57,7 +57,7 @@ total; per-client sums do add up.
 
 **Export**
 A separate export view writes the completed entries of a period, filtered by
-project, tag and client, to a file (CSV for now) for billing and other systems,
+project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain.
 
 **Sample profile**

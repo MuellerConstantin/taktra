@@ -3,7 +3,13 @@ import { RiDownload2Line } from '@remixicon/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import { exportColumns, type ExportPreview } from '../../../shared/export'
+import {
+  exportColumns,
+  exportFormats,
+  type ExportFormat,
+  type ExportPreview,
+  type ExportRow
+} from '../../../shared/export'
 import type { Client } from '../../../shared/clients'
 import type { Project } from '../../../shared/projects'
 import type { Tag } from '../../../shared/tags'
@@ -16,6 +22,10 @@ import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
+
+function formatCell(value: ExportRow[keyof ExportRow]): string {
+  return Array.isArray(value) ? value.join(', ') : String(value ?? '')
+}
 
 function ExportView(): React.JSX.Element {
   const t = useTranslations('ExportView')
@@ -32,6 +42,7 @@ function ExportView(): React.JSX.Element {
   const [clients, setClients] = useState<readonly Client[]>([])
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [tags, setTags] = useState<readonly Tag[]>([])
+  const [format, setFormat] = useState<ExportFormat>('csv')
   const [preview, setPreview] = useState<ExportPreview | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -81,9 +92,9 @@ function ExportView(): React.JSX.Element {
     }
   }, [activeProfile?.path, filter, errorMessage])
 
-  const exportCsv = async (): Promise<void> => {
+  const exportFile = async (): Promise<void> => {
     try {
-      await api.export.csv(filter)
+      await api.export.file(filter, format)
     } catch (caught) {
       setError(errorMessage(caught))
     }
@@ -95,10 +106,24 @@ function ExportView(): React.JSX.Element {
         title={t('title')}
         help={t('help')}
         actions={
-          <Button onPress={exportCsv} isDisabled={!preview || preview.count === 0}>
-            <RiDownload2Line className="size-4" />
-            {t('export')}
-          </Button>
+          <>
+            <Select
+              aria-label={t('format')}
+              value={format}
+              onChange={(key) => key && setFormat(key as ExportFormat)}
+              className="w-48"
+            >
+              {exportFormats.map((option) => (
+                <SelectItem key={option} id={option}>
+                  {t(`formats.${option}`)}
+                </SelectItem>
+              ))}
+            </Select>
+            <Button onPress={exportFile} isDisabled={!preview || preview.count === 0}>
+              <RiDownload2Line className="size-4" />
+              {t('export')}
+            </Button>
+          </>
         }
       >
         <div className="flex flex-wrap items-center gap-2 pb-4">
@@ -152,11 +177,7 @@ function ExportView(): React.JSX.Element {
       </ViewHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-8 py-6">
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <dl className="grid grid-cols-3 gap-3">
-          <div className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3">
-            <dt className="text-xs text-muted-foreground">{t('format')}</dt>
-            <dd className="text-sm font-medium">{t('csv')}</dd>
-          </div>
+        <dl className="grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3">
             <dt className="text-xs text-muted-foreground">{t('entries')}</dt>
             <dd className="text-xl font-semibold tabular-nums">{preview?.count ?? 0}</dd>
@@ -194,9 +215,9 @@ function ExportView(): React.JSX.Element {
                         <td
                           key={column}
                           className="max-w-64 truncate px-3 py-2 align-top"
-                          title={String(row[column] ?? '')}
+                          title={formatCell(row[column])}
                         >
-                          {row[column]}
+                          {formatCell(row[column])}
                         </td>
                       ))}
                     </tr>
