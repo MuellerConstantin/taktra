@@ -1,8 +1,10 @@
+import { readFileSync } from 'node:fs'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   type CallToolResult,
+  type Icon,
   type Tool
 } from '@modelcontextprotocol/sdk/types.js'
 import { app } from 'electron'
@@ -12,6 +14,8 @@ import type { TimeEntryDetails } from '../../shared/timeEntries'
 import { name } from '../../shared/validation'
 import { findBookableActivities } from '../domain/activities'
 import { getRunningTimer, startTimer } from '../domain/timer'
+import iconPng from '../../../resources/icon.png?asset'
+import iconSvg from '../../../resources/icon.svg?asset'
 
 const startTimerInput = z.object({
   activity: name.describe('Name of the activity, as shown in Taktra'),
@@ -84,9 +88,25 @@ function callTool(toolName: string, args: unknown): CallToolResult {
   }
 }
 
+function embeddedIcon(path: string, mimeType: string, sizes: string[]): Icon {
+  return {
+    src: `data:${mimeType};base64,${readFileSync(path).toString('base64')}`,
+    mimeType,
+    sizes
+  }
+}
+
 export function createMcpServer(): Server {
   const server = new Server(
-    { name: 'taktra', version: app.getVersion() },
+    {
+      name: 'taktra',
+      title: 'Taktra',
+      version: app.getVersion(),
+      icons: [
+        embeddedIcon(iconSvg, 'image/svg+xml', ['any']),
+        embeddedIcon(iconPng, 'image/png', ['1024x1024'])
+      ]
+    },
     { capabilities: { tools: {} } }
   )
   server.setRequestHandler(ListToolsRequestSchema, () => ({ tools }))
