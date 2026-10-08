@@ -61,9 +61,9 @@ project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain.
 
 **AI assistants**
-When the user turns it on, AI assistants such as Claude can list and search
-projects and activities, see the running timer, and start and stop the timer
-through MCP. The settings
+When the user turns it on, AI assistants such as Claude can list, search and
+switch profiles, list and search projects and activities, see the running
+timer, and start and stop the timer through MCP. The settings
 connect Taktra to known assistants (Claude Desktop, Claude Code) with one
 click and show the values for setting up any other MCP client by hand.
 
@@ -195,7 +195,7 @@ in `src/main/`.
   `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog) are
   returned as values.
 - **Main broadcasts, windows reload**: When state that several windows show
-  changes (running timer and what it displays, app settings), the main process
+  changes (running timer and what it displays, app settings, profiles), the main process
   sends an event to all windows and each one reloads what it needs.
 - **Several windows, one renderer**: The mini timer and the quick start are
   routes of the same renderer, opened as small frameless windows with the same
@@ -247,6 +247,11 @@ in `src/main/`.
 - **No active profile is a first-class state**: All profile-dependent routes
   render the welcome view (create or open a profile) instead while no profile
   is usable. App settings stay reachable.
+- **A profile switch resets the profile views**: Profile-dependent routes are
+  keyed by the active profile, so a switch from anywhere (the UI or an
+  assistant) discards open dialogs and unsaved input of the old profile. Detail
+  routes go back to their list, because their ids mean something else in
+  another profile.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk.
 - **Theme via semantic tokens**: Colors, radii and shadows are CSS variables

@@ -17,6 +17,12 @@ export function AppTemplate(): React.JSX.Element {
   const hasProfile = activeProfile?.isAvailable ?? false
   const { running, stop } = useTimer()
   const [isPaletteOpen, setPaletteOpen] = useState(false)
+  const [paletteProfile, setPaletteProfile] = useState(activeProfile?.path)
+
+  if (paletteProfile !== activeProfile?.path) {
+    setPaletteProfile(activeProfile?.path)
+    setPaletteOpen(false)
+  }
 
   useShortcut(appShortcuts.timer, () => navigate('/timer'), hasProfile)
   useShortcut(appShortcuts.entries, () => navigate('/tracking'), hasProfile)

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { basename } from 'node:path'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import {
   CallToolRequestSchema,
@@ -11,13 +12,13 @@ import { app } from 'electron'
 import { z } from 'zod'
 import { isAppError } from '../../shared/errors'
 import type { ActivityDetails, TimeEntryDetails } from '../../shared/timeEntries'
-import { MAX_NAME_LENGTH, id, name } from '../../shared/validation'
+import { MAX_NAME_LENGTH, filePath, id, name } from '../../shared/validation'
 import { listBookableActivities } from '../domain/activities'
 import { listClients } from '../domain/clients'
 import { toNameKey } from '../domain/names'
 import { listProjects } from '../domain/projects'
-import { getRunningTimer, startTimer, stopTimer } from '../domain/timer'
-import { getActiveProfileName } from '../profiles'
+import { getRunningTimer, hasRunningTimer, startTimer, stopTimer } from '../domain/timer'
+import { getActiveProfileName, getProfilesState, setActiveProfile } from '../profiles'
 import iconPng from '../../../resources/icon.png?asset'
 import iconSvg from '../../../resources/icon.svg?asset'
 
@@ -45,6 +46,12 @@ const listActivitiesInput = z
   .refine(requiresProfile, { message: 'profile is required with projectId', path: ['profile'] })
 
 const searchProjectsInput = z.object({ query })
+
+const searchProfilesInput = z.object({ query })
+
+const switchProfileInput = z.object({
+  path: filePath.describe('Path of the profile file, from list_profiles or search_profiles')
+})
 
 const searchActivitiesInput = z
   .object({
@@ -121,10 +128,20 @@ function describeBooking(booked: TimeEntryDetails | null): object {
   }
 }
 
+function activeProfileName(): string | null {
+  try {
+    return getActiveProfileName()
+  } catch (error) {
+    if (isAppError(error, 'NO_ACTIVE_PROFILE')) return null
+    throw error
+  }
+}
+
 /** Refuses ids from another profile, which would silently mean other projects or activities. */
 function assertActiveProfile(expected: string | undefined): void {
   if (expected === undefined) return
-  const activeProfile = getActiveProfileName()
+  const activeProfile = activeProfileName()
+  if (activeProfile === null) throw new ToolError('No profile is open in Taktra.')
   if (expected !== activeProfile)
     throw new ToolError(
       `The active profile is "${activeProfile}", not "${expected}". Look up the ids again.`
@@ -145,6 +162,35 @@ function startTimerById(args: unknown): TimeEntryDetails {
   }
 }
 
+function describeProfiles(): {
+  readonly path: string
+  readonly name: string
+  readonly active: boolean
+  readonly available: boolean
+}[] {
+  const { profiles, activePath } = getProfilesState()
+  return profiles.map((profile) => ({
+    path: profile.path,
+    name: profile.name ?? basename(profile.path),
+    active: profile.path === activePath,
+    available: profile.isAvailable
+  }))
+}
+
+function switchProfile(args: unknown): object {
+  const { path } = parse(switchProfileInput, args)
+  const { profiles, activePath } = getProfilesState()
+  const target = profiles.find((profile) => profile.path === path)
+  if (!target) throw new ToolError(`No profile with path "${path}". Use list_profiles.`)
+  if (!target.isAvailable)
+    throw new ToolError(`The profile "${target.name ?? basename(path)}" cannot be opened.`)
+  if (path === activePath) return { switched: false }
+
+  const stopped = hasRunningTimer() ? stopTimer() : null
+  setActiveProfile(path)
+  return { switched: true, stoppedTimer: stopped && describeBooking(stopped) }
+}
+
 interface ToolDefinition {
   readonly title: string
   readonly description: string
@@ -161,6 +207,31 @@ const definitions: Readonly<Record<string, ToolDefinition>> = {
     input: noInput,
     annotations: { readOnlyHint: true },
     run: () => ({})
+  },
+  list_profiles: {
+    title: 'List profiles',
+    description:
+      'Lists the profiles known to Taktra. Each profile is a separate file with its own projects and activities.',
+    input: noInput,
+    annotations: { readOnlyHint: true },
+    run: () => ({ profiles: describeProfiles() })
+  },
+  search_profiles: {
+    title: 'Search profiles',
+    description: 'Finds profiles known to Taktra by part of their name.',
+    input: searchProfilesInput,
+    annotations: { readOnlyHint: true },
+    run: (args) => {
+      const { query } = parse(searchProfilesInput, args)
+      return { profiles: describeProfiles().filter((profile) => matches(profile.name, query)) }
+    }
+  },
+  switch_profile: {
+    title: 'Switch profile',
+    description:
+      'Opens another profile in Taktra. A running timer is stopped and booked first. Ids from the previous profile are no longer valid.',
+    input: switchProfileInput,
+    run: switchProfile
   },
   get_running_timer: {
     title: 'Show running timer',
@@ -258,7 +329,7 @@ function callTool(toolName: string, args: unknown): CallToolResult {
     const definition = definitions[toolName]
     if (!definition) throw new ToolError(`Unknown tool "${toolName}".`)
     const result = definition.run(args)
-    const text = JSON.stringify({ profile: getActiveProfileName(), ...result })
+    const text = JSON.stringify({ profile: activeProfileName(), ...result })
     return { content: [{ type: 'text', text }] }
   } catch (error) {
     return { isError: true, content: [{ type: 'text', text: errorMessage(toolName, error) }] }

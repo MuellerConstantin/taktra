@@ -146,6 +146,7 @@ const api = {
   events: {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback),
     onSettingsChanged: (callback: () => void) => subscribe('settings:changed', callback),
+    onProfilesChanged: (callback: () => void) => subscribe('profiles:changed', callback),
     onQuickShown: (callback: () => void) => subscribe('quick:shown', callback),
     onShowAbout: (callback: () => void) => subscribe('about:show', callback),
     onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback)

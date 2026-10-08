@@ -88,12 +88,17 @@ function unavailableReasonOf(
   return null
 }
 
+function notifyProfilesChanged(): void {
+  for (const window of BrowserWindow.getAllWindows()) window.webContents.send('profiles:changed')
+}
+
 function updateKnownProfiles(paths: string[], activePath: string | null): void {
   const previousPath = store.get('activePath')
   if (previousPath && previousPath !== activePath && isActiveDatabase(previousPath)) stopTimer()
 
   store.set({ paths, activePath })
   syncActiveDatabase()
+  notifyProfilesChanged()
 }
 
 export function getActiveProfileName(): string {
@@ -160,6 +165,7 @@ export function renameProfile(path: string, name: string): ProfilesState {
   if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 
   withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', name))
+  notifyProfilesChanged()
 
   return getProfilesState()
 }

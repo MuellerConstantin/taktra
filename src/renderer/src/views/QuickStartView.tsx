@@ -14,6 +14,7 @@ import type { ActivityDetails } from '../../../shared/timeEntries'
 import { Button } from '../components/atoms/Button'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'
+import { useProfiles } from '../hooks/useProfiles'
 import { useTimer } from '../hooks/useTimer'
 import { api, events } from '../lib/api'
 import { elapsedSeconds, formatElapsed } from '../lib/duration'
@@ -41,6 +42,7 @@ function QuickStartView(): React.JSX.Element {
   const errorMessage = useErrorMessage()
   const { contains } = useFilter({ sensitivity: 'base' })
   const { running, revision, start, stop } = useTimer()
+  const { activeProfile } = useProfiles()
   const now = useNow(running !== null)
   const [query, setQuery] = useState('')
   const [recent, setRecent] = useState<readonly Option[]>([])
@@ -88,7 +90,7 @@ function QuickStartView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [shownCount, revision, errorMessage])
+  }, [shownCount, revision, activeProfile?.path, errorMessage])
 
   useEffect(() => {
     const root = rootRef.current

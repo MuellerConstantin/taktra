@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ProfilesState } from '../../../shared/profiles'
-import { api } from '../lib/api'
+import { api, events } from '../lib/api'
 import { ProfilesContext } from './ProfilesContext'
 
 interface ProfilesProviderProps {
@@ -11,7 +11,11 @@ function ProfilesProvider({ children }: ProfilesProviderProps): React.JSX.Elemen
   const [state, setState] = useState<ProfilesState | null>(null)
 
   useEffect(() => {
-    api.profiles.get().then(setState)
+    const reload = (): void => {
+      api.profiles.get().then(setState).catch(console.error)
+    }
+    reload()
+    return events.onProfilesChanged(reload)
   }, [])
 
   const createProfile = useCallback(async (name: string, path: string) => {
