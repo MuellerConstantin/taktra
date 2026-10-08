@@ -460,7 +460,8 @@
     "appearance": "Appearance",
     "controls": "Controls",
     "about": "About Taktra",
-    "updates": "Updates"
+    "updates": "Updates",
+    "assistants": "AI assistants"
   },
   "AppearanceSettings": {
     "theme": {
@@ -519,6 +520,22 @@
     "title": "Updates",
     "label": "Check for updates automatically",
     "description": "Looks for new versions on GitHub at start and every few hours. Updates are downloaded in the background and installed when you quit Taktra. Without a connection, nothing happens."
+  },
+  "AssistantsSettings": {
+    "title": "AI assistants",
+    "label": "Allow access for AI assistants",
+    "description": "Assistants such as Claude can see the running timer and start a timer for an activity. They connect through MCP, the Model Context Protocol.",
+    "privacy": "Taktra itself sends nothing. What an assistant reads from Taktra is sent to the provider of its AI model, like the rest of the chat.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "setup": {
+      "title": "Setup",
+      "description": "Add Taktra to your assistant once. When the assistant needs Taktra and it is not running, it starts in the tray. If you move Taktra to another folder, copy the setup again.",
+      "claudeDesktop": "Claude Desktop",
+      "claudeDesktopDescription": "Add this to the configuration file of Claude Desktop, then restart Claude Desktop.",
+      "claudeCode": "Claude Code",
+      "claudeCodeDescription": "Run this command once in a terminal."
+    }
   },
   "ShortcutRecorder": {
     "recording": "Press keys…"

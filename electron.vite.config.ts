@@ -6,7 +6,13 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   main: {
     build: {
-      externalizeDeps: { exclude: ['electron-store'] }
+      externalizeDeps: { exclude: ['electron-store'] },
+      rollupOptions: {
+        input: {
+          index: resolve('src/main/index.ts'),
+          mcp: resolve('src/main/mcpBridge.ts')
+        }
+      }
     }
   },
   preload: {},

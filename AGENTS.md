@@ -60,6 +60,11 @@ A separate export view writes the completed entries of a period, filtered by
 project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain.
 
+**AI assistants**
+When the user turns it on, AI assistants such as Claude can see the running
+timer and start a timer for an existing activity through MCP. The settings
+show the setup for Claude Desktop and Claude Code.
+
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
 development.
@@ -76,6 +81,7 @@ development.
 - **Charts**: nivo
 - **App settings**: `electron-store`
 - **Export**: `csv-stringify` (main process only)
+- **AI assistants**: `@modelcontextprotocol/sdk` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
 
 ## Project Structure
@@ -203,6 +209,15 @@ in `src/main/`.
   never updates itself (the updater would run the installer and leave a second
   copy), it only points to the download. Releases are created as drafts, so
   nothing reaches installed apps before it is published by hand.
+- **MCP through the running app**: The app is the only process that touches
+  the profile, so MCP tools run in the main process and broadcast like any
+  other change. Clients start `out/main/mcp.js` with the app's executable and
+  `ELECTRON_RUN_AS_NODE=1`, because Electron in app mode cannot serve stdio on
+  Windows. This bridge must not import electron; it connects stdio to a per-user
+  named pipe (a socket elsewhere) and starts the app with `--hidden`, tray only,
+  if it is not running. The pipe exists only while access is turned on (off by
+  default), and no network port is opened. The bridge depends on Electron's
+  `RunAsNode` fuse staying enabled.
 - **Two names**: "Taktra" is the display name (window and dialog titles,
   installer, UI text), "taktra" the technical one (package, executable, app id,
   user data folder, generated file names). The user data folder is pinned to

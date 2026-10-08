@@ -6,6 +6,7 @@ import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AppInfo } from '../shared/about'
 import type { ExportFormat, ExportPreview } from '../shared/export'
+import type { McpClientConfig } from '../shared/mcp'
 import type { UpdateStatus } from '../shared/updates'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
@@ -123,6 +124,9 @@ const api = {
     setQuickStart: (accelerator: string) =>
       invoke<Settings>('shortcuts:setQuickStart', accelerator),
     setRecording: (recording: boolean) => invoke<void>('shortcuts:setRecording', recording)
+  },
+  mcp: {
+    config: () => invoke<McpClientConfig>('mcp:config')
   },
   quick: {
     hide: () => invoke<void>('quick:hide'),

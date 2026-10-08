@@ -88,6 +88,30 @@ export function getActivityDetails(id: number): ActivityDetails {
   return { ...row, tags: tagsByActivity([id]).get(id) ?? [] }
 }
 
+/** Activities that can be booked on, matched by name regardless of case. */
+export function findBookableActivities(
+  activityName: string,
+  projectName?: string
+): ActivityDetails[] {
+  const rows = getActiveDatabase()
+    .select(activityDetailsColumns)
+    .from(activities)
+    .innerJoin(projects, eq(activities.projectId, projects.id))
+    .leftJoin(clients, effectiveClientJoin)
+    .where(
+      and(
+        eq(activities.nameKey, toNameKey(activityName)),
+        projectName === undefined ? undefined : eq(projects.nameKey, toNameKey(projectName)),
+        isNull(activities.archivedAt),
+        isNull(projects.archivedAt)
+      )
+    )
+    .all()
+
+  const tagMap = tagsByActivity(rows.map((row) => row.activity.id))
+  return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
+}
+
 function assertClientAssignable(projectId: number, clientId: number | null): void {
   if (clientId === null) return
   if (findProject(projectId).clientId !== null)

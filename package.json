@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "better-sqlite3": "^13.0.3",
     "csv-stringify": "^6.9.0",
     "drizzle-orm": "^0.45.3",

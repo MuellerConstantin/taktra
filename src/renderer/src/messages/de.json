@@ -460,7 +460,8 @@
     "appearance": "Darstellung",
     "controls": "Bedienung",
     "about": "Über Taktra",
-    "updates": "Updates"
+    "updates": "Updates",
+    "assistants": "KI-Assistenten"
   },
   "AppearanceSettings": {
     "theme": {
@@ -519,6 +520,22 @@
     "title": "Updates",
     "label": "Automatisch nach Updates suchen",
     "description": "Sucht beim Start und alle paar Stunden auf GitHub nach neuen Versionen. Updates werden im Hintergrund geladen und beim Beenden von Taktra installiert. Ohne Verbindung passiert nichts."
+  },
+  "AssistantsSettings": {
+    "title": "KI-Assistenten",
+    "label": "Zugriff für KI-Assistenten erlauben",
+    "description": "Assistenten wie Claude können den laufenden Timer sehen und einen Timer für eine Tätigkeit starten. Sie verbinden sich über MCP, das Model Context Protocol.",
+    "privacy": "Taktra selbst sendet nichts. Was ein Assistent aus Taktra liest, geht wie der übrige Chat an den Anbieter seines KI-Modells.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "setup": {
+      "title": "Einrichtung",
+      "description": "Trage Taktra einmal in deinem Assistenten ein. Braucht der Assistent Taktra und es läuft nicht, startet es im Tray. Verschiebst du Taktra in einen anderen Ordner, kopiere die Einrichtung erneut.",
+      "claudeDesktop": "Claude Desktop",
+      "claudeDesktopDescription": "Füge das in die Konfigurationsdatei von Claude Desktop ein und starte Claude Desktop danach neu.",
+      "claudeCode": "Claude Code",
+      "claudeCodeDescription": "Führe diesen Befehl einmal in einem Terminal aus."
+    }
   },
   "ShortcutRecorder": {
     "recording": "Tasten drücken…"

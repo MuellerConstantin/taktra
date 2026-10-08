@@ -19,7 +19,8 @@ const store = new Store<Settings>({
     miniTimer: { type: 'boolean', default: true },
     quickStartShortcutEnabled: { type: 'boolean', default: true },
     quickStartShortcut: { type: 'string', minLength: 1, default: DEFAULT_QUICK_START_SHORTCUT },
-    autoUpdate: { type: 'boolean', default: true }
+    autoUpdate: { type: 'boolean', default: true },
+    mcpAccess: { type: 'boolean', default: false }
   },
   clearInvalidConfig: true
 })
