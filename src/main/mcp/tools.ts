@@ -1,8 +1,4 @@
-import { rmSync } from 'node:fs'
-import { createServer, type Server as PipeServer, type Socket } from 'node:net'
-import { join } from 'node:path'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -12,14 +8,10 @@ import {
 import { app } from 'electron'
 import { z } from 'zod'
 import { isAppError } from '../../shared/errors'
-import type { McpClientConfig } from '../../shared/mcp'
 import type { TimeEntryDetails } from '../../shared/timeEntries'
 import { name } from '../../shared/validation'
 import { findBookableActivities } from '../domain/activities'
 import { getRunningTimer, startTimer } from '../domain/timer'
-import { handle } from '../ipc'
-import { mcpPipePath } from '../mcpPipe'
-import { getSettings, onSettingsChanged } from '../settings'
 
 const startTimerInput = z.object({
   activity: name.describe('Name of the activity, as shown in Taktra'),
@@ -92,7 +84,7 @@ function callTool(toolName: string, args: unknown): CallToolResult {
   }
 }
 
-function createMcpServer(): Server {
+export function createMcpServer(): Server {
   const server = new Server(
     { name: 'taktra', version: app.getVersion() },
     { capabilities: { tools: {} } }
@@ -102,50 +94,4 @@ function createMcpServer(): Server {
     callTool(request.params.name, request.params.arguments)
   )
   return server
-}
-
-let pipeServer: PipeServer | null = null
-const connections = new Set<Socket>()
-
-function startServing(): void {
-  if (pipeServer) return
-  const path = mcpPipePath()
-  // A socket file left behind by a crash blocks listening; the single instance lock means no
-  // other Taktra uses it. Named pipes on Windows vanish with their process.
-  if (process.platform !== 'win32') rmSync(path, { force: true })
-
-  pipeServer = createServer((socket) => {
-    connections.add(socket)
-    socket.on('close', () => connections.delete(socket))
-    createMcpServer()
-      .connect(new StdioServerTransport(socket, socket))
-      .catch((error) => console.error('MCP connection failed', error))
-  })
-  pipeServer.on('error', (error) => console.error('MCP pipe failed', error))
-  pipeServer.listen(path)
-}
-
-function stopServing(): void {
-  pipeServer?.close()
-  pipeServer = null
-  for (const socket of connections) socket.destroy()
-}
-
-function applyMcpAccess(): void {
-  if (getSettings().mcpAccess) startServing()
-  else stopServing()
-}
-
-function getMcpClientConfig(): McpClientConfig {
-  return {
-    command: process.execPath,
-    args: [join(app.getAppPath(), 'out', 'main', 'mcp.js')],
-    env: { ELECTRON_RUN_AS_NODE: '1' }
-  }
-}
-
-export function initMcp(): void {
-  applyMcpAccess()
-  onSettingsChanged(applyMcpAccess)
-  handle('mcp:config', z.tuple([]), () => getMcpClientConfig())
 }

@@ -63,7 +63,8 @@ with a preview of what the file will contain.
 **AI assistants**
 When the user turns it on, AI assistants such as Claude can see the running
 timer and start a timer for an existing activity through MCP. The settings
-show the setup for Claude Desktop and Claude Code.
+connect Taktra to known assistants (Claude Desktop, Claude Code) with one
+click and show the values for setting up any other MCP client by hand.
 
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
@@ -91,7 +92,8 @@ src/
 ├── main/              # Electron main process
 │   ├── db/            # Connection, migrations, schema, backups, sample data
 │   ├── domain/        # Data of the active profile and its IPC handlers; uses db/, never desktop/
-│   └── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
+│   ├── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
+│   └── mcp/           # MCP server, stdio bridge and client setup; uses domain/, never db/
 ├── preload/           # Typed `window.api` bridge
 ├── shared/            # Types used by main, preload and renderer
 │   └── validation/    # Zod schemas per domain, text length limits
@@ -218,6 +220,14 @@ in `src/main/`.
   if it is not running. The pipe exists only while access is turned on (off by
   default), and no network port is opened. The bridge depends on Electron's
   `RunAsNode` fuse staying enabled.
+- **Connecting assistants by writing their configuration**: Like Docker's MCP
+  Toolkit, Taktra adds or removes its own entry in the configuration of known
+  clients, only on an explicit click. Each client implements one interface
+  (detect, read, write, remove its entry); clients with a JSON file share one
+  implementation, others bring their own. A file that cannot be parsed is never
+  touched, and writes go through a temporary file, so a client reading at the
+  same moment never sees a half-written one. A client counts as installed when
+  its data folder exists, because its configuration file may not exist yet.
 - **Two names**: "Taktra" is the display name (window and dialog titles,
   installer, UI text), "taktra" the technical one (package, executable, app id,
   user data folder, generated file names). The user data folder is pinned to

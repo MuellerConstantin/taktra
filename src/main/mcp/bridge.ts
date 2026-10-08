@@ -4,11 +4,12 @@
  * Electron in app mode cannot serve stdio on Windows, and this file runs as plain Node, so it
  * must not import electron.
  */
+
 import { spawn } from 'node:child_process'
 import { connect } from 'node:net'
 import { resolve } from 'node:path'
-import { START_HIDDEN_ARG } from './constants'
-import { mcpPipePath } from './mcpPipe'
+import { START_HIDDEN_ARG } from '../constants'
+import { mcpPipePath } from './pipe'
 
 const RETRY_MS = 100
 const START_TIMEOUT_MS = 15_000

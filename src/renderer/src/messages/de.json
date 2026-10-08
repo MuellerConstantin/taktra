@@ -529,17 +529,32 @@
     "copy": "Kopieren",
     "copied": "Kopiert",
     "setup": {
-      "title": "Einrichtung",
-      "description": "Trage Taktra einmal in deinem Assistenten ein. Braucht der Assistent Taktra und es läuft nicht, startet es im Tray. Verschiebst du Taktra in einen anderen Ordner, kopiere die Einrichtung erneut.",
-      "generic": "Jeder MCP-Client",
-      "genericDescription": "Trage Taktra mit diesen Werten als lokalen Server (stdio) ein. Wo das geht, hängt vom Assistenten ab.",
+      "title": "Verbinden",
+      "description": "Verbinde einen Assistenten einmal. Braucht er Taktra und es läuft nicht, startet Taktra im Tray.",
+      "restart": "Starte {name} neu, damit die Änderung wirkt.",
+      "other": "Du nutzt einen anderen Assistenten?"
+    },
+    "clients": {
+      "states": {
+        "notInstalled": "Nicht installiert",
+        "disconnected": "Nicht verbunden",
+        "connected": "Verbunden",
+        "outdated": "Mit Taktra in einem anderen Ordner verbunden",
+        "invalid": "Seine Konfigurationsdatei ist nicht lesbar"
+      },
+      "connect": "Verbinden",
+      "reconnect": "Erneut verbinden",
+      "disconnect": "Trennen",
+      "download": "Herunterladen",
+      "manual": "Verbinden fügt diesen Eintrag in {path} ein. Du kannst ihn auch selbst eintragen:"
+    },
+    "manual": {
+      "title": "Eigenen MCP-Client verbinden",
+      "subtitle": "Jeden MCP-Client von Hand einrichten",
+      "description": "Trage Taktra mit diesen Werten als lokalen Server (stdio) ein. Wo das geht, hängt vom Assistenten ab.",
       "command": "Befehl",
       "arguments": "Argument",
-      "environment": "Umgebungsvariable",
-      "claudeDesktop": "Claude Desktop",
-      "claudeDesktopDescription": "Füge das in die Konfigurationsdatei von Claude Desktop ein und starte Claude Desktop danach neu.",
-      "claudeCode": "Claude Code",
-      "claudeCodeDescription": "Führe diesen Befehl einmal in einem Terminal aus."
+      "environment": "Umgebungsvariable"
     }
   },
   "ShortcutRecorder": {
@@ -593,6 +608,8 @@
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
-    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?"
+    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
+    "MCP_CLIENT_CONFIG_INVALID": "Die Konfigurationsdatei des Assistenten ist nicht lesbar. Taktra lässt sie unverändert.",
+    "MCP_CLIENT_CONFIG_WRITE_FAILED": "Die Konfigurationsdatei des Assistenten konnte nicht geschrieben werden."
   }
 }

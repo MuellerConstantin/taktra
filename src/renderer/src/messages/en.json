@@ -529,17 +529,32 @@
     "copy": "Copy",
     "copied": "Copied",
     "setup": {
-      "title": "Setup",
-      "description": "Add Taktra to your assistant once. When the assistant needs Taktra and it is not running, it starts in the tray. If you move Taktra to another folder, copy the setup again.",
-      "generic": "Any MCP client",
-      "genericDescription": "Add Taktra as a local server (stdio) with these values. Where to enter them depends on the assistant.",
+      "title": "Connect",
+      "description": "Connect an assistant once. When it needs Taktra and Taktra is not running, it starts in the tray.",
+      "restart": "Restart {name} for the change to take effect.",
+      "other": "Using another assistant?"
+    },
+    "clients": {
+      "states": {
+        "notInstalled": "Not installed",
+        "disconnected": "Not connected",
+        "connected": "Connected",
+        "outdated": "Connected to Taktra in another folder",
+        "invalid": "Its configuration file cannot be read"
+      },
+      "connect": "Connect",
+      "reconnect": "Reconnect",
+      "disconnect": "Disconnect",
+      "download": "Download",
+      "manual": "Connecting adds this entry to {path}. You can also add it yourself:"
+    },
+    "manual": {
+      "title": "Connect your MCP client",
+      "subtitle": "Set up any MCP client by hand",
+      "description": "Add Taktra as a local server (stdio) with these values. Where to enter them depends on the assistant.",
       "command": "Command",
       "arguments": "Argument",
-      "environment": "Environment variable",
-      "claudeDesktop": "Claude Desktop",
-      "claudeDesktopDescription": "Add this to the configuration file of Claude Desktop, then restart Claude Desktop.",
-      "claudeCode": "Claude Code",
-      "claudeCodeDescription": "Run this command once in a terminal."
+      "environment": "Environment variable"
     }
   },
   "ShortcutRecorder": {
@@ -593,6 +608,8 @@
     "VALIDATION_FAILED": "The input is invalid.",
     "UNKNOWN": "Something went wrong. Please try again.",
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
-    "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?"
+    "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
+    "MCP_CLIENT_CONFIG_INVALID": "The configuration file of the assistant cannot be read. Taktra leaves it unchanged.",
+    "MCP_CLIENT_CONFIG_WRITE_FAILED": "The configuration file of the assistant could not be written."
   }
 }

@@ -10,7 +10,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: resolve('src/main/index.ts'),
-          mcp: resolve('src/main/mcpBridge.ts')
+          mcp: resolve('src/main/mcp/bridge.ts')
         }
       }
     }

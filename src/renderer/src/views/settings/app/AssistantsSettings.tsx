@@ -1,7 +1,7 @@
-import { RiCheckLine, RiFileCopyLine } from '@remixicon/react'
+import { RiCheckLine, RiExternalLinkLine, RiFileCopyLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import type { McpClientConfig } from '../../../../../shared/mcp'
+import type { McpClientConfig, McpClientStatus } from '../../../../../shared/mcp'
 import { Button } from '../../../components/atoms/Button'
 import {
   Disclosure,
@@ -14,17 +14,7 @@ import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useSettings } from '../../../hooks/useSettings'
 import { api } from '../../../lib/api'
 
-const SERVER_NAME = 'taktra'
-
-function claudeDesktopConfig(config: McpClientConfig): string {
-  return JSON.stringify({ mcpServers: { [SERVER_NAME]: config } }, null, 2)
-}
-
-function claudeCodeCommand({ command, args, env }: McpClientConfig): string {
-  const envOptions = Object.entries(env).map(([key, value]) => `--env ${key}=${value}`)
-  const quoted = [command, ...args].map((part) => `"${part}"`)
-  return ['claude mcp add', SERVER_NAME, '--scope user', ...envOptions, '--', ...quoted].join(' ')
-}
+const cardClassName = 'overflow-hidden rounded-xl border border-border bg-card'
 
 function CopyButton({ text }: { readonly text: string }): React.JSX.Element {
   const t = useTranslations('AssistantsSettings')
@@ -53,29 +43,8 @@ function Code({ children }: { readonly children: string }): React.JSX.Element {
   )
 }
 
-interface ClientSetupProps {
-  readonly id: string
-  readonly title: string
-  readonly description: string
-  readonly code: string
-}
-
-function ClientSetup({ id, title, description, code }: ClientSetupProps): React.JSX.Element {
-  return (
-    <Disclosure id={id} className="border-b border-border last:border-b-0">
-      <DisclosureHeader className="px-4 py-3 font-medium">{title}</DisclosureHeader>
-      <DisclosurePanel>
-        <div className="flex flex-col gap-3 px-4 pb-4">
-          <p className="text-sm text-muted-foreground">{description}</p>
-          <Code>{code}</Code>
-        </div>
-      </DisclosurePanel>
-    </Disclosure>
-  )
-}
-
-function GenericSetup({ config }: { readonly config: McpClientConfig }): React.JSX.Element {
-  const t = useTranslations('AssistantsSettings.setup')
+function ManualSetup({ config }: { readonly config: McpClientConfig }): React.JSX.Element {
+  const t = useTranslations('AssistantsSettings.manual')
   const values = [
     { label: t('command'), value: config.command },
     { label: t('arguments'), value: config.args.join(' ') },
@@ -88,22 +57,94 @@ function GenericSetup({ config }: { readonly config: McpClientConfig }): React.J
   ]
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-      <div className="flex flex-col gap-0.5">
-        <span className="text-sm font-medium">{t('generic')}</span>
-        <span className="text-sm text-muted-foreground">{t('genericDescription')}</span>
+    <Disclosure id="manual" className={cardClassName}>
+      <DisclosureHeader className="px-4 py-3">
+        <span className="flex min-w-0 flex-col">
+          <span className="font-medium">{t('title')}</span>
+          <span className="text-muted-foreground">{t('subtitle')}</span>
+        </span>
+      </DisclosureHeader>
+      <DisclosurePanel>
+        <div className="flex flex-col gap-3 px-4 pb-4">
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
+          <dl className="flex flex-col gap-2">
+            {values.map(({ label, value }) => (
+              <div key={label} className="flex flex-col gap-1">
+                <dt className="text-xs text-muted-foreground">{label}</dt>
+                <dd>
+                  <Code>{value}</Code>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </DisclosurePanel>
+    </Disclosure>
+  )
+}
+
+interface ClientRowProps {
+  readonly client: McpClientStatus
+  readonly onConnect: () => void
+  readonly onDisconnect: () => void
+}
+
+function ClientAction({ client, onConnect, onDisconnect }: ClientRowProps): React.JSX.Element {
+  const t = useTranslations('AssistantsSettings.clients')
+
+  switch (client.state) {
+    case 'notInstalled':
+      return (
+        <Button variant="secondary" onPress={() => window.open(client.downloadUrl, '_blank')}>
+          <RiExternalLinkLine className="size-4" />
+          {t('download')}
+        </Button>
+      )
+    case 'disconnected':
+      return <Button onPress={onConnect}>{t('connect')}</Button>
+    case 'outdated':
+      return <Button onPress={onConnect}>{t('reconnect')}</Button>
+    case 'connected':
+      return (
+        <Button variant="secondary" onPress={onDisconnect}>
+          {t('disconnect')}
+        </Button>
+      )
+    case 'invalid':
+      return <></>
+  }
+}
+
+function ClientRow(props: ClientRowProps): React.JSX.Element {
+  const t = useTranslations('AssistantsSettings.clients')
+  const { client } = props
+
+  return (
+    <Disclosure id={client.id} className="border-b border-border last:border-b-0">
+      <div className="flex items-center gap-3 pr-4">
+        <div className="min-w-0 flex-1">
+          <DisclosureHeader className="px-4 py-3">
+            <span className="flex min-w-0 flex-col">
+              <span className="font-medium">{client.name}</span>
+              <span
+                className={client.state === 'connected' ? 'text-primary' : 'text-muted-foreground'}
+              >
+                {t(`states.${client.state}`)}
+              </span>
+            </span>
+          </DisclosureHeader>
+        </div>
+        <ClientAction {...props} />
       </div>
-      <dl className="flex flex-col gap-2">
-        {values.map(({ label, value }) => (
-          <div key={label} className="flex flex-col gap-1">
-            <dt className="text-xs text-muted-foreground">{label}</dt>
-            <dd>
-              <Code>{value}</Code>
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+      <DisclosurePanel>
+        <div className="flex flex-col gap-3 px-4 pb-4">
+          <p className="text-sm break-all text-muted-foreground">
+            {t('manual', { path: client.configPath })}
+          </p>
+          <Code>{client.manualEntry}</Code>
+        </div>
+      </DisclosurePanel>
+    </Disclosure>
   )
 }
 
@@ -112,18 +153,37 @@ function AssistantsSettings(): React.JSX.Element {
   const errorMessage = useErrorMessage()
   const { settings, updateSettings } = useSettings()
   const [config, setConfig] = useState<McpClientConfig | null>(null)
+  const [clients, setClients] = useState<readonly McpClientStatus[]>([])
+  const [restartName, setRestartName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let isCurrent = true
-    api.mcp
-      .config()
-      .then((loaded) => isCurrent && setConfig(loaded))
+    Promise.all([api.mcp.config(), api.mcp.clients()])
+      .then(([loadedConfig, loadedClients]) => {
+        if (!isCurrent) return
+        setConfig(loadedConfig)
+        setClients(loadedClients)
+      })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
     return () => {
       isCurrent = false
     }
   }, [errorMessage])
+
+  const change = async (
+    client: McpClientStatus,
+    action: (id: string) => Promise<McpClientStatus[]>
+  ): Promise<void> => {
+    setError(null)
+    setRestartName(null)
+    try {
+      setClients(await action(client.id))
+      setRestartName(client.name)
+    } catch (caught) {
+      setError(errorMessage(caught))
+    }
+  }
 
   return (
     <div className="flex max-w-2xl flex-col gap-10">
@@ -147,26 +207,25 @@ function AssistantsSettings(): React.JSX.Element {
           <h2 className="text-sm font-semibold">{t('setup.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('setup.description')}</p>
           {error && <p className="text-sm text-destructive">{error}</p>}
+          {restartName && (
+            <p className="text-sm text-primary">{t('setup.restart', { name: restartName })}</p>
+          )}
+          {clients.length > 0 && (
+            <DisclosureGroup allowsMultipleExpanded className={cardClassName}>
+              {clients.map((client) => (
+                <ClientRow
+                  key={client.id}
+                  client={client}
+                  onConnect={() => change(client, api.mcp.connect)}
+                  onDisconnect={() => change(client, api.mcp.disconnect)}
+                />
+              ))}
+            </DisclosureGroup>
+          )}
           {config && (
             <>
-              <GenericSetup config={config} />
-              <DisclosureGroup
-                allowsMultipleExpanded
-                className="overflow-hidden rounded-xl border border-border bg-card"
-              >
-                <ClientSetup
-                  id="claudeDesktop"
-                  title={t('setup.claudeDesktop')}
-                  description={t('setup.claudeDesktopDescription')}
-                  code={claudeDesktopConfig(config)}
-                />
-                <ClientSetup
-                  id="claudeCode"
-                  title={t('setup.claudeCode')}
-                  description={t('setup.claudeCodeDescription')}
-                  code={claudeCodeCommand(config)}
-                />
-              </DisclosureGroup>
+              <p className="pt-2 text-sm text-muted-foreground">{t('setup.other')}</p>
+              <ManualSetup config={config} />
             </>
           )}
         </section>
