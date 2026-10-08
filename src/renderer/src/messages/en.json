@@ -531,6 +531,11 @@
     "setup": {
       "title": "Setup",
       "description": "Add Taktra to your assistant once. When the assistant needs Taktra and it is not running, it starts in the tray. If you move Taktra to another folder, copy the setup again.",
+      "generic": "Any MCP client",
+      "genericDescription": "Add Taktra as a local server (stdio) with these values. Where to enter them depends on the assistant.",
+      "command": "Command",
+      "arguments": "Argument",
+      "environment": "Environment variable",
       "claudeDesktop": "Claude Desktop",
       "claudeDesktopDescription": "Add this to the configuration file of Claude Desktop, then restart Claude Desktop.",
       "claudeCode": "Claude Code",

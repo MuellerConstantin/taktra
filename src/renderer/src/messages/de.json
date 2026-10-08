@@ -531,6 +531,11 @@
     "setup": {
       "title": "Einrichtung",
       "description": "Trage Taktra einmal in deinem Assistenten ein. Braucht der Assistent Taktra und es läuft nicht, startet es im Tray. Verschiebst du Taktra in einen anderen Ordner, kopiere die Einrichtung erneut.",
+      "generic": "Jeder MCP-Client",
+      "genericDescription": "Trage Taktra mit diesen Werten als lokalen Server (stdio) ein. Wo das geht, hängt vom Assistenten ab.",
+      "command": "Befehl",
+      "arguments": "Argument",
+      "environment": "Umgebungsvariable",
       "claudeDesktop": "Claude Desktop",
       "claudeDesktopDescription": "Füge das in die Konfigurationsdatei von Claude Desktop ein und starte Claude Desktop danach neu.",
       "claudeCode": "Claude Code",
