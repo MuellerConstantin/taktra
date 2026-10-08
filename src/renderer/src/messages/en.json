@@ -534,7 +534,7 @@
       "restart": "Restart {name} for the change to take effect.",
       "other": "Using another assistant?"
     },
-    "clients": {
+    "assistants": {
       "states": {
         "notInstalled": "Not installed",
         "disconnected": "Not connected",
@@ -609,7 +609,7 @@
     "UNKNOWN": "Something went wrong. Please try again.",
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
     "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
-    "MCP_CLIENT_CONFIG_INVALID": "The configuration file of the assistant cannot be read. Taktra leaves it unchanged.",
-    "MCP_CLIENT_CONFIG_WRITE_FAILED": "The configuration file of the assistant could not be written."
+    "ASSISTANT_CONFIG_INVALID": "The configuration file of the assistant cannot be read. Taktra leaves it unchanged.",
+    "ASSISTANT_CONFIG_WRITE_FAILED": "The configuration file of the assistant could not be written."
   }
 }

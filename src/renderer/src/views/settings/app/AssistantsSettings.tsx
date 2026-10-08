@@ -1,7 +1,7 @@
-import { RiCheckLine, RiExternalLinkLine, RiFileCopyLine } from '@remixicon/react'
+import { RiCheckLine, RiExternalLinkLine, RiFileCopyLine, RiRobot2Line } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import type { McpClientConfig, McpClientStatus } from '../../../../../shared/mcp'
+import type { AssistantStatus, McpLaunchConfig } from '../../../../../shared/mcp'
 import { Button } from '../../../components/atoms/Button'
 import {
   Disclosure,
@@ -15,6 +15,22 @@ import { useSettings } from '../../../hooks/useSettings'
 import { api } from '../../../lib/api'
 
 const cardClassName = 'overflow-hidden rounded-xl border border-border bg-card'
+
+const logos = import.meta.glob<string>('../../../assets/assistants/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default'
+})
+
+function AssistantLogo({ id }: { readonly id: string }): React.JSX.Element {
+  const src = logos[`../../../assets/assistants/${id}.svg`]
+  if (src) return <img src={src} alt="" className="size-8 shrink-0 rounded-md" />
+  return (
+    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+      <RiRobot2Line aria-hidden className="size-4" />
+    </span>
+  )
+}
 
 function CopyButton({ text }: { readonly text: string }): React.JSX.Element {
   const t = useTranslations('AssistantsSettings')
@@ -43,7 +59,7 @@ function Code({ children }: { readonly children: string }): React.JSX.Element {
   )
 }
 
-function ManualSetup({ config }: { readonly config: McpClientConfig }): React.JSX.Element {
+function ManualSetup({ config }: { readonly config: McpLaunchConfig }): React.JSX.Element {
   const t = useTranslations('AssistantsSettings.manual')
   const values = [
     { label: t('command'), value: config.command },
@@ -83,19 +99,23 @@ function ManualSetup({ config }: { readonly config: McpClientConfig }): React.JS
   )
 }
 
-interface ClientRowProps {
-  readonly client: McpClientStatus
+interface AssistantRowProps {
+  readonly assistant: AssistantStatus
   readonly onConnect: () => void
   readonly onDisconnect: () => void
 }
 
-function ClientAction({ client, onConnect, onDisconnect }: ClientRowProps): React.JSX.Element {
-  const t = useTranslations('AssistantsSettings.clients')
+function AssistantAction({
+  assistant,
+  onConnect,
+  onDisconnect
+}: AssistantRowProps): React.JSX.Element {
+  const t = useTranslations('AssistantsSettings.assistants')
 
-  switch (client.state) {
+  switch (assistant.state) {
     case 'notInstalled':
       return (
-        <Button variant="secondary" onPress={() => window.open(client.downloadUrl, '_blank')}>
+        <Button variant="secondary" onPress={() => window.open(assistant.downloadUrl, '_blank')}>
           <RiExternalLinkLine className="size-4" />
           {t('download')}
         </Button>
@@ -115,33 +135,36 @@ function ClientAction({ client, onConnect, onDisconnect }: ClientRowProps): Reac
   }
 }
 
-function ClientRow(props: ClientRowProps): React.JSX.Element {
-  const t = useTranslations('AssistantsSettings.clients')
-  const { client } = props
+function AssistantRow(props: AssistantRowProps): React.JSX.Element {
+  const t = useTranslations('AssistantsSettings.assistants')
+  const { assistant } = props
 
   return (
-    <Disclosure id={client.id} className="border-b border-border last:border-b-0">
+    <Disclosure id={assistant.id} className="border-b border-border last:border-b-0">
       <div className="flex items-center gap-3 pr-4">
         <div className="min-w-0 flex-1">
           <DisclosureHeader className="px-4 py-3">
+            <AssistantLogo id={assistant.id} />
             <span className="flex min-w-0 flex-col">
-              <span className="font-medium">{client.name}</span>
+              <span className="font-medium">{assistant.name}</span>
               <span
-                className={client.state === 'connected' ? 'text-primary' : 'text-muted-foreground'}
+                className={
+                  assistant.state === 'connected' ? 'text-primary' : 'text-muted-foreground'
+                }
               >
-                {t(`states.${client.state}`)}
+                {t(`states.${assistant.state}`)}
               </span>
             </span>
           </DisclosureHeader>
         </div>
-        <ClientAction {...props} />
+        <AssistantAction {...props} />
       </div>
       <DisclosurePanel>
         <div className="flex flex-col gap-3 px-4 pb-4">
-          <p className="text-sm break-all text-muted-foreground">
-            {t('manual', { path: client.configPath })}
+          <p className="text-sm wrap-anywhere text-muted-foreground">
+            {t('manual', { path: assistant.configPath })}
           </p>
-          <Code>{client.manualEntry}</Code>
+          <Code>{assistant.manualEntry}</Code>
         </div>
       </DisclosurePanel>
     </Disclosure>
@@ -152,18 +175,18 @@ function AssistantsSettings(): React.JSX.Element {
   const t = useTranslations('AssistantsSettings')
   const errorMessage = useErrorMessage()
   const { settings, updateSettings } = useSettings()
-  const [config, setConfig] = useState<McpClientConfig | null>(null)
-  const [clients, setClients] = useState<readonly McpClientStatus[]>([])
+  const [config, setConfig] = useState<McpLaunchConfig | null>(null)
+  const [assistants, setAssistants] = useState<readonly AssistantStatus[]>([])
   const [restartName, setRestartName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let isCurrent = true
-    Promise.all([api.mcp.config(), api.mcp.clients()])
-      .then(([loadedConfig, loadedClients]) => {
+    Promise.all([api.mcp.config(), api.mcp.assistants()])
+      .then(([loadedConfig, loadedAssistants]) => {
         if (!isCurrent) return
         setConfig(loadedConfig)
-        setClients(loadedClients)
+        setAssistants(loadedAssistants)
       })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
     return () => {
@@ -172,14 +195,14 @@ function AssistantsSettings(): React.JSX.Element {
   }, [errorMessage])
 
   const change = async (
-    client: McpClientStatus,
-    action: (id: string) => Promise<McpClientStatus[]>
+    assistant: AssistantStatus,
+    action: (id: string) => Promise<AssistantStatus[]>
   ): Promise<void> => {
     setError(null)
     setRestartName(null)
     try {
-      setClients(await action(client.id))
-      setRestartName(client.name)
+      setAssistants(await action(assistant.id))
+      setRestartName(assistant.name)
     } catch (caught) {
       setError(errorMessage(caught))
     }
@@ -210,14 +233,14 @@ function AssistantsSettings(): React.JSX.Element {
           {restartName && (
             <p className="text-sm text-primary">{t('setup.restart', { name: restartName })}</p>
           )}
-          {clients.length > 0 && (
+          {assistants.length > 0 && (
             <DisclosureGroup allowsMultipleExpanded className={cardClassName}>
-              {clients.map((client) => (
-                <ClientRow
-                  key={client.id}
-                  client={client}
-                  onConnect={() => change(client, api.mcp.connect)}
-                  onDisconnect={() => change(client, api.mcp.disconnect)}
+              {assistants.map((assistant) => (
+                <AssistantRow
+                  key={assistant.id}
+                  assistant={assistant}
+                  onConnect={() => change(assistant, api.mcp.connect)}
+                  onDisconnect={() => change(assistant, api.mcp.disconnect)}
                 />
               ))}
             </DisclosureGroup>

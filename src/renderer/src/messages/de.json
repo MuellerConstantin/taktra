@@ -534,7 +534,7 @@
       "restart": "Starte {name} neu, damit die Änderung wirkt.",
       "other": "Du nutzt einen anderen Assistenten?"
     },
-    "clients": {
+    "assistants": {
       "states": {
         "notInstalled": "Nicht installiert",
         "disconnected": "Nicht verbunden",
@@ -609,7 +609,7 @@
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
-    "MCP_CLIENT_CONFIG_INVALID": "Die Konfigurationsdatei des Assistenten ist nicht lesbar. Taktra lässt sie unverändert.",
-    "MCP_CLIENT_CONFIG_WRITE_FAILED": "Die Konfigurationsdatei des Assistenten konnte nicht geschrieben werden."
+    "ASSISTANT_CONFIG_INVALID": "Die Konfigurationsdatei des Assistenten ist nicht lesbar. Taktra lässt sie unverändert.",
+    "ASSISTANT_CONFIG_WRITE_FAILED": "Die Konfigurationsdatei des Assistenten konnte nicht geschrieben werden."
   }
 }

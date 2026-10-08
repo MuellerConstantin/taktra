@@ -4,7 +4,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 import { handle } from '../ipc'
 import { getSettings, onSettingsChanged } from '../settings'
-import { initMcpClients } from './clients'
+import { initAssistants } from './assistants'
 import { bridgeLaunchConfig } from './launch'
 import { mcpPipePath } from './pipe'
 import { createMcpServer } from './tools'
@@ -45,5 +45,5 @@ export function initMcp(): void {
   applyMcpAccess()
   onSettingsChanged(applyMcpAccess)
   handle('mcp:config', z.tuple([]), () => bridgeLaunchConfig())
-  initMcpClients()
+  initAssistants()
 }
