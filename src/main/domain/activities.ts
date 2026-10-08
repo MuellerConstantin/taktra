@@ -9,7 +9,7 @@ import { isUniqueViolation } from '../db/errors'
 import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { clientRef, effectiveClientJoin, findClient } from './clients'
-import { sortByName, toNameKey } from './names'
+import { compareNames, sortByName, toNameKey } from './names'
 import { findProject } from './projects'
 import { notifyTimerChanged } from './timerEvents'
 
@@ -88,11 +88,8 @@ export function getActivityDetails(id: number): ActivityDetails {
   return { ...row, tags: tagsByActivity([id]).get(id) ?? [] }
 }
 
-/** Activities that can be booked on, matched by name regardless of case. */
-export function findBookableActivities(
-  activityName: string,
-  projectName?: string
-): ActivityDetails[] {
+/** Activities that can be booked on, i.e. neither they nor their project are archived. */
+export function listBookableActivities(projectId?: number): ActivityDetails[] {
   const rows = getActiveDatabase()
     .select(activityDetailsColumns)
     .from(activities)
@@ -100,13 +97,13 @@ export function findBookableActivities(
     .leftJoin(clients, effectiveClientJoin)
     .where(
       and(
-        eq(activities.nameKey, toNameKey(activityName)),
-        projectName === undefined ? undefined : eq(projects.nameKey, toNameKey(projectName)),
+        projectId === undefined ? undefined : eq(activities.projectId, projectId),
         isNull(activities.archivedAt),
         isNull(projects.archivedAt)
       )
     )
     .all()
+    .sort((a, b) => compareNames(a.activity.name, b.activity.name))
 
   const tagMap = tagsByActivity(rows.map((row) => row.activity.id))
   return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))

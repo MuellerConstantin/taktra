@@ -61,8 +61,9 @@ project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain.
 
 **AI assistants**
-When the user turns it on, AI assistants such as Claude can see the running
-timer, start a timer for an existing activity and stop it through MCP. The settings
+When the user turns it on, AI assistants such as Claude can list and search
+projects and activities, see the running timer, and start and stop the timer
+through MCP. The settings
 connect Taktra to known assistants (Claude Desktop, Claude Code) with one
 click and show the values for setting up any other MCP client by hand.
 
@@ -219,7 +220,11 @@ in `src/main/`.
   named pipe (a socket elsewhere) and starts the app with `--hidden`, tray only,
   if it is not running. The pipe exists only while access is turned on (off by
   default), and no network port is opened. The bridge depends on Electron's
-  `RunAsNode` fuse staying enabled.
+  `RunAsNode` fuse staying enabled. Tools address projects and activities by
+  id, never by name, so nothing is guessed; assistants list or search first.
+  Ids are only valid in their profile, so every answer names the active profile
+  and every tool that takes an id also takes the profile it comes from and
+  refuses it if another profile is active.
 - **Connecting assistants by writing their configuration**: Like Docker's MCP
   Toolkit, Taktra adds or removes its own entry in the configuration of known
   clients, only on an explicit click. Each client implements one interface
