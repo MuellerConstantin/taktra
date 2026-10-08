@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { RouterProvider } from 'react-aria-components'
 import { Outlet, useHref, useNavigate } from 'react-router'
 import AboutProvider from '../../contexts/AboutProvider'
@@ -8,6 +8,7 @@ import { useShortcut } from '../../hooks/useShortcut'
 import { useTimer } from '../../hooks/useTimer'
 import { api } from '../../lib/api'
 import { appShortcuts } from '../../lib/shortcuts'
+import { CommandPalette } from '../organisms/CommandPalette'
 import { Sidebar } from '../organisms/Sidebar'
 
 export function AppTemplate(): React.JSX.Element {
@@ -15,6 +16,7 @@ export function AppTemplate(): React.JSX.Element {
   const { activeProfile } = useProfiles()
   const hasProfile = activeProfile?.isAvailable ?? false
   const { running, stop } = useTimer()
+  const [isPaletteOpen, setPaletteOpen] = useState(false)
 
   useShortcut(appShortcuts.timer, () => navigate('/timer'), hasProfile)
   useShortcut(appShortcuts.entries, () => navigate('/tracking'), hasProfile)
@@ -25,6 +27,7 @@ export function AppTemplate(): React.JSX.Element {
   useShortcut(appShortcuts.export, () => navigate('/export'), hasProfile)
   useShortcut(appShortcuts.settings, () => navigate('/settings'))
   useShortcut(appShortcuts.quickStart, () => api.quick.toggle().catch(console.error), hasProfile)
+  useShortcut(appShortcuts.commandPalette, () => setPaletteOpen(true))
   useShortcut(appShortcuts.stopTimer, () => stop().catch(console.error), running !== null)
 
   useEffect(() => {
@@ -41,11 +44,12 @@ export function AppTemplate(): React.JSX.Element {
       <UpdatesProvider>
         <AboutProvider>
           <div className="flex h-screen bg-background text-foreground">
-            <Sidebar />
+            <Sidebar onSearch={() => setPaletteOpen(true)} />
             <main className="flex-1 overflow-y-auto">
               <Outlet />
             </main>
           </div>
+          <CommandPalette isOpen={isPaletteOpen} onOpenChange={setPaletteOpen} />
         </AboutProvider>
       </UpdatesProvider>
     </RouterProvider>

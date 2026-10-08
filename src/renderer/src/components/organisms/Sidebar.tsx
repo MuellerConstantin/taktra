@@ -5,6 +5,7 @@ import {
   RiDownload2Line,
   RiFolderLine,
   RiPriceTag3Line,
+  RiSearchLine,
   RiSettings3Line,
   RiShutDownLine,
   RiTimerLine,
@@ -69,7 +70,11 @@ function NavItem({
   )
 }
 
-export function Sidebar(): React.JSX.Element {
+interface SidebarProps {
+  readonly onSearch: () => void
+}
+
+export function Sidebar({ onSearch }: SidebarProps): React.JSX.Element {
   const t = useTranslations('Navigation')
   const { activeProfile } = useProfiles()
   const { showAbout } = useAbout()
@@ -89,6 +94,14 @@ export function Sidebar(): React.JSX.Element {
       </div>
       <div className="flex flex-col gap-2 px-3 pb-4">
         <ProfileSwitcher />
+        <Button
+          onPress={onSearch}
+          className="flex h-9 w-full cursor-default items-center gap-2 rounded-lg border border-sidebar-border px-3 text-sm text-muted-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+        >
+          <RiSearchLine aria-hidden className="size-4 shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">{t('search')}</span>
+          <KeyCombo accelerator={appShortcuts.commandPalette} />
+        </Button>
         <TimerIndicator />
       </div>
       <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3">

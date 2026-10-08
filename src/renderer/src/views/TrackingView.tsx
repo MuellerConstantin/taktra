@@ -25,6 +25,7 @@ import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'
 import { useProfiles } from '../hooks/useProfiles'
 import { useShortcut } from '../hooks/useShortcut'
+import { useCreateRequest } from '../hooks/useCreateRequest'
 import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
@@ -129,6 +130,7 @@ function TrackingView(): React.JSX.Element {
   }
 
   useShortcut(appShortcuts.create, () => setDialog({}))
+  useCreateRequest(() => setDialog({}))
 
   const runTimer = async (action: () => Promise<void>): Promise<void> => {
     setDeleteError(null)

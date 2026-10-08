@@ -1,5 +1,13 @@
 import { RiCheckLine } from '@remixicon/react'
-import { ListBoxItem, composeRenderProps, type ListBoxItemProps } from 'react-aria-components'
+import {
+  Collection,
+  Header,
+  ListBoxItem,
+  ListBoxSection,
+  composeRenderProps,
+  type ListBoxItemProps,
+  type ListBoxSectionProps
+} from 'react-aria-components'
 import { dropdownItemStyles } from './styles'
 
 export function DropdownItem(props: ListBoxItemProps): React.JSX.Element {
@@ -19,5 +27,23 @@ export function DropdownItem(props: ListBoxItemProps): React.JSX.Element {
         </>
       ))}
     </ListBoxItem>
+  )
+}
+
+export interface DropdownSectionProps<T> extends ListBoxSectionProps<T> {
+  readonly title: string
+}
+
+export function DropdownSection<T extends object>({
+  title,
+  items,
+  children,
+  ...props
+}: DropdownSectionProps<T>): React.JSX.Element {
+  return (
+    <ListBoxSection {...props} className="not-first:mt-2">
+      <Header className="px-3 pt-1 pb-1 text-xs font-medium text-muted-foreground">{title}</Header>
+      <Collection items={items}>{children}</Collection>
+    </ListBoxSection>
   )
 }

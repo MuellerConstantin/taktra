@@ -1,5 +1,6 @@
 {
   "Navigation": {
+    "search": "Search…",
     "timer": "Timer",
     "tracking": "Entries",
     "projects": "Projects",
@@ -95,6 +96,30 @@
   },
   "ViewHeader": {
     "help": "Help"
+  },
+  "CommandPalette": {
+    "label": "Command palette",
+    "placeholder": "Search views, actions and settings…",
+    "noMatch": "Nothing found.",
+    "sections": {
+      "navigation": "Go to",
+      "actions": "Actions",
+      "projects": "Projects",
+      "activities": "Activities",
+      "tags": "Tags",
+      "settings": "Settings"
+    },
+    "actions": {
+      "stopTimer": "Stop timer",
+      "quickStart": "Open quick start",
+      "newEntry": "New entry",
+      "newProject": "New project",
+      "newClient": "New client",
+      "newTag": "New tag"
+    },
+    "settings": {
+      "profileName": "Profile name"
+    }
   },
   "TimerView": {
     "title": "Timer",
@@ -478,6 +503,7 @@
       "export": "Go to export",
       "settings": "Open settings",
       "quickStart": "Open quick start",
+      "commandPalette": "Open command palette",
       "stopTimer": "Stop running timer",
       "create": "New entry, project, client or tag",
       "search": "Search projects, clients or tags",

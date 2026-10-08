@@ -14,6 +14,7 @@ import { TagDialog } from '../components/molecules/TagDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useShortcut } from '../hooks/useShortcut'
+import { useCreateRequest } from '../hooks/useCreateRequest'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
@@ -62,6 +63,7 @@ function TagsView(): React.JSX.Element {
   }
 
   useShortcut(appShortcuts.create, () => setDialog({}))
+  useCreateRequest(() => setDialog({}))
   useShortcut(appShortcuts.search, () => searchRef.current?.focus())
 
   return (

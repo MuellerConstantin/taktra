@@ -1,5 +1,6 @@
 {
   "Navigation": {
+    "search": "Suchen…",
     "timer": "Timer",
     "tracking": "Einträge",
     "projects": "Projekte",
@@ -95,6 +96,30 @@
   },
   "ViewHeader": {
     "help": "Hilfe"
+  },
+  "CommandPalette": {
+    "label": "Befehlspalette",
+    "placeholder": "Ansichten, Aktionen und Einstellungen suchen…",
+    "noMatch": "Nichts gefunden.",
+    "sections": {
+      "navigation": "Gehe zu",
+      "actions": "Aktionen",
+      "projects": "Projekte",
+      "activities": "Tätigkeiten",
+      "tags": "Tags",
+      "settings": "Einstellungen"
+    },
+    "actions": {
+      "stopTimer": "Timer stoppen",
+      "quickStart": "Schnellstart öffnen",
+      "newEntry": "Neuer Eintrag",
+      "newProject": "Neues Projekt",
+      "newClient": "Neuer Leistungsempfänger",
+      "newTag": "Neuer Tag"
+    },
+    "settings": {
+      "profileName": "Profilname"
+    }
   },
   "TimerView": {
     "title": "Timer",
@@ -478,6 +503,7 @@
       "export": "Zum Export",
       "settings": "Einstellungen öffnen",
       "quickStart": "Schnellstart öffnen",
+      "commandPalette": "Befehlspalette öffnen",
       "stopTimer": "Laufenden Timer stoppen",
       "create": "Neuer Eintrag, neues Projekt, neuer Leistungsempfänger oder neuer Tag",
       "search": "Projekte, Leistungsempfänger oder Tags durchsuchen",
