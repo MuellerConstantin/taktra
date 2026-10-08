@@ -4,10 +4,12 @@ directories:
   buildResources: build
 files:
   - '!**/.vscode/*'
+  - '!.claude/**'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
   - '!drizzle.config.ts'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,CHANGELOG.md,README.md}'
+  - '!{AGENTS.md,CLAUDE.md}'
   - '!{.env,.env.*,.npmrc}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
