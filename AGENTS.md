@@ -218,7 +218,10 @@ in `src/main/`.
   `ELECTRON_RUN_AS_NODE=1`, because Electron in app mode cannot serve stdio on
   Windows. This bridge must not import electron; it connects stdio to a per-user
   named pipe (a socket elsewhere) and starts the app with `--hidden`, tray only,
-  if it is not running. The pipe exists only while access is turned on (off by
+  if it is not running. Clients do not restart a server whose process ended,
+  so the bridge outlives the app: it fails open requests when the app quits,
+  connects again on the next one and replays the client's handshake to the new
+  instance. The pipe exists only while access is turned on (off by
   default), and no network port is opened. The bridge depends on Electron's
   `RunAsNode` fuse staying enabled. Tools address projects and activities by
   id, never by name, so nothing is guessed; assistants list or search first.
