@@ -13,7 +13,7 @@ import { isAppError } from '../../shared/errors'
 import type { TimeEntryDetails } from '../../shared/timeEntries'
 import { name } from '../../shared/validation'
 import { findBookableActivities } from '../domain/activities'
-import { getRunningTimer, startTimer } from '../domain/timer'
+import { getRunningTimer, startTimer, stopTimer } from '../domain/timer'
 import iconPng from '../../../resources/icon.png?asset'
 import iconSvg from '../../../resources/icon.svg?asset'
 
@@ -34,20 +34,38 @@ const tools: Tool[] = [
     description:
       'Starts the Taktra timer for an existing activity. A running timer is stopped and booked first.',
     inputSchema: z.toJSONSchema(startTimerInput, { io: 'input' }) as Tool['inputSchema']
+  },
+  {
+    name: 'stop_timer',
+    description: 'Stops the running Taktra timer and books its time.',
+    inputSchema: { type: 'object', properties: {} },
+    annotations: { idempotentHint: true }
   }
 ]
 
 class ToolError extends Error {}
 
-function describeTimer(timer: TimeEntryDetails | null): object {
-  if (!timer) return { running: false }
+function describeEntry(details: TimeEntryDetails): object {
   return {
-    running: true,
-    activity: timer.activity.name,
-    project: timer.project.name,
-    client: timer.client?.name ?? null,
-    tags: timer.tags.map((tag) => tag.name),
-    startedAt: timer.entry.startedAt?.toISOString() ?? null
+    activity: details.activity.name,
+    project: details.project.name,
+    client: details.client?.name ?? null,
+    tags: details.tags.map((tag) => tag.name),
+    startedAt: details.entry.startedAt?.toISOString() ?? null
+  }
+}
+
+function describeTimer(timer: TimeEntryDetails | null): object {
+  return timer ? { running: true, ...describeEntry(timer) } : { running: false }
+}
+
+function describeBooking(booked: TimeEntryDetails | null): object {
+  if (!booked) return { stopped: false }
+  return {
+    stopped: true,
+    ...describeEntry(booked),
+    endedAt: booked.entry.endedAt?.toISOString() ?? null,
+    durationMinutes: Math.round((booked.entry.durationSec ?? 0) / 60)
   }
 }
 
@@ -66,9 +84,10 @@ function startTimerByName(args: unknown): TimeEntryDetails {
   return startTimer(matches[0].activity.id)
 }
 
-function runTool(toolName: string, args: unknown): TimeEntryDetails | null {
-  if (toolName === 'get_running_timer') return getRunningTimer()
-  if (toolName === 'start_timer') return startTimerByName(args)
+function runTool(toolName: string, args: unknown): object {
+  if (toolName === 'get_running_timer') return describeTimer(getRunningTimer())
+  if (toolName === 'start_timer') return describeTimer(startTimerByName(args))
+  if (toolName === 'stop_timer') return describeBooking(stopTimer())
   throw new ToolError(`Unknown tool "${toolName}".`)
 }
 
@@ -81,7 +100,7 @@ function errorMessage(toolName: string, error: unknown): string {
 
 function callTool(toolName: string, args: unknown): CallToolResult {
   try {
-    const text = JSON.stringify(describeTimer(runTool(toolName, args)))
+    const text = JSON.stringify(runTool(toolName, args))
     return { content: [{ type: 'text', text }] }
   } catch (error) {
     return { isError: true, content: [{ type: 'text', text: errorMessage(toolName, error) }] }
