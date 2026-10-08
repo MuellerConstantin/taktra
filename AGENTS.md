@@ -63,7 +63,7 @@ with a preview of what the file will contain.
 **AI assistants**
 When the user turns it on, AI assistants such as Claude can list, search and
 switch profiles, list and search projects and activities, see the running
-timer, and start and stop the timer through MCP. The settings
+timer, and start, stop and discard the timer through MCP. The settings
 connect Taktra to known assistants (Claude Desktop, Claude Code) with one
 click and show the values for setting up any other MCP client by hand.
 

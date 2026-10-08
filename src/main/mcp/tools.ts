@@ -17,7 +17,13 @@ import { listBookableActivities } from '../domain/activities'
 import { listClients } from '../domain/clients'
 import { toNameKey } from '../domain/names'
 import { listProjects } from '../domain/projects'
-import { getRunningTimer, hasRunningTimer, startTimer, stopTimer } from '../domain/timer'
+import {
+  discardTimer,
+  getRunningTimer,
+  hasRunningTimer,
+  startTimer,
+  stopTimer
+} from '../domain/timer'
 import { getActiveProfileName, getProfilesState, setActiveProfile } from '../profiles'
 import iconPng from '../../../resources/icon.png?asset'
 import iconSvg from '../../../resources/icon.svg?asset'
@@ -146,6 +152,13 @@ function assertActiveProfile(expected: string | undefined): void {
     throw new ToolError(
       `The active profile is "${activeProfile}", not "${expected}". Look up the ids again.`
     )
+}
+
+function discardRunningTimer(): object {
+  const timer = getRunningTimer()
+  if (!timer) return { discarded: false }
+  discardTimer()
+  return { discarded: true, ...describeEntry(timer) }
 }
 
 function startTimerById(args: unknown): TimeEntryDetails {
@@ -306,6 +319,14 @@ const definitions: Readonly<Record<string, ToolDefinition>> = {
     input: noInput,
     annotations: { idempotentHint: true },
     run: () => describeBooking(stopTimer())
+  },
+  discard_timer: {
+    title: 'Discard timer',
+    description:
+      'Discards the running Taktra timer without booking its time. Its entry is deleted, and so is its activity if it has no other entries.',
+    input: noInput,
+    annotations: { destructiveHint: true, idempotentHint: true },
+    run: discardRunningTimer
   }
 }
 
