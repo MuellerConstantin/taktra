@@ -12,6 +12,7 @@ function ProfileSettingsView(): React.JSX.Element | null {
     <TabViewTemplate
       title={activeProfile.name}
       subtitle={t('title')}
+      help={t('help')}
       sections={[{ path: '/profile/general', label: t('general') }]}
     />
   )

@@ -93,6 +93,7 @@ function ExportView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={t('title')}
+        help={t('help')}
         actions={
           <Button onPress={exportCsv} isDisabled={!preview || preview.count === 0}>
             <RiDownload2Line className="size-4" />

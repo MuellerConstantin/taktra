@@ -70,6 +70,7 @@ function TimerView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         subtitle={dayFormatter.format(todayDate.toDate(getLocalTimeZone()))}
+        help={t('help')}
         actions={
           running && (
             <Button variant="secondary" onPress={() => setDialogOpen(true)}>

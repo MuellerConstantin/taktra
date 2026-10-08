@@ -121,7 +121,7 @@ function ReportsView(): React.JSX.Element {
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t('title')}>
+      <ViewHeader title={t('title')} help={t('help')}>
         <div className="flex flex-wrap items-center gap-2 pb-4">
           <Select
             aria-label={t('projects')}

@@ -155,6 +155,7 @@ function TrackingView(): React.JSX.Element {
       <ViewHeader
         title={title}
         subtitle={dayFormatter.format(date.toDate(getLocalTimeZone()))}
+        help={t('help')}
         actions={
           <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />

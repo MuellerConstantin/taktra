@@ -93,6 +93,9 @@
     "newerVersionText": "The selected profile was created or updated by a newer version of Taktra. Update Taktra, choose another profile, or remove it from the list.",
     "migrationFailedText": "The selected profile could not be updated to the file format of this Taktra version. The file was not changed. Choose another profile, keep using it with the previous Taktra version, or remove it from the list."
   },
+  "ViewHeader": {
+    "help": "Help"
+  },
   "TimerView": {
     "title": "Timer",
     "switch": "Switch activity",
@@ -109,7 +112,8 @@
     "discardConfirmTitle": "Discard running timer?",
     "discardConfirmText": "The running time is not booked and the entry is deleted.",
     "discardConfirmAction": "Discard",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "help": "Start and stop time tracking for an activity here. Recently used activities start with one click, new ones are created when you start the timer. Without opening Taktra, use the quick start from the tray icon."
   },
   "TimerIndicator": {
     "open": "Open timer for {name}",
@@ -154,7 +158,8 @@
     "gap": "{duration} not tracked",
     "withoutTimes": "Without clock times",
     "continue": "Start timer for {name}",
-    "stop": "Stop timer for {name}"
+    "stop": "Stop timer for {name}",
+    "help": "All entries of a day, that is the time booked on activities, by timer or by hand. Add time you forgot to track and correct entries here. Gaps between entries show time not tracked yet."
   },
   "DayNavigator": {
     "previous": "Previous day",
@@ -213,7 +218,7 @@
   "ProjectsView": {
     "title": "Projects",
     "create": "New project",
-    "empty": "No projects yet.",
+    "empty": "No projects yet. Create a project, then book time on its activities.",
     "noMatches": "No matching projects.",
     "search": "Search projects",
     "edit": "Edit {name}",
@@ -223,7 +228,8 @@
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel",
     "showArchived": "Archived",
-    "archived": "Archived"
+    "archived": "Archived",
+    "help": "Projects structure your work and contain the activities you book time on. Activities are created when you track time. Open a project to see its activities and the time booked on them."
   },
   "ProjectDetailView": {
     "subtitle": "Project",
@@ -308,7 +314,7 @@
   "ClientsView": {
     "title": "Clients",
     "create": "New client",
-    "empty": "No clients yet.",
+    "empty": "No clients yet. Add clients to evaluate and export your time by who the work was for.",
     "noMatches": "No matching clients.",
     "search": "Search clients",
     "edit": "Edit {name}",
@@ -320,7 +326,8 @@
     "deleteConfirmAction": "Delete",
     "cancel": "Cancel",
     "showArchived": "Archived",
-    "archived": "Archived"
+    "archived": "Archived",
+    "help": "Who you work for, such as customers or internal departments. Assign them to a project or to single activities, never when booking. Reports and exports can then be filtered by client."
   },
   "ClientDialog": {
     "createTitle": "New client",
@@ -334,7 +341,7 @@
   "TagsView": {
     "title": "Tags",
     "create": "New tag",
-    "empty": "No tags yet.",
+    "empty": "No tags yet. Tags such as meeting or support show what kind of work your time went into.",
     "noMatches": "No matching tags.",
     "search": "Search tags",
     "edit": "Edit {name}",
@@ -342,7 +349,8 @@
     "deleteConfirmTitle": "Delete tag “{name}”?",
     "deleteConfirmText": "The tag is deleted permanently. This cannot be undone.",
     "deleteConfirmAction": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "help": "Tags describe the kind of work, such as meeting or support, independent of the project. Assign them to activities. Reports then show how much time went into each kind of work."
   },
   "TagDetailView": {
     "subtitle": "Tag",
@@ -390,7 +398,8 @@
       "client": "Client",
       "tag": "Tag",
       "projectTag": "Project × tag"
-    }
+    },
+    "help": "Shows how much time went where in a period, grouped by project, tag or client. Use the filters to narrow it down, for example to a single client."
   },
   "ExportView": {
     "title": "Export",
@@ -410,7 +419,8 @@
     "entries": "Entries",
     "total": "Total time",
     "empty": "No completed entries in this period.",
-    "preview": "Preview: first {shown} of {count} entries"
+    "preview": "Preview: first {shown} of {count} entries",
+    "help": "Writes all completed entries of a period to a file, for example for billing or other systems. The preview shows what the file will contain."
   },
   "ReportBreakdown": {
     "untagged": "No tag",
@@ -490,7 +500,8 @@
   },
   "ProfileSettingsView": {
     "title": "Profile settings",
-    "general": "General"
+    "general": "General",
+    "help": "A profile is a separate file with all its projects and entries, for example one for work and one for private projects. To back it up, simply copy the file."
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",

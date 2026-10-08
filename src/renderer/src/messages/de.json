@@ -93,6 +93,9 @@
     "newerVersionText": "Das ausgewählte Profil wurde mit einer neueren Taktra-Version erstellt oder bearbeitet. Aktualisiere Taktra, wähle ein anderes Profil oder entferne es aus der Liste.",
     "migrationFailedText": "Das ausgewählte Profil konnte nicht auf das Dateiformat dieser Taktra-Version aktualisiert werden. Die Datei wurde nicht verändert. Wähle ein anderes Profil, nutze es weiter mit der vorherigen Taktra-Version oder entferne es aus der Liste."
   },
+  "ViewHeader": {
+    "help": "Hilfe"
+  },
   "TimerView": {
     "title": "Timer",
     "switch": "Tätigkeit wechseln",
@@ -109,7 +112,8 @@
     "discardConfirmTitle": "Laufenden Timer verwerfen?",
     "discardConfirmText": "Die laufende Zeit wird nicht gebucht und der Eintrag gelöscht.",
     "discardConfirmAction": "Verwerfen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "help": "Hier startest und stoppst du die Zeiterfassung für eine Tätigkeit. Zuletzt verwendete Tätigkeiten startest du mit einem Klick, neue legst du beim Starten an. Ohne Taktra zu öffnen geht das über den Schnellstart im Tray."
   },
   "TimerIndicator": {
     "open": "Timer für {name} öffnen",
@@ -154,7 +158,8 @@
     "gap": "{duration} nicht erfasst",
     "withoutTimes": "Ohne Uhrzeit",
     "continue": "Timer für {name} starten",
-    "stop": "Timer für {name} stoppen"
+    "stop": "Timer für {name} stoppen",
+    "help": "Alle Einträge eines Tages, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist."
   },
   "DayNavigator": {
     "previous": "Vorheriger Tag",
@@ -213,7 +218,7 @@
   "ProjectsView": {
     "title": "Projekte",
     "create": "Neues Projekt",
-    "empty": "Noch keine Projekte.",
+    "empty": "Noch keine Projekte. Lege ein Projekt an und buche dann Zeit auf seine Tätigkeiten.",
     "noMatches": "Keine passenden Projekte.",
     "search": "Projekte durchsuchen",
     "edit": "{name} bearbeiten",
@@ -223,7 +228,8 @@
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen",
     "showArchived": "Archivierte",
-    "archived": "Archiviert"
+    "archived": "Archiviert",
+    "help": "Projekte gliedern deine Arbeit und enthalten die Tätigkeiten, auf die du Zeit buchst. Tätigkeiten entstehen beim Buchen. Öffne ein Projekt, um seine Tätigkeiten und die darauf gebuchte Zeit zu sehen."
   },
   "ProjectDetailView": {
     "subtitle": "Projekt",
@@ -308,7 +314,7 @@
   "ClientsView": {
     "title": "Leistungsempfänger",
     "create": "Neuer Leistungsempfänger",
-    "empty": "Noch keine Leistungsempfänger.",
+    "empty": "Noch keine Leistungsempfänger. Lege sie an, um deine Zeit danach auszuwerten und zu exportieren, für wen du gearbeitet hast.",
     "noMatches": "Keine passenden Leistungsempfänger.",
     "search": "Leistungsempfänger suchen",
     "edit": "{name} bearbeiten",
@@ -320,7 +326,8 @@
     "deleteConfirmAction": "Löschen",
     "cancel": "Abbrechen",
     "showArchived": "Archivierte",
-    "archived": "Archiviert"
+    "archived": "Archiviert",
+    "help": "Für wen du arbeitest, etwa Kunden oder interne Abteilungen. Du ordnest sie einem Projekt oder einzelnen Tätigkeiten zu, nie beim Buchen. Auswertung und Export lassen sich dann nach Leistungsempfänger filtern."
   },
   "ClientDialog": {
     "createTitle": "Neuer Leistungsempfänger",
@@ -334,7 +341,7 @@
   "TagsView": {
     "title": "Tags",
     "create": "Neuer Tag",
-    "empty": "Noch keine Tags.",
+    "empty": "Noch keine Tags. Tags wie Meeting oder Support zeigen, in welche Art von Arbeit deine Zeit geflossen ist.",
     "noMatches": "Keine passenden Tags.",
     "search": "Tags durchsuchen",
     "edit": "{name} bearbeiten",
@@ -342,7 +349,8 @@
     "deleteConfirmTitle": "Tag „{name}“ löschen?",
     "deleteConfirmText": "Der Tag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.",
     "deleteConfirmAction": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "help": "Tags beschreiben die Art der Arbeit, etwa Meeting oder Support, unabhängig vom Projekt. Du vergibst sie an Tätigkeiten. Die Auswertung zeigt dann, wie viel Zeit in welche Art von Arbeit geflossen ist."
   },
   "TagDetailView": {
     "subtitle": "Tag",
@@ -390,7 +398,8 @@
       "client": "Leistungsempfänger",
       "tag": "Tag",
       "projectTag": "Projekt × Tag"
-    }
+    },
+    "help": "Zeigt, wie viel Zeit in einem Zeitraum wohin ging, nach Projekt, Tag oder Leistungsempfänger. Mit den Filtern grenzt du ein, etwa auf einen einzelnen Leistungsempfänger."
   },
   "ExportView": {
     "title": "Export",
@@ -410,7 +419,8 @@
     "entries": "Einträge",
     "total": "Gesamtzeit",
     "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum.",
-    "preview": "Vorschau: die ersten {shown} von {count} Einträgen"
+    "preview": "Vorschau: die ersten {shown} von {count} Einträgen",
+    "help": "Schreibt alle abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Die Vorschau zeigt, was in der Datei steht."
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
@@ -490,7 +500,8 @@
   },
   "ProfileSettingsView": {
     "title": "Profileinstellungen",
-    "general": "Allgemein"
+    "general": "Allgemein",
+    "help": "Ein Profil ist eine eigene Datei mit allen Projekten und Einträgen, etwa eines für die Arbeit und eines für Privates. Zum Sichern kopierst du einfach die Datei."
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",

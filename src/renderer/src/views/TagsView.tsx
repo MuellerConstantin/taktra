@@ -68,6 +68,7 @@ function TagsView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={t('title')}
+        help={t('help')}
         actions={
           <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />
