@@ -1,6 +1,7 @@
 import './identity'
-import { app, nativeTheme } from 'electron'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
+import { join } from 'node:path'
+import { app, BrowserWindow, nativeTheme } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { START_HIDDEN_ARG } from './constants'
 import { initAbout } from './desktop/about'
@@ -55,8 +56,26 @@ function createWindow(): void {
     mainWindow.hide()
   })
 
+  setDevAppDetails(mainWindow)
   setMainWindow(mainWindow)
   attachMiniTimer(mainWindow)
+}
+
+/*
+ * In development the process is electron.exe without the installer's shortcut, so Windows
+ * would label the taskbar entry and its jump list "Electron" with Electron's icon.
+ */
+function setDevAppDetails(window: BrowserWindow): void {
+  if (!is.dev || process.platform !== 'win32') {
+    return
+  }
+
+  window.setAppDetails({
+    appId: 'app.taktra',
+    appIconPath: join(app.getAppPath(), 'build', 'icon.ico'),
+    relaunchCommand: `"${process.execPath}" "${app.getAppPath()}"`,
+    relaunchDisplayName: app.getName()
+  })
 }
 
 function openMainWindow(): void {
