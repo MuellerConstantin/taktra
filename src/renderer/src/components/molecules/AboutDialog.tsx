@@ -5,13 +5,20 @@ import {
   RiFileCopyLine,
   RiFolderOpenLine,
   RiGithubLine,
+  RiHeartLine,
   RiLightbulbLine,
   RiRefreshLine,
   RiRestartLine
 } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import { NEW_ISSUE_URL, RELEASES_URL, REPOSITORY_URL, type AppInfo } from '../../../../shared/about'
+import {
+  DONATION_URL,
+  NEW_ISSUE_URL,
+  RELEASES_URL,
+  REPOSITORY_URL,
+  type AppInfo
+} from '../../../../shared/about'
 import type { UpdateStatus } from '../../../../shared/updates'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useUpdates } from '../../hooks/useUpdates'
@@ -162,6 +169,10 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
               <Button variant="secondary" onPress={suggestFeature}>
                 <RiLightbulbLine aria-hidden className="size-4" />
                 {t('suggestFeature')}
+              </Button>
+              <Button variant="secondary" onPress={() => window.open(DONATION_URL, '_blank')}>
+                <RiHeartLine aria-hidden className="size-4" />
+                {t('donate')}
               </Button>
             </div>
             <div className="flex flex-wrap justify-center gap-2">

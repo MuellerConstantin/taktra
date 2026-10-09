@@ -129,6 +129,11 @@ const api = {
     toggle: () => invoke<void>('quick:toggle'),
     resize: (height: number) => invoke<void>('quick:resize', height)
   },
+  donation: {
+    hint: () => invoke<boolean>('donation:hint'),
+    snooze: () => invoke<void>('donation:snooze'),
+    dismiss: () => invoke<void>('donation:dismiss')
+  },
   app: {
     showMainWindow: () => invoke<void>('app:showMainWindow'),
     quit: () => invoke<void>('app:quit'),
@@ -142,7 +147,8 @@ const api = {
     onProfilesChanged: (callback: () => void) => subscribe('profiles:changed', callback),
     onQuickShown: (callback: () => void) => subscribe('quick:shown', callback),
     onShowAbout: (callback: () => void) => subscribe('about:show', callback),
-    onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback)
+    onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback),
+    onDonationChanged: (callback: () => void) => subscribe('donation:changed', callback)
   }
 }
 

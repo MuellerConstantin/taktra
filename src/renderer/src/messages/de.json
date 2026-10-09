@@ -19,6 +19,7 @@
     "license": "Freie Software unter der GNU AGPL-3.0",
     "reportBug": "Fehler melden",
     "suggestFeature": "Idee vorschlagen",
+    "donate": "Spenden",
     "repository": "GitHub",
     "dataFolder": "Datenordner öffnen",
     "copy": "Infos kopieren",
@@ -42,6 +43,14 @@
     "available": "Version {version} ist verfügbar.",
     "restart": "Jetzt neu starten",
     "download": "Herunterladen"
+  },
+  "DonationReminder": {
+    "text": "Taktra ist kostenlos. Wenn es dir Zeit spart, kannst du die Weiterentwicklung mit einer Spende unterstützen.",
+    "donate": "Spenden",
+    "dismiss": "Nicht mehr anzeigen"
+  },
+  "Toast": {
+    "close": "Schließen"
   },
   "ProfileSwitcher": {
     "label": "Profil",
@@ -509,6 +518,7 @@
       "quickStart": "Schnellstart öffnen",
       "commandPalette": "Befehlspalette öffnen",
       "stopTimer": "Laufenden Timer stoppen",
+      "donation": "Spendenerinnerung anzeigen",
       "create": "Neuer Eintrag, neues Projekt, neuer Leistungsempfänger oder neuer Tag",
       "search": "Projekte, Leistungsempfänger oder Tags durchsuchen",
       "previousDay": "Vorheriger Tag",

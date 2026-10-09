@@ -20,6 +20,7 @@ import {
 } from './desktop/windows'
 import { initActivities } from './domain/activities'
 import { initClients } from './domain/clients'
+import { initDonation, recordUsageDay } from './donation'
 import { initExport } from './domain/export'
 import { initProjects } from './domain/projects'
 import { initReports } from './domain/reports'
@@ -47,6 +48,8 @@ function createWindow(): void {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  mainWindow.on('focus', recordUsageDay)
 
   mainWindow.on('close', (event) => {
     if (isQuitting()) return
@@ -97,6 +100,7 @@ function start(): void {
   initQuit()
   initAbout()
   initUpdates()
+  initDonation()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

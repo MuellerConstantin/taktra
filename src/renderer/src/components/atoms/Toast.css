@@ -1,0 +1,28 @@
+::view-transition-new(.toast):only-child {
+  animation: toast-in 300ms ease-out;
+}
+
+::view-transition-old(.toast):only-child {
+  animation: toast-out 300ms ease-in forwards;
+}
+
+@keyframes toast-in {
+  from {
+    translate: 0 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes toast-out {
+  to {
+    translate: 0 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(.toast),
+  ::view-transition-old(.toast) {
+    animation: none;
+  }
+}

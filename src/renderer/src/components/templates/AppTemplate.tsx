@@ -3,11 +3,13 @@ import { RouterProvider } from 'react-aria-components'
 import { Outlet, useHref, useNavigate } from 'react-router'
 import AboutProvider from '../../contexts/AboutProvider'
 import UpdatesProvider from '../../contexts/UpdatesProvider'
+import { useDonationReminder } from '../../hooks/useDonationReminder'
 import { useProfiles } from '../../hooks/useProfiles'
 import { useShortcut } from '../../hooks/useShortcut'
 import { useTimer } from '../../hooks/useTimer'
 import { api } from '../../lib/api'
 import { appShortcuts } from '../../lib/shortcuts'
+import { ToastRegion } from '../atoms/Toast'
 import { CommandPalette } from '../organisms/CommandPalette'
 import { Sidebar } from '../organisms/Sidebar'
 
@@ -35,6 +37,7 @@ export function AppTemplate(): React.JSX.Element {
   useShortcut(appShortcuts.quickStart, () => api.quick.toggle().catch(console.error), hasProfile)
   useShortcut(appShortcuts.commandPalette, () => setPaletteOpen(true))
   useShortcut(appShortcuts.stopTimer, () => stop().catch(console.error), running !== null)
+  useDonationReminder()
 
   useEffect(() => {
     const report = (): void => {
@@ -56,6 +59,7 @@ export function AppTemplate(): React.JSX.Element {
             </main>
           </div>
           <CommandPalette isOpen={isPaletteOpen} onOpenChange={setPaletteOpen} />
+          <ToastRegion />
         </AboutProvider>
       </UpdatesProvider>
     </RouterProvider>

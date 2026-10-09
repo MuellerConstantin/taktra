@@ -89,6 +89,7 @@ export const appShortcuts = {
   quickStart: 'CommandOrControl+K',
   commandPalette: 'CommandOrControl+Shift+P',
   stopTimer: 'CommandOrControl+Shift+Space',
+  donation: 'CommandOrControl+Shift+D',
   create: 'CommandOrControl+N',
   search: 'CommandOrControl+F',
   previousDay: 'Left',
