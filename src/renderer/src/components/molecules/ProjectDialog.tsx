@@ -46,6 +46,8 @@ export function ProjectDialog({
       : activities.filter(
           (activity) => activity.clientId !== null && activity.clientId !== clientId
         ).length
+  const removedClient =
+    clientId === null ? clients.find((client) => client.id === project?.clientId) : undefined
 
   useEffect(() => {
     Promise.all([
@@ -107,6 +109,11 @@ export function ProjectDialog({
               {replacedCount > 0 && (
                 <p className="text-sm text-destructive">
                   {t('clientReplaces', { count: replacedCount })}
+                </p>
+              )}
+              {removedClient && activities.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {t('clientHandedDown', { count: activities.length, client: removedClient.name })}
                 </p>
               )}
             </div>

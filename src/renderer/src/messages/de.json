@@ -332,6 +332,7 @@
     "colorLabel": "Farbe",
     "clientDescription": "Gilt für alle Tätigkeiten des Projekts, auch für bereits erfasste Zeit.",
     "clientReplaces": "{count, plural, one {# Tätigkeit hat} other {# Tätigkeiten haben}} einen anderen Leistungsempfänger. Er wird durch den des Projekts ersetzt, auch für bereits erfasste Zeit.",
+    "clientHandedDown": "{count, plural, one {# Tätigkeit behält} other {# Tätigkeiten behalten}} „{client}“ als Leistungsempfänger, auch für bereits erfasste Zeit.",
     "cancel": "Abbrechen",
     "create": "Anlegen",
     "save": "Speichern"

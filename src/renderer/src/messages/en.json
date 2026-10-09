@@ -332,6 +332,7 @@
     "colorLabel": "Color",
     "clientDescription": "Applies to all activities of the project, including time already tracked.",
     "clientReplaces": "{count, plural, one {# activity has} other {# activities have}} a different client. It is replaced by the client of the project, including time already tracked.",
+    "clientHandedDown": "{count, plural, one {# activity keeps} other {# activities keep}} “{client}” as their client, including time already tracked.",
     "cancel": "Cancel",
     "create": "Create",
     "save": "Save"
