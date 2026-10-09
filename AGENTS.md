@@ -60,13 +60,6 @@ A separate export view writes the completed entries of a period, filtered by
 project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain.
 
-**AI assistants**
-When the user turns it on, AI assistants such as Claude can list, search and
-switch profiles, list and search projects and activities, see the running
-timer, and start, stop and discard the timer through MCP. The settings
-connect Taktra to known assistants (Claude Desktop, Claude Code) with one
-click and show the values for setting up any other MCP client by hand.
-
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
 development.
@@ -83,7 +76,6 @@ development.
 - **Charts**: nivo
 - **App settings**: `electron-store`
 - **Export**: `csv-stringify` (main process only)
-- **AI assistants**: `@modelcontextprotocol/sdk` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
 
 ## Project Structure
@@ -93,8 +85,7 @@ src/
 ├── main/              # Electron main process
 │   ├── db/            # Connection, migrations, schema, backups, sample data
 │   ├── domain/        # Data of the active profile and its IPC handlers; uses db/, never desktop/
-│   ├── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
-│   └── mcp/           # MCP server, stdio bridge and client setup; uses domain/, never db/
+│   └── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
 ├── preload/           # Typed `window.api` bridge
 ├── shared/            # Types used by main, preload and renderer
 │   └── validation/    # Zod schemas per domain, text length limits
@@ -212,30 +203,6 @@ in `src/main/`.
   never updates itself (the updater would run the installer and leave a second
   copy), it only points to the download. Releases are created as drafts, so
   nothing reaches installed apps before it is published by hand.
-- **MCP through the running app**: The app is the only process that touches
-  the profile, so MCP tools run in the main process and broadcast like any
-  other change. Clients start `out/main/mcp.js` with the app's executable and
-  `ELECTRON_RUN_AS_NODE=1`, because Electron in app mode cannot serve stdio on
-  Windows. This bridge must not import electron; it connects stdio to a per-user
-  named pipe (a socket elsewhere) and starts the app with `--hidden`, tray only,
-  if it is not running. Clients do not restart a server whose process ended,
-  so the bridge outlives the app: it fails open requests when the app quits,
-  connects again on the next one and replays the client's handshake to the new
-  instance. The pipe exists only while access is turned on (off by
-  default), and no network port is opened. The bridge depends on Electron's
-  `RunAsNode` fuse staying enabled. Tools address projects and activities by
-  id, never by name, so nothing is guessed; assistants list or search first.
-  Ids are only valid in their profile, so every answer names the active profile
-  and every tool that takes an id also takes the profile it comes from and
-  refuses it if another profile is active.
-- **Connecting assistants by writing their configuration**: Like Docker's MCP
-  Toolkit, Taktra adds or removes its own entry in the configuration of known
-  clients, only on an explicit click. Each client implements one interface
-  (detect, read, write, remove its entry); clients with a JSON file share one
-  implementation, others bring their own. A file that cannot be parsed is never
-  touched, and writes go through a temporary file, so a client reading at the
-  same moment never sees a half-written one. A client counts as installed when
-  its data folder exists, because its configuration file may not exist yet.
 - **Two names**: "Taktra" is the display name (window and dialog titles,
   installer, UI text), "taktra" the technical one (package, executable, app id,
   user data folder, generated file names). The user data folder is pinned to
@@ -251,10 +218,9 @@ in `src/main/`.
   render the welcome view (create or open a profile) instead while no profile
   is usable. App settings stay reachable.
 - **A profile switch resets the profile views**: Profile-dependent routes are
-  keyed by the active profile, so a switch from anywhere (the UI or an
-  assistant) discards open dialogs and unsaved input of the old profile. Detail
-  routes go back to their list, because their ids mean something else in
-  another profile.
+  keyed by the active profile, so a switch discards open dialogs and unsaved
+  input of the old profile. Detail routes go back to their list, because their
+  ids mean something else in another profile.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk.
 - **Theme via semantic tokens**: Colors, radii and shadows are CSS variables

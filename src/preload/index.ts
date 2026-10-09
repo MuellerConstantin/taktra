@@ -6,7 +6,6 @@ import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AppInfo } from '../shared/about'
 import type { ExportFormat, ExportPreview } from '../shared/export'
-import type { AssistantStatus, McpLaunchConfig } from '../shared/mcp'
 import type { UpdateStatus } from '../shared/updates'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
@@ -124,12 +123,6 @@ const api = {
     setQuickStart: (accelerator: string) =>
       invoke<Settings>('shortcuts:setQuickStart', accelerator),
     setRecording: (recording: boolean) => invoke<void>('shortcuts:setRecording', recording)
-  },
-  mcp: {
-    config: () => invoke<McpLaunchConfig>('mcp:config'),
-    assistants: () => invoke<AssistantStatus[]>('mcp:assistants'),
-    connect: (id: string) => invoke<AssistantStatus[]>('mcp:connect', id),
-    disconnect: (id: string) => invoke<AssistantStatus[]>('mcp:disconnect', id)
   },
   quick: {
     hide: () => invoke<void>('quick:hide'),

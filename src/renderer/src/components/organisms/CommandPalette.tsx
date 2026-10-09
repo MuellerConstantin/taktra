@@ -298,12 +298,6 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       run: goTo('/settings/controls')
     },
     { id: 'updates', label: tApp('UpdatesSettings.title'), run: goTo('/settings/updates') },
-    {
-      id: 'assistants',
-      label: tApp('AssistantsSettings.title'),
-      keywords: 'MCP Claude',
-      run: goTo('/settings/assistants')
-    },
     ...(hasProfile ? profileSettings : [])
   ].map((command) => ({ ...command, icon: RiSettings3Line }))
 

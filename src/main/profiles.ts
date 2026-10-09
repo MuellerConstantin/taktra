@@ -15,7 +15,6 @@ import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from './constants'
 import {
   activateDatabase,
   closeActiveDatabase,
-  getActiveDatabase,
   isActiveDatabase,
   openProfileDatabase,
   readProperty,
@@ -99,10 +98,6 @@ function updateKnownProfiles(paths: string[], activePath: string | null): void {
   store.set({ paths, activePath })
   syncActiveDatabase()
   notifyProfilesChanged()
-}
-
-export function getActiveProfileName(): string {
-  return readProperty(getActiveDatabase(), 'name') ?? ''
 }
 
 export function getProfilesState(): ProfilesState {

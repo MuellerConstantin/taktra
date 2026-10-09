@@ -3,7 +3,6 @@ import { join } from 'node:path'
 import { app, BrowserWindow, nativeTheme } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { START_HIDDEN_ARG } from './constants'
 import { initAbout } from './desktop/about'
 import { attachMiniTimer, initMiniTimer } from './desktop/miniTimer'
 import { initQuickStart } from './desktop/quickStart'
@@ -27,7 +26,6 @@ import { initReports } from './domain/reports'
 import { initTags } from './domain/tags'
 import { initTimeEntries } from './domain/timeEntries'
 import { initTimer } from './domain/timer'
-import { initMcp } from './mcp/server'
 import { initProfiles } from './profiles'
 import { initSettings } from './settings'
 
@@ -99,16 +97,12 @@ function start(): void {
   initQuit()
   initAbout()
   initUpdates()
-  initMcp()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  if (!process.argv.includes(START_HIDDEN_ARG)) {
-    createWindow()
-  }
-
+  createWindow()
   initQuickStart()
   initShortcuts()
   initTray(openMainWindow)
@@ -117,11 +111,7 @@ function start(): void {
 }
 
 if (app.requestSingleInstanceLock()) {
-  app.on('second-instance', (_, argv) => {
-    if (!argv.includes(START_HIDDEN_ARG)) {
-      openMainWindow()
-    }
-  })
+  app.on('second-instance', openMainWindow)
   app.whenReady().then(start)
 } else {
   app.quit()

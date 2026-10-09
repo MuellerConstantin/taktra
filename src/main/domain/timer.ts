@@ -42,16 +42,15 @@ function bookedTimes(
   }
 }
 
-function stopRunning(now: Date): number | null {
+function stopRunning(now: Date): void {
   const db = getActiveDatabase()
   const entry = db.select().from(timeEntries).where(isRunning).get()
-  if (!entry?.startedAt) return null
+  if (!entry?.startedAt) return
 
   db.update(timeEntries)
     .set(bookedTimes(entry.startedAt, now))
     .where(eq(timeEntries.id, entry.id))
     .run()
-  return entry.id
 }
 
 export function getRunningTimer(): TimeEntryDetails | null {
@@ -90,15 +89,10 @@ export function startTimer(activityId: number): TimeEntryDetails {
   return timer
 }
 
-/** Books the running timer and returns the booked entry, or `null` if no timer ran. */
-export function stopTimer(): TimeEntryDetails | null {
+export function stopTimer(): void {
   const db = getActiveDatabase()
-  const booked = db.transaction(() => {
-    const entryId = stopRunning(new Date())
-    return entryId === null ? null : selectTimeEntryDetails(eq(timeEntries.id, entryId))[0]
-  })
+  db.transaction(() => stopRunning(new Date()))
   notifyTimerChanged()
-  return booked
 }
 
 export function discardTimer(): void {
@@ -131,9 +125,7 @@ export function listRecentActivities(limit: number): ActivityDetails[] {
 export function initTimer(): void {
   handle('timer:get', z.tuple([]), () => getRunningTimer())
   handle('timer:start', z.tuple([id]), (_, activityId) => startTimer(activityId))
-  handle('timer:stop', z.tuple([]), () => {
-    stopTimer()
-  })
+  handle('timer:stop', z.tuple([]), () => stopTimer())
   handle('timer:discard', z.tuple([]), () => discardTimer())
   handle('timer:recent', z.tuple([id.max(50)]), (_, limit) => listRecentActivities(limit))
 }

@@ -8,8 +8,7 @@ export const settingsPatch = z
     miniTimer: z.boolean(),
     quickStartShortcutEnabled: z.boolean(),
     quickStartShortcut: z.string().min(1),
-    autoUpdate: z.boolean(),
-    mcpAccess: z.boolean()
+    autoUpdate: z.boolean()
   })
   .partial()
   .strict()

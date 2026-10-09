@@ -9,7 +9,7 @@ import { isUniqueViolation } from '../db/errors'
 import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { clientRef, effectiveClientJoin, findClient } from './clients'
-import { compareNames, sortByName, toNameKey } from './names'
+import { sortByName, toNameKey } from './names'
 import { findProject } from './projects'
 import { notifyTimerChanged } from './timerEvents'
 
@@ -86,27 +86,6 @@ export function getActivityDetails(id: number): ActivityDetails {
     .get()
   if (!row) throw new AppError('ACTIVITY_NOT_FOUND', String(id))
   return { ...row, tags: tagsByActivity([id]).get(id) ?? [] }
-}
-
-/** Activities that can be booked on, i.e. neither they nor their project are archived. */
-export function listBookableActivities(projectId?: number): ActivityDetails[] {
-  const rows = getActiveDatabase()
-    .select(activityDetailsColumns)
-    .from(activities)
-    .innerJoin(projects, eq(activities.projectId, projects.id))
-    .leftJoin(clients, effectiveClientJoin)
-    .where(
-      and(
-        projectId === undefined ? undefined : eq(activities.projectId, projectId),
-        isNull(activities.archivedAt),
-        isNull(projects.archivedAt)
-      )
-    )
-    .all()
-    .sort((a, b) => compareNames(a.activity.name, b.activity.name))
-
-  const tagMap = tagsByActivity(rows.map((row) => row.activity.id))
-  return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
 }
 
 function assertClientAssignable(projectId: number, clientId: number | null): void {

@@ -460,8 +460,7 @@
     "appearance": "Darstellung",
     "controls": "Bedienung",
     "about": "Über Taktra",
-    "updates": "Updates",
-    "assistants": "KI-Assistenten"
+    "updates": "Updates"
   },
   "AppearanceSettings": {
     "theme": {
@@ -521,42 +520,6 @@
     "label": "Automatisch nach Updates suchen",
     "description": "Sucht beim Start und alle paar Stunden auf GitHub nach neuen Versionen. Updates werden im Hintergrund geladen und beim Beenden von Taktra installiert. Ohne Verbindung passiert nichts."
   },
-  "AssistantsSettings": {
-    "title": "KI-Assistenten",
-    "label": "Zugriff für KI-Assistenten erlauben",
-    "description": "Assistenten wie Claude können den laufenden Timer sehen und einen Timer für eine Tätigkeit starten. Sie verbinden sich über MCP, das Model Context Protocol.",
-    "privacy": "Taktra selbst sendet nichts. Was ein Assistent aus Taktra liest, geht wie der übrige Chat an den Anbieter seines KI-Modells.",
-    "copy": "Kopieren",
-    "copied": "Kopiert",
-    "setup": {
-      "title": "Verbinden",
-      "description": "Verbinde einen Assistenten einmal. Braucht er Taktra und es läuft nicht, startet Taktra im Tray.",
-      "restart": "Starte {name} neu, damit die Änderung wirkt.",
-      "other": "Du nutzt einen anderen Assistenten?"
-    },
-    "assistants": {
-      "states": {
-        "notInstalled": "Nicht installiert",
-        "disconnected": "Nicht verbunden",
-        "connected": "Verbunden",
-        "outdated": "Mit Taktra in einem anderen Ordner verbunden",
-        "invalid": "Seine Konfigurationsdatei ist nicht lesbar"
-      },
-      "connect": "Verbinden",
-      "reconnect": "Erneut verbinden",
-      "disconnect": "Trennen",
-      "download": "Herunterladen",
-      "manual": "Verbinden fügt diesen Eintrag in {path} ein. Du kannst ihn auch selbst eintragen:"
-    },
-    "manual": {
-      "title": "Eigenen MCP-Client verbinden",
-      "subtitle": "Jeden MCP-Client von Hand einrichten",
-      "description": "Trage Taktra mit diesen Werten als lokalen Server (stdio) ein. Wo das geht, hängt vom Assistenten ab.",
-      "command": "Befehl",
-      "arguments": "Argument",
-      "environment": "Umgebungsvariable"
-    }
-  },
   "ShortcutRecorder": {
     "recording": "Tasten drücken…"
   },
@@ -608,8 +571,6 @@
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
-    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
-    "ASSISTANT_CONFIG_INVALID": "Die Konfigurationsdatei des Assistenten ist nicht lesbar. Taktra lässt sie unverändert.",
-    "ASSISTANT_CONFIG_WRITE_FAILED": "Die Konfigurationsdatei des Assistenten konnte nicht geschrieben werden."
+    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?"
   }
 }

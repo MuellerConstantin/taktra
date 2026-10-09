@@ -17,5 +17,4 @@ export interface Settings {
   readonly quickStartShortcutEnabled: boolean
   readonly quickStartShortcut: string
   readonly autoUpdate: boolean
-  readonly mcpAccess: boolean
 }
