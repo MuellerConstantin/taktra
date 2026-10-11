@@ -7,18 +7,18 @@ import {
   type CalendarDate
 } from '@internationalized/date'
 import { useEffect, useState } from 'react'
-import { Form, useFilter } from 'react-aria-components'
+import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ActivityWithTags } from '../../../../shared/activities'
-import { normalizeName, toNameKey } from '../../../../shared/names'
+import { normalizeName } from '../../../../shared/names'
 import type { Project } from '../../../../shared/projects'
 import type { Tag } from '../../../../shared/tags'
 import type { TimeEntryDetails, TimeEntryTimes } from '../../../../shared/timeEntries'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
+import { findActivityByName } from '../../lib/activities'
 import { api } from '../../lib/api'
 import { formatDuration, parseDuration } from '../../lib/duration'
 import { Button } from '../atoms/Button'
-import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
@@ -26,16 +26,11 @@ import { TextField } from '../atoms/TextField'
 import { TimeField } from '../atoms/TimeField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { ToggleButtonGroup } from '../atoms/ToggleButtonGroup'
+import { ActivityComboBox } from './ActivityComboBox'
 import { NoteField } from './NoteField'
 import { TagPicker } from './TagPicker'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 type Mode = 'range' | 'duration'
-
-interface ActivityOption {
-  readonly id: number | 'new'
-  readonly name: string
-}
 
 interface TimeEntryDialogProps {
   readonly date: CalendarDate
@@ -73,45 +68,27 @@ export function TimeEntryDialog({
   const [note, setNote] = useState(details?.entry.note ?? '')
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
-  const { contains } = useFilter({ sensitivity: 'base' })
 
   useEffect(() => {
-    Promise.all([api.projects.list(), api.tags.list()])
-      .then(([projectList, tagList]) => {
+    Promise.all([
+      api.projects.list(),
+      api.activities.list({ includeArchived: true }),
+      api.tags.list()
+    ])
+      .then(([projectList, activityList, tagList]) => {
         setProjects(projectList)
+        setActivities(activityList)
         setTags(tagList)
       })
       .catch((caught) => setError(errorMessage(caught)))
   }, [errorMessage])
 
-  useEffect(() => {
-    if (projectId === null) return
-    let isCurrent = true
-    api.activities
-      .list({ projectId })
-      .then((result) => isCurrent && setActivities(result))
-      .catch((caught) => isCurrent && setError(errorMessage(caught)))
-    return () => {
-      isCurrent = false
-    }
-  }, [projectId, errorMessage])
-
   const trimmedName = normalizeName(activityName)
-  const existingActivity = activities.find(
-    (activity) => toNameKey(activity.name) === toNameKey(trimmedName)
-  )
+  const existingActivity = findActivityByName(activities, projectId, trimmedName)
   const isNewActivity = trimmedName !== '' && !existingActivity
-  const matchingActivities = existingActivity
-    ? activities
-    : activities.filter((activity) => contains(activity.name, trimmedName))
-  const activityOptions: readonly ActivityOption[] =
-    trimmedName && !existingActivity
-      ? [...matchingActivities, { id: 'new', name: trimmedName }]
-      : matchingActivities
 
   const handleProjectChange = (key: React.Key | null): void => {
     setProjectId(typeof key === 'number' ? key : null)
-    setActivities([])
     setActivityName('')
     setChosenTagIds(null)
   }
@@ -144,6 +121,8 @@ export function TimeEntryDialog({
 
     setPending(true)
     try {
+      if (existingActivity?.archivedAt && existingActivity.id !== details?.activity.id)
+        await api.activities.setArchived(existingActivity.id, false)
       const activity =
         existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
       if (!existingActivity) setActivities((current) => [...current, { ...activity, tagIds: [] }])
@@ -187,24 +166,18 @@ export function TimeEntryDialog({
                 </SelectItem>
               )}
             </Select>
-            <ComboBox
+            <ActivityComboBox
               label={t('activityLabel')}
-              items={activityOptions}
-              inputValue={activityName}
-              onInputChange={setActivityName}
-              onSelectionChange={(key) => typeof key === 'number' && setChosenTagIds(null)}
-              allowsCustomValue
-              maxLength={MAX_NAME_LENGTH}
-              allowsEmptyCollection
-              isRequired
-              isDisabled={projectId === null}
-            >
-              {(option) => (
-                <ComboBoxItem id={option.id} textValue={option.name}>
-                  {option.id === 'new' ? t('createActivity', { name: option.name }) : option.name}
-                </ComboBoxItem>
-              )}
-            </ComboBox>
+              activities={activities}
+              projects={projects}
+              projectId={projectId}
+              value={activityName}
+              onChange={setActivityName}
+              onSelect={(activity) => {
+                setProjectId(activity.projectId)
+                setChosenTagIds(null)
+              }}
+            />
             {isNewActivity && (
               <TagPicker
                 tags={tags}

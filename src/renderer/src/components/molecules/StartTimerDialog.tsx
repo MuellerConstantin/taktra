@@ -1,24 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Form, useFilter } from 'react-aria-components'
+import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Activity } from '../../../../shared/activities'
-import { normalizeName, toNameKey } from '../../../../shared/names'
+import type { ActivityWithTags } from '../../../../shared/activities'
+import { normalizeName } from '../../../../shared/names'
 import type { Project } from '../../../../shared/projects'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useTimer } from '../../hooks/useTimer'
+import { findActivityByName } from '../../lib/activities'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'
-import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
+import { ActivityComboBox } from './ActivityComboBox'
 import { NoteField } from './NoteField'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
-
-interface ActivityOption {
-  readonly id: number | 'new'
-  readonly name: string
-}
 
 interface StartTimerDialogProps {
   readonly onClose: () => void
@@ -30,43 +25,22 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
   const { start } = useTimer()
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [projectId, setProjectId] = useState<number | null>(null)
-  const [activities, setActivities] = useState<readonly Activity[]>([])
+  const [activities, setActivities] = useState<readonly ActivityWithTags[]>([])
   const [activityName, setActivityName] = useState('')
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
-  const { contains } = useFilter({ sensitivity: 'base' })
 
   useEffect(() => {
-    api.projects
-      .list()
-      .then(setProjects)
+    Promise.all([api.projects.list(), api.activities.list({ includeArchived: true })])
+      .then(([projectList, activityList]) => {
+        setProjects(projectList)
+        setActivities(activityList)
+      })
       .catch((caught) => setError(errorMessage(caught)))
   }, [errorMessage])
 
-  useEffect(() => {
-    if (projectId === null) return
-    let isCurrent = true
-    api.activities
-      .list({ projectId })
-      .then((result) => isCurrent && setActivities(result))
-      .catch((caught) => isCurrent && setError(errorMessage(caught)))
-    return () => {
-      isCurrent = false
-    }
-  }, [projectId, errorMessage])
-
   const trimmedName = normalizeName(activityName)
-  const existingActivity = activities.find(
-    (activity) => toNameKey(activity.name) === toNameKey(trimmedName)
-  )
-  const matchingActivities = existingActivity
-    ? activities
-    : activities.filter((activity) => contains(activity.name, trimmedName))
-  const activityOptions: readonly ActivityOption[] =
-    trimmedName && !existingActivity
-      ? [...matchingActivities, { id: 'new', name: trimmedName }]
-      : matchingActivities
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -75,8 +49,9 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
 
     setPending(true)
     try {
-      const activity =
-        existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
+      const existing = findActivityByName(activities, projectId, trimmedName)
+      if (existing?.archivedAt) await api.activities.setArchived(existing.id, false)
+      const activity = existing ?? (await api.activities.create({ projectId, name: trimmedName }))
       await start(activity.id, note)
       onClose()
     } catch (caught) {
@@ -99,7 +74,6 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
               value={projectId}
               onChange={(key) => {
                 setProjectId(typeof key === 'number' ? key : null)
-                setActivities([])
                 setActivityName('')
               }}
               isRequired
@@ -116,23 +90,15 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
                 </SelectItem>
               )}
             </Select>
-            <ComboBox
+            <ActivityComboBox
               label={t('activityLabel')}
-              items={activityOptions}
-              inputValue={activityName}
-              onInputChange={setActivityName}
-              allowsCustomValue
-              maxLength={MAX_NAME_LENGTH}
-              allowsEmptyCollection
-              isRequired
-              isDisabled={projectId === null}
-            >
-              {(option) => (
-                <ComboBoxItem id={option.id} textValue={option.name}>
-                  {option.id === 'new' ? t('createActivity', { name: option.name }) : option.name}
-                </ComboBoxItem>
-              )}
-            </ComboBox>
+              activities={activities}
+              projects={projects}
+              projectId={projectId}
+              value={activityName}
+              onChange={setActivityName}
+              onSelect={(activity) => setProjectId(activity.projectId)}
+            />
             <NoteField value={note} onChange={setNote} rows={3} />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">

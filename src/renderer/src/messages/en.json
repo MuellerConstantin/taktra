@@ -168,12 +168,15 @@
     "noRecent": "Type to search all activities.",
     "stop": "Stop timer"
   },
+  "ActivityComboBox": {
+    "create": "Create “{name}”",
+    "archived": "archived"
+  },
   "StartTimerDialog": {
     "title": "Start timer",
     "projectLabel": "Project",
     "projectPlaceholder": "Choose a project",
     "activityLabel": "Activity",
-    "createActivity": "Create “{name}”",
     "cancel": "Cancel",
     "start": "Start"
   },
@@ -227,7 +230,6 @@
     "projectLabel": "Project",
     "projectPlaceholder": "Choose a project",
     "activityLabel": "Activity",
-    "createActivity": "Create “{name}”",
     "modeLabel": "Time input",
     "modeRange": "Start and end",
     "modeDuration": "Duration",
