@@ -23,7 +23,9 @@ unavailable. Deleting a profile moves its file to the operating system's trash.
 **Projects, activities, tags**
 Projects group activities; an activity is what time is booked on. Recurring
 work needs no special modeling — it is the same activity booked again. An
-activity can be moved to another project together with its entries. Tags are
+activity can be moved to another project together with its entries, or merged
+into another activity, which takes over its entries. Creating an activity
+while booking suggests similar existing ones first, so duplicates are rare. Tags are
 global and attached to activities only; every entry inherits the tags of its
 activity, retroactively included. Tags describe the kind of work (meeting,
 support), not who it is for.
@@ -40,14 +42,17 @@ effective client, so per-client sums add up.
 An entry is recorded with start and end, with a duration only, or by the timer.
 The timer rounds start and end to whole minutes and books the difference (at
 least one minute), so back-to-back timers meet on the same minute. Only
-one timer runs at a time, across all profiles.
+one timer runs at a time, across all profiles. Entries and the running timer
+carry an optional note in a restricted subset of Markdown (lists, bold, italic,
+code, links), exported as written.
 
 **Quick access to the timer**
 The timer view is the start page with recently used activities. A sidebar
 indicator shows the running timer everywhere, and a small always-on-top mini
 timer shows it while the main window is minimized or covered. The app lives in
 the tray; the tray icon and a configurable global shortcut open a quick start
-window to search an activity and start it.
+window to search an activity and start it. Inside the main window, a command
+palette reaches views, actions and settings from the keyboard.
 
 **Reports**
 Tracked time is evaluated over a date range, filtered by project, tag and
@@ -74,6 +79,7 @@ development.
 - **Database**: SQLite via `better-sqlite3`, Drizzle ORM, `drizzle-kit`
 - **Validation**: Zod (main process only)
 - **Charts**: nivo
+- **Notes**: `react-markdown` with `remark-gfm` and `remark-breaks`
 - **App settings**: `electron-store`
 - **Export**: `csv-stringify` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
@@ -99,7 +105,8 @@ src/
 ```
 
 App-wide modules (lifecycle, IPC registration, settings, profiles) sit directly
-in `src/main/`.
+in `src/main/`. `docs/screenshots/` holds the README screenshots; they show only
+the sample profile and are excluded from the packaged app.
 
 ## Design Decisions
 

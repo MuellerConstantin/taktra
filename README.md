@@ -12,10 +12,16 @@
   <img src="https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite" />
   <img src="https://img.shields.io/badge/Language-TypeScript-blue?logo=typescript" />
 </p>
+<p align="center">
+  <img width="800" alt="The timer view of Taktra with a running timer" src="./docs/screenshots/timer.png">
+</p>
 
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Download](#download)
 - [Motivation](#motivation)
 - [Development](#development)
   - [Database Migrations](#database-migrations)
@@ -27,19 +33,56 @@
 
 ## Introduction
 
-Taktra is a time tracking app for the desktop. Work is organized into projects and activities — a daily
-standup is simply the same activity booked again each day — and time is booked on activities, either with a
-start and end time or as a plain duration. Tags such as `meeting` or `support` are attached to activities and
-cut across projects, so every entry inherits the tags of its activity. Reports evaluate the tracked time over
-any period, grouped by project, by tag, or by both.
+Taktra is a local-first time tracker for the desktop. Install it, start a timer, and you are done: there is
+no server to run, no account to create and no cloud that holds your data. Everything happens on your
+machine, and your data is a plain file you own.
 
-Starting a timer takes a click: from the recently used activities on the start page, or from a quick start
-search that opens from the tray icon or a global shortcut. Taktra keeps running in the
-tray when its window is closed, and a small always-on-top mini timer shows what is being tracked while the
-window is out of sight.
+- **Your data, your file.** Each profile is a single `*.taktra` file wherever you keep it. Backing it up or
+  moving it is as simple as copying a document.
+- **Works offline, always.** No server, no account, no telemetry. The only network access is the optional
+  update check, which can be turned off.
+- **A timer one click away.** From the start page, the tray icon or a global shortcut.
+- **Lean by design.** It starts instantly, lives quietly in the tray and does one thing well.
 
-There is no server, no account and no sync. Everything runs on your machine, and your data is a plain file
-you own.
+## Features
+
+- Projects, activities and tags; recurring work is simply the same activity booked again
+- Clients to see who the work is for
+- Time entries with start and end, as a plain duration or by a start/stop timer, with Markdown notes
+- Quick start from the tray or a global shortcut, and an always-on-top mini timer
+- Reports by project, client and tag over any period
+- Export to CSV or JSON in a stable format for billing and other tools
+- Several profiles, each in its own file, like KeePass databases
+- Light and dark theme, English and German, command palette and keyboard shortcuts
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="33%"><a href="./docs/screenshots/entries.png"><img alt="Entries of one day as a timeline" src="./docs/screenshots/entries.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/reports.png"><img alt="Reports with the tracked time per day" src="./docs/screenshots/reports.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/export.png"><img alt="Export with a preview of the file" src="./docs/screenshots/export.png"></a></td>
+  </tr>
+  <tr>
+    <td width="33%"><a href="./docs/screenshots/projects.png"><img alt="Projects of the sample profile" src="./docs/screenshots/projects.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/quick-start.png"><img alt="Quick start window" src="./docs/screenshots/quick-start.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/entries-dark.png"><img alt="Entries in the dark theme" src="./docs/screenshots/entries-dark.png"></a></td>
+  </tr>
+</table>
+
+Screenshots show the generated sample profile.
+
+## Download
+
+Taktra is available for Windows so far. The [latest release](https://github.com/MuellerConstantin/taktra/releases/latest)
+offers two packages:
+
+- **Installer** (`taktra-<version>-setup.exe`): installs per user without admin rights and keeps itself up
+  to date.
+- **Portable zip** (`taktra-<version>-portable.zip`): runs without installation. It does not update
+  itself but points to new releases.
+
+The welcome screen offers a sample profile to look around before booking your own time.
 
 ## Motivation
 
