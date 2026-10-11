@@ -15,7 +15,7 @@ const timezone = z.string().refine((value) => {
 
 const validDate = z.date().refine((value) => !Number.isNaN(value.getTime()), 'Invalid date')
 
-const note = z.string().trim().max(MAX_NOTE_LENGTH).transform(emptyToNull).nullable()
+export const note = z.string().trim().max(MAX_NOTE_LENGTH).transform(emptyToNull).nullable()
 
 const entryBase = {
   activityId: id,

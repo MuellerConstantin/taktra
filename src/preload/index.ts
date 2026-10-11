@@ -109,11 +109,13 @@ const api = {
     create: (input: TimeEntryInput) => invoke<TimeEntry>('timeEntries:create', input),
     update: (id: number, input: TimeEntryInput) =>
       invoke<TimeEntry>('timeEntries:update', id, input),
+    setNote: (id: number, note: string) => invoke<void>('timeEntries:note', id, note),
     delete: (id: number) => invoke<void>('timeEntries:delete', id)
   },
   timer: {
     get: () => invoke<TimeEntryDetails | null>('timer:get'),
-    start: (activityId: number) => invoke<TimeEntryDetails>('timer:start', activityId),
+    start: (activityId: number, note?: string) =>
+      invoke<TimeEntryDetails>('timer:start', activityId, note),
     stop: () => invoke<void>('timer:stop'),
     discard: () => invoke<void>('timer:discard'),
     recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)

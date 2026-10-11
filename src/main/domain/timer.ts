@@ -1,7 +1,7 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { AppError, isAppError } from '../../shared/errors'
-import { id } from '../../shared/validation'
+import { id, note } from '../../shared/validation'
 import type { ActivityDetails, TimeEntryDetails } from '../../shared/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
@@ -66,7 +66,7 @@ export function hasRunningTimer(): boolean {
   }
 }
 
-export function startTimer(activityId: number): TimeEntryDetails {
+export function startTimer(activityId: number, note: string | null = null): TimeEntryDetails {
   const activity = findActivity(activityId)
   if (activity.archivedAt || findProject(activity.projectId).archivedAt)
     throw new AppError('VALIDATION_FAILED', 'Activity or project is archived')
@@ -78,6 +78,7 @@ export function startTimer(activityId: number): TimeEntryDetails {
     db.insert(timeEntries)
       .values({
         activityId,
+        note,
         date: toLocalDate(now),
         startedAt: now,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -124,7 +125,9 @@ export function listRecentActivities(limit: number): ActivityDetails[] {
 
 export function initTimer(): void {
   handle('timer:get', z.tuple([]), () => getRunningTimer())
-  handle('timer:start', z.tuple([id]), (_, activityId) => startTimer(activityId))
+  handle('timer:start', z.tuple([id, note.optional()]), (_, activityId, timerNote) =>
+    startTimer(activityId, timerNote)
+  )
   handle('timer:stop', z.tuple([]), () => stopTimer())
   handle('timer:discard', z.tuple([]), () => discardTimer())
   handle('timer:recent', z.tuple([id.max(50)]), (_, limit) => listRecentActivities(limit))

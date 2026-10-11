@@ -1,15 +1,17 @@
 import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
-import { RiArrowLeftRightLine, RiPlayFill, RiStopFill } from '@remixicon/react'
+import { RiArrowLeftRightLine, RiPlayFill, RiStickyNoteLine, RiStopFill } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivityDetails } from '../../../shared/timeEntries'
+import type { ActivityDetails, TimeEntry } from '../../../shared/timeEntries'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
+import { ExpandableNote } from '../components/molecules/Note'
 import { StartTimerDialog } from '../components/molecules/StartTimerDialog'
 import { TagBadges } from '../components/molecules/TagBadges'
+import { TimerNoteDialog } from '../components/molecules/TimerNoteDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'
@@ -33,6 +35,7 @@ function TimerView(): React.JSX.Element {
   const [bookedTodaySec, setBookedTodaySec] = useState(0)
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isDiscardOpen, setDiscardOpen] = useState(false)
+  const [noteEntry, setNoteEntry] = useState<TimeEntry | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const todayDate = today(getLocalTimeZone())
@@ -111,14 +114,24 @@ function TimerView(): React.JSX.Element {
                   </span>
                 </span>
                 {running.tags.length > 0 && <TagBadges tags={running.tags} />}
+                {running.entry.note && (
+                  <ExpandableNote
+                    text={running.entry.note}
+                    className="max-w-full text-sm text-muted-foreground"
+                  />
+                )}
                 <span className="text-xs text-muted-foreground">
                   {t('since', { time: timeFormatter.format(running.entry.startedAt) })}
                 </span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 <Button onPress={() => run(stop)} shortcut={appShortcuts.stopTimer}>
                   <RiStopFill className="size-4" />
                   {t('stop')}
+                </Button>
+                <Button variant="secondary" onPress={() => setNoteEntry(running.entry)}>
+                  <RiStickyNoteLine className="size-4" />
+                  {running.entry.note ? t('editNote') : t('addNote')}
                 </Button>
                 <Button variant="secondary" onPress={() => setDiscardOpen(true)}>
                   {t('discard')}
@@ -197,6 +210,13 @@ function TimerView(): React.JSX.Element {
         </section>
       </div>
       {isDialogOpen && <StartTimerDialog onClose={() => setDialogOpen(false)} />}
+      {noteEntry && (
+        <TimerNoteDialog
+          entryId={noteEntry.id}
+          note={noteEntry.note}
+          onClose={() => setNoteEntry(null)}
+        />
+      )}
       <Modal isOpen={isDiscardOpen} onOpenChange={setDiscardOpen} isDismissable>
         <AlertDialog
           variant="destructive"

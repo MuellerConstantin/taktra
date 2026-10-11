@@ -32,8 +32,8 @@ function TimerProvider({ children }: TimerProviderProps): React.JSX.Element {
 
   useEffect(() => events.onTimerChanged(() => setRevision((count) => count + 1)), [])
 
-  const start = useCallback(async (activityId: number) => {
-    await api.timer.start(activityId)
+  const start = useCallback(async (activityId: number, note?: string) => {
+    await api.timer.start(activityId, note)
   }, [])
 
   const stop = useCallback(async () => {

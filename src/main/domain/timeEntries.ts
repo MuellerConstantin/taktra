@@ -1,7 +1,7 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
 import { AppError } from '../../shared/errors'
-import { id, timeEntryFilter, timeEntryInput } from '../../shared/validation'
+import { id, note, timeEntryFilter, timeEntryInput } from '../../shared/validation'
 import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../shared/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
@@ -13,6 +13,7 @@ import {
   tagsByActivity
 } from './activities'
 import { effectiveClientJoin } from './clients'
+import { notifyTimerChanged } from './timerEvents'
 
 type TimeEntryValues = Pick<
   TimeEntry,
@@ -97,6 +98,12 @@ export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
   })
 }
 
+export function setTimeEntryNote(id: number, note: string | null): void {
+  const entry = findTimeEntry(id)
+  getActiveDatabase().update(timeEntries).set({ note }).where(eq(timeEntries.id, id)).run()
+  if (entry.endedAt === null && entry.startedAt !== null) notifyTimerChanged()
+}
+
 export function deleteTimeEntry(id: number): void {
   const entry = findTimeEntry(id)
   const db = getActiveDatabase()
@@ -112,6 +119,9 @@ export function initTimeEntries(): void {
   handle('timeEntries:create', z.tuple([timeEntryInput]), (_, input) => createTimeEntry(input))
   handle('timeEntries:update', z.tuple([id, timeEntryInput]), (_, entryId, input) =>
     updateTimeEntry(entryId, input)
+  )
+  handle('timeEntries:note', z.tuple([id, note]), (_, entryId, entryNote) =>
+    setTimeEntryNote(entryId, entryNote)
   )
   handle('timeEntries:delete', z.tuple([id]), (_, entryId) => deleteTimeEntry(entryId))
 }

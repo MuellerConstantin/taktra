@@ -137,6 +137,8 @@
     "since": "Running since {time}",
     "stop": "Stop",
     "discard": "Discard",
+    "addNote": "Add note",
+    "editNote": "Edit note",
     "idle": "No timer running.",
     "start": "Start timer",
     "recent": "Recently used",
@@ -147,7 +149,7 @@
     "discardConfirmText": "The running time is not booked and the entry is deleted.",
     "discardConfirmAction": "Discard",
     "cancel": "Cancel",
-    "help": "Start and stop time tracking for an activity here. Recently used activities start with one click, new ones are created when you start the timer. Without opening Taktra, use the quick start from the tray icon."
+    "help": "Start and stop time tracking for an activity here. Recently used activities start with one click, new ones are created when you start the timer. Without opening Taktra, use the quick start from the tray icon. What sets a single appointment apart belongs in the note, so the same activity can be booked again."
   },
   "TimerIndicator": {
     "open": "Open timer for {name}",
@@ -174,6 +176,11 @@
     "createActivity": "Create “{name}”",
     "cancel": "Cancel",
     "start": "Start"
+  },
+  "TimerNoteDialog": {
+    "title": "Note",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "TrackingView": {
     "today": "Today",
@@ -229,10 +236,6 @@
     "durationLabel": "Duration",
     "durationDescription": "For example 1:30, 1.5, 90m or 1h 30m",
     "durationInvalid": "Please enter a duration between 1 minute and 24 hours.",
-    "noteLabel": "Note",
-    "noteDescription": "Markdown: lists, **bold**, *italic*, `code` and links",
-    "preview": "Preview",
-    "previewEmpty": "Nothing to preview yet.",
     "endBeforeStart": "The end must be after the start.",
     "cancel": "Cancel",
     "create": "Create",
@@ -242,6 +245,12 @@
   "Note": {
     "showMore": "Show more",
     "showLess": "Show less"
+  },
+  "NoteField": {
+    "label": "Note",
+    "description": "Markdown: lists, **bold**, *italic*, `code` and links",
+    "preview": "Preview",
+    "previewEmpty": "Nothing to preview yet."
   },
   "TagPicker": {
     "label": "Tags",

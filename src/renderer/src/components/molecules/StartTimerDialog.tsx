@@ -12,6 +12,7 @@ import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { Select, SelectItem } from '../atoms/Select'
+import { NoteField } from './NoteField'
 import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface ActivityOption {
@@ -31,6 +32,7 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
   const [projectId, setProjectId] = useState<number | null>(null)
   const [activities, setActivities] = useState<readonly Activity[]>([])
   const [activityName, setActivityName] = useState('')
+  const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
   const { contains } = useFilter({ sensitivity: 'base' })
@@ -75,7 +77,7 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
     try {
       const activity =
         existingActivity ?? (await api.activities.create({ projectId, name: trimmedName }))
-      await start(activity.id)
+      await start(activity.id, note)
       onClose()
     } catch (caught) {
       setError(errorMessage(caught))
@@ -131,6 +133,7 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
                 </ComboBoxItem>
               )}
             </ComboBox>
+            <NoteField value={note} onChange={setNote} rows={3} />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>
