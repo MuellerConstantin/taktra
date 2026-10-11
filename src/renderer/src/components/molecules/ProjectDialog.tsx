@@ -4,6 +4,7 @@ import { useTranslations } from 'use-intl'
 import type { ActivityWithTags } from '../../../../shared/activities'
 import type { Client } from '../../../../shared/clients'
 import type { Project } from '../../../../shared/projects'
+import { useCustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { COLORS } from '../../lib/colors'
@@ -13,6 +14,7 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { ClientSelect } from './ClientSelect'
+import { CustomFieldInputs } from './CustomFieldInputs'
 import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
 interface ProjectDialogProps {
@@ -39,6 +41,8 @@ export function ProjectDialog({
   const [activities, setActivities] = useState<readonly ActivityWithTags[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
+  const fieldValues = useCustomFieldValues('project', project?.id)
+  const shownError = error ?? fieldValues.error
 
   const replacedCount =
     clientId === null || clientId === project?.clientId
@@ -67,9 +71,11 @@ export function ProjectDialog({
     setError(null)
     try {
       const input = { name, description, color, clientId }
-      onSaved(
-        project ? await api.projects.update(project.id, input) : await api.projects.create(input)
-      )
+      const saved = project
+        ? await api.projects.update(project.id, input)
+        : await api.projects.create(input)
+      await fieldValues.save(saved.id)
+      onSaved(saved)
       onClose()
     } catch (caught) {
       setError(errorMessage(caught))
@@ -117,13 +123,14 @@ export function ProjectDialog({
                 </p>
               )}
             </div>
+            <CustomFieldInputs values={fieldValues} />
             <ColorSwatchPicker
               label={t('colorLabel')}
               colors={COLORS}
               value={color}
               onChange={(value) => setColor(value.toString('hex').toLowerCase())}
             />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {shownError && <p className="text-sm text-destructive">{shownError}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>
                 {t('cancel')}

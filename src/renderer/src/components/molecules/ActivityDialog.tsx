@@ -4,6 +4,7 @@ import { useTranslations } from 'use-intl'
 import type { ActivityRef } from '../../../../shared/activities'
 import type { Client } from '../../../../shared/clients'
 import type { Tag } from '../../../../shared/tags'
+import { useCustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'
@@ -11,6 +12,7 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { ClientSelect } from './ClientSelect'
+import { CustomFieldInputs } from './CustomFieldInputs'
 import { TagPicker } from './TagPicker'
 import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
 
@@ -36,6 +38,8 @@ export function ActivityDialog({
   const [clientId, setClientId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, setPending] = useState(false)
+  const fieldValues = useCustomFieldValues('activity', activity.id)
+  const shownError = error ?? fieldValues.error
 
   useEffect(() => {
     Promise.all([
@@ -67,6 +71,7 @@ export function ActivityDialog({
       if (tagsChanged) await api.activities.setTags(activity.id, tagIds)
       if (projectClientId === null && clientId !== initialClientId)
         await api.activities.setClient(activity.id, clientId)
+      await fieldValues.save(activity.id)
       onSaved()
       onClose()
     } catch (caught) {
@@ -99,7 +104,8 @@ export function ActivityDialog({
               isDisabled={projectClientId !== null}
             />
             <TagPicker tags={tags} value={tagIds} onChange={setTagIds} />
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            <CustomFieldInputs values={fieldValues} />
+            {shownError && <p className="text-sm text-destructive">{shownError}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>
                 {t('cancel')}

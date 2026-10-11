@@ -21,6 +21,7 @@ import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
+import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
 import { ExpandableNote } from '../components/molecules/Note'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { TagBadges } from '../components/molecules/TagBadges'
@@ -193,6 +194,7 @@ function ActivityDetailView(): React.JSX.Element {
               </span>
             )}
             {tags.length > 0 && <TagBadges tags={tags} />}
+            <CustomFieldValueList scope="activity" ownerId={activity.id} revision={reloadCount} />
           </div>
           <span className="shrink-0 text-sm text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}

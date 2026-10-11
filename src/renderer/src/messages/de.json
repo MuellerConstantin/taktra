@@ -650,6 +650,11 @@
     "done": "Fertig",
     "limit": "Höchstens {max} aktive Optionen."
   },
+  "CustomFieldInputs": {
+    "none": "Keine Angabe",
+    "search": "{name} durchsuchen",
+    "empty": "Keine passende Option gefunden."
+  },
   "DeleteProfileSection": {
     "title": "Profil löschen",
     "description": "Verschiebt die Profildatei in den Papierkorb und entfernt das Profil aus Taktra.",

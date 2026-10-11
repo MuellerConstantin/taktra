@@ -650,6 +650,11 @@
     "done": "Done",
     "limit": "At most {max} active options."
   },
+  "CustomFieldInputs": {
+    "none": "None",
+    "search": "Search {name}",
+    "empty": "No matching options."
+  },
   "DeleteProfileSection": {
     "title": "Delete profile",
     "description": "Moves the profile file to the trash and removes the profile from Taktra.",

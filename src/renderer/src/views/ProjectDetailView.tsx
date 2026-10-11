@@ -7,6 +7,7 @@ import type { AggregateRow } from '../../../shared/reports'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
+import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
@@ -103,13 +104,14 @@ function ProjectDetailView(): React.JSX.Element {
         }
       >
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-4">
-          <div className="flex min-w-0 flex-1 basis-40 items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex min-w-0 flex-1 basis-40 flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
             {project.archivedAt && (
               <span className="rounded-full border border-border px-2 py-0.5 text-xs">
                 {t('archived')}
               </span>
             )}
             <span className="truncate">{project.description}</span>
+            <CustomFieldValueList scope="project" ownerId={project.id} revision={reloadCount} />
           </div>
           <span className="shrink-0 text-sm text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}
