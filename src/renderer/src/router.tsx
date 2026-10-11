@@ -18,6 +18,7 @@ import AppearanceSettings from './views/settings/app/AppearanceSettings'
 import ControlsSettings from './views/settings/app/ControlsSettings'
 import UpdatesSettings from './views/settings/app/UpdatesSettings'
 import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
+import ProfileFieldsSettings from './views/settings/profile/ProfileFieldsSettings'
 import ProfileGeneralSettings from './views/settings/profile/ProfileGeneralSettings'
 
 export const router = createHashRouter([
@@ -46,7 +47,8 @@ export const router = createHashRouter([
             element: <ProfileSettingsView />,
             children: [
               { index: true, element: <Navigate to="general" replace /> },
-              { path: 'general', element: <ProfileGeneralSettings /> }
+              { path: 'general', element: <ProfileGeneralSettings /> },
+              { path: 'fields', element: <ProfileFieldsSettings /> }
             ]
           }
         ]

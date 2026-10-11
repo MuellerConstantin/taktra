@@ -255,6 +255,11 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
   const profileSettings: readonly Command[] = [
     { id: 'profileName', label: t('settings.profileName'), run: goTo('/profile/general') },
     {
+      id: 'customFields',
+      label: t('settings.customFields'),
+      run: goTo('/profile/fields')
+    },
+    {
       id: 'deleteProfile',
       label: tApp('DeleteProfileSection.title'),
       run: goTo('/profile/general')

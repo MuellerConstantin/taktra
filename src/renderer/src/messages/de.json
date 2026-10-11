@@ -127,7 +127,8 @@
       "newTag": "Neuer Tag"
     },
     "settings": {
-      "profileName": "Profilname"
+      "profileName": "Profilname",
+      "customFields": "Felder"
     }
   },
   "TimerView": {
@@ -567,13 +568,87 @@
   "ProfileSettingsView": {
     "title": "Profileinstellungen",
     "general": "Allgemein",
-    "help": "Ein Profil ist eine eigene Datei mit allen Projekten und Einträgen, etwa eines für die Arbeit und eines für Privates. Zum Sichern kopierst du einfach die Datei."
+    "help": "Ein Profil ist eine eigene Datei mit allen Projekten und Einträgen, etwa eines für die Arbeit und eines für Privates. Zum Sichern kopierst du einfach die Datei.",
+    "fields": "Felder"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
     "nameDescription": "Wird in der Profildatei gespeichert. Umbenennen ändert den Dateinamen nicht.",
     "nameRequired": "Bitte einen Namen eingeben.",
     "save": "Speichern"
+  },
+  "ProfileFieldsSettings": {
+    "description": "Zusätzliche Angaben, die du an Projekten, Leistungsempfängern und Tätigkeiten pflegst, etwa eine Auftragsnummer oder eine Kostenstelle. Jedes Feld gehört zu genau einem davon.",
+    "showArchived": "Archivierte",
+    "archived": "Archiviert",
+    "empty": "Noch keine Felder.",
+    "create": "Feld hinzufügen",
+    "limit": "Höchstens {max} aktive Felder. Archiviere ein Feld, um ein weiteres anzulegen.",
+    "types": {
+      "text": "Text"
+    },
+    "selectSummary": "{count, plural, =0 {Auswahlliste, keine Optionen} one {Auswahlliste, # Option} other {Auswahlliste, # Optionen}}",
+    "edit": "{name} bearbeiten",
+    "editOptions": "Optionen von {name} bearbeiten",
+    "archive": "{name} archivieren",
+    "unarchive": "{name} wiederherstellen",
+    "delete": "{name} löschen",
+    "deleteConfirmTitle": "Feld „{name}“ löschen?",
+    "deleteConfirmText": "Das Feld wird mit seinen Optionen endgültig gelöscht. Felder mit Werten lassen sich nicht löschen, archiviere sie stattdessen.",
+    "deleteConfirmAction": "Löschen",
+    "cancel": "Abbrechen",
+    "scopes": {
+      "project": {
+        "title": "Projektfelder",
+        "description": "Gelten für ein ganzes Projekt, etwa eine Auftragsnummer."
+      },
+      "client": {
+        "title": "Felder für Leistungsempfänger",
+        "description": "Beschreiben, für wen gearbeitet wird, etwa eine Kostenstelle."
+      },
+      "activity": {
+        "title": "Tätigkeitsfelder",
+        "description": "Gehören zu einer einzelnen Tätigkeit, etwa eine Ticketnummer. Beim Verschieben in ein anderes Projekt bleiben sie erhalten."
+      }
+    }
+  },
+  "CustomFieldDialog": {
+    "scopes": {
+      "project": "Neues Projektfeld",
+      "client": "Neues Feld für Leistungsempfänger",
+      "activity": "Neues Tätigkeitsfeld"
+    },
+    "editTitle": "Feld bearbeiten",
+    "nameLabel": "Name",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "typeLabel": "Typ",
+    "typeDescription": "Lässt sich später nicht ändern.",
+    "types": {
+      "text": "Text",
+      "select": "Auswahlliste"
+    },
+    "textHint": "Freie Eingabe, etwa eine Ticketnummer.",
+    "selectHint": "Feste Optionen zur Auswahl, damit die Werte einheitlich bleiben.",
+    "cancel": "Abbrechen",
+    "create": "Anlegen",
+    "save": "Speichern"
+  },
+  "CustomFieldOptionsDialog": {
+    "title": "Optionen von „{name}“",
+    "description": "Archivierte Optionen bleiben an vorhandenen Werten erhalten, sind aber nicht mehr auswählbar.",
+    "empty": "Noch keine Optionen.",
+    "nameLabel": "Name der Option",
+    "newLabel": "Neue Option",
+    "add": "Hinzufügen",
+    "rename": "{name} umbenennen",
+    "archive": "{name} archivieren",
+    "unarchive": "{name} wiederherstellen",
+    "delete": "{name} löschen",
+    "archived": "Archiviert",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "done": "Fertig",
+    "limit": "Höchstens {max} aktive Optionen."
   },
   "DeleteProfileSection": {
     "title": "Profil löschen",

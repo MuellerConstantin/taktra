@@ -13,7 +13,10 @@ function ProfileSettingsView(): React.JSX.Element | null {
       title={activeProfile.name}
       subtitle={t('title')}
       help={t('help')}
-      sections={[{ path: '/profile/general', label: t('general') }]}
+      sections={[
+        { path: '/profile/general', label: t('general') },
+        { path: '/profile/fields', label: t('fields') }
+      ]}
     />
   )
 }

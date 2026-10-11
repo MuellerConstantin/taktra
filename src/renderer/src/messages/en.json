@@ -127,7 +127,8 @@
       "newTag": "New tag"
     },
     "settings": {
-      "profileName": "Profile name"
+      "profileName": "Profile name",
+      "customFields": "Fields"
     }
   },
   "TimerView": {
@@ -567,13 +568,87 @@
   "ProfileSettingsView": {
     "title": "Profile settings",
     "general": "General",
-    "help": "A profile is a separate file with all its projects and entries, for example one for work and one for private projects. To back it up, simply copy the file."
+    "help": "A profile is a separate file with all its projects and entries, for example one for work and one for private projects. To back it up, simply copy the file.",
+    "fields": "Fields"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
     "nameDescription": "Stored in the profile file. Renaming does not change the file name.",
     "nameRequired": "Please enter a name.",
     "save": "Save"
+  },
+  "ProfileFieldsSettings": {
+    "description": "Additional details you keep on projects, clients and activities, such as an order number or a cost center. Each field belongs to exactly one of them.",
+    "showArchived": "Archived",
+    "archived": "Archived",
+    "empty": "No fields yet.",
+    "create": "Add field",
+    "limit": "At most {max} active fields. Archive a field to add another one.",
+    "types": {
+      "text": "Text"
+    },
+    "selectSummary": "{count, plural, =0 {Selection, no options} one {Selection, # option} other {Selection, # options}}",
+    "edit": "Edit {name}",
+    "editOptions": "Edit options of {name}",
+    "archive": "Archive {name}",
+    "unarchive": "Restore {name}",
+    "delete": "Delete {name}",
+    "deleteConfirmTitle": "Delete field “{name}”?",
+    "deleteConfirmText": "The field and its options are deleted permanently. Fields with values cannot be deleted; archive them instead.",
+    "deleteConfirmAction": "Delete",
+    "cancel": "Cancel",
+    "scopes": {
+      "project": {
+        "title": "Project fields",
+        "description": "Apply to a whole project, such as an order number."
+      },
+      "client": {
+        "title": "Client fields",
+        "description": "Describe who the work is for, such as a cost center."
+      },
+      "activity": {
+        "title": "Activity fields",
+        "description": "Belong to a single activity, such as a ticket number. They stay with it when it moves to another project."
+      }
+    }
+  },
+  "CustomFieldDialog": {
+    "scopes": {
+      "project": "New project field",
+      "client": "New client field",
+      "activity": "New activity field"
+    },
+    "editTitle": "Edit field",
+    "nameLabel": "Name",
+    "nameRequired": "Please enter a name.",
+    "typeLabel": "Type",
+    "typeDescription": "Cannot be changed later.",
+    "types": {
+      "text": "Text",
+      "select": "Selection"
+    },
+    "textHint": "Free input, such as a ticket number.",
+    "selectHint": "Fixed options to choose from, so values stay consistent.",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save"
+  },
+  "CustomFieldOptionsDialog": {
+    "title": "Options of “{name}”",
+    "description": "Archived options stay on existing values but can no longer be selected.",
+    "empty": "No options yet.",
+    "nameLabel": "Option name",
+    "newLabel": "New option",
+    "add": "Add",
+    "rename": "Rename {name}",
+    "archive": "Archive {name}",
+    "unarchive": "Restore {name}",
+    "delete": "Delete {name}",
+    "archived": "Archived",
+    "save": "Save",
+    "cancel": "Cancel",
+    "done": "Done",
+    "limit": "At most {max} active options."
   },
   "DeleteProfileSection": {
     "title": "Delete profile",
