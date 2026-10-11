@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A command palette (Ctrl+Shift+P) reaches views, actions and settings from the keyboard.
+- Export entries as JSON in addition to CSV, with the same columns.
+- A note can be added when starting a timer and edited while it runs.
+- Merge an activity into another one, which takes over its time entries.
+- When a new activity is created while booking, similar existing activities are suggested first.
+- View headers and empty states explain the concepts behind each view.
+- Removing a project's client tells that it is handed down to the project's activities.
+- After some days of use, a reminder now and then asks for a donation. It can be snoozed or
+  turned off for good.
+
+### Changed
+
+- The actions of the activity detail view moved into its menu.
+- The about dialog has calmer buttons.
+
+### Fixed
+
+- Names that differ only in extra whitespace count as the same name for projects, activities, tags
+  and clients.
+
 ## [0.2.0] - 2026-10-05
 
 ### Added
