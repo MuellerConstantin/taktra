@@ -212,6 +212,22 @@ export function deleteActivityIfUnused(id: number): void {
   if (!hasTimeEntries(id)) getActiveDatabase().delete(activities).where(eq(activities.id, id)).run()
 }
 
+export function mergeActivity(id: number, targetId: number): void {
+  if (id === targetId)
+    throw new AppError('VALIDATION_FAILED', 'Cannot merge an activity into itself')
+  const source = findActivity(id)
+  const target = findActivity(targetId)
+
+  const db = getActiveDatabase()
+  db.transaction((tx) => {
+    tx.update(timeEntries).set({ activityId: targetId }).where(eq(timeEntries.activityId, id)).run()
+    if (target.archivedAt && !source.archivedAt)
+      tx.update(activities).set({ archivedAt: null }).where(eq(activities.id, targetId)).run()
+    tx.delete(activities).where(eq(activities.id, id)).run()
+  })
+  notifyTimerChanged()
+}
+
 export function deleteActivity(id: number): void {
   findActivity(id)
   if (hasTimeEntries(id)) throw new AppError('ACTIVITY_HAS_TIME_ENTRIES', String(id))
@@ -236,6 +252,9 @@ export function initActivities(): void {
   )
   handle('activities:setTags', z.tuple([id, z.array(id)]), (_, activityId, tagIds) =>
     setActivityTags(activityId, tagIds)
+  )
+  handle('activities:merge', z.tuple([id, id]), (_, activityId, targetId) =>
+    mergeActivity(activityId, targetId)
   )
   handle('activities:delete', z.tuple([id]), (_, activityId) => deleteActivity(activityId))
 }

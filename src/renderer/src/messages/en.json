@@ -321,7 +321,8 @@
   "ActivityMenu": {
     "label": "Actions for {name}",
     "edit": "Edit",
-    "move": "Move to project…"
+    "move": "Move to project…",
+    "merge": "Merge into…"
   },
   "MoveActivityDialog": {
     "title": "Move “{name}”",
@@ -336,6 +337,22 @@
     "clientReplaced": "The target project sets its own client: “{from}” is replaced by “{to}”, including time already tracked.",
     "cancel": "Cancel",
     "move": "Move"
+  },
+  "MergeActivityDialog": {
+    "title": "Merge “{name}”",
+    "targetLabel": "Merge into",
+    "targetPlaceholder": "Choose an activity",
+    "searchActivities": "Search activities",
+    "noActivities": "No activities found.",
+    "archived": "archived",
+    "summary": "{count, plural, =0 {“{source}” has no entries.} one {The # entry of “{source}” moves to “{target}”.} other {The # entries of “{source}” move to “{target}”.}} “{source}” is deleted afterwards. This cannot be undone.",
+    "projectChanges": "The entries move from project “{from}” to “{to}”, also for past periods.",
+    "clientChanges": "The client of the entries changes from “{from}” to “{to}”, also for time already tracked.",
+    "tagsChange": "The entries take on the tags of the target: {from} becomes {to}.",
+    "noClient": "none",
+    "noTags": "none",
+    "cancel": "Cancel",
+    "merge": "Merge"
   },
   "ClientSelect": {
     "label": "Client",

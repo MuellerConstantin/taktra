@@ -1,10 +1,16 @@
-import { RiFolderTransferLine, RiMoreLine, RiPencilLine } from '@remixicon/react'
+import {
+  RiFolderTransferLine,
+  RiMergeCellsHorizontal,
+  RiMoreLine,
+  RiPencilLine
+} from '@remixicon/react'
 import { useState } from 'react'
 import { useTranslations } from 'use-intl'
 import type { ActivityRef } from '../../../../shared/activities'
 import { Button } from '../atoms/Button'
 import { Menu, MenuItem, MenuTrigger } from '../atoms/Menu'
 import { ActivityDialog } from './ActivityDialog'
+import { MergeActivityDialog } from './MergeActivityDialog'
 import { MoveActivityDialog } from './MoveActivityDialog'
 
 interface ActivityMenuProps {
@@ -14,7 +20,7 @@ interface ActivityMenuProps {
 
 export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.JSX.Element {
   const t = useTranslations('ActivityMenu')
-  const [dialog, setDialog] = useState<'edit' | 'move' | null>(null)
+  const [dialog, setDialog] = useState<'edit' | 'move' | 'merge' | null>(null)
 
   return (
     <>
@@ -22,7 +28,7 @@ export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.
         <Button variant="icon" aria-label={t('label', { name: activity.name })}>
           <RiMoreLine className="size-4" />
         </Button>
-        <Menu onAction={(key) => setDialog(key === 'move' ? 'move' : 'edit')}>
+        <Menu onAction={(key) => setDialog(key === 'move' || key === 'merge' ? key : 'edit')}>
           <MenuItem id="edit">
             <RiPencilLine aria-hidden className="size-4" />
             {t('edit')}
@@ -30,6 +36,10 @@ export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.
           <MenuItem id="move">
             <RiFolderTransferLine aria-hidden className="size-4" />
             {t('move')}
+          </MenuItem>
+          <MenuItem id="merge">
+            <RiMergeCellsHorizontal aria-hidden className="size-4" />
+            {t('merge')}
           </MenuItem>
         </Menu>
       </MenuTrigger>
@@ -41,6 +51,13 @@ export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.
           activity={activity}
           onClose={() => setDialog(null)}
           onMoved={onChanged}
+        />
+      )}
+      {dialog === 'merge' && (
+        <MergeActivityDialog
+          activity={activity}
+          onClose={() => setDialog(null)}
+          onMerged={onChanged}
         />
       )}
     </>

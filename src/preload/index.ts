@@ -88,6 +88,7 @@ const api = {
       invoke<Activity>('activities:setClient', id, clientId),
     setTags: (id: number, tagIds: readonly number[]) =>
       invoke<void>('activities:setTags', id, tagIds),
+    merge: (id: number, targetId: number) => invoke<void>('activities:merge', id, targetId),
     delete: (id: number) => invoke<void>('activities:delete', id)
   },
   reports: {

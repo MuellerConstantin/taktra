@@ -321,7 +321,8 @@
   "ActivityMenu": {
     "label": "Aktionen für {name}",
     "edit": "Bearbeiten",
-    "move": "In Projekt verschieben…"
+    "move": "In Projekt verschieben…",
+    "merge": "Zusammenführen mit…"
   },
   "MoveActivityDialog": {
     "title": "„{name}“ verschieben",
@@ -336,6 +337,22 @@
     "clientReplaced": "Das Zielprojekt gibt einen eigenen Leistungsempfänger vor: „{from}“ wird durch „{to}“ ersetzt, auch für bereits erfasste Zeit.",
     "cancel": "Abbrechen",
     "move": "Verschieben"
+  },
+  "MergeActivityDialog": {
+    "title": "„{name}“ zusammenführen",
+    "targetLabel": "Zusammenführen mit",
+    "targetPlaceholder": "Tätigkeit auswählen",
+    "searchActivities": "Tätigkeiten durchsuchen",
+    "noActivities": "Keine Tätigkeiten gefunden.",
+    "archived": "archiviert",
+    "summary": "{count, plural, =0 {„{source}“ hat keine Buchungen.} one {Die # Buchung von „{source}“ wandert zu „{target}“.} other {Die # Buchungen von „{source}“ wandern zu „{target}“.}} „{source}“ wird danach gelöscht. Das lässt sich nicht rückgängig machen.",
+    "projectChanges": "Die Buchungen wechseln von Projekt „{from}“ zu „{to}“, auch für vergangene Zeiträume.",
+    "clientChanges": "Der Leistungsempfänger der Buchungen ändert sich von „{from}“ zu „{to}“, auch für bereits erfasste Zeit.",
+    "tagsChange": "Die Buchungen übernehmen die Tags des Ziels: aus {from} wird {to}.",
+    "noClient": "keiner",
+    "noTags": "keine",
+    "cancel": "Abbrechen",
+    "merge": "Zusammenführen"
   },
   "ClientSelect": {
     "label": "Leistungsempfänger",
