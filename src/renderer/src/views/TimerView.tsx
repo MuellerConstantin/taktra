@@ -1,5 +1,11 @@
 import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date'
-import { RiArrowLeftRightLine, RiPlayFill, RiStickyNoteLine, RiStopFill } from '@remixicon/react'
+import {
+  RiAddLine,
+  RiArrowLeftRightLine,
+  RiPlayFill,
+  RiPencilLine,
+  RiStopFill
+} from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
@@ -114,24 +120,38 @@ function TimerView(): React.JSX.Element {
                   </span>
                 </span>
                 {running.tags.length > 0 && <TagBadges tags={running.tags} />}
-                {running.entry.note && (
-                  <ExpandableNote
-                    text={running.entry.note}
-                    className="max-w-full text-sm text-muted-foreground"
-                  />
+                {running.entry.note ? (
+                  <div className="flex max-w-full items-start gap-1">
+                    <ExpandableNote
+                      text={running.entry.note}
+                      className="text-sm text-muted-foreground"
+                    />
+                    <Button
+                      variant="icon"
+                      aria-label={t('editNote')}
+                      onPress={() => setNoteEntry(running.entry)}
+                    >
+                      <RiPencilLine className="size-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="icon"
+                    onPress={() => setNoteEntry(running.entry)}
+                    className="gap-1 px-2 text-sm"
+                  >
+                    <RiAddLine className="size-4" />
+                    {t('addNote')}
+                  </Button>
                 )}
                 <span className="text-xs text-muted-foreground">
                   {t('since', { time: timeFormatter.format(running.entry.startedAt) })}
                 </span>
               </div>
-              <div className="flex flex-wrap justify-center gap-2">
+              <div className="flex gap-2">
                 <Button onPress={() => run(stop)} shortcut={appShortcuts.stopTimer}>
                   <RiStopFill className="size-4" />
                   {t('stop')}
-                </Button>
-                <Button variant="secondary" onPress={() => setNoteEntry(running.entry)}>
-                  <RiStickyNoteLine className="size-4" />
-                  {running.entry.note ? t('editNote') : t('addNote')}
                 </Button>
                 <Button variant="secondary" onPress={() => setDiscardOpen(true)}>
                   {t('discard')}
