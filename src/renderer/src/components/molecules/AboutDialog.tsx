@@ -28,6 +28,8 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import logo from '../../../../../resources/icon.svg'
 
+const linkClassName = 'gap-1.5 px-2 text-sm'
+
 interface AboutDialogProps {
   readonly isOpen: boolean
   readonly onOpenChange: (isOpen: boolean) => void
@@ -150,8 +152,9 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
                 </Button>
               ) : (
                 <Button
-                  variant="secondary"
+                  variant="icon"
                   onPress={() => updates.check().catch(console.error)}
+                  className={linkClassName}
                   isDisabled={['unsupported', 'checking', 'downloading'].includes(
                     updates.status.state
                   )}
@@ -161,30 +164,46 @@ export function AboutDialog({ isOpen, onOpenChange }: AboutDialogProps): React.J
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button variant="secondary" onPress={reportBug} isDisabled={!info}>
+            <div className="grid grid-flow-col grid-rows-3 justify-items-start gap-x-6">
+              <Button
+                variant="icon"
+                onPress={reportBug}
+                isDisabled={!info}
+                className={linkClassName}
+              >
                 <RiBugLine aria-hidden className="size-4" />
                 {t('reportBug')}
               </Button>
-              <Button variant="secondary" onPress={suggestFeature}>
+              <Button variant="icon" onPress={suggestFeature} className={linkClassName}>
                 <RiLightbulbLine aria-hidden className="size-4" />
                 {t('suggestFeature')}
               </Button>
-              <Button variant="secondary" onPress={() => window.open(DONATION_URL, '_blank')}>
+              <Button
+                variant="icon"
+                onPress={() => window.open(DONATION_URL, '_blank')}
+                className={linkClassName}
+              >
                 <RiHeartLine aria-hidden className="size-4" />
                 {t('donate')}
               </Button>
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button variant="secondary" onPress={() => window.open(REPOSITORY_URL, '_blank')}>
+              <Button
+                variant="icon"
+                onPress={() => window.open(REPOSITORY_URL, '_blank')}
+                className={linkClassName}
+              >
                 <RiGithubLine aria-hidden className="size-4" />
                 {t('repository')}
               </Button>
-              <Button variant="secondary" onPress={openDataFolder}>
+              <Button variant="icon" onPress={openDataFolder} className={linkClassName}>
                 <RiFolderOpenLine aria-hidden className="size-4" />
                 {t('dataFolder')}
               </Button>
-              <Button variant="secondary" onPress={copyInfo} isDisabled={!info}>
+              <Button
+                variant="icon"
+                onPress={copyInfo}
+                isDisabled={!info}
+                className={linkClassName}
+              >
                 {isCopied ? (
                   <RiCheckLine aria-hidden className="size-4" />
                 ) : (
