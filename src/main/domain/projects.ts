@@ -1,5 +1,6 @@
 import { eq, isNull } from 'drizzle-orm'
 import { AppError } from '../../shared/errors'
+import { toNameKey } from '../../shared/names'
 import { z } from 'zod'
 import type { Project, ProjectData } from '../../shared/projects'
 import { id, listOptions, projectInput } from '../../shared/validation'
@@ -8,7 +9,7 @@ import { isUniqueViolation } from '../db/errors'
 import { activities, projects, timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { findClient } from './clients'
-import { sortByName, toNameKey } from './names'
+import { sortByName } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
 export function findProject(id: number): Project {

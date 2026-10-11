@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { AppError } from '../../shared/errors'
+import { toNameKey } from '../../shared/names'
 import { z } from 'zod'
 import { id, tagInput } from '../../shared/validation'
 import type { Tag, TagData } from '../../shared/tags'
@@ -7,7 +8,7 @@ import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { tags } from '../db/schema'
 import { handle } from '../ipc'
-import { sortByName, toNameKey } from './names'
+import { sortByName } from './names'
 import { notifyTimerChanged } from './timerEvents'
 
 function findTag(id: number): Tag {

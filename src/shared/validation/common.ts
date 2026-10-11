@@ -1,11 +1,12 @@
 import { z } from 'zod'
+import { normalizeName } from '../names'
 import { MAX_NAME_LENGTH } from './limits'
 
 export const emptyToNull = (value: string): string | null => value || null
 
 export const id = z.number().int().positive()
 
-export const name = z.string().trim().min(1).max(MAX_NAME_LENGTH)
+export const name = z.string().overwrite(normalizeName).min(1).max(MAX_NAME_LENGTH)
 
 export const color = z
   .string()

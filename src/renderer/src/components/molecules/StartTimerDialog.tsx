@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Form, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Activity } from '../../../../shared/activities'
+import { normalizeName, toNameKey } from '../../../../shared/names'
 import type { Project } from '../../../../shared/projects'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useTimer } from '../../hooks/useTimer'
@@ -53,9 +54,9 @@ export function StartTimerDialog({ onClose }: StartTimerDialogProps): React.JSX.
     }
   }, [projectId, errorMessage])
 
-  const trimmedName = activityName.trim()
+  const trimmedName = normalizeName(activityName)
   const existingActivity = activities.find(
-    (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
+    (activity) => toNameKey(activity.name) === toNameKey(trimmedName)
   )
   const matchingActivities = existingActivity
     ? activities

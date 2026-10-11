@@ -11,6 +11,7 @@ import { useEffect, useId, useState } from 'react'
 import { Form, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { ActivityWithTags } from '../../../../shared/activities'
+import { normalizeName, toNameKey } from '../../../../shared/names'
 import type { Project } from '../../../../shared/projects'
 import type { Tag } from '../../../../shared/tags'
 import type { TimeEntryDetails, TimeEntryTimes } from '../../../../shared/timeEntries'
@@ -98,9 +99,9 @@ export function TimeEntryDialog({
     }
   }, [projectId, errorMessage])
 
-  const trimmedName = activityName.trim()
+  const trimmedName = normalizeName(activityName)
   const existingActivity = activities.find(
-    (activity) => activity.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase()
+    (activity) => toNameKey(activity.name) === toNameKey(trimmedName)
   )
   const isNewActivity = trimmedName !== '' && !existingActivity
   const matchingActivities = existingActivity
