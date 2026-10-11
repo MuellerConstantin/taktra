@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import {
-  exportColumns,
   exportFormats,
   type ExportFormat,
   type ExportPreview,
-  type ExportRow
+  type ExportValue
 } from '../../../shared/export'
 import type { Client } from '../../../shared/clients'
 import type { Project } from '../../../shared/projects'
@@ -23,7 +22,7 @@ import { api } from '../lib/api'
 import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
 
-function formatCell(value: ExportRow[keyof ExportRow]): string {
+function formatCell(value: ExportValue): string {
   return Array.isArray(value) ? value.join(', ') : String(value ?? '')
 }
 
@@ -201,9 +200,9 @@ function ExportView(): React.JSX.Element {
               <table className="w-full text-left font-mono text-xs">
                 <thead className="border-b border-border text-muted-foreground">
                   <tr>
-                    {exportColumns.map((column) => (
-                      <th key={column} scope="col" className="px-3 py-2 font-medium">
-                        {column}
+                    {preview.headers.map((header) => (
+                      <th key={header} scope="col" className="px-3 py-2 font-medium">
+                        {header}
                       </th>
                     ))}
                   </tr>
@@ -211,13 +210,13 @@ function ExportView(): React.JSX.Element {
                 <tbody>
                   {preview.rows.map((row, index) => (
                     <tr key={index} className="border-b border-border last:border-0">
-                      {exportColumns.map((column) => (
+                      {row.map((value, column) => (
                         <td
                           key={column}
                           className="max-w-64 truncate px-3 py-2 align-top"
-                          title={formatCell(row[column])}
+                          title={formatCell(value)}
                         >
-                          {formatCell(row[column])}
+                          {formatCell(value)}
                         </td>
                       ))}
                     </tr>

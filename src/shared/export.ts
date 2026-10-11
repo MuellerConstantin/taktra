@@ -1,5 +1,5 @@
 /** Column names are part of the file format other systems import, so they never change. */
-export const exportColumns = [
+export const builtinExportColumns = [
   'date',
   'project',
   'activity',
@@ -11,26 +11,28 @@ export const exportColumns = [
   'client'
 ] as const
 
-export type ExportColumn = (typeof exportColumns)[number]
+export type BuiltinExportColumn = (typeof builtinExportColumns)[number]
 
-export interface ExportRow {
-  readonly date: string
-  readonly project: string
-  readonly activity: string
-  readonly tags: readonly string[]
-  readonly start: string | null
-  readonly end: string | null
-  readonly duration_min: number
-  readonly note: string | null
-  readonly client: string | null
+/** A custom field column is headed by the field's name key. */
+export type ExportColumn = { readonly builtin: BuiltinExportColumn } | { readonly fieldId: number }
+
+export const defaultExportColumns: readonly ExportColumn[] = builtinExportColumns.map(
+  (builtin) => ({ builtin })
+)
+
+export type ExportValue = string | number | readonly string[] | null
+
+/** Rows hold their values in the order of the headers. */
+export interface ExportTable {
+  readonly headers: readonly string[]
+  readonly rows: readonly (readonly ExportValue[])[]
 }
 
 export const exportFormats = ['csv', 'json'] as const
 
 export type ExportFormat = (typeof exportFormats)[number]
 
-export interface ExportPreview {
-  readonly rows: readonly ExportRow[]
+export interface ExportPreview extends ExportTable {
   readonly count: number
   readonly totalMin: number
 }

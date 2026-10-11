@@ -696,6 +696,7 @@
     "VALIDATION_FAILED": "Die Eingabe ist ungültig.",
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
-    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?"
+    "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
+    "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen. Entferne eine davon aus dem Export."
   }
 }

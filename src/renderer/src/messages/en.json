@@ -696,6 +696,7 @@
     "VALIDATION_FAILED": "The input is invalid.",
     "UNKNOWN": "Something went wrong. Please try again.",
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
-    "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?"
+    "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
+    "EXPORT_COLUMN_CONFLICT": "Two columns have the same name. Remove one of them from the export."
   }
 }

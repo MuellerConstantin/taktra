@@ -275,6 +275,18 @@ export function getFieldValues(scope: CustomFieldScope, ownerId: number): FieldV
   return selectFieldValues(scope, ownerId)
 }
 
+/** Values of one field as text (option names for select fields), keyed by owner id. */
+export function listFieldValueTexts(field: CustomField): Map<number, string> {
+  const { table, ownerId } = valueTables[field.scope]
+  const rows = getActiveDatabase()
+    .select({ ownerId, textValue: table.textValue, optionName: customFieldOptions.name })
+    .from(table)
+    .leftJoin(customFieldOptions, eq(table.optionId, customFieldOptions.id))
+    .where(eq(table.fieldId, field.id))
+    .all()
+  return new Map(rows.map((row) => [row.ownerId, row.textValue ?? row.optionName ?? '']))
+}
+
 function assertValueAllowed(scope: CustomFieldScope, value: FieldValueData): void {
   const field = findCustomField(value.fieldId)
   if (field.scope !== scope)

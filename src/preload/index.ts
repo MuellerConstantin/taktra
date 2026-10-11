@@ -14,7 +14,7 @@ import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AppInfo } from '../shared/about'
-import type { ExportFormat, ExportPreview } from '../shared/export'
+import type { ExportColumn, ExportFormat, ExportPreview } from '../shared/export'
 import type { UpdateStatus } from '../shared/updates'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
@@ -130,9 +130,10 @@ const api = {
     install: () => invoke<void>('updates:install')
   },
   export: {
-    preview: (filter: TimeFilter) => invoke<ExportPreview>('export:preview', filter),
-    file: (filter: TimeFilter, format: ExportFormat) =>
-      invoke<string | null>('export:file', filter, format)
+    preview: (filter: TimeFilter, columns?: readonly ExportColumn[]) =>
+      invoke<ExportPreview>('export:preview', filter, columns),
+    file: (filter: TimeFilter, format: ExportFormat, columns?: readonly ExportColumn[]) =>
+      invoke<string | null>('export:file', filter, format, columns)
   },
   timeEntries: {
     list: (filter: TimeEntryFilter) => invoke<TimeEntryDetails[]>('timeEntries:list', filter),
