@@ -16,9 +16,14 @@ import { MoveActivityDialog } from './MoveActivityDialog'
 interface ActivityMenuProps {
   readonly activity: ActivityRef
   readonly onChanged: () => void
+  readonly onMerged?: (targetId: number) => void
 }
 
-export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.JSX.Element {
+export function ActivityMenu({
+  activity,
+  onChanged,
+  onMerged
+}: ActivityMenuProps): React.JSX.Element {
   const t = useTranslations('ActivityMenu')
   const [dialog, setDialog] = useState<'edit' | 'move' | 'merge' | null>(null)
 
@@ -57,7 +62,7 @@ export function ActivityMenu({ activity, onChanged }: ActivityMenuProps): React.
         <MergeActivityDialog
           activity={activity}
           onClose={() => setDialog(null)}
-          onMerged={onChanged}
+          onMerged={(targetId) => (onMerged ? onMerged(targetId) : onChanged())}
         />
       )}
     </>

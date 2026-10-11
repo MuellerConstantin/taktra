@@ -290,8 +290,6 @@
   },
   "ActivityDetailView": {
     "projects": "Projekte",
-    "edit": "Bearbeiten",
-    "move": "Verschieben",
     "archive": "Archivieren",
     "unarchive": "Wiederherstellen",
     "archived": "Archiviert",

@@ -4,7 +4,6 @@ import {
   RiArrowRightSLine,
   RiBuilding2Line,
   RiDeleteBinLine,
-  RiFolderTransferLine,
   RiInboxUnarchiveLine,
   RiPencilLine,
   RiPlayFill,
@@ -21,8 +20,7 @@ import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
-import { ActivityDialog } from '../components/molecules/ActivityDialog'
-import { MoveActivityDialog } from '../components/molecules/MoveActivityDialog'
+import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { ExpandableNote } from '../components/molecules/Note'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { TagBadges } from '../components/molecules/TagBadges'
@@ -49,7 +47,6 @@ function ActivityDetailView(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
-  const [dialog, setDialog] = useState<'edit' | 'move' | null>(null)
   const [entryToEdit, setEntryToEdit] = useState<TimeEntryDetails | null>(null)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [period, setPeriod] = useState<Period>(allTime)
@@ -125,7 +122,7 @@ function ActivityDetailView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={
-          <span className="line-clamp-2 break-words" title={activity.name}>
+          <span className="line-clamp-2 wrap-break-word" title={activity.name}>
             {activity.name}
           </span>
         }
@@ -163,14 +160,6 @@ function ActivityDetailView(): React.JSX.Element {
               )}
               {activity.archivedAt ? t('unarchive') : t('archive')}
             </Button>
-            <Button variant="secondary" onPress={() => setDialog('move')}>
-              <RiFolderTransferLine className="size-4" />
-              {t('move')}
-            </Button>
-            <Button variant="secondary" onPress={() => setDialog('edit')}>
-              <RiPencilLine className="size-4" />
-              {t('edit')}
-            </Button>
             {isRunning ? (
               <Button onPress={() => runAction(stop)}>
                 <RiStopFill className="size-4" />
@@ -182,6 +171,11 @@ function ActivityDetailView(): React.JSX.Element {
                 {t('start')}
               </Button>
             )}
+            <ActivityMenu
+              activity={activityRef}
+              onChanged={reload}
+              onMerged={(targetId) => navigate(`/activities/${targetId}`, { replace: true })}
+            />
           </>
         }
       >
@@ -262,16 +256,6 @@ function ActivityDetailView(): React.JSX.Element {
           )
         }}
       </GridList>
-      {dialog === 'edit' && (
-        <ActivityDialog activity={activityRef} onClose={() => setDialog(null)} onSaved={reload} />
-      )}
-      {dialog === 'move' && (
-        <MoveActivityDialog
-          activity={activityRef}
-          onClose={() => setDialog(null)}
-          onMoved={reload}
-        />
-      )}
       {entryToEdit && (
         <TimeEntryDialog
           date={parseDate(entryToEdit.entry.date)}
