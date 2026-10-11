@@ -20,6 +20,7 @@ import {
 } from './desktop/windows'
 import { initActivities } from './domain/activities'
 import { initClients } from './domain/clients'
+import { initCustomFields } from './domain/customFields'
 import { initDonation, recordUsageDay } from './donation'
 import { initExport } from './domain/export'
 import { initProjects } from './domain/projects'
@@ -92,6 +93,7 @@ function start(): void {
   initProjects()
   initTags()
   initActivities()
+  initCustomFields()
   initTimeEntries()
   initTimer()
   initMiniTimer()

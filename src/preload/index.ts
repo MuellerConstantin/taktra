@@ -1,6 +1,15 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
 import type { Client, ClientInput } from '../shared/clients'
+import type {
+  CustomField,
+  CustomFieldInput,
+  CustomFieldOption,
+  CustomFieldScope,
+  CustomFieldWithOptions,
+  FieldValue,
+  FieldValueInput
+} from '../shared/customFields'
 import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
@@ -90,6 +99,26 @@ const api = {
       invoke<void>('activities:setTags', id, tagIds),
     merge: (id: number, targetId: number) => invoke<void>('activities:merge', id, targetId),
     delete: (id: number) => invoke<void>('activities:delete', id)
+  },
+  customFields: {
+    list: (options?: { scope?: CustomFieldScope; includeArchived?: boolean }) =>
+      invoke<CustomFieldWithOptions[]>('customFields:list', options),
+    create: (input: CustomFieldInput) => invoke<CustomField>('customFields:create', input),
+    rename: (id: number, name: string) => invoke<CustomField>('customFields:rename', id, name),
+    setArchived: (id: number, archived: boolean) =>
+      invoke<CustomField>('customFields:setArchived', id, archived),
+    delete: (id: number) => invoke<void>('customFields:delete', id),
+    createOption: (fieldId: number, name: string) =>
+      invoke<CustomFieldOption>('customFields:createOption', fieldId, name),
+    renameOption: (id: number, name: string) =>
+      invoke<CustomFieldOption>('customFields:renameOption', id, name),
+    setOptionArchived: (id: number, archived: boolean) =>
+      invoke<CustomFieldOption>('customFields:setOptionArchived', id, archived),
+    deleteOption: (id: number) => invoke<void>('customFields:deleteOption', id),
+    values: (scope: CustomFieldScope, ownerId: number) =>
+      invoke<FieldValue[]>('customFields:values', scope, ownerId),
+    setValues: (scope: CustomFieldScope, ownerId: number, values: readonly FieldValueInput[]) =>
+      invoke<FieldValue[]>('customFields:setValues', scope, ownerId, values)
   },
   reports: {
     aggregate: (filter: TimeFilter, groupBy: readonly Grouping[]) =>

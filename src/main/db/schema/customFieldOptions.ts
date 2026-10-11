@@ -15,8 +15,8 @@ export const customFieldOptions = sqliteTable(
     fieldId: integer()
       .notNull()
       .references(() => customFields.id, { onDelete: 'cascade' }),
-    label: text().notNull(),
-    labelKey: text().notNull(),
+    name: text().notNull(),
+    nameKey: text().notNull(),
     archivedAt: integer({ mode: 'timestamp_ms' }),
     createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()
@@ -27,10 +27,10 @@ export const customFieldOptions = sqliteTable(
       .$onUpdateFn(() => new Date())
   },
   (table) => [
-    uniqueIndex('custom_field_options_field_label_unique').on(table.fieldId, table.labelKey),
+    uniqueIndex('custom_field_options_field_name_unique').on(table.fieldId, table.nameKey),
     check(
-      'custom_field_options_label_length',
-      sql`length(${table.label}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`
+      'custom_field_options_name_length',
+      sql`length(${table.name}) <= ${sql.raw(String(MAX_NAME_LENGTH))}`
     )
   ]
 )

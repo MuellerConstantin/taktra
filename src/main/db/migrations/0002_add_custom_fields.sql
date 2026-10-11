@@ -30,17 +30,17 @@ CREATE TABLE `custom_field_options` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uid` text NOT NULL,
 	`field_id` integer NOT NULL,
-	`label` text NOT NULL,
-	`label_key` text NOT NULL,
+	`name` text NOT NULL,
+	`name_key` text NOT NULL,
 	`archived_at` integer,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`field_id`) REFERENCES `custom_fields`(`id`) ON UPDATE no action ON DELETE cascade,
-	CONSTRAINT "custom_field_options_label_length" CHECK(length("custom_field_options"."label") <= 50)
+	CONSTRAINT "custom_field_options_name_length" CHECK(length("custom_field_options"."name") <= 50)
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `custom_field_options_uid_unique` ON `custom_field_options` (`uid`);--> statement-breakpoint
-CREATE UNIQUE INDEX `custom_field_options_field_label_unique` ON `custom_field_options` (`field_id`,`label_key`);--> statement-breakpoint
+CREATE UNIQUE INDEX `custom_field_options_field_name_unique` ON `custom_field_options` (`field_id`,`name_key`);--> statement-breakpoint
 CREATE TABLE `custom_fields` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uid` text NOT NULL,

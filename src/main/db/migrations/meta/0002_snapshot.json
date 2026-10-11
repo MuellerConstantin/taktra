@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c2605aec-f80e-4681-b057-5f1de963b3c3",
+  "id": "b22f1e1e-abc3-42ba-a72e-3b2ac8a4a28f",
   "prevId": "1d4e3ad8-e4aa-438c-8768-6a883eacb8e6",
   "tables": {
     "activities": {
@@ -501,15 +501,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "label": {
-          "name": "label",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "label_key": {
-          "name": "label_key",
+        "name_key": {
+          "name": "name_key",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -545,11 +545,11 @@
           ],
           "isUnique": true
         },
-        "custom_field_options_field_label_unique": {
-          "name": "custom_field_options_field_label_unique",
+        "custom_field_options_field_name_unique": {
+          "name": "custom_field_options_field_name_unique",
           "columns": [
             "field_id",
-            "label_key"
+            "name_key"
           ],
           "isUnique": true
         }
@@ -572,9 +572,9 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {
-        "custom_field_options_label_length": {
-          "name": "custom_field_options_label_length",
-          "value": "length(\"custom_field_options\".\"label\") <= 50"
+        "custom_field_options_name_length": {
+          "name": "custom_field_options_name_length",
+          "value": "length(\"custom_field_options\".\"name\") <= 50"
         }
       }
     },

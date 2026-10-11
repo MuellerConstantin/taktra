@@ -7,7 +7,15 @@ import { toNameKey } from '../../shared/names'
 import { activityInput, activityListOptions, id, name } from '../../shared/validation'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
-import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
+import {
+  activities,
+  activityFieldValues,
+  activityTags,
+  clients,
+  projects,
+  tags,
+  timeEntries
+} from '../db/schema'
 import { handle } from '../ipc'
 import { clientRef, effectiveClientJoin, findClient } from './clients'
 import { sortByName } from './names'
@@ -221,6 +229,16 @@ export function mergeActivity(id: number, targetId: number): void {
   const db = getActiveDatabase()
   db.transaction((tx) => {
     tx.update(timeEntries).set({ activityId: targetId }).where(eq(timeEntries.activityId, id)).run()
+    const sourceValues = tx
+      .select()
+      .from(activityFieldValues)
+      .where(eq(activityFieldValues.activityId, id))
+      .all()
+    if (sourceValues.length > 0)
+      tx.insert(activityFieldValues)
+        .values(sourceValues.map((value) => ({ ...value, activityId: targetId })))
+        .onConflictDoNothing()
+        .run()
     if (target.archivedAt && !source.archivedAt)
       tx.update(activities).set({ archivedAt: null }).where(eq(activities.id, targetId)).run()
     tx.delete(activities).where(eq(activities.id, id)).run()
