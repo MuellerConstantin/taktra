@@ -9,7 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- A command palette (Ctrl+Shift+P) reaches views, actions and settings from the keyboard.
+- Custom fields for extra details such as an order number, a cost center or a ticket number. A
+  field belongs to projects, clients or activities and is free text or a select list. Fields are
+  managed in the profile settings and filled in on the project, client or activity. Fields and
+  options with values are archived instead of deleted.
+- Export templates choose the columns of the file, their order and names, custom fields included.
+  Templates are saved in the profile; without one the standard columns are written.
+- An in-app help explains the concepts of Taktra in short chapters. It opens from the command
+  palette and from the help popovers in the view headers.
+- A command palette (Ctrl+Shift+P) reaches views, actions and settings from the keyboard, also by
+  synonyms such as "customers" for clients.
 - Export entries as JSON in addition to CSV, with the same columns.
 - A note can be added when starting a timer and edited while it runs.
 - Merge an activity into another one, which takes over its time entries.
@@ -18,11 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removing a project's client tells that it is handed down to the project's activities.
 - After some days of use, a reminder now and then asks for a donation. It can be snoozed or
   turned off for good.
+- The sample profile includes custom fields and export templates.
 
 ### Changed
 
 - The actions of the activity detail view moved into its menu.
 - The about dialog has calmer buttons.
+- The headers of the reports, export and detail views are calmer.
 
 ### Fixed
 

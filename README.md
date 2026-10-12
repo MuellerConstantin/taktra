@@ -51,9 +51,12 @@ machine, and your data is a plain file you own.
 - Time entries with start and end, as a plain duration or by a start/stop timer, with Markdown notes
 - Quick start from the tray or a global shortcut, and an always-on-top mini timer
 - Reports by project, client and tag over any period
-- Export to CSV or JSON in a stable format for billing and other tools
+- Custom fields on projects, clients and activities, e.g. an order number or a cost center
+- Export to CSV or JSON in a stable format for billing and other tools, with templates for the
+  columns
 - Several profiles, each in its own file, like KeePass databases
 - Light and dark theme, English and German, command palette and keyboard shortcuts
+- An in-app help that explains the concepts in short chapters
 
 ## Screenshots
 

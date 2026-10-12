@@ -38,6 +38,15 @@ of a project without one (e.g. a standard product with client-specific
 customizing). It is never chosen when booking. An activity has at most one
 effective client, so per-client sums add up.
 
+**Custom fields**
+Custom fields hold details Taktra does not know on its own, such as an order
+number, a cost center or a ticket number, mostly for the export. A field
+belongs to exactly one level (project, client or activity) and is free text or
+a select list; its type cannot change later. Values are not inherited: every
+entry gets each field from its activity, project or client. Fields are managed
+in the profile settings and filled in where they belong. A field or option
+with values is archived, not deleted.
+
 **Time entries**
 An entry is recorded with start and end, with a duration only, or by the timer.
 The timer rounds start and end to whole minutes and books the difference (at
@@ -66,6 +75,11 @@ project, tag and client, to a file (CSV or JSON) for billing and other systems,
 with a preview of what the file will contain. Export templates of a profile
 choose the columns, their order and names, custom fields included; without one
 the standard columns are written.
+
+**Help**
+An in-app help explains the domain rules in short chapters of questions and
+answers, written in Markdown per language. It opens from the command palette
+and from the help popover in a view's header.
 
 **Sample profile**
 The welcome view offers a generated sample profile for trying the app and for
@@ -103,6 +117,7 @@ src/
     ├── contexts/      # Context objects and providers
     ├── hooks/
     ├── lib/           # API client and helpers
+    ├── help/          # Help chapters in Markdown, one folder per language
     └── messages/      # Translations
 ```
 
