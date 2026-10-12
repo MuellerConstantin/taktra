@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from 'react'
 import { Autocomplete, ListBox, useFilter } from 'react-aria-components'
 import { useNavigate } from 'react-router'
-import { useTranslations } from 'use-intl'
+import { useTranslations, type Messages } from 'use-intl'
 import { Dialog } from '../atoms/Dialog'
 import { KeyCombo } from '../atoms/KeyCombo'
 import { DropdownItem, DropdownSection } from '../atoms/ListBox'
@@ -35,12 +35,14 @@ interface Command {
   readonly id: string
   readonly label: string
   readonly detail?: string
-  readonly keywords?: string
+  readonly keywords?: readonly string[]
   readonly icon?: RemixiconComponentType
   readonly color?: string
   readonly shortcut?: string
   readonly run: () => void
 }
+
+type KeywordKey = keyof Messages['CommandPalette']['keywords']
 
 interface Section {
   readonly id: string
@@ -67,6 +69,7 @@ interface PaletteDialogProps {
 
 function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
   const t = useTranslations('CommandPalette')
+  const keywords = (key: KeywordKey): readonly string[] => t.raw(`keywords.${key}`)
   const tApp = useTranslations()
   const navigate = useNavigate()
   const errorMessage = useErrorMessage()
@@ -82,8 +85,13 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
   useEffect(() => {
     if (!hasProfile) return
     let isCurrent = true
-    Promise.all([api.projects.list(), api.activities.list(), api.tags.list()])
-      .then(([projects, activities, tags]) => {
+    Promise.all([
+      api.projects.list(),
+      api.activities.list(),
+      api.tags.list(),
+      api.exportTemplates.list()
+    ])
+      .then(([projects, activities, tags, exportTemplates]) => {
         if (!isCurrent) return
         const projectById = new Map(projects.map((project) => [project.id, project]))
         setEntities([
@@ -123,6 +131,16 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
               color: tag.color ?? NEUTRAL_COLOR,
               run: () => navigate(`/tags/${tag.id}`)
             }))
+          },
+          {
+            id: 'exportTemplates',
+            title: t('sections.exportTemplates'),
+            items: exportTemplates.map((template) => ({
+              id: `export-template-${template.id}`,
+              label: template.name,
+              icon: RiDownload2Line,
+              run: () => navigate(`/export?template=${template.id}`)
+            }))
           }
         ])
       })
@@ -141,6 +159,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'timer',
       label: tApp('Navigation.timer'),
+      keywords: keywords('timer'),
       icon: RiTimerLine,
       shortcut: appShortcuts.timer,
       run: goTo('/timer')
@@ -148,6 +167,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'tracking',
       label: tApp('Navigation.tracking'),
+      keywords: keywords('tracking'),
       icon: RiCalendarCheckLine,
       shortcut: appShortcuts.entries,
       run: goTo('/tracking')
@@ -155,6 +175,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'projects',
       label: tApp('Navigation.projects'),
+      keywords: keywords('projects'),
       icon: RiFolderLine,
       shortcut: appShortcuts.projects,
       run: goTo('/projects')
@@ -162,6 +183,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'clients',
       label: tApp('Navigation.clients'),
+      keywords: keywords('clients'),
       icon: RiBuilding2Line,
       shortcut: appShortcuts.clients,
       run: goTo('/clients')
@@ -169,6 +191,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'tags',
       label: tApp('Navigation.tags'),
+      keywords: keywords('tags'),
       icon: RiPriceTag3Line,
       shortcut: appShortcuts.tags,
       run: goTo('/tags')
@@ -176,6 +199,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'reports',
       label: tApp('Navigation.reports'),
+      keywords: keywords('reports'),
       icon: RiBarChartBoxLine,
       shortcut: appShortcuts.reports,
       run: goTo('/reports')
@@ -183,6 +207,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'export',
       label: tApp('Navigation.export'),
+      keywords: keywords('export'),
       icon: RiDownload2Line,
       shortcut: appShortcuts.export,
       run: goTo('/export')
@@ -190,6 +215,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'profile',
       label: tApp('ProfileSettingsView.title'),
+      keywords: keywords('profile'),
       icon: RiUserSettingsLine,
       run: goTo('/profile')
     }
@@ -200,6 +226,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'settings',
       label: tApp('Navigation.settings'),
+      keywords: keywords('settings'),
       icon: RiSettings3Line,
       shortcut: appShortcuts.settings,
       run: goTo('/settings')
@@ -210,6 +237,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'quickStart',
       label: t('actions.quickStart'),
+      keywords: keywords('quickStart'),
       icon: RiTimerLine,
       shortcut: appShortcuts.quickStart,
       run: runAsync(api.quick.toggle)
@@ -217,6 +245,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
     {
       id: 'newEntry',
       label: t('actions.newEntry'),
+      keywords: keywords('newEntry'),
       icon: RiAddLine,
       run: goTo('/tracking', createRequest)
     },
@@ -232,7 +261,18 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       icon: RiAddLine,
       run: goTo('/clients', createRequest)
     },
-    { id: 'newTag', label: t('actions.newTag'), icon: RiAddLine, run: goTo('/tags', createRequest) }
+    {
+      id: 'newTag',
+      label: t('actions.newTag'),
+      icon: RiAddLine,
+      run: goTo('/tags', createRequest)
+    },
+    {
+      id: 'newExportTemplate',
+      label: t('actions.newExportTemplate'),
+      icon: RiAddLine,
+      run: goTo('/export/templates/new')
+    }
   ]
 
   const actions: readonly Command[] = [
@@ -253,15 +293,22 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
   ]
 
   const profileSettings: readonly Command[] = [
-    { id: 'profileName', label: t('settings.profileName'), run: goTo('/profile/general') },
+    {
+      id: 'profileName',
+      label: t('settings.profileName'),
+      keywords: keywords('profileName'),
+      run: goTo('/profile/general')
+    },
     {
       id: 'customFields',
       label: t('settings.customFields'),
+      keywords: keywords('customFields'),
       run: goTo('/profile/fields')
     },
     {
       id: 'deleteProfile',
       label: tApp('DeleteProfileSection.title'),
+      keywords: keywords('deleteProfile'),
       run: goTo('/profile/general')
     }
   ]
@@ -274,35 +321,39 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
         tApp('AppearanceSettings.theme.system'),
         tApp('AppearanceSettings.theme.light'),
         tApp('AppearanceSettings.theme.dark')
-      ].join(' '),
+      ],
       run: goTo('/settings/appearance')
     },
     {
       id: 'language',
       label: tApp('AppearanceSettings.language.label'),
-      keywords: [
-        tApp('AppearanceSettings.language.en'),
-        tApp('AppearanceSettings.language.de')
-      ].join(' '),
+      keywords: [tApp('AppearanceSettings.language.en'), tApp('AppearanceSettings.language.de')],
       run: goTo('/settings/appearance')
     },
     {
       id: 'miniTimer',
       label: tApp('ControlsSettings.miniTimer.title'),
+      keywords: keywords('miniTimer'),
       run: goTo('/settings/controls')
     },
     {
       id: 'globalShortcuts',
       label: tApp('ControlsSettings.global.title'),
-      keywords: t('actions.quickStart'),
+      keywords: [t('actions.quickStart'), ...keywords('globalShortcuts')],
       run: goTo('/settings/controls')
     },
     {
       id: 'appShortcuts',
       label: tApp('ControlsSettings.app.title'),
+      keywords: keywords('appShortcuts'),
       run: goTo('/settings/controls')
     },
-    { id: 'updates', label: tApp('UpdatesSettings.title'), run: goTo('/settings/updates') },
+    {
+      id: 'updates',
+      label: tApp('UpdatesSettings.title'),
+      keywords: keywords('updates'),
+      run: goTo('/settings/updates')
+    },
     ...(hasProfile ? profileSettings : [])
   ].map((command) => ({ ...command, icon: RiSettings3Line }))
 
@@ -347,7 +398,7 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
               {(command) => (
                 <DropdownItem
                   id={command.id}
-                  textValue={[command.label, command.detail, command.keywords]
+                  textValue={[command.label, command.detail, ...(command.keywords ?? [])]
                     .filter(Boolean)
                     .join(' ')}
                 >

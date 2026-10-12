@@ -116,7 +116,8 @@
       "projects": "Projects",
       "activities": "Activities",
       "tags": "Tags",
-      "settings": "Settings"
+      "settings": "Settings",
+      "exportTemplates": "Export templates"
     },
     "actions": {
       "stopTimer": "Stop timer",
@@ -124,11 +125,38 @@
       "newEntry": "New entry",
       "newProject": "New project",
       "newClient": "New client",
-      "newTag": "New tag"
+      "newTag": "New tag",
+      "newExportTemplate": "New export template"
     },
     "settings": {
       "profileName": "Profile name",
       "customFields": "Fields"
+    },
+    "keywords": {
+      "timer": ["stopwatch", "track time", "start", "stop", "recent"],
+      "tracking": ["time entries", "bookings", "timesheet", "log", "day", "week", "calendar"],
+      "projects": ["activities", "tasks"],
+      "clients": ["customers", "departments", "cost centers", "billing"],
+      "tags": ["categories", "labels", "kind of work"],
+      "reports": ["statistics", "evaluation", "charts", "totals", "hours"],
+      "export": ["billing", "invoice", "CSV", "JSON", "file", "templates", "columns"],
+      "profile": ["profile file", "backup"],
+      "settings": ["preferences", "options"],
+      "quickStart": ["start timer", "search activity"],
+      "newEntry": ["add time", "book manually", "record afterwards"],
+      "miniTimer": ["always on top", "floating window"],
+      "globalShortcuts": ["hotkey", "keyboard shortcut", "key combination"],
+      "appShortcuts": ["keyboard shortcuts", "hotkeys", "keys"],
+      "updates": ["version", "update automatically", "GitHub"],
+      "customFields": [
+        "custom fields",
+        "extra fields",
+        "order number",
+        "cost center",
+        "ticket number"
+      ],
+      "deleteProfile": ["remove profile", "trash"],
+      "profileName": ["rename"]
     }
   },
   "TimerView": {

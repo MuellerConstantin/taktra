@@ -116,7 +116,8 @@
       "projects": "Projekte",
       "activities": "Tätigkeiten",
       "tags": "Tags",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "exportTemplates": "Exportvorlagen"
     },
     "actions": {
       "stopTimer": "Timer stoppen",
@@ -124,11 +125,72 @@
       "newEntry": "Neuer Eintrag",
       "newProject": "Neues Projekt",
       "newClient": "Neuer Leistungsempfänger",
-      "newTag": "Neuer Tag"
+      "newTag": "Neuer Tag",
+      "newExportTemplate": "Neue Exportvorlage"
     },
     "settings": {
       "profileName": "Profilname",
       "customFields": "Felder"
+    },
+    "keywords": {
+      "timer": [
+        "Stoppuhr",
+        "Zeit erfassen",
+        "starten",
+        "stoppen",
+        "zuletzt",
+        "Zeiterfassung",
+        "timer"
+      ],
+      "tracking": [
+        "Zeiteinträge",
+        "Buchungen",
+        "Zeiten",
+        "Stundenzettel",
+        "Tag",
+        "Woche",
+        "Kalender",
+        "entries"
+      ],
+      "projects": ["Tätigkeiten", "Aktivitäten", "Aufgaben", "projects", "activities"],
+      "clients": [
+        "Kunden",
+        "Auftraggeber",
+        "Abteilungen",
+        "Kostenstellen",
+        "Abrechnung",
+        "clients",
+        "customers"
+      ],
+      "tags": ["Kategorien", "Schlagwörter", "Labels", "Art der Arbeit"],
+      "reports": [
+        "Auswertungen",
+        "Statistik",
+        "Berichte",
+        "Diagramme",
+        "Summen",
+        "Stunden",
+        "reports"
+      ],
+      "export": ["Abrechnung", "Rechnung", "CSV", "JSON", "Datei", "Vorlagen", "Spalten"],
+      "profile": ["Profildatei", "Sicherung", "Backup", "profile"],
+      "settings": ["Optionen", "Präferenzen", "settings", "preferences"],
+      "quickStart": ["Timer starten", "Tätigkeit suchen"],
+      "newEntry": ["Zeit nachtragen", "manuell buchen", "nachträglich erfassen"],
+      "miniTimer": ["immer im Vordergrund", "schwebendes Fenster"],
+      "globalShortcuts": ["Hotkey", "Tastenkürzel", "Tastenkombination"],
+      "appShortcuts": ["Tastenkürzel", "Hotkeys", "Tastatur", "Tastenkombinationen", "shortcuts"],
+      "updates": ["Version", "automatisch aktualisieren", "GitHub"],
+      "customFields": [
+        "eigene Felder",
+        "Zusatzfelder",
+        "Auftragsnummer",
+        "Kostenstelle",
+        "Ticketnummer",
+        "custom fields"
+      ],
+      "deleteProfile": ["Profil entfernen", "Papierkorb"],
+      "profileName": ["umbenennen"]
     }
   },
   "TimerView": {
