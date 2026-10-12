@@ -481,13 +481,15 @@
     "searchTags": "Tags suchen",
     "noMatches": "Keine Treffer",
     "format": "Format",
-    "formats": {
-      "csv": "CSV (RFC 4180, UTF-8)",
-      "json": "JSON (UTF-8)"
-    },
     "entries": "Einträge",
     "total": "Gesamtzeit",
-    "help": "Schreibt die abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Eine Vorlage legt fest, welche Spalten die Datei enthält; die Vorschau zeigt, was in der Datei steht."
+    "help": "Schreibt die abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Eine Vorlage legt fest, welche Spalten die Datei enthält; die Vorschau zeigt, was in der Datei steht.",
+    "more": "Weitere Aktionen"
+  },
+  "FilterButton": {
+    "label": "Filter",
+    "active": "Filter ({count})",
+    "clear": "Filter zurücksetzen"
   },
   "ExportPreviewTable": {
     "title": "Vorschau: die ersten {shown} von {count} Einträgen",
@@ -500,7 +502,6 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "delete": "Vorlage löschen",
-    "available": "Verfügbare Spalten",
     "builtinSection": "Standardspalten",
     "scopeSections": {
       "project": "Projektfelder",
@@ -525,8 +526,6 @@
     },
     "archived": "archiviert",
     "archivedField": "{name} (archiviert)",
-    "add": "{name} hinzufügen",
-    "allUsed": "Alle Spalten sind in der Datei.",
     "limit": "Eine Vorlage enthält höchstens {max} Spalten.",
     "selected": "In der Datei",
     "selectedHelp": "Ziehe die Spalten in die Reihenfolge der Datei. Ein leerer Name verwendet den grau angezeigten.",
@@ -538,7 +537,9 @@
     "previewConflict": "Benenne die markierten Spalten um, um die Vorschau zu sehen.",
     "deleteConfirmTitle": "Vorlage „{name}“ löschen?",
     "deleteConfirmText": "Die Vorlage wird endgültig gelöscht. Damit exportierte Dateien bleiben unverändert.",
-    "deleteConfirmAction": "Löschen"
+    "deleteConfirmAction": "Löschen",
+    "more": "Weitere Aktionen",
+    "addColumn": "Spalte hinzufügen"
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",

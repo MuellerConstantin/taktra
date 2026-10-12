@@ -481,13 +481,15 @@
     "searchTags": "Search tags",
     "noMatches": "No matches",
     "format": "Format",
-    "formats": {
-      "csv": "CSV (RFC 4180, UTF-8)",
-      "json": "JSON (UTF-8)"
-    },
     "entries": "Entries",
     "total": "Total time",
-    "help": "Writes the completed entries of a period to a file, for example for billing or other systems. A template decides which columns the file contains; the preview shows what the file will contain."
+    "help": "Writes the completed entries of a period to a file, for example for billing or other systems. A template decides which columns the file contains; the preview shows what the file will contain.",
+    "more": "More actions"
+  },
+  "FilterButton": {
+    "label": "Filter",
+    "active": "Filter ({count})",
+    "clear": "Clear filters"
   },
   "ExportPreviewTable": {
     "title": "Preview: first {shown} of {count} entries",
@@ -500,7 +502,6 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete template",
-    "available": "Available columns",
     "builtinSection": "Standard columns",
     "scopeSections": {
       "project": "Project fields",
@@ -525,8 +526,6 @@
     },
     "archived": "archived",
     "archivedField": "{name} (archived)",
-    "add": "Add {name}",
-    "allUsed": "All columns are in the file.",
     "limit": "A template holds at most {max} columns.",
     "selected": "In the file",
     "selectedHelp": "Drag the columns into the order of the file. An empty name uses the one shown in grey.",
@@ -538,7 +537,9 @@
     "previewConflict": "Rename the marked columns to see the preview.",
     "deleteConfirmTitle": "Delete template “{name}”?",
     "deleteConfirmText": "The template is deleted permanently. Files exported with it stay unchanged.",
-    "deleteConfirmAction": "Delete"
+    "deleteConfirmAction": "Delete",
+    "more": "More actions",
+    "addColumn": "Add column"
   },
   "ReportBreakdown": {
     "untagged": "No tag",
