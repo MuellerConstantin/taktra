@@ -1,5 +1,7 @@
 import {
+  RiArchiveLine,
   RiFolderTransferLine,
+  RiInboxUnarchiveLine,
   RiMergeCellsHorizontal,
   RiMoreLine,
   RiPencilLine
@@ -17,12 +19,15 @@ interface ActivityMenuProps {
   readonly activity: ActivityRef
   readonly onChanged: () => void
   readonly onMerged?: (targetId: number) => void
+  /** Adds archiving to the menu, where the archive state of the activity is known. */
+  readonly archive?: { readonly isArchived: boolean; readonly onToggle: () => void }
 }
 
 export function ActivityMenu({
   activity,
   onChanged,
-  onMerged
+  onMerged,
+  archive
 }: ActivityMenuProps): React.JSX.Element {
   const t = useTranslations('ActivityMenu')
   const [dialog, setDialog] = useState<'edit' | 'move' | 'merge' | null>(null)
@@ -33,7 +38,12 @@ export function ActivityMenu({
         <Button variant="icon" aria-label={t('label', { name: activity.name })}>
           <RiMoreLine className="size-4" />
         </Button>
-        <Menu onAction={(key) => setDialog(key === 'move' || key === 'merge' ? key : 'edit')}>
+        <Menu
+          onAction={(key) => {
+            if (key === 'archive') archive?.onToggle()
+            else setDialog(key === 'move' || key === 'merge' ? key : 'edit')
+          }}
+        >
           <MenuItem id="edit">
             <RiPencilLine aria-hidden className="size-4" />
             {t('edit')}
@@ -46,6 +56,16 @@ export function ActivityMenu({
             <RiMergeCellsHorizontal aria-hidden className="size-4" />
             {t('merge')}
           </MenuItem>
+          {archive && (
+            <MenuItem id="archive">
+              {archive.isArchived ? (
+                <RiInboxUnarchiveLine aria-hidden className="size-4" />
+              ) : (
+                <RiArchiveLine aria-hidden className="size-4" />
+              )}
+              {archive.isArchived ? t('unarchive') : t('archive')}
+            </MenuItem>
+          )}
         </Menu>
       </MenuTrigger>
       {dialog === 'edit' && (

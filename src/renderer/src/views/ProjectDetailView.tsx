@@ -1,4 +1,4 @@
-import { RiArchiveLine, RiInboxUnarchiveLine, RiPencilLine } from '@remixicon/react'
+import { RiArchiveLine, RiInboxUnarchiveLine, RiMoreLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
@@ -6,6 +6,7 @@ import type { Project } from '../../../shared/projects'
 import type { AggregateRow } from '../../../shared/reports'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
@@ -88,18 +89,25 @@ function ProjectDetailView(): React.JSX.Element {
         subtitle={t('subtitle')}
         actions={
           <>
-            <Button variant="secondary" onPress={toggleArchived}>
-              {project.archivedAt ? (
-                <RiInboxUnarchiveLine className="size-4" />
-              ) : (
-                <RiArchiveLine className="size-4" />
-              )}
-              {project.archivedAt ? t('unarchive') : t('archive')}
-            </Button>
             <Button variant="secondary" onPress={() => setProjectDialogOpen(true)}>
               <RiPencilLine className="size-4" />
               {t('edit')}
             </Button>
+            <MenuTrigger placement="bottom end">
+              <Button variant="icon" aria-label={t('more')}>
+                <RiMoreLine className="size-4" />
+              </Button>
+              <Menu onAction={toggleArchived}>
+                <MenuItem id="archive">
+                  {project.archivedAt ? (
+                    <RiInboxUnarchiveLine aria-hidden className="size-4" />
+                  ) : (
+                    <RiArchiveLine aria-hidden className="size-4" />
+                  )}
+                  {project.archivedAt ? t('unarchive') : t('archive')}
+                </MenuItem>
+              </Menu>
+            </MenuTrigger>
           </>
         }
       >

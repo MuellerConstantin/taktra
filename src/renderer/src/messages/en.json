@@ -287,12 +287,11 @@
     "activities": "Activities",
     "empty": "No activities yet. Activities are created when you track time.",
     "emptyPeriod": "No time tracked in this period.",
-    "entryCount": "{count, plural, one {# entry} other {# entries}}"
+    "entryCount": "{count, plural, one {# entry} other {# entries}}",
+    "more": "More actions"
   },
   "ActivityDetailView": {
     "projects": "Projects",
-    "archive": "Archive",
-    "unarchive": "Restore",
     "archived": "Archived",
     "start": "Start timer",
     "stop": "Stop timer",
@@ -321,7 +320,9 @@
     "label": "Actions for {name}",
     "edit": "Edit",
     "move": "Move to project…",
-    "merge": "Merge into…"
+    "merge": "Merge into…",
+    "archive": "Archive",
+    "unarchive": "Restore"
   },
   "MoveActivityDialog": {
     "title": "Move “{name}”",

@@ -1,10 +1,8 @@
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
 import {
-  RiArchiveLine,
   RiArrowRightSLine,
   RiBuilding2Line,
   RiDeleteBinLine,
-  RiInboxUnarchiveLine,
   RiPencilLine,
   RiPlayFill,
   RiStopFill
@@ -148,19 +146,6 @@ function ActivityDetailView(): React.JSX.Element {
         }
         actions={
           <>
-            <Button
-              variant="secondary"
-              onPress={() =>
-                runAction(() => api.activities.setArchived(activity.id, !activity.archivedAt))
-              }
-            >
-              {activity.archivedAt ? (
-                <RiInboxUnarchiveLine className="size-4" />
-              ) : (
-                <RiArchiveLine className="size-4" />
-              )}
-              {activity.archivedAt ? t('unarchive') : t('archive')}
-            </Button>
             {isRunning ? (
               <Button onPress={() => runAction(stop)}>
                 <RiStopFill className="size-4" />
@@ -176,6 +161,11 @@ function ActivityDetailView(): React.JSX.Element {
               activity={activityRef}
               onChanged={reload}
               onMerged={(targetId) => navigate(`/activities/${targetId}`, { replace: true })}
+              archive={{
+                isArchived: activity.archivedAt !== null,
+                onToggle: () =>
+                  runAction(() => api.activities.setArchived(activity.id, !activity.archivedAt))
+              }}
             />
           </>
         }

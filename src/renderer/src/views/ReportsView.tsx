@@ -9,6 +9,7 @@ import type { Tag } from '../../../shared/tags'
 import { Select, SelectItem } from '../components/atoms/Select'
 import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ToggleButtonGroup } from '../components/atoms/ToggleButtonGroup'
+import { FilterButton } from '../components/molecules/FilterButton'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { TimelineChart } from '../components/molecules/TimelineChart'
 import { ViewHeader } from '../components/molecules/ViewHeader'
@@ -123,52 +124,58 @@ function ReportsView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader title={t('title')} help={t('help')}>
         <div className="flex flex-wrap items-center gap-2 pb-4">
-          <Select
-            aria-label={t('projects')}
-            placeholder={t('allProjects')}
-            search={{ label: t('searchProjects'), empty: t('noMatches') }}
-            selectionMode="multiple"
-            value={[...projectIds]}
-            onChange={(keys) => setProjectIds(keys.map(Number))}
-            className="w-48"
+          <PeriodPicker value={period} onChange={setPeriod} />
+          <FilterButton
+            count={projectIds.length + clientIds.length + tagIds.length}
+            onClear={() => {
+              setProjectIds([])
+              setClientIds([])
+              setTagIds([])
+            }}
           >
-            {projects.map((project) => (
-              <SelectItem key={project.id} id={project.id} textValue={project.name}>
-                {project.name}
-              </SelectItem>
-            ))}
-          </Select>
-          <Select
-            aria-label={t('clients')}
-            placeholder={t('allClients')}
-            search={{ label: t('searchClients'), empty: t('noMatches') }}
-            selectionMode="multiple"
-            value={[...clientIds]}
-            onChange={(keys) => setClientIds(keys.map(Number))}
-            className="w-60"
-          >
-            {clients.map((client) => (
-              <SelectItem key={client.id} id={client.id} textValue={client.name}>
-                {client.name}
-              </SelectItem>
-            ))}
-          </Select>
-          <Select
-            aria-label={t('tags')}
-            placeholder={t('allTags')}
-            search={{ label: t('searchTags'), empty: t('noMatches') }}
-            selectionMode="multiple"
-            value={[...tagIds]}
-            onChange={(keys) => setTagIds(keys.map(Number))}
-            className="w-48"
-          >
-            {tags.map((tag) => (
-              <SelectItem key={tag.id} id={tag.id} textValue={tag.name}>
-                {tag.name}
-              </SelectItem>
-            ))}
-          </Select>
-          <PeriodPicker value={period} onChange={setPeriod} className="ml-auto" />
+            <Select
+              label={t('projects')}
+              placeholder={t('allProjects')}
+              search={{ label: t('searchProjects'), empty: t('noMatches') }}
+              selectionMode="multiple"
+              value={[...projectIds]}
+              onChange={(keys) => setProjectIds(keys.map(Number))}
+            >
+              {projects.map((project) => (
+                <SelectItem key={project.id} id={project.id} textValue={project.name}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <Select
+              label={t('clients')}
+              placeholder={t('allClients')}
+              search={{ label: t('searchClients'), empty: t('noMatches') }}
+              selectionMode="multiple"
+              value={[...clientIds]}
+              onChange={(keys) => setClientIds(keys.map(Number))}
+            >
+              {clients.map((client) => (
+                <SelectItem key={client.id} id={client.id} textValue={client.name}>
+                  {client.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <Select
+              label={t('tags')}
+              placeholder={t('allTags')}
+              search={{ label: t('searchTags'), empty: t('noMatches') }}
+              selectionMode="multiple"
+              value={[...tagIds]}
+              onChange={(keys) => setTagIds(keys.map(Number))}
+            >
+              {tags.map((tag) => (
+                <SelectItem key={tag.id} id={tag.id} textValue={tag.name}>
+                  {tag.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </FilterButton>
         </div>
       </ViewHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-8 py-6">
