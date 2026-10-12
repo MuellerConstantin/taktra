@@ -36,7 +36,7 @@ export function TabViewTemplate({
         helpTopic={helpTopic}
         actions={actions}
       >
-        <TabList aria-label={title} className="flex flex-wrap gap-x-4 gap-y-1">
+        <TabList aria-label={title} className="flex gap-4">
           {sections.map(({ path, label }) => (
             <Tab
               key={path}

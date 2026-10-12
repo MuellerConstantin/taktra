@@ -825,6 +825,7 @@
   },
   "HelpView": {
     "title": "Hilfe",
+    "chapters": "Kapitel",
     "topics": {
       "basics": "Grundbegriffe",
       "tracking": "Zeit erfassen",

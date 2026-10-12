@@ -791,6 +791,7 @@
   },
   "HelpView": {
     "title": "Help",
+    "chapters": "Chapters",
     "topics": {
       "basics": "Basics",
       "tracking": "Tracking time",
