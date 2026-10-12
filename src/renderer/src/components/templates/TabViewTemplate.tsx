@@ -1,6 +1,7 @@
 import { Tab, TabList, TabPanel, Tabs } from 'react-aria-components'
 import { Outlet, useLocation } from 'react-router'
 import { ViewHeader } from '../molecules/ViewHeader'
+import type { HelpTopic } from '../../lib/help'
 
 export interface TabViewSection {
   readonly path: string
@@ -11,6 +12,7 @@ interface TabViewTemplateProps {
   readonly title: string
   readonly subtitle?: string
   readonly help?: string
+  readonly helpTopic?: HelpTopic
   readonly sections: readonly TabViewSection[]
   readonly actions?: React.ReactNode
 }
@@ -19,6 +21,7 @@ export function TabViewTemplate({
   title,
   subtitle,
   help,
+  helpTopic,
   sections,
   actions
 }: TabViewTemplateProps): React.JSX.Element {
@@ -26,8 +29,14 @@ export function TabViewTemplate({
 
   return (
     <Tabs selectedKey={pathname} className="flex h-full flex-col">
-      <ViewHeader title={title} subtitle={subtitle} help={help} actions={actions}>
-        <TabList aria-label={title} className="flex gap-4">
+      <ViewHeader
+        title={title}
+        subtitle={subtitle}
+        help={help}
+        helpTopic={helpTopic}
+        actions={actions}
+      >
+        <TabList aria-label={title} className="flex flex-wrap gap-x-4 gap-y-1">
           {sections.map(({ path, label }) => (
             <Tab
               key={path}

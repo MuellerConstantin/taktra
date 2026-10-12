@@ -122,7 +122,7 @@ function ReportsView(): React.JSX.Element {
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t('title')} help={t('help')}>
+      <ViewHeader title={t('title')} help={t('help')} helpTopic="reports">
         <div className="flex flex-wrap items-center gap-2 pb-4">
           <PeriodPicker value={period} onChange={setPeriod} />
           <FilterButton

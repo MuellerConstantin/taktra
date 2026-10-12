@@ -21,6 +21,8 @@ import UpdatesSettings from './views/settings/app/UpdatesSettings'
 import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
 import ProfileFieldsSettings from './views/settings/profile/ProfileFieldsSettings'
 import ProfileGeneralSettings from './views/settings/profile/ProfileGeneralSettings'
+import HelpView from './views/help/HelpView'
+import HelpTopicView from './views/help/HelpTopicView'
 
 export const router = createHashRouter([
   { path: '/mini', element: <MiniTimerView /> },
@@ -64,6 +66,14 @@ export const router = createHashRouter([
           { path: 'appearance', element: <AppearanceSettings /> },
           { path: 'controls', element: <ControlsSettings /> },
           { path: 'updates', element: <UpdatesSettings /> }
+        ]
+      },
+      {
+        path: 'help',
+        element: <HelpView />,
+        children: [
+          { index: true, element: <HelpTopicView /> },
+          { path: ':topic', element: <HelpTopicView /> }
         ]
       }
     ]

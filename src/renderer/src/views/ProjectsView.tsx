@@ -74,6 +74,7 @@ function ProjectsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         help={t('help')}
+        helpTopic="projects"
         actions={
           <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />

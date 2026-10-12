@@ -104,7 +104,8 @@
     "migrationFailedText": "The selected profile could not be updated to the file format of this Taktra version. The file was not changed. Choose another profile, keep using it with the previous Taktra version, or remove it from the list."
   },
   "ViewHeader": {
-    "help": "Help"
+    "help": "Help",
+    "more": "Learn more"
   },
   "CommandPalette": {
     "label": "Command palette",
@@ -156,7 +157,8 @@
         "ticket number"
       ],
       "deleteProfile": ["remove profile", "trash"],
-      "profileName": ["rename"]
+      "profileName": ["rename"],
+      "help": ["manual", "guide", "documentation", "explanation", "FAQ"]
     }
   },
   "TimerView": {
@@ -783,5 +785,17 @@
     "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them in the template.",
     "EXPORT_TEMPLATE_NOT_FOUND": "The template no longer exists.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "A template with this name already exists."
+  },
+  "HelpView": {
+    "title": "Help",
+    "topics": {
+      "basics": "Basics",
+      "tracking": "Tracking time",
+      "projects": "Projects",
+      "activities": "Activities",
+      "clients": "Clients",
+      "reports": "Reports",
+      "profiles": "Profiles"
+    }
   }
 }

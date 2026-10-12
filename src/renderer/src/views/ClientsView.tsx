@@ -75,6 +75,7 @@ function ClientsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         help={t('help')}
+        helpTopic="clients"
         actions={
           <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />

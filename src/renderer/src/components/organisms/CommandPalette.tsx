@@ -5,6 +5,7 @@ import {
   RiCalendarCheckLine,
   RiDownload2Line,
   RiFolderLine,
+  RiQuestionLine,
   RiInformationLine,
   RiPriceTag3Line,
   RiSettings3Line,
@@ -230,6 +231,13 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       icon: RiSettings3Line,
       shortcut: appShortcuts.settings,
       run: goTo('/settings')
+    },
+    {
+      id: 'help',
+      label: tApp('HelpView.title'),
+      keywords: keywords('help'),
+      icon: RiQuestionLine,
+      run: goTo('/help')
     }
   ]
 

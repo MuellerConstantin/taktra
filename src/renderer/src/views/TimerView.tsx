@@ -80,6 +80,7 @@ function TimerView(): React.JSX.Element {
         title={t('title')}
         subtitle={dayFormatter.format(todayDate.toDate(getLocalTimeZone()))}
         help={t('help')}
+        helpTopic="tracking"
         actions={
           running && (
             <Button variant="secondary" onPress={() => setDialogOpen(true)}>

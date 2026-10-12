@@ -1,14 +1,16 @@
 import { RiQuestionLine } from '@remixicon/react'
-import { DialogTrigger } from 'react-aria-components'
+import { DialogTrigger, Link } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import { Button } from '../atoms/Button'
 import { Dialog } from '../atoms/Dialog'
 import { Popover } from '../atoms/Popover'
+import type { HelpTopic } from '../../lib/help'
 
 interface ViewHeaderProps {
   readonly title: React.ReactNode
   readonly subtitle?: React.ReactNode
   readonly help?: string
+  readonly helpTopic?: HelpTopic
   readonly actions?: React.ReactNode
   readonly children?: React.ReactNode
 }
@@ -17,6 +19,7 @@ export function ViewHeader({
   title,
   subtitle,
   help,
+  helpTopic,
   actions,
   children
 }: ViewHeaderProps): React.JSX.Element {
@@ -35,8 +38,16 @@ export function ViewHeader({
                   <RiQuestionLine className="size-4" />
                 </Button>
                 <Popover placement="bottom start" className="max-w-80">
-                  <Dialog aria-label={t('help')} className="p-4 text-sm">
-                    {help}
+                  <Dialog aria-label={t('help')} className="space-y-2 p-4 text-sm">
+                    <p>{help}</p>
+                    {helpTopic && (
+                      <Link
+                        href={`/help/${helpTopic}`}
+                        className="cursor-default rounded-sm text-primary underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {t('more')}
+                      </Link>
+                    )}
                   </Dialog>
                 </Popover>
               </DialogTrigger>
