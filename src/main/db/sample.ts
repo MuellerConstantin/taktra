@@ -1,6 +1,22 @@
+import type { CustomFieldScope } from '../../shared/customFields'
+import type { BuiltinExportColumn, ExportFormat } from '../../shared/export'
 import { toNameKey } from '../../shared/names'
 import type { ProfileDatabase } from './database'
-import { activities, activityTags, clients, projects, tags, timeEntries } from './schema'
+import {
+  activities,
+  activityFieldValues,
+  activityTags,
+  clientFieldValues,
+  clients,
+  customFieldOptions,
+  customFields,
+  exportTemplateColumns,
+  exportTemplates,
+  projectFieldValues,
+  projects,
+  tags,
+  timeEntries
+} from './schema'
 
 type SampleActivity = readonly [
   name: string,
@@ -18,6 +34,21 @@ interface SampleProject {
   readonly activeMonthsAgo: readonly [from: number, to: number]
   readonly weight: number
   readonly activities: readonly SampleActivity[]
+}
+
+interface SampleField {
+  readonly scope: CustomFieldScope
+  readonly name: string
+  readonly options?: readonly (readonly [name: string, archived: boolean])[]
+  /** Values by project, client or "project/activity" name; a select value names its option. */
+  readonly values: Readonly<Record<string, string>>
+}
+
+interface SampleExportTemplate {
+  readonly name: string
+  readonly format: ExportFormat
+  /** A built-in column, or a custom field by name with the header it is exported under. */
+  readonly columns: readonly (BuiltinExportColumn | readonly [field: string, header: string])[]
 }
 
 export const SAMPLE_PROFILE_NAME = 'Sample'
@@ -205,6 +236,96 @@ const sampleProjects: readonly SampleProject[] = [
   }
 ]
 
+const sampleFields: readonly SampleField[] = [
+  {
+    scope: 'project',
+    name: 'Order number',
+    values: {
+      'Customer Portal': 'PO-2024-0117',
+      'Webshop Relaunch': 'PO-2025-0342',
+      'Mobile App': '4500-1873',
+      'Data Platform': '4500-2210',
+      'Support Retainer': 'SR-2024-07',
+      'Security Audit': 'WB-SEC-0425',
+      'Intranet Redesign': 'LW-2023-118'
+    }
+  },
+  {
+    scope: 'project',
+    name: 'Billing',
+    options: [
+      ['Time and materials', false],
+      ['Fixed price', false],
+      ['Retainer', false],
+      ['Not billable', false],
+      ['Daily rate', true]
+    ],
+    values: {
+      'Customer Portal': 'Time and materials',
+      'Webshop Relaunch': 'Fixed price',
+      Internal: 'Not billable',
+      'Booking Platform': 'Time and materials',
+      'Mobile App': 'Time and materials',
+      'Data Platform': 'Time and materials',
+      'Support Retainer': 'Retainer',
+      'Open Source': 'Not billable',
+      'Security Audit': 'Fixed price',
+      'Legacy Migration': 'Daily rate',
+      'Intranet Redesign': 'Fixed price'
+    }
+  },
+  {
+    scope: 'client',
+    name: 'Customer number',
+    values: {
+      'Northwind Traders': '10017',
+      'Adventure Works': '10023',
+      Contoso: '10031',
+      Fabrikam: '10045',
+      'Tailspin Toys': '10052',
+      'Woodgrove Bank': '10068',
+      Litware: '10009'
+    }
+  },
+  {
+    scope: 'client',
+    name: 'Cost center',
+    values: { 'Human Resources': 'CC-4100' }
+  },
+  {
+    scope: 'activity',
+    name: 'Ticket',
+    values: {
+      'Booking Platform/Customizing Northwind': 'BOOK-1284',
+      'Booking Platform/Onboarding Tailspin': 'BOOK-1342',
+      'Security Audit/Remediation': 'SEC-77'
+    }
+  }
+]
+
+const sampleExportTemplates: readonly SampleExportTemplate[] = [
+  {
+    name: 'Invoice export',
+    format: 'csv',
+    columns: [
+      'date',
+      'client',
+      ['Customer number', 'customer_number'],
+      'project',
+      ['Order number', 'order_number'],
+      ['Billing', 'billing'],
+      'activity',
+      'duration_min',
+      'note'
+    ]
+  },
+  {
+    name: 'Ticket worklog',
+    format: 'json',
+    columns: [['Ticket', 'ticket'], 'date', 'start', 'end', 'duration_min', 'activity', 'note']
+  }
+]
+
 const notes = [
   'Follow-up',
   'Pairing with Lea',
@@ -262,6 +383,7 @@ export function seedSampleData(db: ProfileDatabase): void {
   )
   const clientIdOf = (name?: string): number | null => (name ? clientIds.get(name)! : null)
 
+  const projectIds = new Map<string, number>()
   const activityIds = new Map<string, number>()
   for (const project of sampleProjects) {
     const projectId = db
@@ -276,6 +398,7 @@ export function seedSampleData(db: ProfileDatabase): void {
       })
       .returning({ id: projects.id })
       .get().id
+    projectIds.set(project.name, projectId)
 
     for (const [name, tagNames, , client] of project.activities) {
       const activityId = db
@@ -294,6 +417,72 @@ export function seedSampleData(db: ProfileDatabase): void {
 
   const idOf = (project: string, activity: string): number =>
     activityIds.get(`${project}/${activity}`)!
+
+  const ownerIds: Record<CustomFieldScope, ReadonlyMap<string, number>> = {
+    project: projectIds,
+    client: clientIds,
+    activity: activityIds
+  }
+  const fieldIds = new Map<string, number>()
+  for (const field of sampleFields) {
+    const fieldId = db
+      .insert(customFields)
+      .values({
+        scope: field.scope,
+        type: field.options ? 'select' : 'text',
+        name: field.name,
+        nameKey: toNameKey(field.name)
+      })
+      .returning({ id: customFields.id })
+      .get().id
+    fieldIds.set(field.name, fieldId)
+    const optionIds = new Map(
+      (field.options ?? []).map(([name, archived]) => [
+        name,
+        db
+          .insert(customFieldOptions)
+          .values({ fieldId, name, nameKey: toNameKey(name), archivedAt: archived ? now : null })
+          .returning({ id: customFieldOptions.id })
+          .get().id
+      ])
+    )
+
+    for (const [owner, value] of Object.entries(field.values)) {
+      const ownerId = ownerIds[field.scope].get(owner)!
+      const stored = field.options
+        ? { fieldId, textValue: null, optionId: optionIds.get(value)! }
+        : { fieldId, textValue: value, optionId: null }
+      if (field.scope === 'project')
+        db.insert(projectFieldValues)
+          .values({ projectId: ownerId, ...stored })
+          .run()
+      else if (field.scope === 'client')
+        db.insert(clientFieldValues)
+          .values({ clientId: ownerId, ...stored })
+          .run()
+      else
+        db.insert(activityFieldValues)
+          .values({ activityId: ownerId, ...stored })
+          .run()
+    }
+  }
+
+  for (const template of sampleExportTemplates) {
+    const templateId = db
+      .insert(exportTemplates)
+      .values({ name: template.name, nameKey: toNameKey(template.name), format: template.format })
+      .returning({ id: exportTemplates.id })
+      .get().id
+    db.insert(exportTemplateColumns)
+      .values(
+        template.columns.map((column, position) =>
+          typeof column === 'string'
+            ? { templateId, position, builtin: column }
+            : { templateId, position, fieldId: fieldIds.get(column[0])!, header: column[1] }
+        )
+      )
+      .run()
+  }
 
   const clock = (day: Date, activityId: number, startMinute: number, minutes: number): void => {
     const startedAt = new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, startMinute)
