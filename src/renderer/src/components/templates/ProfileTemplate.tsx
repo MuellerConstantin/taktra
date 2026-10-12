@@ -7,7 +7,8 @@ import WelcomeView from '../../views/WelcomeView'
 const listsOfDetails: Readonly<Record<string, string>> = {
   projects: '/projects',
   activities: '/projects',
-  tags: '/tags'
+  tags: '/tags',
+  export: '/export'
 }
 
 function listOfDetail(pathname: string): string | null {

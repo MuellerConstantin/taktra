@@ -1,15 +1,32 @@
 import { z } from 'zod'
 import { builtinExportColumns, exportFormats } from '../export'
-import { id } from './common'
+import { normalizeName } from '../names'
+import { emptyToNull, id, name } from './common'
+import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from './limits'
 
 export const exportFormat = z.enum(exportFormats)
 
-export const exportColumns = z
+const header = z
+  .string()
+  .overwrite(normalizeName)
+  .max(MAX_NAME_LENGTH)
+  .transform(emptyToNull)
+  .nullish()
+
+const exportColumnList = z
   .array(
     z.union([
-      z.strictObject({ builtin: z.enum(builtinExportColumns) }),
-      z.strictObject({ fieldId: id })
+      z.strictObject({ builtin: z.enum(builtinExportColumns), header }),
+      z.strictObject({ fieldId: id, header })
     ])
   )
   .min(1)
-  .optional()
+  .max(MAX_EXPORT_COLUMNS)
+
+export const exportColumns = exportColumnList.optional()
+
+export const exportTemplateInput = z.object({
+  name,
+  format: exportFormat,
+  columns: exportColumnList
+})

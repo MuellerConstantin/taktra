@@ -6,6 +6,7 @@ import { app, BrowserWindow, dialog } from 'electron'
 import { z } from 'zod'
 import type { CustomField } from '../../shared/customFields'
 import { AppError } from '../../shared/errors'
+import { toNameKey } from '../../shared/names'
 import {
   defaultExportColumns,
   type BuiltinExportColumn,
@@ -82,18 +83,31 @@ interface ResolvedColumn {
   readonly valueOf: ValueOf
 }
 
-/** Headers must be unique, because JSON keys and CSV importers could not tell the columns apart. */
-function resolveColumns(columns: readonly ExportColumn[]): ResolvedColumn[] {
-  const resolved = columns.map((column) => {
-    if ('builtin' in column)
-      return { header: column.builtin, valueOf: builtinValues[column.builtin] }
-    const field = findCustomField(column.fieldId)
-    return { header: field.nameKey, valueOf: fieldValues(field) }
-  })
-  const headers = resolved.map((column) => column.header)
-  const conflict = headers.find((header, index) => headers.indexOf(header) !== index)
+function defaultHeader(column: ExportColumn): string {
+  return 'builtin' in column ? column.builtin : findCustomField(column.fieldId).nameKey
+}
+
+/**
+ * Headers are compared like names and must be unique, because JSON keys and CSV importers could
+ * not tell the columns apart.
+ */
+export function resolveHeaders(columns: readonly ExportColumn[]): string[] {
+  const headers = columns.map((column) => column.header ?? defaultHeader(column))
+  const keys = headers.map(toNameKey)
+  const conflict = keys.find((key, index) => keys.indexOf(key) !== index)
   if (conflict !== undefined) throw new AppError('EXPORT_COLUMN_CONFLICT', conflict)
-  return resolved
+  return headers
+}
+
+function resolveColumns(columns: readonly ExportColumn[]): ResolvedColumn[] {
+  const headers = resolveHeaders(columns)
+  return columns.map((column, index) => ({
+    header: headers[index],
+    valueOf:
+      'builtin' in column
+        ? builtinValues[column.builtin]
+        : fieldValues(findCustomField(column.fieldId))
+  }))
 }
 
 /** Completed entries matching the filter; a running timer is left out. */

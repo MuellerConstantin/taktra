@@ -1,19 +1,21 @@
 import { getLocalTimeZone, today } from '@internationalized/date'
-import { RiDownload2Line } from '@remixicon/react'
+import { RiAddLine, RiDownload2Line, RiPencilLine } from '@remixicon/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
+import { useNavigate, useSearchParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import {
   exportFormats,
   type ExportFormat,
   type ExportPreview,
-  type ExportValue
+  type ExportTemplate
 } from '../../../shared/export'
 import type { Client } from '../../../shared/clients'
 import type { Project } from '../../../shared/projects'
 import type { Tag } from '../../../shared/tags'
 import { Button } from '../components/atoms/Button'
 import { Select, SelectItem } from '../components/atoms/Select'
+import { ExportPreviewTable } from '../components/molecules/ExportPreviewTable'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
@@ -22,15 +24,13 @@ import { api } from '../lib/api'
 import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
 
-function formatCell(value: ExportValue): string {
-  return Array.isArray(value) ? value.join(', ') : String(value ?? '')
-}
-
 function ExportView(): React.JSX.Element {
   const t = useTranslations('ExportView')
   const errorMessage = useErrorMessage()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [period, setPeriod] = useState<Period>(() => ({
     preset: 'lastMonth',
     range: presetRange('lastMonth', today(getLocalTimeZone()), locale)
@@ -41,9 +41,16 @@ function ExportView(): React.JSX.Element {
   const [clients, setClients] = useState<readonly Client[]>([])
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [tags, setTags] = useState<readonly Tag[]>([])
-  const [format, setFormat] = useState<ExportFormat>('csv')
+  const [templates, setTemplates] = useState<readonly ExportTemplate[] | null>(null)
+  const [chosenFormat, setFormat] = useState<ExportFormat | null>(null)
   const [preview, setPreview] = useState<ExportPreview | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const template = templates?.find(
+    (candidate) => String(candidate.id) === searchParams.get('template')
+  )
+  const columns = template?.columns
+  const format = chosenFormat ?? template?.format ?? 'csv'
 
   const { from, to } = periodFilter(period)
   const filter = useMemo(
@@ -62,13 +69,15 @@ function ExportView(): React.JSX.Element {
     Promise.all([
       api.clients.list({ includeArchived: true }),
       api.projects.list({ includeArchived: true }),
-      api.tags.list()
+      api.tags.list(),
+      api.exportTemplates.list()
     ])
-      .then(([loadedClients, loadedProjects, loadedTags]) => {
+      .then(([loadedClients, loadedProjects, loadedTags, loadedTemplates]) => {
         if (!isCurrent) return
         setClients(loadedClients)
         setProjects(loadedProjects)
         setTags(loadedTags)
+        setTemplates(loadedTemplates)
       })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
     return () => {
@@ -77,23 +86,33 @@ function ExportView(): React.JSX.Element {
   }, [activeProfile?.path, errorMessage])
 
   useEffect(() => {
+    if (templates === null) return
     let isCurrent = true
     api.export
-      .preview(filter)
+      .preview(filter, columns)
       .then((loaded) => {
         if (!isCurrent) return
         setPreview(loaded)
         setError(null)
       })
-      .catch((caught) => isCurrent && setError(errorMessage(caught)))
+      .catch((caught) => {
+        if (!isCurrent) return
+        setPreview(null)
+        setError(errorMessage(caught))
+      })
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, filter, errorMessage])
+  }, [activeProfile?.path, templates, filter, columns, errorMessage])
+
+  const chooseTemplate = (id: string): void => {
+    setFormat(null)
+    setSearchParams(id === 'default' ? {} : { template: id }, { replace: true })
+  }
 
   const exportFile = async (): Promise<void> => {
     try {
-      await api.export.file(filter, format)
+      await api.export.file(filter, format, columns)
     } catch (caught) {
       setError(errorMessage(caught))
     }
@@ -106,6 +125,34 @@ function ExportView(): React.JSX.Element {
         help={t('help')}
         actions={
           <>
+            <Select
+              aria-label={t('template')}
+              value={template ? String(template.id) : 'default'}
+              onChange={(key) => key && chooseTemplate(String(key))}
+              className="w-56"
+            >
+              <SelectItem id="default">{t('defaultTemplate')}</SelectItem>
+              {(templates ?? []).map((candidate) => (
+                <SelectItem key={candidate.id} id={String(candidate.id)}>
+                  {candidate.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <Button
+              variant="icon"
+              aria-label={t('editTemplate')}
+              isDisabled={!template}
+              onPress={() => template && navigate(`/export/templates/${template.id}`)}
+            >
+              <RiPencilLine className="size-4" />
+            </Button>
+            <Button
+              variant="icon"
+              aria-label={t('newTemplate')}
+              onPress={() => navigate('/export/templates/new')}
+            >
+              <RiAddLine className="size-4" />
+            </Button>
             <Select
               aria-label={t('format')}
               value={format}
@@ -188,44 +235,7 @@ function ExportView(): React.JSX.Element {
             </dd>
           </div>
         </dl>
-        {preview && preview.count === 0 && (
-          <p className="text-center text-sm text-muted-foreground">{t('empty')}</p>
-        )}
-        {preview && preview.count > 0 && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-sm font-semibold">
-              {t('preview', { shown: preview.rows.length, count: preview.count })}
-            </h2>
-            <div className="overflow-x-auto rounded-xl border border-border bg-card">
-              <table className="w-full text-left font-mono text-xs">
-                <thead className="border-b border-border text-muted-foreground">
-                  <tr>
-                    {preview.headers.map((header) => (
-                      <th key={header} scope="col" className="px-3 py-2 font-medium">
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {preview.rows.map((row, index) => (
-                    <tr key={index} className="border-b border-border last:border-0">
-                      {row.map((value, column) => (
-                        <td
-                          key={column}
-                          className="max-w-64 truncate px-3 py-2 align-top"
-                          title={formatCell(value)}
-                        >
-                          {formatCell(value)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+        {preview && <ExportPreviewTable preview={preview} />}
       </div>
     </div>
   )

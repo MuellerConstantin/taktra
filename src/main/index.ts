@@ -23,6 +23,7 @@ import { initClients } from './domain/clients'
 import { initCustomFields } from './domain/customFields'
 import { initDonation, recordUsageDay } from './donation'
 import { initExport } from './domain/export'
+import { initExportTemplates } from './domain/exportTemplates'
 import { initProjects } from './domain/projects'
 import { initReports } from './domain/reports'
 import { initTags } from './domain/tags'
@@ -99,6 +100,7 @@ function start(): void {
   initMiniTimer()
   initReports()
   initExport()
+  initExportTemplates()
   initQuit()
   initAbout()
   initUpdates()

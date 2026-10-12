@@ -14,7 +14,13 @@ import type { IpcResponse } from '../shared/errors'
 import type { ProfilesState } from '../shared/profiles'
 import type { Project, ProjectInput } from '../shared/projects'
 import type { AppInfo } from '../shared/about'
-import type { ExportColumn, ExportFormat, ExportPreview } from '../shared/export'
+import type {
+  ExportColumn,
+  ExportFormat,
+  ExportPreview,
+  ExportTemplate,
+  ExportTemplateInput
+} from '../shared/export'
 import type { UpdateStatus } from '../shared/updates'
 import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
 import type { Settings, ShortcutStatus } from '../shared/settings'
@@ -134,6 +140,14 @@ const api = {
       invoke<ExportPreview>('export:preview', filter, columns),
     file: (filter: TimeFilter, format: ExportFormat, columns?: readonly ExportColumn[]) =>
       invoke<string | null>('export:file', filter, format, columns)
+  },
+  exportTemplates: {
+    list: () => invoke<ExportTemplate[]>('exportTemplates:list'),
+    get: (id: number) => invoke<ExportTemplate>('exportTemplates:get', id),
+    create: (input: ExportTemplateInput) => invoke<ExportTemplate>('exportTemplates:create', input),
+    update: (id: number, input: ExportTemplateInput) =>
+      invoke<ExportTemplate>('exportTemplates:update', id, input),
+    delete: (id: number) => invoke<void>('exportTemplates:delete', id)
   },
   timeEntries: {
     list: (filter: TimeEntryFilter) => invoke<TimeEntryDetails[]>('timeEntries:list', filter),

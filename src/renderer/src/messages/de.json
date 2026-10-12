@@ -466,6 +466,10 @@
   "ExportView": {
     "title": "Export",
     "export": "Exportieren…",
+    "template": "Vorlage",
+    "defaultTemplate": "Standard",
+    "editTemplate": "Vorlage bearbeiten",
+    "newTemplate": "Neue Vorlage",
     "clients": "Leistungsempfänger",
     "allClients": "Alle Leistungsempfänger",
     "searchClients": "Leistungsempfänger suchen",
@@ -483,9 +487,58 @@
     },
     "entries": "Einträge",
     "total": "Gesamtzeit",
-    "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum.",
-    "preview": "Vorschau: die ersten {shown} von {count} Einträgen",
-    "help": "Schreibt alle abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Die Vorschau zeigt, was in der Datei steht."
+    "help": "Schreibt die abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Eine Vorlage legt fest, welche Spalten die Datei enthält; die Vorschau zeigt, was in der Datei steht."
+  },
+  "ExportPreviewTable": {
+    "title": "Vorschau: die ersten {shown} von {count} Einträgen",
+    "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum."
+  },
+  "ExportTemplateView": {
+    "subtitle": "Exportvorlage",
+    "newTitle": "Neue Vorlage",
+    "name": "Name",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Vorlage löschen",
+    "available": "Verfügbare Spalten",
+    "builtinSection": "Standardspalten",
+    "scopeSections": {
+      "project": "Projektfelder",
+      "client": "Felder für Leistungsempfänger",
+      "activity": "Tätigkeitsfelder"
+    },
+    "scopes": {
+      "project": "Projektfeld",
+      "client": "Feld für Leistungsempfänger",
+      "activity": "Tätigkeitsfeld"
+    },
+    "builtins": {
+      "date": "Datum",
+      "project": "Projekt",
+      "activity": "Tätigkeit",
+      "tags": "Tags",
+      "start": "Beginn",
+      "end": "Ende",
+      "duration_min": "Dauer in Minuten",
+      "note": "Notiz",
+      "client": "Leistungsempfänger"
+    },
+    "archived": "archiviert",
+    "archivedField": "{name} (archiviert)",
+    "add": "{name} hinzufügen",
+    "allUsed": "Alle Spalten sind in der Datei.",
+    "limit": "Eine Vorlage enthält höchstens {max} Spalten.",
+    "selected": "In der Datei",
+    "selectedHelp": "Ziehe die Spalten in die Reihenfolge der Datei. Ein leerer Name verwendet den grau angezeigten.",
+    "reorder": "{name} verschieben",
+    "header": "Name von {name} in der Datei",
+    "conflict": "Name doppelt vergeben",
+    "remove": "{name} entfernen",
+    "previewHelp": "Vorschau mit den Einträgen eines Zeitraums, auch vor dem Speichern.",
+    "previewConflict": "Benenne die markierten Spalten um, um die Vorschau zu sehen.",
+    "deleteConfirmTitle": "Vorlage „{name}“ löschen?",
+    "deleteConfirmText": "Die Vorlage wird endgültig gelöscht. Damit exportierte Dateien bleiben unverändert.",
+    "deleteConfirmAction": "Löschen"
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
@@ -697,6 +750,8 @@
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
-    "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen. Entferne eine davon aus dem Export."
+    "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
+    "EXPORT_TEMPLATE_NOT_FOUND": "Die Vorlage existiert nicht mehr.",
+    "EXPORT_TEMPLATE_NAME_TAKEN": "Eine Vorlage mit diesem Namen existiert bereits."
   }
 }

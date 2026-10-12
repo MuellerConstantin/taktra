@@ -1,7 +1,9 @@
 import {
+  DropIndicator as RACDropIndicator,
   GridList as RACGridList,
   GridListItem as RACGridListItem,
   composeRenderProps,
+  type DropIndicatorProps,
   type GridListItemProps,
   type GridListProps
 } from 'react-aria-components'
@@ -29,6 +31,9 @@ const itemStyles = tv({
     },
     isSelected: {
       true: 'bg-accent'
+    },
+    isDragging: {
+      true: 'opacity-50'
     }
   }
 })
@@ -44,6 +49,17 @@ export function GridListItem(props: GridListItemProps): React.JSX.Element {
       className={composeRenderProps(props.className, (className, renderProps) =>
         itemStyles({ ...renderProps, className })
       )}
+    />
+  )
+}
+
+export function GridListDropIndicator(props: DropIndicatorProps): React.JSX.Element {
+  return (
+    <RACDropIndicator
+      {...props}
+      className={({ isDropTarget }) =>
+        isDropTarget ? 'h-0.5 bg-primary outline-0' : 'h-0 outline-0'
+      }
     />
   )
 }
