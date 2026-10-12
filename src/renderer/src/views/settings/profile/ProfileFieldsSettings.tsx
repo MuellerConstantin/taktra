@@ -7,6 +7,7 @@ import {
   RiPencilLine
 } from '@remixicon/react'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import {
   customFieldScopes,
@@ -146,7 +147,15 @@ function ProfileFieldsSettings(): React.JSX.Element {
   return (
     <div className="flex max-w-2xl flex-col gap-10">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <p className="min-w-0 flex-1 basis-80 text-sm text-muted-foreground">{t('description')}</p>
+        <p className="min-w-0 flex-1 basis-80 text-sm text-muted-foreground">
+          {t('description')}{' '}
+          <Link
+            href="/help/customFields"
+            className="cursor-default rounded-sm text-primary underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t('more')}
+          </Link>
+        </p>
         <ToggleButton isSelected={showArchived} onChange={setShowArchived}>
           <RiArchiveLine className="size-4" />
           {t('showArchived')}

@@ -125,6 +125,8 @@ function ActivityDetailView(): React.JSX.Element {
             {activity.name}
           </span>
         }
+        help={t('help')}
+        helpTopic="activities"
         subtitle={
           <span className="flex min-w-0 items-center gap-1">
             <Link href="/projects" className={breadcrumbLinkClassName}>

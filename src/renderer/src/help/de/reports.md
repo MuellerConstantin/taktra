@@ -6,11 +6,7 @@ Das ist kein Fehler. Die Frage „Wie viel Zeit hatte mit Meetings zu tun?“ wi
 
 ## Welche Summen gehen auf?
 
-Projekte und [Leistungsempfänger](#/help/clients). Jede Tätigkeit gehört zu genau einem Projekt und hat höchstens einen Leistungsempfänger. Jede Minute zählt dort also genau einmal.
-
-## Warum sieht eine alte Auswertung heute anders aus?
-
-Weil eine Tätigkeit seitdem geändert wurde, etwa ein neuer Tag oder ein anderes Projekt. Solche Änderungen gelten für ihre gesamte Zeit, siehe [Tätigkeiten](#/help/activities).
+Projekte und [Leistungsempfänger](clients.md). Jede Tätigkeit gehört zu genau einem Projekt und hat höchstens einen Leistungsempfänger. Jede Minute zählt dort also genau einmal.
 
 ## Wie halte ich einen Stand fest, etwa für eine Rechnung?
 

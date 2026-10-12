@@ -5,12 +5,18 @@ import basicsDe from '../help/de/basics.md?raw'
 import basicsEn from '../help/en/basics.md?raw'
 import clientsDe from '../help/de/clients.md?raw'
 import clientsEn from '../help/en/clients.md?raw'
+import exportDe from '../help/de/export.md?raw'
+import exportEn from '../help/en/export.md?raw'
+import customFieldsDe from '../help/de/customFields.md?raw'
+import customFieldsEn from '../help/en/customFields.md?raw'
 import profilesDe from '../help/de/profiles.md?raw'
 import profilesEn from '../help/en/profiles.md?raw'
 import projectsDe from '../help/de/projects.md?raw'
 import projectsEn from '../help/en/projects.md?raw'
 import reportsDe from '../help/de/reports.md?raw'
 import reportsEn from '../help/en/reports.md?raw'
+import tagsDe from '../help/de/tags.md?raw'
+import tagsEn from '../help/en/tags.md?raw'
 import trackingDe from '../help/de/tracking.md?raw'
 import trackingEn from '../help/en/tracking.md?raw'
 
@@ -19,8 +25,11 @@ export const helpTopics = [
   'tracking',
   'projects',
   'activities',
+  'tags',
   'clients',
   'reports',
+  'export',
+  'customFields',
   'profiles'
 ] as const
 
@@ -32,8 +41,11 @@ export const helpTexts: Readonly<Record<Language, Readonly<Record<HelpTopic, str
     tracking: trackingEn,
     projects: projectsEn,
     activities: activitiesEn,
+    tags: tagsEn,
     clients: clientsEn,
     reports: reportsEn,
+    export: exportEn,
+    customFields: customFieldsEn,
     profiles: profilesEn
   },
   de: {
@@ -41,8 +53,11 @@ export const helpTexts: Readonly<Record<Language, Readonly<Record<HelpTopic, str
     tracking: trackingDe,
     projects: projectsDe,
     activities: activitiesDe,
+    tags: tagsDe,
     clients: clientsDe,
     reports: reportsDe,
+    export: exportDe,
+    customFields: customFieldsDe,
     profiles: profilesDe
   }
 }

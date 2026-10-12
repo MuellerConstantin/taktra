@@ -71,6 +71,7 @@ function TagsView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         help={t('help')}
+        helpTopic="tags"
         actions={
           <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />

@@ -1,11 +1,14 @@
 ## Chapters
 
-- [Tracking time](#/help/tracking): Timer, adding time afterwards and notes.
-- [Projects](#/help/projects): Project or tag, archive instead of delete.
-- [Activities](#/help/activities): When to create one, duplicates, moving.
-- [Clients](#/help/clients): On the project or on the activity.
-- [Reports](#/help/reports): Why tag sums don't add up.
-- [Profiles](#/help/profiles): Several profiles, backing up and moving.
+- [Tracking time](tracking.md): Timer, adding time afterwards and notes.
+- [Projects](projects.md): Project or tag, archive instead of delete.
+- [Activities](activities.md): When to create one, duplicates, moving.
+- [Tags](tags.md): Kind of work, several per activity.
+- [Clients](clients.md): On the project or on the activity.
+- [Reports](reports.md): Why tag sums don't add up.
+- [Export](export.md): What the file contains, templates.
+- [Custom fields](customFields.md): Order numbers and the like for the export.
+- [Profiles](profiles.md): Several profiles, backing up and moving.
 
 ## The four levels
 

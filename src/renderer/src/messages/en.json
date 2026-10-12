@@ -131,7 +131,7 @@
     },
     "settings": {
       "profileName": "Profile name",
-      "customFields": "Fields"
+      "customFields": "Custom fields"
     },
     "keywords": {
       "timer": ["stopwatch", "track time", "start", "stop", "recent"],
@@ -336,7 +336,8 @@
     "deleteConfirmTitle": "Delete entry of {date}?",
     "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone. If it is the last entry of the activity, the activity is deleted too.",
     "deleteConfirmAction": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "help": "An activity collects all entries booked on it. Its tags and client apply to all of these entries, past ones included."
   },
   "ActivityDialog": {
     "title": "Edit activity",
@@ -570,7 +571,8 @@
     "deleteConfirmText": "The template is deleted permanently. Files exported with it stay unchanged.",
     "deleteConfirmAction": "Delete",
     "more": "More actions",
-    "addColumn": "Add column"
+    "addColumn": "Add column",
+    "help": "A template sets which columns the export file contains, in which order and under which name, so the file fits the system that imports it."
   },
   "ReportBreakdown": {
     "untagged": "No tag",
@@ -654,7 +656,7 @@
     "title": "Profile settings",
     "general": "General",
     "help": "A profile is a separate file with all its projects and entries, for example one for work and one for private projects. To back it up, simply copy the file.",
-    "fields": "Fields"
+    "fields": "Custom fields"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
@@ -695,7 +697,8 @@
         "title": "Activity fields",
         "description": "Belong to a single activity, such as a ticket number. They stay with it when it moves to another project."
       }
-    }
+    },
+    "more": "Learn more"
   },
   "CustomFieldDialog": {
     "scopes": {
@@ -793,8 +796,11 @@
       "tracking": "Tracking time",
       "projects": "Projects",
       "activities": "Activities",
+      "tags": "Tags",
       "clients": "Clients",
       "reports": "Reports",
+      "export": "Export",
+      "customFields": "Custom fields",
       "profiles": "Profiles"
     }
   }

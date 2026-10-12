@@ -1,6 +1,6 @@
 ## Do I need several profiles?
 
-Usually not. Profiles separate completely: no report spans two profiles. That fits work and private projects or two employers. If you only want to keep customers apart, use one profile with several [projects](#/help/projects) or [clients](#/help/clients).
+Usually not. Profiles separate completely: no report spans two profiles. That fits work and private projects or two employers. If you only want to keep customers apart, use one profile with several [projects](projects.md) or [clients](clients.md).
 
 ## Where is my data?
 
@@ -21,10 +21,6 @@ Because the two are independent. If you rename the profile in the [profile setti
 ## My profile is shown as unavailable.
 
 Taktra can't find the file, for example because it was moved or a drive is missing. As soon as it's back, everything works again.
-
-## What happens to my data during updates?
-
-If a new version needs to adjust the file format, it first puts a backup copy into Taktra's user data folder. An older version no longer opens a profile updated this way, so that it cannot damage it.
 
 ## Can I get a deleted profile back?
 

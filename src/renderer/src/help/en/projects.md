@@ -1,18 +1,18 @@
 ## What are projects for?
 
-A project groups what belongs together, for example a customer order or a product. You don't book time on the project directly, but on its [activities](#/help/activities).
+A project groups what belongs together, for example a customer order or a product. You don't book time on the project directly, but on its [activities](activities.md).
 
 ## Project or tag?
 
-The project says _what_ you work on. A tag says _what kind_ of work it is. A meeting in the "Website relaunch" is an activity in that project with the tag "Meeting". The [report](#/help/reports) then shows both: time for the relaunch and time for meetings overall.
+The project says _what_ you work on. A tag says _what kind_ of work it is. A meeting in the "Website relaunch" is an activity in that project with the tag "Meeting". The [report](reports.md) then shows both: time for the relaunch and time for meetings overall.
 
 ## Do I need a separate project for every customer?
 
-No. Who you work for is set with [clients](#/help/clients). Several projects can belong to the same customer.
+No. Who you work for is set with [clients](clients.md). Several projects can belong to the same customer.
 
 ## Why can't I delete a project?
 
-Because time is already booked on it. Otherwise past reports would become incomplete. Archive it instead. Deleting only works as long as no time is booked.
+Because time is already booked on it. Otherwise that time would disappear from all reports. Archive it instead. Deleting only works as long as no time is booked.
 
 ## What happens when I archive a project?
 

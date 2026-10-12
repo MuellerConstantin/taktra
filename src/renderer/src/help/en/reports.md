@@ -6,11 +6,7 @@ This is not an error. It answers the question "how much time had to do with meet
 
 ## Which sums do add up?
 
-Projects and [clients](#/help/clients). Every activity belongs to exactly one project and has at most one client. Every minute therefore counts exactly once there.
-
-## Why does an old report look different today?
-
-Because an activity was changed since then, for example a new tag or another project. Such changes apply to all of its time, see [activities](#/help/activities).
+Projects and [clients](clients.md). Every activity belongs to exactly one project and has at most one client. Every minute therefore counts exactly once there.
 
 ## How do I keep a fixed state, for example for an invoice?
 

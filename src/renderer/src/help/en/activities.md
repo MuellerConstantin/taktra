@@ -12,10 +12,6 @@ Merge them. All entries move to the other activity, and the duplicate disappears
 
 Move it. All of its time goes along to the new project, including that of past months.
 
-## Why does my old report suddenly look different?
-
-Because you changed an activity. Tags and [clients](#/help/clients) belong to the activity, not to the entry. Every change therefore applies to all of its time, retroactively too. This is intended: you can improve a classification later without touching every entry.
-
 ## How do I delete an activity?
 
 You don't, you archive it. It then no longer shows up when you start a timer, but its time stays in the report. If you delete all of its entries, it disappears automatically.

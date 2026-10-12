@@ -4,8 +4,9 @@ import { IntlProvider } from 'use-intl'
 import { useSettings } from '../hooks/useSettings'
 import en from '../messages/en.json'
 import de from '../messages/de.json'
+import type { Language } from '../../../shared/settings'
 
-const messages = { en, de }
+const messages: Readonly<Record<Language, typeof en>> = { en, de }
 
 interface LocaleProviderProps {
   readonly children: React.ReactNode

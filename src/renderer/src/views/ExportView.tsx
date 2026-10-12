@@ -138,6 +138,7 @@ function ExportView(): React.JSX.Element {
       <ViewHeader
         title={t('title')}
         help={t('help')}
+        helpTopic="export"
         actions={
           <>
             <Button onPress={exportFile} isDisabled={!preview || preview.count === 0}>

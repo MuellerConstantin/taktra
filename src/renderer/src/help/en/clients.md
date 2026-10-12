@@ -24,7 +24,3 @@ Both apply retroactively to all time. Taktra warns you before a different client
 ## And when I move an activity?
 
 It keeps its former client, unless the new project sets its own.
-
-## Can I rely on the sums per client?
-
-Yes. Every minute counts for at most one client, and the sums add up to the total. Tags are different, see [reports](#/help/reports).

@@ -10,10 +10,6 @@ Weil du nur an einer Sache gleichzeitig arbeitest. Startest du etwas Neues, stop
 
 Taktra bucht ganze Minuten. Start und Ende werden auf die Minute gerundet, mindestens eine Minute wird gebucht. Dafür schließen zwei Timer direkt hintereinander lückenlos aneinander an.
 
-## Geht Zeit verloren, wenn Taktra abstürzt?
-
-Nein. Ein laufender Timer ist sofort gespeichert und läuft nach einem Neustart einfach weiter.
-
 ## Wie starte ich einen Timer, ohne Taktra zu öffnen?
 
 Mit dem Schnellstart: [Tastenkürzel](#/settings/controls) drücken, Tätigkeit suchen, Enter.

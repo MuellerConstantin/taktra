@@ -24,7 +24,3 @@ Beides gilt rückwirkend für die gesamte Zeit. Bevor dabei ein anderer Leistung
 ## Und beim Verschieben einer Tätigkeit?
 
 Sie behält ihren bisherigen Leistungsempfänger, außer das neue Projekt gibt einen eigenen vor.
-
-## Kann ich mich bei den Summen auf ihn verlassen?
-
-Ja. Jede Minute zählt bei höchstens einem Leistungsempfänger, die Summen ergeben zusammen die Gesamtzeit. Bei Tags ist das anders, siehe [Auswertung](#/help/reports).

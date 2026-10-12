@@ -131,7 +131,7 @@
     },
     "settings": {
       "profileName": "Profilname",
-      "customFields": "Felder"
+      "customFields": "Benutzerdefinierte Felder"
     },
     "keywords": {
       "timer": [
@@ -370,7 +370,8 @@
     "deleteConfirmTitle": "Eintrag vom {date} löschen?",
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden. Ist es der letzte Eintrag der Tätigkeit, wird auch die Tätigkeit gelöscht.",
     "deleteConfirmAction": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "help": "Eine Tätigkeit sammelt alle Einträge, die auf sie gebucht wurden. Ihre Tags und ihr Leistungsempfänger gelten für all diese Einträge, auch für vergangene."
   },
   "ActivityDialog": {
     "title": "Tätigkeit bearbeiten",
@@ -604,7 +605,8 @@
     "deleteConfirmText": "Die Vorlage wird endgültig gelöscht. Damit exportierte Dateien bleiben unverändert.",
     "deleteConfirmAction": "Löschen",
     "more": "Weitere Aktionen",
-    "addColumn": "Spalte hinzufügen"
+    "addColumn": "Spalte hinzufügen",
+    "help": "Eine Vorlage legt fest, welche Spalten die Exportdatei enthält, in welcher Reihenfolge und unter welchem Namen. So passt die Datei zu dem System, das sie einliest."
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
@@ -688,7 +690,7 @@
     "title": "Profileinstellungen",
     "general": "Allgemein",
     "help": "Ein Profil ist eine eigene Datei mit allen Projekten und Einträgen, etwa eines für die Arbeit und eines für Privates. Zum Sichern kopierst du einfach die Datei.",
-    "fields": "Felder"
+    "fields": "Benutzerdefinierte Felder"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
@@ -729,7 +731,8 @@
         "title": "Tätigkeitsfelder",
         "description": "Gehören zu einer einzelnen Tätigkeit, etwa eine Ticketnummer. Beim Verschieben in ein anderes Projekt bleiben sie erhalten."
       }
-    }
+    },
+    "more": "Mehr dazu"
   },
   "CustomFieldDialog": {
     "scopes": {
@@ -827,8 +830,11 @@
       "tracking": "Zeit erfassen",
       "projects": "Projekte",
       "activities": "Tätigkeiten",
+      "tags": "Tags",
       "clients": "Leistungsempfänger",
       "reports": "Auswertung",
+      "export": "Export",
+      "customFields": "Benutzerdefinierte Felder",
       "profiles": "Profile"
     }
   }

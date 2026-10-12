@@ -195,6 +195,8 @@ function ExportTemplateView(): React.JSX.Element {
       <ViewHeader
         subtitle={t('subtitle')}
         title={name.trim() || t('newTitle')}
+        help={t('help')}
+        helpTopic="export"
         actions={
           <>
             <Button

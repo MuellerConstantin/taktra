@@ -1,11 +1,14 @@
 ## Kapitel
 
-- [Zeit erfassen](#/help/tracking): Timer, Nachtragen und Notizen.
-- [Projekte](#/help/projects): Projekt oder Tag, archivieren statt löschen.
-- [Tätigkeiten](#/help/activities): Wann eine neue, Duplikate, verschieben.
-- [Leistungsempfänger](#/help/clients): Am Projekt oder an der Tätigkeit.
-- [Auswertung](#/help/reports): Warum Tag-Summen nicht aufgehen.
-- [Profile](#/help/profiles): Mehrere Profile, sichern und umziehen.
+- [Zeit erfassen](tracking.md): Timer, Nachtragen und Notizen.
+- [Projekte](projects.md): Projekt oder Tag, archivieren statt löschen.
+- [Tätigkeiten](activities.md): Wann eine neue, Duplikate, verschieben.
+- [Tags](tags.md): Art der Arbeit, mehrere pro Tätigkeit.
+- [Leistungsempfänger](clients.md): Am Projekt oder an der Tätigkeit.
+- [Auswertung](reports.md): Warum Tag-Summen nicht aufgehen.
+- [Export](export.md): Was in der Datei steht, Vorlagen.
+- [Benutzerdefinierte Felder](customFields.md): Auftragsnummern und Ähnliches für den Export.
+- [Profile](profiles.md): Mehrere Profile, sichern und umziehen.
 
 ## Die vier Ebenen
 

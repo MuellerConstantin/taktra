@@ -10,10 +10,6 @@ Because you only work on one thing at a time. When you start something new, the 
 
 Taktra books whole minutes. Start and end are rounded to the minute, and at least one minute is booked. In return, two timers in a row meet without a gap.
 
-## Is time lost if Taktra crashes?
-
-No. A running timer is saved right away and simply keeps running after a restart.
-
 ## How do I start a timer without opening Taktra?
 
 With the quick start: press the [shortcut](#/settings/controls), search an activity, press Enter.
