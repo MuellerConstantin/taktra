@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { stringify } from 'csv-stringify/sync'
 import { and, isNotNull } from 'drizzle-orm'
 import { app, BrowserWindow, dialog } from 'electron'
+import writeXlsxFile, { type Cell } from 'write-excel-file/node'
 import { z } from 'zod'
 import type { CustomField } from '../../shared/customFields'
 import { AppError } from '../../shared/errors'
@@ -125,15 +126,16 @@ function toTable(
   }
 }
 
+/** Lists such as tags become one comma-separated text, for formats with a single value per cell. */
+function toCellValue(value: ExportValue): string | number | null {
+  return value !== null && typeof value === 'object' ? value.join(', ') : value
+}
+
 /** RFC 4180: comma, quoted fields where needed, CRLF line endings, no BOM. */
 export function toCsv({ headers, rows }: ExportTable): string {
-  return stringify(
-    [
-      headers,
-      ...rows.map((row) => row.map((value) => (Array.isArray(value) ? value.join(', ') : value)))
-    ],
-    { record_delimiter: 'windows' }
-  )
+  return stringify([headers, ...rows.map((row) => row.map(toCellValue))], {
+    record_delimiter: 'windows'
+  })
 }
 
 /** An array of entries with the CSV headers as keys, in the same order; no BOM. */
@@ -145,12 +147,43 @@ export function toJson({ headers, rows }: ExportTable): string {
 `
 }
 
+const XLSX_MAX_WIDTH = 60
+
+/** Dates as date cells and durations as numbers, so spreadsheets can sort and sum them. */
+export function toXlsx(
+  { headers, rows }: ExportTable,
+  columns: readonly ExportColumn[]
+): Promise<Buffer> {
+  const isDate = columns.map((column) => 'builtin' in column && column.builtin === 'date')
+  const values = rows.map((row) => row.map(toCellValue))
+  const widths = headers.map((header, index) =>
+    values.reduce((width, row) => Math.max(width, String(row[index] ?? '').length), header.length)
+  )
+  const cells = values.map((row) =>
+    row.map((value, index): Cell =>
+      isDate[index] && typeof value === 'string' ? new Date(`${value}T00:00:00Z`) : value
+    )
+  )
+  return writeXlsxFile([headers.map((value): Cell => ({ value, fontWeight: 'bold' })), ...cells], {
+    dateFormat: 'yyyy-mm-dd',
+    stickyRowsCount: 1,
+    columns: widths.map((width) => ({ width: Math.min(width + 2, XLSX_MAX_WIDTH) }))
+  }).toBuffer()
+}
+
 const writers: Record<
   ExportFormat,
-  { readonly name: string; readonly write: (table: ExportTable) => string }
+  {
+    readonly name: string
+    readonly write: (
+      table: ExportTable,
+      columns: readonly ExportColumn[]
+    ) => string | Promise<Buffer>
+  }
 > = {
   csv: { name: 'CSV', write: toCsv },
-  json: { name: 'JSON', write: toJson }
+  json: { name: 'JSON', write: toJson },
+  xlsx: { name: 'Excel', write: toXlsx }
 }
 
 export function previewExport(
@@ -188,7 +221,7 @@ async function exportFile(
     : await dialog.showSaveDialog(options)
   if (result.canceled || !result.filePath) return null
 
-  const content = writer.write(toTable(listCompletedEntries(filter), resolved))
+  const content = await writer.write(toTable(listCompletedEntries(filter), resolved), columns)
   try {
     await writeFile(result.filePath, content, 'utf8')
   } catch (error) {

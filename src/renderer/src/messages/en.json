@@ -140,7 +140,17 @@
       "clients": ["customers", "departments", "cost centers", "billing"],
       "tags": ["categories", "labels", "kind of work"],
       "reports": ["statistics", "evaluation", "charts", "totals", "hours"],
-      "export": ["billing", "invoice", "CSV", "JSON", "file", "templates", "columns"],
+      "export": [
+        "billing",
+        "invoice",
+        "CSV",
+        "JSON",
+        "Excel",
+        "XLSX",
+        "file",
+        "templates",
+        "columns"
+      ],
       "profile": ["profile file", "backup"],
       "settings": ["preferences", "options"],
       "quickStart": ["start timer", "search activity"],

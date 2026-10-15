@@ -323,6 +323,11 @@ const sampleExportTemplates: readonly SampleExportTemplate[] = [
     name: 'Ticket worklog',
     format: 'json',
     columns: [['Ticket', 'ticket'], 'date', 'start', 'end', 'duration_min', 'activity', 'note']
+  },
+  {
+    name: 'Timesheet',
+    format: 'xlsx',
+    columns: ['date', 'client', 'project', 'activity', 'tags', 'duration_min', 'note']
   }
 ]
 

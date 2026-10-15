@@ -40,7 +40,7 @@ export interface ExportTable {
   readonly rows: readonly (readonly ExportValue[])[]
 }
 
-export const exportFormats = ['csv', 'json'] as const
+export const exportFormats = ['csv', 'json', 'xlsx'] as const
 
 export type ExportFormat = (typeof exportFormats)[number]
 

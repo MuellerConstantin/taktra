@@ -29,6 +29,13 @@
       "when": 1791795788939,
       "tag": "0003_add_export_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792093885651,
+      "tag": "0004_add_xlsx_export_format",
+      "breakpoints": true
     }
   ]
 }

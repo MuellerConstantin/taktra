@@ -8,7 +8,7 @@ Eine Zeile pro Eintrag, mit Namen statt interner Nummern. Uhrzeiten stehen in de
 
 ## Welches Format soll ich nehmen?
 
-Das, was das einlesende System erwartet. Im Zweifel CSV, das öffnet jedes Tabellenprogramm. Daneben stehen weitere Formate wie JSON zur Verfügung.
+Das, was das einlesende System erwartet. Willst du die Datei selbst in einer Tabellenkalkulation öffnen, nimm XLSX: Datum und Dauer kommen dort als solche an und lassen sich gleich sortieren und summieren. CSV und JSON sind für andere Programme gedacht.
 
 ## Wozu gibt es Vorlagen?
 

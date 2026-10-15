@@ -52,8 +52,8 @@ machine, and your data is a plain file you own.
 - Quick start from the tray or a global shortcut, and an always-on-top mini timer
 - Reports by project, client and tag over any period
 - Custom fields on projects, clients and activities, e.g. an order number or a cost center
-- Export to CSV or JSON in a stable format for billing and other tools, with templates for the
-  columns
+- Export to CSV, JSON or Excel in a stable format for billing and other tools, with templates for
+  the columns
 - Several profiles, each in its own file, like KeePass databases
 - Light and dark theme, English and German, command palette and keyboard shortcuts
 - An in-app help that explains the concepts in short chapters

@@ -71,7 +71,7 @@ total; per-client sums do add up.
 
 **Export**
 A separate export view writes the completed entries of a period, filtered by
-project, tag and client, to a file (CSV or JSON) for billing and other systems,
+project, tag and client, to a file (CSV, JSON or Excel) for billing and other systems,
 with a preview of what the file will contain. Export templates of a profile
 choose the columns, their order and names, custom fields included; without one
 the standard columns are written.
@@ -97,7 +97,7 @@ development.
 - **Charts**: nivo
 - **Notes**: `react-markdown` with `remark-gfm` and `remark-breaks`
 - **App settings**: `electron-store`
-- **Export**: `csv-stringify` (main process only)
+- **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
 
 ## Project Structure
@@ -188,7 +188,9 @@ the sample profile and are excluded from the packaged app.
   field column is named by the field's name key. A template may rename any
   column, and names must be unique in a file. CSV follows
   RFC 4180 strictly (comma, CRLF, no BOM) through a library; further formats
-  get their own writer for the same rows.
+  get their own writer for the same rows. Excel files are for people, CSV for
+  other systems: xlsx writes dates and durations as typed cells, while CSV is
+  never adapted to Excel (BOM, semicolons).
 - **App settings outside the database**: Preferences of the installation
   (theme, language, mini timer, global shortcut) live in an `electron-store` in
   the user data directory and reach the renderer only through the API.

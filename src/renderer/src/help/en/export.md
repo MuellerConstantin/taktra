@@ -8,7 +8,7 @@ One row per entry, with names instead of internal numbers. Clock times are in yo
 
 ## Which format should I choose?
 
-Whatever the system reading the file expects. If in doubt, CSV, which any spreadsheet opens. Further formats such as JSON are available as well.
+Whatever the system reading the file expects. To open the file yourself in a spreadsheet, choose XLSX: dates and durations arrive there as such and can be sorted and summed right away. CSV and JSON are meant for other programs.
 
 ## What are templates for?
 

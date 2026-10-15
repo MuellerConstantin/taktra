@@ -173,7 +173,17 @@
         "Stunden",
         "reports"
       ],
-      "export": ["Abrechnung", "Rechnung", "CSV", "JSON", "Datei", "Vorlagen", "Spalten"],
+      "export": [
+        "Abrechnung",
+        "Rechnung",
+        "CSV",
+        "JSON",
+        "Excel",
+        "XLSX",
+        "Datei",
+        "Vorlagen",
+        "Spalten"
+      ],
       "profile": ["Profildatei", "Sicherung", "Backup", "profile"],
       "settings": ["Optionen", "Präferenzen", "settings", "preferences"],
       "quickStart": ["Timer starten", "Tätigkeit suchen"],
