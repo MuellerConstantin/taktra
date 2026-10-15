@@ -19,6 +19,11 @@ export const builtinExportColumns = [
 
 export type BuiltinExportColumn = (typeof builtinExportColumns)[number]
 
+export const durationExportColumns: readonly BuiltinExportColumn[] = ['duration_min', 'duration_h']
+
+/** Columns that differ between single entries, so summed layouts cannot contain them. */
+export const entryOnlyExportColumns: readonly BuiltinExportColumn[] = ['start', 'end', 'note']
+
 /**
  * Without its own header, a built-in column is headed by its name and a custom field column by
  * the field's name key.

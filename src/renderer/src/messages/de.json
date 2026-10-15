@@ -609,6 +609,15 @@
     "reorder": "{name} verschieben",
     "header": "Name von {name} in der Datei",
     "conflict": "Name doppelt vergeben",
+    "layout": "Layout",
+    "layouts": {
+      "entries": "Eine Zeile pro Eintrag",
+      "summed": "Summierte Zeilen",
+      "pivot": "Tage als Spalten"
+    },
+    "notSummable": "Lässt sich nicht summieren",
+    "durationMissing": "Summierte Zeilen brauchen eine Dauer in Minuten oder Stunden.",
+    "previewLayout": "Passe die Spalten an das Layout an, um die Vorschau zu sehen.",
     "remove": "{name} entfernen",
     "previewHelp": "Vorschau mit den Einträgen eines Zeitraums, auch vor dem Speichern.",
     "previewConflict": "Benenne die markierten Spalten um, um die Vorschau zu sehen.",
@@ -831,7 +840,7 @@
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
     "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
-    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn, Ende und Notiz gehören zu einzelnen Einträgen und lassen sich nicht summieren. Entferne sie aus der Vorlage.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn, Ende und Notiz unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus der Vorlage.",
     "EXPORT_DURATION_MISSING": "Summierte Zeilen brauchen eine Spalte mit der Dauer in Minuten oder Stunden.",
     "EXPORT_TEMPLATE_NOT_FOUND": "Die Vorlage existiert nicht mehr.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "Eine Vorlage mit diesem Namen existiert bereits."

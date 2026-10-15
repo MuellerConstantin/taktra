@@ -15,7 +15,10 @@ import { customFieldScopes, type CustomField } from '../../../shared/customField
 import {
   builtinExportColumns,
   defaultExportColumns,
+  durationExportColumns,
+  entryOnlyExportColumns,
   exportFormats,
+  exportLayouts,
   type ExportColumn,
   type ExportFormat,
   type ExportLayout,
@@ -80,8 +83,18 @@ function ExportTemplateView(): React.JSX.Element {
     headerKeys.indexOf(headerKeys[index]) !== headerKeys.lastIndexOf(headerKeys[index])
   const hasConflict = headerKeys.some((_, index) => isConflict(index))
 
+  const isSummed = layout !== 'entries'
+  const isEntryOnly = (column: ExportColumn): boolean =>
+    isSummed && 'builtin' in column && entryOnlyExportColumns.includes(column.builtin)
+  const lacksDuration =
+    isSummed &&
+    !columns.some((column) => 'builtin' in column && durationExportColumns.includes(column.builtin))
+  const hasLayoutProblem = lacksDuration || columns.some(isEntryOnly)
+
   const selected = new Set(columns.map(columnKey))
-  const availableBuiltins = builtinExportColumns.filter((builtin) => !selected.has(builtin))
+  const availableBuiltins = builtinExportColumns.filter(
+    (builtin) => !selected.has(builtin) && !isEntryOnly({ builtin })
+  )
   const availableFields = fields.filter((field) => !selected.has(columnKey({ fieldId: field.id })))
   const isFull = columns.length >= MAX_EXPORT_COLUMNS
 
@@ -112,7 +125,7 @@ function ExportTemplateView(): React.JSX.Element {
   }, [templateId, errorMessage])
 
   useEffect(() => {
-    if (!isLoaded || hasConflict) return
+    if (!isLoaded || hasConflict || hasLayoutProblem) return
     let isCurrent = true
     api.export
       .preview(filter, columns, layout)
@@ -125,7 +138,7 @@ function ExportTemplateView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [isLoaded, hasConflict, filter, columns, layout, errorMessage])
+  }, [isLoaded, hasConflict, hasLayoutProblem, filter, columns, layout, errorMessage])
 
   const { dragAndDropHooks } = useDragAndDrop<ExportColumn>({
     getItems: (keys) => [...keys].map((key) => ({ 'text/plain': String(key) })),
@@ -204,7 +217,7 @@ function ExportTemplateView(): React.JSX.Element {
           <>
             <Button
               onPress={save}
-              isDisabled={!isLoaded || isPending || !name.trim() || hasConflict}
+              isDisabled={!isLoaded || isPending || !name.trim() || hasConflict || hasLayoutProblem}
             >
               {t('save')}
             </Button>
@@ -251,6 +264,20 @@ function ExportTemplateView(): React.JSX.Element {
               </SelectItem>
             ))}
           </Select>
+          <Select
+            aria-label={t('layout')}
+            value={layout}
+            onChange={(key) => key && setLayout(key as ExportLayout)}
+            className="w-56"
+          >
+            {exportLayouts
+              .filter((option) => option !== 'pivot')
+              .map((option) => (
+                <SelectItem key={option} id={option}>
+                  {t(`layouts.${option}`)}
+                </SelectItem>
+              ))}
+          </Select>
         </div>
       </ViewHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-8 py-6">
@@ -288,6 +315,9 @@ function ExportTemplateView(): React.JSX.Element {
                         {t(`scopes.${field.scope}`)}
                         {field.archivedAt && ` · ${t('archived')}`}
                       </span>
+                    )}
+                    {isEntryOnly(column) && (
+                      <span className="truncate text-xs text-destructive">{t('notSummable')}</span>
                     )}
                   </div>
                   <TextField
@@ -357,6 +387,7 @@ function ExportTemplateView(): React.JSX.Element {
                 {t('limit', { max: MAX_EXPORT_COLUMNS })}
               </p>
             )}
+            {lacksDuration && <p className="text-sm text-destructive">{t('durationMissing')}</p>}
           </div>
         </section>
         <section className="flex flex-col gap-3">
@@ -366,6 +397,8 @@ function ExportTemplateView(): React.JSX.Element {
           </div>
           {hasConflict ? (
             <p className="text-sm text-destructive">{t('previewConflict')}</p>
+          ) : hasLayoutProblem ? (
+            <p className="text-sm text-destructive">{t('previewLayout')}</p>
           ) : previewError ? (
             <p className="text-sm text-destructive">{previewError}</p>
           ) : (

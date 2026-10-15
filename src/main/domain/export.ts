@@ -10,6 +10,8 @@ import { AppError } from '../../shared/errors'
 import { toNameKey } from '../../shared/names'
 import {
   defaultExportColumns,
+  durationExportColumns,
+  entryOnlyExportColumns,
   type BuiltinExportColumn,
   type ExportColumn,
   type ExportFormat,
@@ -57,8 +59,6 @@ const durationsFromMinutes: Partial<Record<BuiltinExportColumn, (minutes: number
   duration_min: (minutes) => minutes,
   duration_h: toHours
 }
-
-const entryOnlyColumns: readonly BuiltinExportColumn[] = ['start', 'end', 'note']
 
 type ValueOf = (details: TimeEntryDetails) => ExportValue
 
@@ -120,9 +120,9 @@ export function resolveHeaders(columns: readonly ExportColumn[]): string[] {
 export function checkLayout(layout: ExportLayout, columns: readonly ExportColumn[]): void {
   if (layout === 'entries') return
   const builtins = columns.flatMap((column) => ('builtin' in column ? [column.builtin] : []))
-  const entryOnly = builtins.find((builtin) => entryOnlyColumns.includes(builtin))
+  const entryOnly = builtins.find((builtin) => entryOnlyExportColumns.includes(builtin))
   if (entryOnly !== undefined) throw new AppError('EXPORT_COLUMN_NOT_SUMMABLE', entryOnly)
-  if (!builtins.some((builtin) => builtin in durationsFromMinutes)) {
+  if (!builtins.some((builtin) => durationExportColumns.includes(builtin))) {
     throw new AppError('EXPORT_DURATION_MISSING')
   }
 }
