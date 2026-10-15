@@ -34,9 +34,10 @@ export const defaultExportColumns: readonly ExportColumn[] = builtinExportColumn
 
 export type ExportValue = string | number | readonly string[] | null
 
-/** Rows hold their values in the order of the headers. */
+/** Rows hold their values in the order of the headers; date columns hold ISO dates. */
 export interface ExportTable {
   readonly headers: readonly string[]
+  readonly isDate: readonly boolean[]
   readonly rows: readonly (readonly ExportValue[])[]
 }
 

@@ -81,6 +81,7 @@ function fieldValues(field: CustomField): ValueOf {
 
 interface ResolvedColumn {
   readonly header: string
+  readonly isDate: boolean
   readonly valueOf: ValueOf
 }
 
@@ -104,6 +105,7 @@ function resolveColumns(columns: readonly ExportColumn[]): ResolvedColumn[] {
   const headers = resolveHeaders(columns)
   return columns.map((column, index) => ({
     header: headers[index],
+    isDate: 'builtin' in column && column.builtin === 'date',
     valueOf:
       'builtin' in column
         ? builtinValues[column.builtin]
@@ -122,6 +124,7 @@ function toTable(
 ): ExportTable {
   return {
     headers: columns.map((column) => column.header),
+    isDate: columns.map((column) => column.isDate),
     rows: entries.map((details) => columns.map((column) => column.valueOf(details)))
   }
 }
@@ -150,11 +153,7 @@ export function toJson({ headers, rows }: ExportTable): string {
 const XLSX_MAX_WIDTH = 60
 
 /** Dates as date cells and durations as numbers, so spreadsheets can sort and sum them. */
-export function toXlsx(
-  { headers, rows }: ExportTable,
-  columns: readonly ExportColumn[]
-): Promise<Buffer> {
-  const isDate = columns.map((column) => 'builtin' in column && column.builtin === 'date')
+export function toXlsx({ headers, isDate, rows }: ExportTable): Promise<Buffer> {
   const values = rows.map((row) => row.map(toCellValue))
   const widths = headers.map((header, index) =>
     values.reduce((width, row) => Math.max(width, String(row[index] ?? '').length), header.length)
@@ -175,10 +174,7 @@ const writers: Record<
   ExportFormat,
   {
     readonly name: string
-    readonly write: (
-      table: ExportTable,
-      columns: readonly ExportColumn[]
-    ) => string | Promise<Buffer>
+    readonly write: (table: ExportTable) => string | Promise<Buffer>
   }
 > = {
   csv: { name: 'CSV', write: toCsv },
@@ -221,7 +217,7 @@ async function exportFile(
     : await dialog.showSaveDialog(options)
   if (result.canceled || !result.filePath) return null
 
-  const content = await writer.write(toTable(listCompletedEntries(filter), resolved), columns)
+  const content = await writer.write(toTable(listCompletedEntries(filter), resolved))
   try {
     await writeFile(result.filePath, content, 'utf8')
   } catch (error) {
