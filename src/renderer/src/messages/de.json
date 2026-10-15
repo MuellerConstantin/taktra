@@ -598,7 +598,8 @@
       "end": "Ende",
       "duration_min": "Dauer in Minuten",
       "note": "Notiz",
-      "client": "Leistungsempfänger"
+      "client": "Leistungsempfänger",
+      "duration_h": "Dauer in Stunden"
     },
     "archived": "archiviert",
     "archivedField": "{name} (archiviert)",

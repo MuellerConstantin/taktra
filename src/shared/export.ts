@@ -13,7 +13,8 @@ export const builtinExportColumns = [
   'end',
   'duration_min',
   'note',
-  'client'
+  'client',
+  'duration_h'
 ] as const
 
 export type BuiltinExportColumn = (typeof builtinExportColumns)[number]
@@ -28,9 +29,10 @@ export type ExportColumn = (
   readonly header?: string | null
 }
 
-export const defaultExportColumns: readonly ExportColumn[] = builtinExportColumns.map(
-  (builtin) => ({ builtin })
-)
+/** Files without a template keep the columns they had before `duration_h` was added. */
+export const defaultExportColumns: readonly ExportColumn[] = builtinExportColumns
+  .filter((builtin) => builtin !== 'duration_h')
+  .map((builtin) => ({ builtin }))
 
 export type ExportValue = string | number | readonly string[] | null
 

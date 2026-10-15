@@ -61,7 +61,8 @@ const builtinValues: Record<BuiltinExportColumn, ValueOf> = {
     entry.endedAt && entry.timezone ? formatTime(entry.endedAt, entry.timezone) : null,
   duration_min: durationMin,
   note: ({ entry }) => entry.note,
-  client: ({ client }) => client?.name ?? null
+  client: ({ client }) => client?.name ?? null,
+  duration_h: (details) => Math.round((durationMin(details) / 60) * 100) / 100
 }
 
 const fieldOwners: Record<CustomField['scope'], (details: TimeEntryDetails) => number | null> = {

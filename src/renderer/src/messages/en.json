@@ -564,7 +564,8 @@
       "end": "End",
       "duration_min": "Duration in minutes",
       "note": "Note",
-      "client": "Client"
+      "client": "Client",
+      "duration_h": "Duration in hours"
     },
     "archived": "archived",
     "archivedField": "{name} (archived)",

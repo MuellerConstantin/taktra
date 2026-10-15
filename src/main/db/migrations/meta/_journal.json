@@ -36,6 +36,13 @@
       "when": 1792093885651,
       "tag": "0004_add_xlsx_export_format",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792095547599,
+      "tag": "0005_add_duration_h_export_column",
+      "breakpoints": true
     }
   ]
 }
