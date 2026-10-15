@@ -1,5 +1,5 @@
 import type { CustomFieldScope } from '../../shared/customFields'
-import type { BuiltinExportColumn, ExportFormat } from '../../shared/export'
+import type { BuiltinExportColumn, ExportFormat, ExportLayout } from '../../shared/export'
 import { toNameKey } from '../../shared/names'
 import type { ProfileDatabase } from './database'
 import {
@@ -47,6 +47,7 @@ interface SampleField {
 interface SampleExportTemplate {
   readonly name: string
   readonly format: ExportFormat
+  readonly layout?: ExportLayout
   /** A built-in column, or a custom field by name with the header it is exported under. */
   readonly columns: readonly (BuiltinExportColumn | readonly [field: string, header: string])[]
 }
@@ -328,6 +329,18 @@ const sampleExportTemplates: readonly SampleExportTemplate[] = [
     name: 'Timesheet',
     format: 'xlsx',
     columns: ['date', 'client', 'project', 'activity', 'tags', 'duration_min', 'note']
+  },
+  {
+    name: 'Hours per order',
+    format: 'csv',
+    layout: 'summed',
+    columns: ['date', ['Order number', 'order_number'], 'project', 'activity', 'duration_h']
+  },
+  {
+    name: 'Monthly timesheet',
+    format: 'xlsx',
+    layout: 'pivot',
+    columns: ['client', ['Cost center', 'cost_center'], 'project', 'activity', 'duration_h']
   }
 ]
 
@@ -475,7 +488,12 @@ export function seedSampleData(db: ProfileDatabase): void {
   for (const template of sampleExportTemplates) {
     const templateId = db
       .insert(exportTemplates)
-      .values({ name: template.name, nameKey: toNameKey(template.name), format: template.format })
+      .values({
+        name: template.name,
+        nameKey: toNameKey(template.name),
+        format: template.format,
+        layout: template.layout
+      })
       .returning({ id: exportTemplates.id })
       .get().id
     db.insert(exportTemplateColumns)
