@@ -74,7 +74,9 @@ A separate export view writes the completed entries of a period, filtered by
 project, tag and client, to a file (CSV, JSON or Excel) for billing and other systems,
 with a preview of what the file will contain. Export templates of a profile
 choose the columns, their order and names, custom fields included; without one
-the standard columns are written.
+the standard columns are written. A template writes one row per entry, sums the
+entries per combination of its other columns, or sums them with one column per
+day of the period, as in a time sheet.
 
 **Help**
 An in-app help explains the domain rules in short chapters of questions and
@@ -180,10 +182,13 @@ the sample profile and are excluded from the packaged app.
 - **Text length limits on three levels**: Inputs set `maxLength`, the Zod
   schemas reject longer values, and check constraints in the database are the
   last line of defence. The limits are defined once in `shared/validation/`.
-- **Exports are a stable file format**: Exports contain a cleaned view (one
-  row per entry, names instead of ids, local clock times, durations in whole
-  minutes), never the tables, so the schema stays free to change, and stay
-  flat: one file, no separate files linked by keys. The standard column names
+- **Exports are a stable file format**: Exports contain a cleaned view (names
+  instead of ids, local clock times, durations in whole minutes or in hours
+  rounded to hundredths), never the tables, so the schema stays free to change,
+  and stay flat: one file, no separate files linked by keys. Rows are single
+  entries or sums; sums add up whole minutes before converting them, and
+  columns that differ per entry (start, end, note) are rejected in them rather
+  than dropped. The standard column names
   are English and never change, because other systems import them; a custom
   field column is named by the field's name key. A template may rename any
   column, and names must be unique in a file. CSV follows

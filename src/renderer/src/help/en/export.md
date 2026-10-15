@@ -4,7 +4,7 @@ To pass tracked time on, for example for an invoice, payroll or another system. 
 
 ## What is in the file?
 
-One row per entry, with names instead of internal numbers. Clock times are in your local time, durations in whole minutes, notes as you wrote them. Only completed entries are exported, so a running timer is missing.
+By default one row per entry, with names instead of internal numbers. Clock times are in your local time, durations in whole minutes or in hours, notes as you wrote them. Only completed entries are exported, so a running timer is missing.
 
 ## Which format should I choose?
 
@@ -13,3 +13,7 @@ Whatever the system reading the file expects. To open the file yourself in a spr
 ## What are templates for?
 
 To make the file fit the system that reads it. A template sets which columns the file contains, in which order and under which name. Besides the standard columns, these can be [custom fields](customFields.md) too. Templates are saved in the profile. Without a template, the file contains the standard columns.
+
+## Can the file contain sums instead of single entries?
+
+Yes, a template can sum the entries: every combination of its other columns becomes one row, for example one per activity and day. With days as columns, each day of the period gets a column of its own instead, like in a time sheet. Start, end and note differ for every entry, so they cannot be summed.

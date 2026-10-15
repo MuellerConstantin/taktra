@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Export entries as an Excel file (xlsx), with dates and durations as cells a spreadsheet can sort
   and sum.
+- Export templates can sum the entries per combination of their columns, for example per activity
+  and day, or write one column per day of the period like a time sheet.
+- The duration in hours, rounded to hundredths, as a further export column.
 
 ## [0.3.0] - 2026-10-12
 
