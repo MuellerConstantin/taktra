@@ -82,13 +82,13 @@ function save(input: ExportTemplateData, write: () => number): ExportTemplate {
 }
 
 export function createExportTemplate(input: ExportTemplateData): ExportTemplate {
-  const { name, format } = input
+  const { name, format, layout } = input
   return save(
     input,
     () =>
       getActiveDatabase()
         .insert(exportTemplates)
-        .values({ name, nameKey: toNameKey(name), format })
+        .values({ name, nameKey: toNameKey(name), format, layout })
         .returning({ id: exportTemplates.id })
         .get().id
   )
@@ -96,11 +96,11 @@ export function createExportTemplate(input: ExportTemplateData): ExportTemplate 
 
 export function updateExportTemplate(id: number, input: ExportTemplateData): ExportTemplate {
   getExportTemplate(id)
-  const { name, format } = input
+  const { name, format, layout } = input
   return save(input, () => {
     getActiveDatabase()
       .update(exportTemplates)
-      .set({ name, nameKey: toNameKey(name), format })
+      .set({ name, nameKey: toNameKey(name), format, layout })
       .where(eq(exportTemplates.id, id))
       .run()
     return id

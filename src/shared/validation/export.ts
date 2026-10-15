@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { builtinExportColumns, exportFormats } from '../export'
+import { builtinExportColumns, exportFormats, exportLayouts } from '../export'
 import { normalizeName } from '../names'
 import { emptyToNull, id, name } from './common'
 import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from './limits'
@@ -28,5 +28,6 @@ export const exportColumns = exportColumnList.optional()
 export const exportTemplateInput = z.object({
   name,
   format: exportFormat,
+  layout: z.enum(exportLayouts),
   columns: exportColumnList
 })

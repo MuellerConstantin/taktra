@@ -18,6 +18,7 @@ import {
   exportFormats,
   type ExportColumn,
   type ExportFormat,
+  type ExportLayout,
   type ExportPreview
 } from '../../../shared/export'
 import { toNameKey } from '../../../shared/names'
@@ -51,6 +52,7 @@ function ExportTemplateView(): React.JSX.Element {
   const [fields, setFields] = useState<readonly CustomField[]>([])
   const [name, setName] = useState('')
   const [format, setFormat] = useState<ExportFormat>('csv')
+  const [layout, setLayout] = useState<ExportLayout>('entries')
   const [columns, setColumns] = useState<readonly ExportColumn[]>(defaultExportColumns)
   const [isLoaded, setLoaded] = useState(false)
   const [period, setPeriod] = useState<Period>(() => ({
@@ -98,6 +100,7 @@ function ExportTemplateView(): React.JSX.Element {
         if (template) {
           setName(template.name)
           setFormat(template.format)
+          setLayout(template.layout)
           setColumns(template.columns)
         }
         setLoaded(true)
@@ -160,7 +163,7 @@ function ExportTemplateView(): React.JSX.Element {
 
   const save = (): Promise<void> =>
     run(async () => {
-      const input = { name, format, columns: [...columns] }
+      const input = { name, format, layout, columns: [...columns] }
       const saved =
         templateId === null
           ? await api.exportTemplates.create(input)

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { exportFormats } from '../../../shared/export'
+import { exportFormats, exportLayouts } from '../../../shared/export'
 import { MAX_NAME_LENGTH } from '../../../shared/validation/limits'
 
 export const exportTemplates = sqliteTable(
@@ -15,6 +15,7 @@ export const exportTemplates = sqliteTable(
     name: text().notNull(),
     nameKey: text().notNull(),
     format: text({ enum: exportFormats }).notNull(),
+    layout: text({ enum: exportLayouts }).notNull().default('entries'),
     createdAt: integer({ mode: 'timestamp_ms' })
       .notNull()
       .$defaultFn(() => new Date()),
@@ -32,6 +33,10 @@ export const exportTemplates = sqliteTable(
     check(
       'export_templates_format',
       sql`${table.format} IN (${sql.raw(exportFormats.map((format) => `'${format}'`).join(', '))})`
+    ),
+    check(
+      'export_templates_layout',
+      sql`${table.layout} IN (${sql.raw(exportLayouts.map((layout) => `'${layout}'`).join(', '))})`
     )
   ]
 )

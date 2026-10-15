@@ -1,0 +1,1 @@
+ALTER TABLE `export_templates` ADD `layout` text DEFAULT 'entries' NOT NULL;

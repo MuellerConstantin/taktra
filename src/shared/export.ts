@@ -47,6 +47,11 @@ export const exportFormats = ['csv', 'json', 'xlsx'] as const
 
 export type ExportFormat = (typeof exportFormats)[number]
 
+/** One row per entry, summed rows, or summed rows with one column per day. */
+export const exportLayouts = ['entries', 'summed', 'pivot'] as const
+
+export type ExportLayout = (typeof exportLayouts)[number]
+
 export interface ExportPreview extends ExportTable {
   readonly count: number
   readonly totalMin: number
