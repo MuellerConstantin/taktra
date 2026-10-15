@@ -19,10 +19,10 @@ export const builtinExportColumns = [
 
 export type BuiltinExportColumn = (typeof builtinExportColumns)[number]
 
-export const durationExportColumns: readonly BuiltinExportColumn[] = ['duration_min', 'duration_h']
+const durationExportColumns: readonly BuiltinExportColumn[] = ['duration_min', 'duration_h']
 
 /** Columns that differ between single entries, so summed layouts cannot contain them. */
-export const entryOnlyExportColumns: readonly BuiltinExportColumn[] = ['start', 'end', 'note']
+const entryOnlyExportColumns: readonly BuiltinExportColumn[] = ['start', 'end', 'note']
 
 /**
  * Without its own header, a built-in column is headed by its name and a custom field column by
@@ -56,6 +56,29 @@ export type ExportFormat = (typeof exportFormats)[number]
 export const exportLayouts = ['entries', 'summed', 'pivot'] as const
 
 export type ExportLayout = (typeof exportLayouts)[number]
+
+/** Why a layout cannot contain a built-in column, or null if it can. */
+export function excludedColumnError(
+  layout: ExportLayout,
+  builtin: BuiltinExportColumn
+): 'EXPORT_COLUMN_NOT_SUMMABLE' | 'EXPORT_DATE_IN_PIVOT' | null {
+  if (layout === 'entries') return null
+  if (entryOnlyExportColumns.includes(builtin)) return 'EXPORT_COLUMN_NOT_SUMMABLE'
+  return layout === 'pivot' && builtin === 'date' ? 'EXPORT_DATE_IN_PIVOT' : null
+}
+
+/** Summed layouts need a duration to sum, and days as columns exactly one to fill the days. */
+export function durationError(
+  layout: ExportLayout,
+  columns: readonly ExportColumn[]
+): 'EXPORT_DURATION_MISSING' | 'EXPORT_DURATION_TWICE' | null {
+  if (layout === 'entries') return null
+  const count = columns.filter(
+    (column) => 'builtin' in column && durationExportColumns.includes(column.builtin)
+  ).length
+  if (count === 0) return 'EXPORT_DURATION_MISSING'
+  return layout === 'pivot' && count > 1 ? 'EXPORT_DURATION_TWICE' : null
+}
 
 export interface ExportPreview extends ExportTable {
   readonly count: number

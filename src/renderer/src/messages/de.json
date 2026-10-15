@@ -616,6 +616,8 @@
       "pivot": "Tage als Spalten"
     },
     "notSummable": "Lässt sich nicht summieren",
+    "dateInPivot": "Die Tage sind schon Spalten",
+    "durationTwice": "Tage als Spalten brauchen genau eine Dauer, in Minuten oder Stunden.",
     "durationMissing": "Summierte Zeilen brauchen eine Dauer in Minuten oder Stunden.",
     "previewLayout": "Passe die Spalten an das Layout an, um die Vorschau zu sehen.",
     "remove": "{name} entfernen",
@@ -842,6 +844,8 @@
     "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
     "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn, Ende und Notiz unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus der Vorlage.",
     "EXPORT_DURATION_MISSING": "Summierte Zeilen brauchen eine Spalte mit der Dauer in Minuten oder Stunden.",
+    "EXPORT_DURATION_TWICE": "Tage als Spalten brauchen genau eine Spalte mit der Dauer, in Minuten oder Stunden.",
+    "EXPORT_DATE_IN_PIVOT": "Bei Tagen als Spalten steht das Datum schon in den Spaltennamen. Entferne es aus der Vorlage.",
     "EXPORT_TEMPLATE_NOT_FOUND": "Die Vorlage existiert nicht mehr.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "Eine Vorlage mit diesem Namen existiert bereits."
   },

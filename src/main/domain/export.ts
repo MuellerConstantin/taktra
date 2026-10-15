@@ -10,8 +10,8 @@ import { AppError } from '../../shared/errors'
 import { toNameKey } from '../../shared/names'
 import {
   defaultExportColumns,
-  durationExportColumns,
-  entryOnlyExportColumns,
+  durationError,
+  excludedColumnError,
   type BuiltinExportColumn,
   type ExportColumn,
   type ExportFormat,
@@ -116,15 +116,13 @@ export function resolveHeaders(columns: readonly ExportColumn[]): string[] {
   return headers
 }
 
-/** Summed layouts need a duration to sum and cannot show what differs between single entries. */
 export function checkLayout(layout: ExportLayout, columns: readonly ExportColumn[]): void {
-  if (layout === 'entries') return
-  const builtins = columns.flatMap((column) => ('builtin' in column ? [column.builtin] : []))
-  const entryOnly = builtins.find((builtin) => entryOnlyExportColumns.includes(builtin))
-  if (entryOnly !== undefined) throw new AppError('EXPORT_COLUMN_NOT_SUMMABLE', entryOnly)
-  if (!builtins.some((builtin) => durationExportColumns.includes(builtin))) {
-    throw new AppError('EXPORT_DURATION_MISSING')
+  for (const column of columns) {
+    const error = 'builtin' in column ? excludedColumnError(layout, column.builtin) : null
+    if (error) throw new AppError(error, 'builtin' in column ? column.builtin : undefined)
   }
+  const error = durationError(layout, columns)
+  if (error) throw new AppError(error)
 }
 
 function resolveColumns(columns: readonly ExportColumn[], layout: ExportLayout): ResolvedColumn[] {
@@ -164,11 +162,83 @@ function sumRows(
   )
 }
 
+/** Every day of the filter, or of the entries where the filter leaves the range open. */
+function listDays(entries: readonly TimeEntryDetails[], { from, to }: TimeFilter): string[] {
+  const first = from ?? entries[0]?.entry.date
+  const last = to ?? entries.at(-1)?.entry.date
+  if (!first || !last) return []
+  const days: string[] = []
+  for (
+    const day = new Date(`${first}T00:00:00Z`);
+    day.toISOString().slice(0, 10) <= last;
+    day.setUTCDate(day.getUTCDate() + 1)
+  ) {
+    days.push(day.toISOString().slice(0, 10))
+  }
+  return days
+}
+
+/** Summed rows of the other columns, with one column per day where the duration column stands. */
+function toPivotTable(
+  entries: readonly TimeEntryDetails[],
+  columns: readonly ResolvedColumn[],
+  days: readonly string[]
+): ExportTable {
+  const durationIndex = columns.findIndex((column) => column.fromMinutes)
+  const fromMinutes = columns[durationIndex]?.fromMinutes
+  if (!fromMinutes) throw new AppError('EXPORT_DURATION_MISSING')
+  const keyColumns = columns.filter((column) => !column.fromMinutes)
+
+  const keyHeaders = new Set(keyColumns.map((column) => toNameKey(column.header)))
+  const conflict = days.find((day) => keyHeaders.has(toNameKey(day)))
+  if (conflict !== undefined) throw new AppError('EXPORT_COLUMN_CONFLICT', conflict)
+
+  const groups = new Map<
+    string,
+    { readonly keys: readonly ExportValue[]; readonly minutesByDay: Map<string, number> }
+  >()
+  for (const details of entries) {
+    const keys = keyColumns.map((column) => column.valueOf(details))
+    const id = JSON.stringify(keys)
+    const group = groups.get(id) ?? { keys, minutesByDay: new Map<string, number>() }
+    const { date } = details.entry
+    group.minutesByDay.set(date, (group.minutesByDay.get(date) ?? 0) + durationMin(details))
+    groups.set(id, group)
+  }
+
+  const withDays = <T>(values: readonly T[], dayValues: readonly T[]): T[] => [
+    ...values.slice(0, durationIndex),
+    ...dayValues,
+    ...values.slice(durationIndex)
+  ]
+  return {
+    headers: withDays(
+      keyColumns.map((column) => column.header),
+      days
+    ),
+    isDate: withDays(
+      keyColumns.map((column) => column.isDate),
+      days.map(() => false)
+    ),
+    rows: [...groups.values()].map(({ keys, minutesByDay }) =>
+      withDays(
+        keys,
+        days.map((day) => {
+          const minutes = minutesByDay.get(day)
+          return minutes === undefined ? null : fromMinutes(minutes)
+        })
+      )
+    )
+  }
+}
+
 function toTable(
   entries: readonly TimeEntryDetails[],
   columns: readonly ResolvedColumn[],
-  layout: ExportLayout
+  layout: ExportLayout,
+  filter: TimeFilter
 ): ExportTable {
+  if (layout === 'pivot') return toPivotTable(entries, columns, listDays(entries, filter))
   return {
     headers: columns.map((column) => column.header),
     isDate: columns.map((column) => column.isDate),
@@ -242,7 +312,8 @@ export function previewExport(
   const table = toTable(
     layout === 'entries' ? entries.slice(0, PREVIEW_ROWS) : entries,
     resolved,
-    layout
+    layout,
+    filter
   )
   return {
     ...table,
@@ -263,8 +334,13 @@ async function exportFile(
   columns: readonly ExportColumn[] = defaultExportColumns,
   layout: ExportLayout = 'entries'
 ): Promise<string | null> {
-  // Resolved before the dialog, so a column conflict is reported before a file is chosen.
-  const resolved = resolveColumns(columns, layout)
+  // Built before the dialog, so a column conflict is reported before a file is chosen.
+  const table = toTable(
+    listCompletedEntries(filter),
+    resolveColumns(columns, layout),
+    layout,
+    filter
+  )
   const writer = writers[format]
   const options = {
     defaultPath: join(app.getPath('downloads'), defaultFileName(filter, format)),
@@ -275,7 +351,7 @@ async function exportFile(
     : await dialog.showSaveDialog(options)
   if (result.canceled || !result.filePath) return null
 
-  const content = await writer.write(toTable(listCompletedEntries(filter), resolved, layout))
+  const content = await writer.write(table)
   try {
     await writeFile(result.filePath, content, 'utf8')
   } catch (error) {

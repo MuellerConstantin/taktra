@@ -15,8 +15,8 @@ import { customFieldScopes, type CustomField } from '../../../shared/customField
 import {
   builtinExportColumns,
   defaultExportColumns,
-  durationExportColumns,
-  entryOnlyExportColumns,
+  durationError,
+  excludedColumnError,
   exportFormats,
   exportLayouts,
   type ExportColumn,
@@ -83,17 +83,15 @@ function ExportTemplateView(): React.JSX.Element {
     headerKeys.indexOf(headerKeys[index]) !== headerKeys.lastIndexOf(headerKeys[index])
   const hasConflict = headerKeys.some((_, index) => isConflict(index))
 
-  const isSummed = layout !== 'entries'
-  const isEntryOnly = (column: ExportColumn): boolean =>
-    isSummed && 'builtin' in column && entryOnlyExportColumns.includes(column.builtin)
-  const lacksDuration =
-    isSummed &&
-    !columns.some((column) => 'builtin' in column && durationExportColumns.includes(column.builtin))
-  const hasLayoutProblem = lacksDuration || columns.some(isEntryOnly)
+  const excludedError = (column: ExportColumn): ReturnType<typeof excludedColumnError> =>
+    'builtin' in column ? excludedColumnError(layout, column.builtin) : null
+  const durationProblem = durationError(layout, columns)
+  const hasLayoutProblem =
+    durationProblem !== null || columns.some((column) => excludedError(column) !== null)
 
   const selected = new Set(columns.map(columnKey))
   const availableBuiltins = builtinExportColumns.filter(
-    (builtin) => !selected.has(builtin) && !isEntryOnly({ builtin })
+    (builtin) => !selected.has(builtin) && excludedColumnError(layout, builtin) === null
   )
   const availableFields = fields.filter((field) => !selected.has(columnKey({ fieldId: field.id })))
   const isFull = columns.length >= MAX_EXPORT_COLUMNS
@@ -270,13 +268,11 @@ function ExportTemplateView(): React.JSX.Element {
             onChange={(key) => key && setLayout(key as ExportLayout)}
             className="w-56"
           >
-            {exportLayouts
-              .filter((option) => option !== 'pivot')
-              .map((option) => (
-                <SelectItem key={option} id={option}>
-                  {t(`layouts.${option}`)}
-                </SelectItem>
-              ))}
+            {exportLayouts.map((option) => (
+              <SelectItem key={option} id={option}>
+                {t(`layouts.${option}`)}
+              </SelectItem>
+            ))}
           </Select>
         </div>
       </ViewHeader>
@@ -316,8 +312,12 @@ function ExportTemplateView(): React.JSX.Element {
                         {field.archivedAt && ` · ${t('archived')}`}
                       </span>
                     )}
-                    {isEntryOnly(column) && (
-                      <span className="truncate text-xs text-destructive">{t('notSummable')}</span>
+                    {excludedError(column) && (
+                      <span className="truncate text-xs text-destructive">
+                        {excludedError(column) === 'EXPORT_DATE_IN_PIVOT'
+                          ? t('dateInPivot')
+                          : t('notSummable')}
+                      </span>
                     )}
                   </div>
                   <TextField
@@ -387,7 +387,13 @@ function ExportTemplateView(): React.JSX.Element {
                 {t('limit', { max: MAX_EXPORT_COLUMNS })}
               </p>
             )}
-            {lacksDuration && <p className="text-sm text-destructive">{t('durationMissing')}</p>}
+            {durationProblem && (
+              <p className="text-sm text-destructive">
+                {durationProblem === 'EXPORT_DURATION_MISSING'
+                  ? t('durationMissing')
+                  : t('durationTwice')}
+              </p>
+            )}
           </div>
         </section>
         <section className="flex flex-col gap-3">

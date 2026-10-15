@@ -582,6 +582,8 @@
       "pivot": "Days as columns"
     },
     "notSummable": "Cannot be summed",
+    "dateInPivot": "The days are already columns",
+    "durationTwice": "Days as columns need exactly one duration, in minutes or hours.",
     "durationMissing": "Summed rows need a duration in minutes or hours.",
     "previewLayout": "Adjust the columns to the layout to see the preview.",
     "remove": "Remove {name}",
@@ -808,6 +810,8 @@
     "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them in the template.",
     "EXPORT_COLUMN_NOT_SUMMABLE": "Start, end and note differ for every entry and do not fit summed rows. Remove them from the template.",
     "EXPORT_DURATION_MISSING": "Summed rows need a duration column in minutes or hours.",
+    "EXPORT_DURATION_TWICE": "Days as columns need exactly one duration column, in minutes or hours.",
+    "EXPORT_DATE_IN_PIVOT": "With days as columns, the date is already in the column names. Remove it from the template.",
     "EXPORT_TEMPLATE_NOT_FOUND": "The template no longer exists.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "A template with this name already exists."
   },
