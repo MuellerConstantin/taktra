@@ -797,6 +797,8 @@
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
     "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
     "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them in the template.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Start, end and note belong to single entries and cannot be summed. Remove them from the template.",
+    "EXPORT_DURATION_MISSING": "Summed rows need a duration column in minutes or hours.",
     "EXPORT_TEMPLATE_NOT_FOUND": "The template no longer exists.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "A template with this name already exists."
   },

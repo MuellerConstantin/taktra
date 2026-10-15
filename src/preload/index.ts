@@ -17,6 +17,7 @@ import type { AppInfo } from '../shared/about'
 import type {
   ExportColumn,
   ExportFormat,
+  ExportLayout,
   ExportPreview,
   ExportTemplate,
   ExportTemplateInput
@@ -136,10 +137,14 @@ const api = {
     install: () => invoke<void>('updates:install')
   },
   export: {
-    preview: (filter: TimeFilter, columns?: readonly ExportColumn[]) =>
-      invoke<ExportPreview>('export:preview', filter, columns),
-    file: (filter: TimeFilter, format: ExportFormat, columns?: readonly ExportColumn[]) =>
-      invoke<string | null>('export:file', filter, format, columns)
+    preview: (filter: TimeFilter, columns?: readonly ExportColumn[], layout?: ExportLayout) =>
+      invoke<ExportPreview>('export:preview', filter, columns, layout),
+    file: (
+      filter: TimeFilter,
+      format: ExportFormat,
+      columns?: readonly ExportColumn[],
+      layout?: ExportLayout
+    ) => invoke<string | null>('export:file', filter, format, columns, layout)
   },
   exportTemplates: {
     list: () => invoke<ExportTemplate[]>('exportTemplates:list'),

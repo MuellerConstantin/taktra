@@ -115,7 +115,7 @@ function ExportTemplateView(): React.JSX.Element {
     if (!isLoaded || hasConflict) return
     let isCurrent = true
     api.export
-      .preview(filter, columns)
+      .preview(filter, columns, layout)
       .then((loaded) => {
         if (!isCurrent) return
         setPreview(loaded)
@@ -125,7 +125,7 @@ function ExportTemplateView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [isLoaded, hasConflict, filter, columns, errorMessage])
+  }, [isLoaded, hasConflict, filter, columns, layout, errorMessage])
 
   const { dragAndDropHooks } = useDragAndDrop<ExportColumn>({
     getItems: (keys) => [...keys].map((key) => ({ 'text/plain': String(key) })),

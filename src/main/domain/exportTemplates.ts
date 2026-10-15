@@ -8,7 +8,7 @@ import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { exportTemplateColumns, exportTemplates } from '../db/schema'
 import { handle } from '../ipc'
-import { resolveHeaders } from './export'
+import { checkLayout, resolveHeaders } from './export'
 import { sortByName } from './names'
 
 type ColumnRow = typeof exportTemplateColumns.$inferSelect
@@ -59,9 +59,10 @@ function insertColumns(templateId: number, columns: readonly ExportColumn[]): vo
     .run()
 }
 
-/** Saved templates can always be exported, so conflicting headers are rejected here already. */
+/** Saved templates can always be exported, so their columns are checked here already. */
 function save(input: ExportTemplateData, write: () => number): ExportTemplate {
   resolveHeaders(input.columns)
+  checkLayout(input.layout, input.columns)
 
   const db = getActiveDatabase()
   try {

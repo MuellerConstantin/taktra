@@ -6,6 +6,8 @@ import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from './limits'
 
 export const exportFormat = z.enum(exportFormats)
 
+export const exportLayout = z.enum(exportLayouts)
+
 const header = z
   .string()
   .overwrite(normalizeName)
@@ -28,6 +30,6 @@ export const exportColumns = exportColumnList.optional()
 export const exportTemplateInput = z.object({
   name,
   format: exportFormat,
-  layout: z.enum(exportLayouts),
+  layout: exportLayout,
   columns: exportColumnList
 })

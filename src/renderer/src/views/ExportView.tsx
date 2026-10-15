@@ -52,6 +52,7 @@ function ExportView(): React.JSX.Element {
     (candidate) => String(candidate.id) === searchParams.get('template')
   )
   const columns = template?.columns
+  const layout = template?.layout
   const format = chosenFormat ?? template?.format ?? 'csv'
 
   const { from, to } = periodFilter(period)
@@ -91,7 +92,7 @@ function ExportView(): React.JSX.Element {
     if (templates === null) return
     let isCurrent = true
     api.export
-      .preview(filter, columns)
+      .preview(filter, columns, layout)
       .then((loaded) => {
         if (!isCurrent) return
         setPreview(loaded)
@@ -105,7 +106,7 @@ function ExportView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, templates, filter, columns, errorMessage])
+  }, [activeProfile?.path, templates, filter, columns, layout, errorMessage])
 
   const chooseTemplate = (id: string): void => {
     setFormat(null)
@@ -114,7 +115,7 @@ function ExportView(): React.JSX.Element {
 
   const exportFile = async (): Promise<void> => {
     try {
-      await api.export.file(filter, format, columns)
+      await api.export.file(filter, format, columns, layout)
     } catch (caught) {
       setError(errorMessage(caught))
     }

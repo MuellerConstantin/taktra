@@ -831,6 +831,8 @@
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
     "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn, Ende und Notiz gehören zu einzelnen Einträgen und lassen sich nicht summieren. Entferne sie aus der Vorlage.",
+    "EXPORT_DURATION_MISSING": "Summierte Zeilen brauchen eine Spalte mit der Dauer in Minuten oder Stunden.",
     "EXPORT_TEMPLATE_NOT_FOUND": "Die Vorlage existiert nicht mehr.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "Eine Vorlage mit diesem Namen existiert bereits."
   },

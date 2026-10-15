@@ -13,13 +13,14 @@ import {
   type BuiltinExportColumn,
   type ExportColumn,
   type ExportFormat,
+  type ExportLayout,
   type ExportPreview,
   type ExportTable,
   type ExportValue
 } from '../../shared/export'
 import type { TimeFilter } from '../../shared/reports'
 import type { TimeEntryDetails } from '../../shared/timeEntries'
-import { exportColumns, exportFormat, timeFilter } from '../../shared/validation'
+import { exportColumns, exportFormat, exportLayout, timeFilter } from '../../shared/validation'
 import { timeEntries } from '../db/schema'
 import { handle } from '../ipc'
 import { findCustomField, listFieldValueTexts } from './customFields'
@@ -47,6 +48,18 @@ function durationMin({ entry }: TimeEntryDetails): number {
   return Math.round((entry.durationSec ?? 0) / 60)
 }
 
+function toHours(minutes: number): number {
+  return Math.round((minutes / 60) * 100) / 100
+}
+
+/** Summed rows add up whole minutes first and convert the sum, so no rounding adds up. */
+const durationsFromMinutes: Partial<Record<BuiltinExportColumn, (minutes: number) => number>> = {
+  duration_min: (minutes) => minutes,
+  duration_h: toHours
+}
+
+const entryOnlyColumns: readonly BuiltinExportColumn[] = ['start', 'end', 'note']
+
 type ValueOf = (details: TimeEntryDetails) => ExportValue
 
 const builtinValues: Record<BuiltinExportColumn, ValueOf> = {
@@ -62,7 +75,7 @@ const builtinValues: Record<BuiltinExportColumn, ValueOf> = {
   duration_min: durationMin,
   note: ({ entry }) => entry.note,
   client: ({ client }) => client?.name ?? null,
-  duration_h: (details) => Math.round((durationMin(details) / 60) * 100) / 100
+  duration_h: (details) => toHours(durationMin(details))
 }
 
 const fieldOwners: Record<CustomField['scope'], (details: TimeEntryDetails) => number | null> = {
@@ -84,6 +97,7 @@ interface ResolvedColumn {
   readonly header: string
   readonly isDate: boolean
   readonly valueOf: ValueOf
+  readonly fromMinutes: ((minutes: number) => number) | null
 }
 
 function defaultHeader(column: ExportColumn): string {
@@ -102,15 +116,28 @@ export function resolveHeaders(columns: readonly ExportColumn[]): string[] {
   return headers
 }
 
-function resolveColumns(columns: readonly ExportColumn[]): ResolvedColumn[] {
+/** Summed layouts need a duration to sum and cannot show what differs between single entries. */
+export function checkLayout(layout: ExportLayout, columns: readonly ExportColumn[]): void {
+  if (layout === 'entries') return
+  const builtins = columns.flatMap((column) => ('builtin' in column ? [column.builtin] : []))
+  const entryOnly = builtins.find((builtin) => entryOnlyColumns.includes(builtin))
+  if (entryOnly !== undefined) throw new AppError('EXPORT_COLUMN_NOT_SUMMABLE', entryOnly)
+  if (!builtins.some((builtin) => builtin in durationsFromMinutes)) {
+    throw new AppError('EXPORT_DURATION_MISSING')
+  }
+}
+
+function resolveColumns(columns: readonly ExportColumn[], layout: ExportLayout): ResolvedColumn[] {
   const headers = resolveHeaders(columns)
+  checkLayout(layout, columns)
   return columns.map((column, index) => ({
     header: headers[index],
     isDate: 'builtin' in column && column.builtin === 'date',
     valueOf:
       'builtin' in column
         ? builtinValues[column.builtin]
-        : fieldValues(findCustomField(column.fieldId))
+        : fieldValues(findCustomField(column.fieldId)),
+    fromMinutes: ('builtin' in column && durationsFromMinutes[column.builtin]) || null
   }))
 }
 
@@ -119,14 +146,36 @@ function listCompletedEntries(filter: TimeFilter): TimeEntryDetails[] {
   return selectTimeEntryDetails(and(conditions(filter), isNotNull(timeEntries.durationSec)))
 }
 
-function toTable(
+/** One row per distinct combination of the other columns, in the order they first occur. */
+function sumRows(
   entries: readonly TimeEntryDetails[],
   columns: readonly ResolvedColumn[]
+): ExportValue[][] {
+  const groups = new Map<string, { readonly keys: readonly ExportValue[]; minutes: number }>()
+  for (const details of entries) {
+    const keys = columns.map((column) => (column.fromMinutes ? null : column.valueOf(details)))
+    const id = JSON.stringify(keys)
+    const group = groups.get(id) ?? { keys, minutes: 0 }
+    group.minutes += durationMin(details)
+    groups.set(id, group)
+  }
+  return [...groups.values()].map(({ keys, minutes }) =>
+    columns.map((column, index) => (column.fromMinutes ? column.fromMinutes(minutes) : keys[index]))
+  )
+}
+
+function toTable(
+  entries: readonly TimeEntryDetails[],
+  columns: readonly ResolvedColumn[],
+  layout: ExportLayout
 ): ExportTable {
   return {
     headers: columns.map((column) => column.header),
     isDate: columns.map((column) => column.isDate),
-    rows: entries.map((details) => columns.map((column) => column.valueOf(details)))
+    rows:
+      layout === 'entries'
+        ? entries.map((details) => columns.map((column) => column.valueOf(details)))
+        : sumRows(entries, columns)
   }
 }
 
@@ -185,12 +234,19 @@ const writers: Record<
 
 export function previewExport(
   filter: TimeFilter,
-  columns: readonly ExportColumn[] = defaultExportColumns
+  columns: readonly ExportColumn[] = defaultExportColumns,
+  layout: ExportLayout = 'entries'
 ): ExportPreview {
-  const resolved = resolveColumns(columns)
+  const resolved = resolveColumns(columns, layout)
   const entries = listCompletedEntries(filter)
+  const table = toTable(
+    layout === 'entries' ? entries.slice(0, PREVIEW_ROWS) : entries,
+    resolved,
+    layout
+  )
   return {
-    ...toTable(entries.slice(0, PREVIEW_ROWS), resolved),
+    ...table,
+    rows: table.rows.slice(0, PREVIEW_ROWS),
     count: entries.length,
     totalMin: entries.reduce((sum, details) => sum + durationMin(details), 0)
   }
@@ -204,10 +260,11 @@ async function exportFile(
   window: BrowserWindow | null,
   filter: TimeFilter,
   format: ExportFormat,
-  columns: readonly ExportColumn[] = defaultExportColumns
+  columns: readonly ExportColumn[] = defaultExportColumns,
+  layout: ExportLayout = 'entries'
 ): Promise<string | null> {
   // Resolved before the dialog, so a column conflict is reported before a file is chosen.
-  const resolved = resolveColumns(columns)
+  const resolved = resolveColumns(columns, layout)
   const writer = writers[format]
   const options = {
     defaultPath: join(app.getPath('downloads'), defaultFileName(filter, format)),
@@ -218,7 +275,7 @@ async function exportFile(
     : await dialog.showSaveDialog(options)
   if (result.canceled || !result.filePath) return null
 
-  const content = await writer.write(toTable(listCompletedEntries(filter), resolved))
+  const content = await writer.write(toTable(listCompletedEntries(filter), resolved, layout))
   try {
     await writeFile(result.filePath, content, 'utf8')
   } catch (error) {
@@ -228,13 +285,15 @@ async function exportFile(
 }
 
 export function initExport(): void {
-  handle('export:preview', z.tuple([timeFilter, exportColumns]), (_, filter, columns) =>
-    previewExport(filter, columns)
+  handle(
+    'export:preview',
+    z.tuple([timeFilter, exportColumns, exportLayout.optional()]),
+    (_, filter, columns, layout) => previewExport(filter, columns, layout)
   )
   handle(
     'export:file',
-    z.tuple([timeFilter, exportFormat, exportColumns]),
-    (event, filter, format, columns) =>
-      exportFile(BrowserWindow.fromWebContents(event.sender), filter, format, columns)
+    z.tuple([timeFilter, exportFormat, exportColumns, exportLayout.optional()]),
+    (event, filter, format, columns, layout) =>
+      exportFile(BrowserWindow.fromWebContents(event.sender), filter, format, columns, layout)
   )
 }
