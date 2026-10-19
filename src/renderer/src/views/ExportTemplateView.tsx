@@ -13,13 +13,17 @@ import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import { customFieldScopes, type CustomField } from '../../../shared/customFields'
 import {
+  allowedAggregations,
   builtinExportColumns,
+  columnAggregation,
+  columnError,
   defaultExportColumns,
   durationError,
-  excludedColumnError,
   exportFormats,
   exportLayouts,
+  type ExportAggregation,
   type ExportColumn,
+  type ExportColumnKind,
   type ExportFormat,
   type ExportLayout,
   type ExportPreview
@@ -83,15 +87,17 @@ function ExportTemplateView(): React.JSX.Element {
     headerKeys.indexOf(headerKeys[index]) !== headerKeys.lastIndexOf(headerKeys[index])
   const hasConflict = headerKeys.some((_, index) => isConflict(index))
 
-  const excludedError = (column: ExportColumn): ReturnType<typeof excludedColumnError> =>
-    'builtin' in column ? excludedColumnError(layout, column.builtin) : null
+  const kindOf = (column: ExportColumn): ExportColumnKind =>
+    'builtin' in column ? column : { fieldType: fieldsById.get(column.fieldId)?.type ?? 'text' }
+  const layoutError = (column: ExportColumn): ReturnType<typeof columnError> =>
+    columnError(layout, column, kindOf(column))
   const durationProblem = durationError(layout, columns)
   const hasLayoutProblem =
-    durationProblem !== null || columns.some((column) => excludedError(column) !== null)
+    durationProblem !== null || columns.some((column) => layoutError(column) !== null)
 
   const selected = new Set(columns.map(columnKey))
   const availableBuiltins = builtinExportColumns.filter(
-    (builtin) => !selected.has(builtin) && excludedColumnError(layout, builtin) === null
+    (builtin) => !selected.has(builtin) && columnError(layout, { builtin }, { builtin }) === null
   )
   const availableFields = fields.filter((field) => !selected.has(columnKey({ fieldId: field.id })))
   const isFull = columns.length >= MAX_EXPORT_COLUMNS
@@ -154,6 +160,11 @@ function ExportTemplateView(): React.JSX.Element {
   const setHeader = (key: string, header: string): void =>
     setColumns((current) =>
       current.map((column) => (columnKey(column) === key ? { ...column, header } : column))
+    )
+
+  const setAggregation = (key: string, aggregation: ExportAggregation): void =>
+    setColumns((current) =>
+      current.map((column) => (columnKey(column) === key ? { ...column, aggregation } : column))
     )
 
   const backToExport = (id: number | null = templateId): void => {
@@ -295,6 +306,8 @@ function ExportTemplateView(): React.JSX.Element {
               const index = columns.findIndex((candidate) => columnKey(candidate) === id)
               const label = labelOf(column)
               const field = 'fieldId' in column ? fieldsById.get(column.fieldId) : undefined
+              const error = layoutError(column)
+              const aggregations = allowedAggregations(kindOf(column))
               return (
                 <GridListItem
                   id={id}
@@ -304,7 +317,7 @@ function ExportTemplateView(): React.JSX.Element {
                   <Button slot="drag" variant="icon" aria-label={t('reorder', { name: label })}>
                     <RiDraggable className="size-4" />
                   </Button>
-                  <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="flex min-w-24 flex-1 flex-col">
                     <span className="truncate">{label}</span>
                     {field && (
                       <span className="truncate text-xs text-muted-foreground">
@@ -312,24 +325,42 @@ function ExportTemplateView(): React.JSX.Element {
                         {field.archivedAt && ` · ${t('archived')}`}
                       </span>
                     )}
-                    {excludedError(column) && (
+                    {error && (
                       <span className="truncate text-xs text-destructive">
-                        {excludedError(column) === 'EXPORT_DATE_IN_PIVOT'
+                        {error === 'EXPORT_DATE_IN_PIVOT'
                           ? t('dateInPivot')
-                          : t('notSummable')}
+                          : error === 'EXPORT_COLUMN_NOT_SUMMABLE'
+                            ? t('notSummable')
+                            : t('aggregationNotAllowed')}
                       </span>
                     )}
                   </div>
-                  <TextField
-                    aria-label={t('header', { name: label })}
-                    placeholder={defaultHeaderOf(column)}
-                    maxLength={MAX_NAME_LENGTH}
-                    value={column.header ?? ''}
-                    onChange={(header) => setHeader(id, header)}
-                    isInvalid={isConflict(index)}
-                    errorMessage={t('conflict')}
-                    className="w-56"
-                  />
+                  <div className="flex min-w-56 flex-wrap justify-end gap-2">
+                    {layout !== 'entries' && aggregations.length > 1 && (
+                      <Select
+                        aria-label={t('aggregation', { name: label })}
+                        value={columnAggregation(column, kindOf(column))}
+                        onChange={(key) => key && setAggregation(id, key as ExportAggregation)}
+                        className="w-56"
+                      >
+                        {aggregations.map((option) => (
+                          <SelectItem key={option} id={option}>
+                            {t(`aggregations.${option}`)}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    )}
+                    <TextField
+                      aria-label={t('header', { name: label })}
+                      placeholder={defaultHeaderOf(column)}
+                      maxLength={MAX_NAME_LENGTH}
+                      value={column.header ?? ''}
+                      onChange={(header) => setHeader(id, header)}
+                      isInvalid={isConflict(index)}
+                      errorMessage={t('conflict')}
+                      className="w-56"
+                    />
+                  </div>
                   <Button
                     variant="icon"
                     aria-label={t('remove', { name: label })}

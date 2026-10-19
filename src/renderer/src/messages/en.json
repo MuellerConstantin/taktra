@@ -582,7 +582,14 @@
       "summed": "Summed rows",
       "pivot": "Days as columns"
     },
+    "aggregation": "How {name} fills summed rows",
+    "aggregations": {
+      "group": "Group rows",
+      "sum": "Sum",
+      "list_distinct": "List values"
+    },
     "notSummable": "Cannot be summed",
+    "aggregationNotAllowed": "Cannot be summarized this way",
     "dateInPivot": "The days are already columns",
     "durationTwice": "Days as columns need exactly one duration, in minutes or hours.",
     "durationMissing": "Summed rows need a duration in minutes or hours.",
@@ -809,7 +816,8 @@
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
     "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
     "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them in the template.",
-    "EXPORT_COLUMN_NOT_SUMMABLE": "Start, end and note differ for every entry and do not fit summed rows. Remove them from the template.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Start and end differ for every entry and do not fit summed rows. Remove them from the template.",
+    "EXPORT_AGGREGATION_NOT_ALLOWED": "A column is summarized in a way it does not allow. Choose another option in the template.",
     "EXPORT_DURATION_MISSING": "Summed rows need a duration column in minutes or hours.",
     "EXPORT_DURATION_TWICE": "Days as columns need exactly one duration column, in minutes or hours.",
     "EXPORT_DATE_IN_PIVOT": "With days as columns, the date is already in the column names. Remove it from the template.",

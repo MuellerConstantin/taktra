@@ -1,5 +1,10 @@
 import type { CustomFieldScope } from '../../shared/customFields'
-import type { BuiltinExportColumn, ExportFormat, ExportLayout } from '../../shared/export'
+import type {
+  BuiltinExportColumn,
+  ExportAggregation,
+  ExportFormat,
+  ExportLayout
+} from '../../shared/export'
 import { toNameKey } from '../../shared/names'
 import type { ProfileDatabase } from './database'
 import {
@@ -48,8 +53,15 @@ interface SampleExportTemplate {
   readonly name: string
   readonly format: ExportFormat
   readonly layout?: ExportLayout
-  /** A built-in column, or a custom field by name with the header it is exported under. */
-  readonly columns: readonly (BuiltinExportColumn | readonly [field: string, header: string])[]
+  /**
+   * A built-in column, a built-in column with its aggregation, or a custom field by name with the
+   * header it is exported under.
+   */
+  readonly columns: readonly (
+    | BuiltinExportColumn
+    | { readonly builtin: BuiltinExportColumn; readonly aggregation: ExportAggregation }
+    | readonly [field: string, header: string]
+  )[]
 }
 
 export const SAMPLE_PROFILE_NAME = 'Sample'
@@ -341,6 +353,18 @@ const sampleExportTemplates: readonly SampleExportTemplate[] = [
     format: 'xlsx',
     layout: 'pivot',
     columns: ['client', ['Cost center', 'cost_center'], 'project', 'activity', 'duration_h']
+  },
+  {
+    name: 'Hours per project',
+    format: 'xlsx',
+    layout: 'summed',
+    columns: [
+      'client',
+      'project',
+      { builtin: 'activity', aggregation: 'list_distinct' },
+      { builtin: 'tags', aggregation: 'list_distinct' },
+      'duration_h'
+    ]
   }
 ]
 
@@ -501,7 +525,9 @@ export function seedSampleData(db: ProfileDatabase): void {
         template.columns.map((column, position) =>
           typeof column === 'string'
             ? { templateId, position, builtin: column }
-            : { templateId, position, fieldId: fieldIds.get(column[0])!, header: column[1] }
+            : 'builtin' in column
+              ? { templateId, position, ...column }
+              : { templateId, position, fieldId: fieldIds.get(column[0])!, header: column[1] }
         )
       )
       .run()

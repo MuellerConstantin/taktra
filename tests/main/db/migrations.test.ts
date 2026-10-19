@@ -179,7 +179,7 @@ describe('openProfileDatabase', () => {
       migration.sql.some((statement) => statement.includes('"export_templates_layout"'))
     )
     const path = createProfileAt(layoutCheck, (client) => {
-      for (const { sql } of seeds) client.exec(sql)
+      for (const { since, sql } of seeds) if (since < layoutCheck) client.exec(sql)
       client.exec("UPDATE export_templates SET layout = 'unknown'")
     })
     const before = withClient(path, takeSnapshot)

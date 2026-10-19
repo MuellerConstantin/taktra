@@ -616,7 +616,14 @@
       "summed": "Summierte Zeilen",
       "pivot": "Tage als Spalten"
     },
+    "aggregation": "Wie {name} summierte Zeilen füllt",
+    "aggregations": {
+      "group": "Zeilen bilden",
+      "sum": "Summieren",
+      "list_distinct": "Werte auflisten"
+    },
     "notSummable": "Lässt sich nicht summieren",
+    "aggregationNotAllowed": "Lässt sich so nicht zusammenfassen",
     "dateInPivot": "Die Tage sind schon Spalten",
     "durationTwice": "Tage als Spalten brauchen genau eine Dauer, in Minuten oder Stunden.",
     "durationMissing": "Summierte Zeilen brauchen eine Dauer in Minuten oder Stunden.",
@@ -843,7 +850,8 @@
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
     "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
-    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn, Ende und Notiz unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus der Vorlage.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn und Ende unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus der Vorlage.",
+    "EXPORT_AGGREGATION_NOT_ALLOWED": "Eine Spalte wird auf eine Art zusammengefasst, die sie nicht erlaubt. Wähle in der Vorlage eine andere Option.",
     "EXPORT_DURATION_MISSING": "Summierte Zeilen brauchen eine Spalte mit der Dauer in Minuten oder Stunden.",
     "EXPORT_DURATION_TWICE": "Tage als Spalten brauchen genau eine Spalte mit der Dauer, in Minuten oder Stunden.",
     "EXPORT_DATE_IN_PIVOT": "Bei Tagen als Spalten steht das Datum schon in den Spaltennamen. Entferne es aus der Vorlage.",

@@ -1,0 +1,1 @@
+ALTER TABLE `export_template_columns` ADD `aggregation` text;

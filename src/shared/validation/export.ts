@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { builtinExportColumns, exportFormats, exportLayouts } from '../export'
+import { builtinExportColumns, exportAggregations, exportFormats, exportLayouts } from '../export'
 import { normalizeName } from '../names'
 import { emptyToNull, id, name } from './common'
 import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from './limits'
@@ -15,11 +15,13 @@ const header = z
   .transform(emptyToNull)
   .nullish()
 
+const aggregation = z.enum(exportAggregations).nullish()
+
 const exportColumnList = z
   .array(
     z.union([
-      z.strictObject({ builtin: z.enum(builtinExportColumns), header }),
-      z.strictObject({ fieldId: id, header })
+      z.strictObject({ builtin: z.enum(builtinExportColumns), header, aggregation }),
+      z.strictObject({ fieldId: id, header, aggregation })
     ])
   )
   .min(1)

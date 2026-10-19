@@ -16,4 +16,8 @@ To make the file fit the system that reads it. A template sets which columns the
 
 ## Can the file contain sums instead of single entries?
 
-Yes, a template can sum the entries: every combination of its other columns becomes one row, for example one per activity and day. With days as columns, each day of the period gets a column of its own instead, like in a time sheet. Start, end and note differ for every entry, so they cannot be summed.
+Yes, a template can sum the entries: every combination of its other columns becomes one row, for example one per activity and day. With days as columns, each day of the period gets a column of its own instead, like in a time sheet. Start and end differ for every entry, so they cannot be summed.
+
+## Does every column of summed rows create rows of its own?
+
+Only if it groups the rows, which is the default. A column can list its values instead: it then creates no rows of its own and lists the different values of the summed entries once each, for example all tags of a project. Notes are always listed, in the order of their entries. The date only groups, because several dates are no longer a date.

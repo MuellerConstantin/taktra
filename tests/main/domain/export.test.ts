@@ -157,10 +157,79 @@ describe('summed layout', () => {
     ])
   })
 
-  it.each(['start', 'end', 'note'] as const)('rejects the entry column %s', (builtin) => {
+  it.each(['start', 'end'] as const)('rejects the entry column %s', (builtin) => {
     expect(() => previewExport(MARCH, builtins(builtin, 'duration_min'), 'summed')).toThrow(
       expect.objectContaining({ code: 'EXPORT_COLUMN_NOT_SUMMABLE' })
     )
+  })
+
+  it('lists the distinct values of a column instead of grouping by it', () => {
+    const columns: ExportColumn[] = [
+      { builtin: 'project' },
+      { builtin: 'date', aggregation: 'group' },
+      { builtin: 'activity', aggregation: 'list_distinct' },
+      { builtin: 'tags', aggregation: 'list_distinct' },
+      { builtin: 'duration_min' }
+    ]
+
+    expect(rowsOf(columns, 'summed')).toEqual([
+      ['Alpha', '2026-03-02', ['Build'], ['meeting', 'support'], 40],
+      ['Alpha', '2026-03-04', ['Build'], ['meeting', 'support'], 20],
+      ['Beta', '2026-03-02', ['Run'], [], 10]
+    ])
+  })
+
+  it('lists notes in the order of their entries', () => {
+    createTimeEntry({ activityId: ids.build, date: '2026-03-01', durationSec: 60, note: 'First' })
+    createTimeEntry({ activityId: ids.build, date: '2026-03-03', durationSec: 60, note: 'First' })
+
+    expect(rowsOf(builtins('activity', 'note', 'duration_min'), 'summed')).toEqual([
+      ['Build', ['First', 'Fixed "the" bug, finally'], 62],
+      ['Run', [], 10]
+    ])
+  })
+
+  it('writes a single row without grouped columns', () => {
+    const columns: ExportColumn[] = [
+      { builtin: 'project', aggregation: 'list_distinct' },
+      { builtin: 'duration_min' }
+    ]
+
+    expect(rowsOf(columns, 'summed')).toEqual([[['Alpha', 'Beta'], 70]])
+  })
+
+  it('lists custom field values and leaves out owners without one', () => {
+    const field = createCustomField({ scope: 'project', type: 'text', name: 'Order number' })
+    setFieldValues('project', ids.alpha, [{ fieldId: field.id, textValue: 'PO-1', optionId: null }])
+    const columns: ExportColumn[] = [
+      { fieldId: field.id, aggregation: 'list_distinct' },
+      { builtin: 'duration_min' }
+    ]
+
+    expect(rowsOf(columns, 'summed')).toEqual([[['PO-1'], 70]])
+  })
+
+  it.each([
+    [{ builtin: 'tags', aggregation: 'sum' }],
+    [{ builtin: 'date', aggregation: 'list_distinct' }],
+    [{ builtin: 'note', aggregation: 'group' }],
+    [{ builtin: 'duration_h', aggregation: 'group' }]
+  ] as const)('rejects an aggregation the column does not allow: %j', (column) => {
+    expect(() => previewExport(MARCH, [column, ...builtins('duration_min')], 'summed')).toThrow(
+      expect.objectContaining({ code: 'EXPORT_AGGREGATION_NOT_ALLOWED' })
+    )
+  })
+
+  it('rejects an aggregation the column does not allow in single entries too', () => {
+    expect(() => previewExport(MARCH, [{ builtin: 'start', aggregation: 'group' }])).toThrow(
+      expect.objectContaining({ code: 'EXPORT_AGGREGATION_NOT_ALLOWED' })
+    )
+  })
+
+  it('ignores the aggregation in single entries', () => {
+    const columns: ExportColumn[] = [{ builtin: 'activity', aggregation: 'list_distinct' }]
+
+    expect(previewExport(MARCH, columns).rows).toContainEqual(['Run'])
   })
 
   it('rejects columns without a duration', () => {
@@ -185,6 +254,23 @@ describe('pivot layout', () => {
     expect(preview.isDate).toEqual([false, false, false, false, false, false])
     expect(preview.rows).toContainEqual(['Build', null, 40, null, 20, 'Contoso'])
     expect(preview.rows).toContainEqual(['Run', null, 10, null, null, null])
+  })
+
+  it('lists distinct values across all days of a row', () => {
+    const columns: ExportColumn[] = [
+      { builtin: 'client' },
+      { builtin: 'duration_min' },
+      { builtin: 'activity', aggregation: 'list_distinct' }
+    ]
+
+    expect(previewExport(MARCH, columns, 'pivot').rows).toContainEqual([
+      'Contoso',
+      null,
+      40,
+      null,
+      20,
+      ['Build']
+    ])
   })
 
   it('counts the summed rows apart from the entries', () => {

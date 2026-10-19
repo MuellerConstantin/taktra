@@ -75,8 +75,9 @@ project, tag and client, to a file (CSV, JSON or Excel) for billing and other sy
 with a preview of what the file will contain. Export templates of a profile
 choose the columns, their order and names, custom fields included; without one
 the standard columns are written. A template writes one row per entry, sums the
-entries per combination of its other columns, or sums them with one column per
-day of the period, as in a time sheet.
+entries per combination of its grouping columns, or sums them with one column
+per day of the period, as in a time sheet. In sums, a column can list the
+distinct values of the summed entries instead of grouping by them.
 
 **Help**
 An in-app help explains the domain rules in short chapters of questions and
@@ -192,9 +193,14 @@ the sample profile and are excluded from the packaged app.
   instead of ids, local clock times, durations in whole minutes or in hours
   rounded to hundredths), never the tables, so the schema stays free to change,
   and stay flat: one file, no separate files linked by keys. Rows are single
-  entries or sums; sums add up whole minutes before converting them, and
-  columns that differ per entry (start, end, note) are rejected in them rather
-  than dropped. The standard column names
+  entries or sums; sums add up whole minutes before converting them. In sums,
+  every column has an aggregation: it groups the rows, is summed, or lists its
+  distinct values. Which ones a column allows is a fixed rule per built-in
+  column and per custom field type, not a setting; a column without its own
+  aggregation has the default of its kind, so older templates keep their
+  meaning. Only durations are summed, because custom field values belong to an
+  owner, not to the entry. Columns that allow none (start, end) are rejected in
+  sums rather than dropped. The standard column names
   are English and never change, because other systems import them; a custom
   field column is named by the field's name key. A template may rename any
   column, and names must be unique in a file. CSV follows

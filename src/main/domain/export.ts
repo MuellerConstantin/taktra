@@ -9,11 +9,14 @@ import type { CustomField } from '../../shared/customFields'
 import { AppError } from '../../shared/errors'
 import { toNameKey } from '../../shared/names'
 import {
+  columnAggregation,
+  columnError,
   defaultExportColumns,
   durationError,
-  excludedColumnError,
   type BuiltinExportColumn,
+  type ExportAggregation,
   type ExportColumn,
+  type ExportColumnKind,
   type ExportFormat,
   type ExportLayout,
   type ExportPreview,
@@ -98,6 +101,7 @@ interface ResolvedColumn {
   readonly isDate: boolean
   readonly valueOf: ValueOf
   readonly fromMinutes: ((minutes: number) => number) | null
+  readonly aggregation: ExportAggregation | null
 }
 
 function defaultHeader(column: ExportColumn): string {
@@ -116,9 +120,13 @@ export function resolveHeaders(columns: readonly ExportColumn[]): string[] {
   return headers
 }
 
+function kindOf(column: ExportColumn): ExportColumnKind {
+  return 'builtin' in column ? column : { fieldType: findCustomField(column.fieldId).type }
+}
+
 export function checkLayout(layout: ExportLayout, columns: readonly ExportColumn[]): void {
   for (const column of columns) {
-    const error = 'builtin' in column ? excludedColumnError(layout, column.builtin) : null
+    const error = columnError(layout, column, kindOf(column))
     if (error) throw new AppError(error, 'builtin' in column ? column.builtin : undefined)
   }
   const error = durationError(layout, columns)
@@ -135,7 +143,8 @@ function resolveColumns(columns: readonly ExportColumn[], layout: ExportLayout):
       'builtin' in column
         ? builtinValues[column.builtin]
         : fieldValues(findCustomField(column.fieldId)),
-    fromMinutes: ('builtin' in column && durationsFromMinutes[column.builtin]) || null
+    fromMinutes: ('builtin' in column && durationsFromMinutes[column.builtin]) || null,
+    aggregation: columnAggregation(column, kindOf(column))
   }))
 }
 
@@ -144,21 +153,62 @@ function listCompletedEntries(filter: TimeFilter): TimeEntryDetails[] {
   return selectTimeEntryDetails(and(conditions(filter), isNotNull(timeEntries.durationSec)))
 }
 
-/** One row per distinct combination of the other columns, in the order they first occur. */
+function totalMinutes(entries: readonly TimeEntryDetails[]): number {
+  return entries.reduce((sum, details) => sum + durationMin(details), 0)
+}
+
+/** Distinct values in the order they first occur; lists such as tags add their items. */
+function listDistinct(column: ResolvedColumn, entries: readonly TimeEntryDetails[]): string[] {
+  const values = entries.flatMap((details) => {
+    const value = column.valueOf(details)
+    if (value === null) return []
+    return typeof value === 'object' ? value : [String(value)]
+  })
+  return [...new Set(values)]
+}
+
+const aggregate: Record<
+  ExportAggregation,
+  (column: ResolvedColumn, entries: readonly TimeEntryDetails[]) => ExportValue
+> = {
+  group: (column, [first]) => column.valueOf(first),
+  sum: (column, entries) => {
+    if (!column.fromMinutes) throw new AppError('EXPORT_AGGREGATION_NOT_ALLOWED', column.header)
+    return column.fromMinutes(totalMinutes(entries))
+  },
+  list_distinct: listDistinct
+}
+
+function aggregateColumn(
+  column: ResolvedColumn,
+  entries: readonly TimeEntryDetails[]
+): ExportValue {
+  if (!column.aggregation) throw new AppError('EXPORT_COLUMN_NOT_SUMMABLE', column.header)
+  return aggregate[column.aggregation](column, entries)
+}
+
+/** Entries with the same values in the grouped columns, in the order the groups first occur. */
+function groupEntries(
+  entries: readonly TimeEntryDetails[],
+  columns: readonly ResolvedColumn[]
+): TimeEntryDetails[][] {
+  const keyColumns = columns.filter((column) => column.aggregation === 'group')
+  const groups = new Map<string, TimeEntryDetails[]>()
+  for (const details of entries) {
+    const id = JSON.stringify(keyColumns.map((column) => column.valueOf(details)))
+    const group = groups.get(id)
+    if (group) group.push(details)
+    else groups.set(id, [details])
+  }
+  return [...groups.values()]
+}
+
 function sumRows(
   entries: readonly TimeEntryDetails[],
   columns: readonly ResolvedColumn[]
 ): ExportValue[][] {
-  const groups = new Map<string, { readonly keys: readonly ExportValue[]; minutes: number }>()
-  for (const details of entries) {
-    const keys = columns.map((column) => (column.fromMinutes ? null : column.valueOf(details)))
-    const id = JSON.stringify(keys)
-    const group = groups.get(id) ?? { keys, minutes: 0 }
-    group.minutes += durationMin(details)
-    groups.set(id, group)
-  }
-  return [...groups.values()].map(({ keys, minutes }) =>
-    columns.map((column, index) => (column.fromMinutes ? column.fromMinutes(minutes) : keys[index]))
+  return groupEntries(entries, columns).map((group) =>
+    columns.map((column) => aggregateColumn(column, group))
   )
 }
 
@@ -187,24 +237,11 @@ function toPivotTable(
   const durationIndex = columns.findIndex((column) => column.fromMinutes)
   const fromMinutes = columns[durationIndex]?.fromMinutes
   if (!fromMinutes) throw new AppError('EXPORT_DURATION_MISSING')
-  const keyColumns = columns.filter((column) => !column.fromMinutes)
+  const otherColumns = columns.filter((column) => !column.fromMinutes)
 
-  const keyHeaders = new Set(keyColumns.map((column) => toNameKey(column.header)))
-  const conflict = days.find((day) => keyHeaders.has(toNameKey(day)))
+  const otherHeaders = new Set(otherColumns.map((column) => toNameKey(column.header)))
+  const conflict = days.find((day) => otherHeaders.has(toNameKey(day)))
   if (conflict !== undefined) throw new AppError('EXPORT_COLUMN_CONFLICT', conflict)
-
-  const groups = new Map<
-    string,
-    { readonly keys: readonly ExportValue[]; readonly minutesByDay: Map<string, number> }
-  >()
-  for (const details of entries) {
-    const keys = keyColumns.map((column) => column.valueOf(details))
-    const id = JSON.stringify(keys)
-    const group = groups.get(id) ?? { keys, minutesByDay: new Map<string, number>() }
-    const { date } = details.entry
-    group.minutesByDay.set(date, (group.minutesByDay.get(date) ?? 0) + durationMin(details))
-    groups.set(id, group)
-  }
 
   const withDays = <T>(values: readonly T[], dayValues: readonly T[]): T[] => [
     ...values.slice(0, durationIndex),
@@ -213,19 +250,19 @@ function toPivotTable(
   ]
   return {
     headers: withDays(
-      keyColumns.map((column) => column.header),
+      otherColumns.map((column) => column.header),
       days
     ),
     isDate: withDays(
-      keyColumns.map((column) => column.isDate),
+      otherColumns.map((column) => column.isDate),
       days.map(() => false)
     ),
-    rows: [...groups.values()].map(({ keys, minutesByDay }) =>
+    rows: groupEntries(entries, columns).map((group) =>
       withDays(
-        keys,
+        otherColumns.map((column) => aggregateColumn(column, group)),
         days.map((day) => {
-          const minutes = minutesByDay.get(day)
-          return minutes === undefined ? null : fromMinutes(minutes)
+          const onDay = group.filter((details) => details.entry.date === day)
+          return onDay.length === 0 ? null : fromMinutes(totalMinutes(onDay))
         })
       )
     )
@@ -322,7 +359,7 @@ export function previewExport(
     rows: table.rows.slice(0, PREVIEW_ROWS),
     count: entries.length,
     rowCount: layout === 'entries' ? entries.length : table.rows.length,
-    totalMin: entries.reduce((sum, details) => sum + durationMin(details), 0)
+    totalMin: totalMinutes(entries)
   }
 }
 

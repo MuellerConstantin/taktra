@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm'
 import { check, index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { builtinExportColumns } from '../../../shared/export'
+import { builtinExportColumns, exportAggregations } from '../../../shared/export'
 import { MAX_NAME_LENGTH } from '../../../shared/validation/limits'
 import { customFields } from './customFields'
 import { exportTemplates } from './exportTemplates'
@@ -14,7 +14,8 @@ export const exportTemplateColumns = sqliteTable(
     position: integer().notNull(),
     builtin: text({ enum: builtinExportColumns }),
     fieldId: integer().references(() => customFields.id, { onDelete: 'cascade' }),
-    header: text()
+    header: text(),
+    aggregation: text({ enum: exportAggregations })
   },
   (table) => [
     primaryKey({ columns: [table.templateId, table.position] }),
@@ -26,6 +27,10 @@ export const exportTemplateColumns = sqliteTable(
     check(
       'export_template_columns_builtin',
       sql`${table.builtin} IN (${sql.raw(builtinExportColumns.map((column) => `'${column}'`).join(', '))})`
+    ),
+    check(
+      'export_template_columns_aggregation',
+      sql`${table.aggregation} IN (${sql.raw(exportAggregations.map((aggregation) => `'${aggregation}'`).join(', '))})`
     ),
     check(
       'export_template_columns_header_length',

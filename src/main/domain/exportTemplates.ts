@@ -13,8 +13,10 @@ import { sortByName } from './names'
 
 type ColumnRow = typeof exportTemplateColumns.$inferSelect
 
-function toColumn({ builtin, fieldId, header }: ColumnRow): ExportColumn {
-  return builtin === null ? { fieldId: fieldId!, header } : { builtin, header }
+function toColumn({ builtin, fieldId, header, aggregation }: ColumnRow): ExportColumn {
+  return builtin === null
+    ? { fieldId: fieldId!, header, aggregation }
+    : { builtin, header, aggregation }
 }
 
 function selectColumns(templateId?: number): ColumnRow[] {
@@ -53,7 +55,8 @@ function insertColumns(templateId: number, columns: readonly ExportColumn[]): vo
         position,
         builtin: 'builtin' in column ? column.builtin : null,
         fieldId: 'fieldId' in column ? column.fieldId : null,
-        header: column.header ?? null
+        header: column.header ?? null,
+        aggregation: column.aggregation ?? null
       }))
     )
     .run()

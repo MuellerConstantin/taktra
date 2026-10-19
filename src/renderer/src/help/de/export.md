@@ -16,4 +16,8 @@ Damit die Datei zum System passt, das sie einliest. Eine Vorlage legt fest, welc
 
 ## Kann die Datei Summen statt einzelner Einträge enthalten?
 
-Ja, eine Vorlage kann die Einträge summieren: Jede Kombination ihrer übrigen Spalten wird zu einer Zeile, etwa eine pro Tätigkeit und Tag. Bei Tagen als Spalten bekommt stattdessen jeder Tag des Zeitraums eine eigene Spalte, wie in einem Stundenzettel. Beginn, Ende und Notiz unterscheiden sich bei jedem Eintrag und lassen sich deshalb nicht summieren.
+Ja, eine Vorlage kann die Einträge summieren: Jede Kombination ihrer übrigen Spalten wird zu einer Zeile, etwa eine pro Tätigkeit und Tag. Bei Tagen als Spalten bekommt stattdessen jeder Tag des Zeitraums eine eigene Spalte, wie in einem Stundenzettel. Beginn und Ende unterscheiden sich bei jedem Eintrag und lassen sich deshalb nicht summieren.
+
+## Bildet jede Spalte summierter Zeilen eigene Zeilen?
+
+Nur wenn sie Zeilen bildet, das ist der Standard. Eine Spalte kann ihre Werte stattdessen auflisten: Dann bildet sie keine eigenen Zeilen und nennt die verschiedenen Werte der summierten Einträge je einmal, etwa alle Tags eines Projekts. Notizen werden immer aufgelistet, in der Reihenfolge ihrer Einträge. Das Datum bildet nur Zeilen, weil mehrere Daten kein Datum mehr sind.
