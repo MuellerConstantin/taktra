@@ -1,3 +1,4 @@
+import { RiArrowRightSLine } from '@remixicon/react'
 import {
   DropIndicator as RACDropIndicator,
   GridList as RACGridList,
@@ -60,6 +61,15 @@ export function GridListDropIndicator(props: DropIndicatorProps): React.JSX.Elem
       className={({ isDropTarget }) =>
         isDropTarget ? 'h-0.5 bg-primary outline-0' : 'h-0 outline-0'
       }
+    />
+  )
+}
+
+export function GridListChevron(): React.JSX.Element {
+  return (
+    <RiArrowRightSLine
+      aria-hidden
+      className="size-6 shrink-0 stroke-current stroke-1 text-primary"
     />
   )
 }

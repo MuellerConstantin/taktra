@@ -1,4 +1,4 @@
-import { RiPencilLine } from '@remixicon/react'
+import { RiPencilLine, RiPriceTag3Fill } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
@@ -6,7 +6,8 @@ import type { ActivityRef } from '../../../shared/activities'
 import type { AggregateRow } from '../../../shared/reports'
 import type { Tag } from '../../../shared/tags'
 import { Button } from '../components/atoms/Button'
-import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Breadcrumbs } from '../components/molecules/Breadcrumbs'
+import { GridList, GridListChevron, GridListItem } from '../components/atoms/GridList'
 import {
   Disclosure,
   DisclosureGroup,
@@ -47,6 +48,7 @@ function groupByProject(rows: readonly AggregateRow[]): ProjectGroup[] {
 
 function TagDetailView(): React.JSX.Element {
   const t = useTranslations('TagDetailView')
+  const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
   const navigate = useNavigate()
   const tagId = Number(useParams().tagId)
@@ -87,18 +89,13 @@ function TagDetailView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={
-          <span className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="size-3.5 shrink-0 rounded-full bg-muted"
-              style={tag.color ? { backgroundColor: tag.color } : undefined}
-            />
-            <span className="line-clamp-2 break-words" title={tag.name}>
-              {tag.name}
-            </span>
+          <span className="line-clamp-2 wrap-break-word" title={tag.name}>
+            {tag.name}
           </span>
         }
-        subtitle={t('subtitle')}
+        icon={RiPriceTag3Fill}
+        iconColor={tag.color}
+        subtitle={<Breadcrumbs items={[{ href: '/tags', label: tNavigation('tags') }]} />}
         actions={
           <Button variant="secondary" onPress={() => setTagDialogOpen(true)}>
             <RiPencilLine className="size-4" />
@@ -164,6 +161,7 @@ function TagDetailView(): React.JSX.Element {
                         {formatDuration(activitySec)}
                       </span>
                       <ActivityMenu activity={activity} onChanged={reload} />
+                      <GridListChevron />
                     </GridListItem>
                   )}
                 </GridList>

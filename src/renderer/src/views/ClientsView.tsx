@@ -3,6 +3,7 @@ import {
   RiArchiveLine,
   RiDeleteBinLine,
   RiInboxUnarchiveLine,
+  RiMoreLine,
   RiPencilLine
 } from '@remixicon/react'
 import { useEffect, useRef, useState } from 'react'
@@ -12,6 +13,7 @@ import type { Client } from '../../../shared/clients'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
 import { ToggleButton } from '../components/atoms/ToggleButton'
@@ -124,37 +126,36 @@ function ClientsView(): React.JSX.Element {
                     </span>
                   )}
                 </span>
-                <Button
-                  variant="icon"
-                  aria-label={t('edit', { name: client.name })}
-                  onPress={() => setDialog({ client })}
-                >
-                  <RiPencilLine className="size-4" />
-                </Button>
-                <Button
-                  variant="icon"
-                  aria-label={
-                    client.archivedAt
-                      ? t('unarchive', { name: client.name })
-                      : t('archive', { name: client.name })
-                  }
-                  onPress={() =>
-                    runAction(() => api.clients.setArchived(client.id, !client.archivedAt))
-                  }
-                >
-                  {client.archivedAt ? (
-                    <RiInboxUnarchiveLine className="size-4" />
-                  ) : (
-                    <RiArchiveLine className="size-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="icon"
-                  aria-label={t('delete', { name: client.name })}
-                  onPress={() => setClientToDelete(client)}
-                >
-                  <RiDeleteBinLine className="size-4" />
-                </Button>
+                <MenuTrigger placement="bottom end">
+                  <Button variant="icon" aria-label={t('actions', { name: client.name })}>
+                    <RiMoreLine className="size-4" />
+                  </Button>
+                  <Menu
+                    onAction={(key) => {
+                      if (key === 'archive')
+                        runAction(() => api.clients.setArchived(client.id, !client.archivedAt))
+                      else if (key === 'delete') setClientToDelete(client)
+                      else setDialog({ client })
+                    }}
+                  >
+                    <MenuItem id="edit">
+                      <RiPencilLine aria-hidden className="size-4" />
+                      {t('edit')}
+                    </MenuItem>
+                    <MenuItem id="archive">
+                      {client.archivedAt ? (
+                        <RiInboxUnarchiveLine aria-hidden className="size-4" />
+                      ) : (
+                        <RiArchiveLine aria-hidden className="size-4" />
+                      )}
+                      {client.archivedAt ? t('unarchive') : t('archive')}
+                    </MenuItem>
+                    <MenuItem id="delete">
+                      <RiDeleteBinLine aria-hidden className="size-4" />
+                      {t('delete')}
+                    </MenuItem>
+                  </Menu>
+                </MenuTrigger>
               </GridListItem>
             )}
           </GridList>

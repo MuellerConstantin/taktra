@@ -1,12 +1,19 @@
-import { RiArchiveLine, RiInboxUnarchiveLine, RiMoreLine, RiPencilLine } from '@remixicon/react'
+import {
+  RiArchiveLine,
+  RiFolderFill,
+  RiInboxUnarchiveLine,
+  RiMoreLine,
+  RiPencilLine
+} from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
 import type { AggregateRow } from '../../../shared/reports'
 import { Button } from '../components/atoms/Button'
-import { GridList, GridListItem } from '../components/atoms/GridList'
+import { GridList, GridListChevron, GridListItem } from '../components/atoms/GridList'
 import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
+import { Breadcrumbs } from '../components/molecules/Breadcrumbs'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
 import { ProjectDialog } from '../components/molecules/ProjectDialog'
@@ -21,6 +28,7 @@ import { allTime, periodFilter, type Period } from '../lib/period'
 
 function ProjectDetailView(): React.JSX.Element {
   const t = useTranslations('ProjectDetailView')
+  const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
   const navigate = useNavigate()
   const projectId = Number(useParams().projectId)
@@ -75,18 +83,13 @@ function ProjectDetailView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={
-          <span className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="size-3.5 shrink-0 rounded-full bg-muted"
-              style={project.color ? { backgroundColor: project.color } : undefined}
-            />
-            <span className="line-clamp-2 break-words" title={project.name}>
-              {project.name}
-            </span>
+          <span className="line-clamp-2 wrap-break-word" title={project.name}>
+            {project.name}
           </span>
         }
-        subtitle={t('subtitle')}
+        icon={RiFolderFill}
+        iconColor={project.color}
+        subtitle={<Breadcrumbs items={[{ href: '/projects', label: tNavigation('projects') }]} />}
         actions={
           <>
             <Button variant="secondary" onPress={() => setProjectDialogOpen(true)}>
@@ -152,6 +155,7 @@ function ProjectDetailView(): React.JSX.Element {
               {formatDuration(totalSec)}
             </span>
             <ActivityMenu activity={activity} onChanged={reload} />
+            <GridListChevron />
           </GridListItem>
         )}
       </GridList>

@@ -1,12 +1,20 @@
-import { RiAddLine, RiArchiveLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
+import {
+  RiAddLine,
+  RiArchiveLine,
+  RiDeleteBinLine,
+  RiMoreLine,
+  RiPencilLine
+} from '@remixicon/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { Project } from '../../../shared/projects'
+import type { AggregateRow } from '../../../shared/reports'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
-import { GridList, GridListItem } from '../components/atoms/GridList'
+import { GridList, GridListChevron, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
 import { ToggleButton } from '../components/atoms/ToggleButton'
@@ -19,6 +27,23 @@ import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
 import { suggestColor } from '../lib/colors'
+import { formatDuration } from '../lib/duration'
+
+interface ProjectTotal {
+  readonly activityCount: number
+  readonly totalSec: number
+}
+
+function totalsByProject(rows: readonly AggregateRow[]): ReadonlyMap<number, ProjectTotal> {
+  return rows.reduce((totals, { project, totalSec }) => {
+    if (!project) return totals
+    const current = totals.get(project.id) ?? { activityCount: 0, totalSec: 0 }
+    return totals.set(project.id, {
+      activityCount: current.activityCount + 1,
+      totalSec: current.totalSec + totalSec
+    })
+  }, new Map<number, ProjectTotal>())
+}
 
 function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
@@ -27,6 +52,7 @@ function ProjectsView(): React.JSX.Element {
   const navigate = useNavigate()
   const [showArchived, setShowArchived] = useState(false)
   const [projects, setProjects] = useState<readonly Project[] | null>(null)
+  const [totals, setTotals] = useState<ReadonlyMap<number, ProjectTotal>>(new Map())
   const [error, setError] = useState<string | null>(null)
   const [dialog, setDialog] = useState<{ readonly project?: Project } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
@@ -42,11 +68,14 @@ function ProjectsView(): React.JSX.Element {
 
   useEffect(() => {
     let isCurrent = true
-    api.projects
-      .list({ includeArchived: showArchived })
-      .then((result) => {
+    Promise.all([
+      api.projects.list({ includeArchived: showArchived }),
+      api.reports.aggregate({}, ['project', 'activity'])
+    ])
+      .then(([loadedProjects, rows]) => {
         if (!isCurrent) return
-        setProjects(result)
+        setProjects(loadedProjects)
+        setTotals(totalsByProject(rows))
         setError(null)
       })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
@@ -136,20 +165,32 @@ function ProjectsView(): React.JSX.Element {
                     </span>
                   )}
                 </div>
-                <Button
-                  variant="icon"
-                  aria-label={t('edit', { name: project.name })}
-                  onPress={() => setDialog({ project })}
-                >
-                  <RiPencilLine className="size-4" />
-                </Button>
-                <Button
-                  variant="icon"
-                  aria-label={t('delete', { name: project.name })}
-                  onPress={() => setProjectToDelete(project)}
-                >
-                  <RiDeleteBinLine className="size-4" />
-                </Button>
+                <span className="shrink-0 text-muted-foreground">
+                  {t('activityCount', { count: totals.get(project.id)?.activityCount ?? 0 })}
+                </span>
+                <span className="w-14 shrink-0 text-right font-medium tabular-nums">
+                  {formatDuration(totals.get(project.id)?.totalSec ?? 0)}
+                </span>
+                <MenuTrigger placement="bottom end">
+                  <Button variant="icon" aria-label={t('actions', { name: project.name })}>
+                    <RiMoreLine className="size-4" />
+                  </Button>
+                  <Menu
+                    onAction={(key) =>
+                      key === 'delete' ? setProjectToDelete(project) : setDialog({ project })
+                    }
+                  >
+                    <MenuItem id="edit">
+                      <RiPencilLine aria-hidden className="size-4" />
+                      {t('edit')}
+                    </MenuItem>
+                    <MenuItem id="delete">
+                      <RiDeleteBinLine aria-hidden className="size-4" />
+                      {t('delete')}
+                    </MenuItem>
+                  </Menu>
+                </MenuTrigger>
+                <GridListChevron />
               </GridListItem>
             )}
           </GridList>

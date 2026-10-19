@@ -1,14 +1,15 @@
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
 import {
-  RiArrowRightSLine,
   RiBuilding2Line,
   RiDeleteBinLine,
+  RiMoreLine,
   RiPencilLine,
   RiPlayFill,
-  RiStopFill
+  RiStopFill,
+  RiTaskFill
 } from '@remixicon/react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocale } from 'react-aria-components'
+import { useLocale } from 'react-aria-components'
 import { useNavigate, useParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import type { ActivityRef } from '../../../shared/activities'
@@ -17,8 +18,10 @@ import type { ActivityDetails, TimeEntryDetails } from '../../../shared/timeEntr
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
+import { Breadcrumbs } from '../components/molecules/Breadcrumbs'
 import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
 import { ExpandableNote } from '../components/molecules/Note'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
@@ -32,11 +35,9 @@ import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
 import { allTime, periodFilter, type Period } from '../lib/period'
 
-const breadcrumbLinkClassName =
-  'cursor-default rounded-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring'
-
 function ActivityDetailView(): React.JSX.Element {
   const t = useTranslations('ActivityDetailView')
+  const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
   const navigate = useNavigate()
   const { locale } = useLocale()
@@ -127,24 +128,14 @@ function ActivityDetailView(): React.JSX.Element {
         }
         help={t('help')}
         helpTopic="activities"
+        icon={RiTaskFill}
         subtitle={
-          <span className="flex min-w-0 items-center gap-1">
-            <Link href="/projects" className={breadcrumbLinkClassName}>
-              {t('projects')}
-            </Link>
-            <RiArrowRightSLine aria-hidden className="size-3.5 shrink-0" />
-            <Link
-              href={`/projects/${project.id}`}
-              className={`flex min-w-0 items-center gap-1.5 ${breadcrumbLinkClassName}`}
-            >
-              <span
-                aria-hidden
-                className="size-2 shrink-0 rounded-full bg-muted"
-                style={project.color ? { backgroundColor: project.color } : undefined}
-              />
-              <span className="truncate">{project.name}</span>
-            </Link>
-          </span>
+          <Breadcrumbs
+            items={[
+              { href: '/projects', label: tNavigation('projects') },
+              { href: `/projects/${project.id}`, label: project.name, color: project.color }
+            ]}
+          />
         }
         actions={
           <>
@@ -229,23 +220,26 @@ function ActivityDetailView(): React.JSX.Element {
               <span className="w-14 py-3 text-right font-medium tabular-nums">
                 {formatDuration(durationOf(entry))}
               </span>
-              <Button
-                variant="icon"
-                className="mt-2.5"
-                aria-label={t('editEntry', { date })}
-                onPress={() => setEntryToEdit(row)}
-                isDisabled={isEntryRunning}
-              >
-                <RiPencilLine className="size-4" />
-              </Button>
-              <Button
-                variant="icon"
-                className="mt-2.5"
-                aria-label={t('deleteEntry', { date })}
-                onPress={() => setEntryToDelete(row)}
-              >
-                <RiDeleteBinLine className="size-4" />
-              </Button>
+              <MenuTrigger placement="bottom end">
+                <Button variant="icon" className="mt-2.5" aria-label={t('entryActions', { date })}>
+                  <RiMoreLine className="size-4" />
+                </Button>
+                <Menu
+                  disabledKeys={isEntryRunning ? ['edit'] : []}
+                  onAction={(key) =>
+                    key === 'delete' ? setEntryToDelete(row) : setEntryToEdit(row)
+                  }
+                >
+                  <MenuItem id="edit">
+                    <RiPencilLine aria-hidden className="size-4" />
+                    {t('editEntry')}
+                  </MenuItem>
+                  <MenuItem id="delete">
+                    <RiDeleteBinLine aria-hidden className="size-4" />
+                    {t('deleteEntry')}
+                  </MenuItem>
+                </Menu>
+              </MenuTrigger>
             </GridListItem>
           )
         }}

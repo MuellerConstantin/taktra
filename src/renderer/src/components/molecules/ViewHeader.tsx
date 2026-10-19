@@ -1,4 +1,4 @@
-import { RiQuestionLine } from '@remixicon/react'
+import { RiQuestionLine, type RemixiconComponentType } from '@remixicon/react'
 import { DialogTrigger, Link } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import { Button } from '../atoms/Button'
@@ -9,6 +9,8 @@ import type { HelpTopic } from '../../lib/help'
 interface ViewHeaderProps {
   readonly title: React.ReactNode
   readonly subtitle?: React.ReactNode
+  readonly icon?: RemixiconComponentType
+  readonly iconColor?: string | null
   readonly help?: string
   readonly helpTopic?: HelpTopic
   readonly actions?: React.ReactNode
@@ -18,6 +20,8 @@ interface ViewHeaderProps {
 export function ViewHeader({
   title,
   subtitle,
+  icon: Icon,
+  iconColor,
   help,
   helpTopic,
   actions,
@@ -31,6 +35,13 @@ export function ViewHeader({
         <div className="flex min-w-0 flex-1 basis-48 flex-col gap-0.5">
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           <div className="flex min-w-0 items-center gap-1.5">
+            {Icon && (
+              <Icon
+                aria-hidden
+                className="mr-1 size-5 shrink-0 text-muted-foreground"
+                style={iconColor ? { color: iconColor } : undefined}
+              />
+            )}
             <h1 className="min-w-0 text-xl font-semibold">{title}</h1>
             {help && (
               <DialogTrigger>

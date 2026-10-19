@@ -7,7 +7,7 @@ import type { Tag } from '../../../shared/tags'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Badge } from '../components/atoms/Badge'
 import { Button } from '../components/atoms/Button'
-import { GridList, GridListItem } from '../components/atoms/GridList'
+import { GridList, GridListChevron, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
 import { TagDialog } from '../components/molecules/TagDialog'
@@ -126,6 +126,7 @@ function TagsView(): React.JSX.Element {
                 >
                   <RiDeleteBinLine className="size-4" />
                 </Button>
+                <GridListChevron />
               </GridListItem>
             )}
           </GridList>
