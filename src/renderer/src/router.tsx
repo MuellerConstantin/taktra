@@ -13,7 +13,6 @@ import TagsView from './views/TagsView'
 import TagDetailView from './views/TagDetailView'
 import ReportsView from './views/ReportsView'
 import ExportView from './views/ExportView'
-import ExportTemplateView from './views/ExportTemplateView'
 import AppSettingsView from './views/settings/app/AppSettingsView'
 import AppearanceSettings from './views/settings/app/AppearanceSettings'
 import ControlsSettings from './views/settings/app/ControlsSettings'
@@ -21,6 +20,7 @@ import UpdatesSettings from './views/settings/app/UpdatesSettings'
 import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
 import ProfileFieldsSettings from './views/settings/profile/ProfileFieldsSettings'
 import ProfileGeneralSettings from './views/settings/profile/ProfileGeneralSettings'
+import ProfileTemplatesSettings from './views/settings/profile/ProfileTemplatesSettings'
 import HelpView from './views/help/HelpView'
 import HelpTopicView from './views/help/HelpTopicView'
 
@@ -45,15 +45,14 @@ export const router = createHashRouter([
           { path: 'tags/:tagId', element: <TagDetailView /> },
           { path: 'reports', element: <ReportsView /> },
           { path: 'export', element: <ExportView /> },
-          { path: 'export/templates/new', element: <ExportTemplateView /> },
-          { path: 'export/templates/:templateId', element: <ExportTemplateView /> },
           {
             path: 'profile',
             element: <ProfileSettingsView />,
             children: [
               { index: true, element: <Navigate to="general" replace /> },
               { path: 'general', element: <ProfileGeneralSettings /> },
-              { path: 'fields', element: <ProfileFieldsSettings /> }
+              { path: 'fields', element: <ProfileFieldsSettings /> },
+              { path: 'templates', element: <ProfileTemplatesSettings /> }
             ]
           }
         ]

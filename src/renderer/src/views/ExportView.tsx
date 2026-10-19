@@ -1,37 +1,84 @@
 import { getLocalTimeZone, today } from '@internationalized/date'
-import { RiAddLine, RiDownload2Line, RiMoreLine, RiPencilLine } from '@remixicon/react'
+import {
+  RiArrowGoBackLine,
+  RiDownload2Line,
+  RiEqualizerLine,
+  RiAddLine,
+  RiSaveLine
+} from '@remixicon/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useLocale } from 'react-aria-components'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { useTranslations } from 'use-intl'
 import {
+  defaultExportColumns,
   exportFormats,
+  exportLayouts,
+  type ExportColumn,
   type ExportFormat,
+  type ExportLayout,
   type ExportPreview,
   type ExportTemplate
 } from '../../../shared/export'
 import type { Client } from '../../../shared/clients'
+import type { CustomField } from '../../../shared/customFields'
 import type { Project } from '../../../shared/projects'
 import type { Tag } from '../../../shared/tags'
 import { Button } from '../components/atoms/Button'
-import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from '../components/atoms/Menu'
 import { Select, SelectItem } from '../components/atoms/Select'
-import { FilterButton } from '../components/molecules/FilterButton'
+import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ExportPreviewTable } from '../components/molecules/ExportPreviewTable'
+import { ExportTemplateDialog } from '../components/molecules/ExportTemplateDialog'
+import { FilterButton } from '../components/molecules/FilterButton'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { ViewHeader } from '../components/molecules/ViewHeader'
+import { ExportColumnsEditor } from '../components/organisms/ExportColumnsEditor'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
-import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
+
+/** What the file looks like, whether it comes from a template or is put together on the fly. */
+interface ExportDraft {
+  readonly format: ExportFormat
+  readonly layout: ExportLayout
+  readonly columns: readonly ExportColumn[]
+}
+
+const STANDARD = 'standard'
+
+const standardDraft: ExportDraft = {
+  format: 'csv',
+  layout: 'entries',
+  columns: defaultExportColumns
+}
+
+function draftOf(template: ExportTemplate | undefined): ExportDraft {
+  return template
+    ? { format: template.format, layout: template.layout, columns: template.columns }
+    : standardDraft
+}
+
+/** Compares drafts as they would be saved: blank headers and missing aggregations mean none. */
+function isSameDraft(a: ExportDraft, b: ExportDraft): boolean {
+  const normalize = ({ format, layout, columns }: ExportDraft): string =>
+    JSON.stringify({
+      format,
+      layout,
+      columns: columns.map((column) => [
+        'builtin' in column ? column.builtin : column.fieldId,
+        column.header?.trim() || null,
+        column.aggregation ?? null
+      ])
+    })
+  return normalize(a) === normalize(b)
+}
 
 function ExportView(): React.JSX.Element {
   const t = useTranslations('ExportView')
   const errorMessage = useErrorMessage()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [period, setPeriod] = useState<Period>(() => ({
     preset: 'lastMonth',
@@ -43,17 +90,25 @@ function ExportView(): React.JSX.Element {
   const [clients, setClients] = useState<readonly Client[]>([])
   const [projects, setProjects] = useState<readonly Project[]>([])
   const [tags, setTags] = useState<readonly Tag[]>([])
+  const [fields, setFields] = useState<readonly CustomField[]>([])
   const [templates, setTemplates] = useState<readonly ExportTemplate[] | null>(null)
-  const [chosenFormat, setFormat] = useState<ExportFormat | null>(null)
+  const [draft, setDraft] = useState<ExportDraft>(standardDraft)
+  const [loadedKey, setLoadedKey] = useState<string | null>(null)
+  const [isSaveOpen, setSaveOpen] = useState(false)
+  const [isEditing, setEditing] = useState(false)
   const [preview, setPreview] = useState<ExportPreview | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const template = templates?.find(
-    (candidate) => String(candidate.id) === searchParams.get('template')
-  )
-  const columns = template?.columns
-  const layout = template?.layout
-  const format = chosenFormat ?? template?.format ?? 'csv'
+  const templateKey = searchParams.get('template') ?? STANDARD
+  const template = templates?.find((candidate) => String(candidate.id) === templateKey)
+  const isModified = !isSameDraft(draft, draftOf(template))
+
+  // A template chosen here or linked from elsewhere replaces the draft once the templates are
+  // loaded; saving sets the key first, so the draft stays as it is.
+  if (templates !== null && loadedKey !== templateKey) {
+    setLoadedKey(templateKey)
+    setDraft(draftOf(template))
+  }
 
   const { from, to } = periodFilter(period)
   const filter = useMemo(
@@ -73,13 +128,15 @@ function ExportView(): React.JSX.Element {
       api.clients.list({ includeArchived: true }),
       api.projects.list({ includeArchived: true }),
       api.tags.list(),
+      api.customFields.list({ includeArchived: true }),
       api.exportTemplates.list()
     ])
-      .then(([loadedClients, loadedProjects, loadedTags, loadedTemplates]) => {
+      .then(([loadedClients, loadedProjects, loadedTags, loadedFields, loadedTemplates]) => {
         if (!isCurrent) return
         setClients(loadedClients)
         setProjects(loadedProjects)
         setTags(loadedTags)
+        setFields(loadedFields)
         setTemplates(loadedTemplates)
       })
       .catch((caught) => isCurrent && setError(errorMessage(caught)))
@@ -88,8 +145,11 @@ function ExportView(): React.JSX.Element {
     }
   }, [activeProfile?.path, errorMessage])
 
+  const { columns, layout, format } = draft
+  const isLoaded = templates !== null && loadedKey === templateKey
+
   useEffect(() => {
-    if (templates === null) return
+    if (!isLoaded) return
     let isCurrent = true
     api.export
       .preview(filter, columns, layout)
@@ -106,20 +166,51 @@ function ExportView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, templates, filter, columns, layout, errorMessage])
+  }, [isLoaded, filter, columns, layout, errorMessage])
 
-  const chooseTemplate = (id: string): void => {
-    setFormat(null)
-    setSearchParams(id === 'default' ? {} : { template: id }, { replace: true })
+  const showTemplate = (key: string): void => {
+    setSearchParams(key === STANDARD ? {} : { template: key }, { replace: true })
   }
 
-  const exportFile = async (): Promise<void> => {
+  /** Shows another template without loading it, because the draft already is its content. */
+  const keepDraftAs = (key: string): void => {
+    setLoadedKey(key)
+    showTemplate(key)
+  }
+
+  const reloadTemplates = async (): Promise<void> => {
+    setTemplates(await api.exportTemplates.list())
+  }
+
+  const run = async (action: () => Promise<void>): Promise<void> => {
     try {
-      await api.export.file(filter, format, columns, layout)
+      await action()
     } catch (caught) {
       setError(errorMessage(caught))
     }
   }
+
+  const exportFile = (): Promise<void> =>
+    run(async () => {
+      await api.export.file(filter, format, columns, layout)
+    })
+
+  const saveAsTemplate = async (name: string): Promise<void> => {
+    const saved = await api.exportTemplates.create({ name, ...draft, columns: [...columns] })
+    await reloadTemplates()
+    keepDraftAs(String(saved.id))
+  }
+
+  const updateTemplate = (): Promise<void> =>
+    run(async () => {
+      if (!template) return
+      await api.exportTemplates.update(template.id, {
+        name: template.name,
+        ...draft,
+        columns: [...columns]
+      })
+      await reloadTemplates()
+    })
 
   const filterCount = projectIds.length + clientIds.length + tagIds.length
 
@@ -129,11 +220,6 @@ function ExportView(): React.JSX.Element {
     setTagIds([])
   }
 
-  const handleAction = (key: React.Key): void => {
-    if (key === 'new') void navigate('/export/templates/new')
-    if (key === 'edit' && template) void navigate(`/export/templates/${template.id}`)
-  }
-
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
@@ -141,44 +227,10 @@ function ExportView(): React.JSX.Element {
         help={t('help')}
         helpTopic="export"
         actions={
-          <>
-            <Button onPress={exportFile} isDisabled={!preview || preview.count === 0}>
-              <RiDownload2Line className="size-4" />
-              {t('export')}
-            </Button>
-            <MenuTrigger placement="bottom end">
-              <Button variant="icon" aria-label={t('more')}>
-                <RiMoreLine className="size-4" />
-              </Button>
-              <Menu onAction={handleAction}>
-                <MenuItem id="edit" isDisabled={!template}>
-                  <RiPencilLine aria-hidden className="size-4" />
-                  {t('editTemplate')}
-                </MenuItem>
-                <MenuItem id="new">
-                  <RiAddLine aria-hidden className="size-4" />
-                  {t('newTemplate')}
-                </MenuItem>
-                <MenuSeparator />
-                <MenuSection
-                  title={t('format')}
-                  selectionMode="single"
-                  disallowEmptySelection
-                  selectedKeys={[format]}
-                  onSelectionChange={(keys) => {
-                    const [key] = keys === 'all' ? [] : [...keys]
-                    if (key) setFormat(key as ExportFormat)
-                  }}
-                >
-                  {exportFormats.map((option) => (
-                    <MenuItem key={option} id={option}>
-                      {option.toUpperCase()}
-                    </MenuItem>
-                  ))}
-                </MenuSection>
-              </Menu>
-            </MenuTrigger>
-          </>
+          <Button onPress={exportFile} isDisabled={!preview || preview.count === 0}>
+            <RiDownload2Line className="size-4" />
+            {t('export')}
+          </Button>
         }
       >
         <div className="flex flex-wrap items-center gap-2 pb-4">
@@ -227,41 +279,122 @@ function ExportView(): React.JSX.Element {
               ))}
             </Select>
           </FilterButton>
-          <Select
-            aria-label={t('template')}
-            value={template ? String(template.id) : 'default'}
-            onChange={(key) => key && chooseTemplate(String(key))}
-            className="ml-auto w-44"
-          >
-            <SelectItem id="default">{t('defaultTemplate')}</SelectItem>
-            {(templates ?? []).map((candidate) => (
-              <SelectItem key={candidate.id} id={String(candidate.id)}>
-                {candidate.name}
-              </SelectItem>
-            ))}
-          </Select>
         </div>
       </ViewHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-8 py-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-end gap-2">
+            <Select
+              label={t('template')}
+              value={templateKey}
+              onChange={(key) => key && showTemplate(String(key))}
+              className="w-48"
+            >
+              <SelectItem id={STANDARD}>{t('standardTemplate')}</SelectItem>
+              {(templates ?? []).map((candidate) => (
+                <SelectItem key={candidate.id} id={String(candidate.id)}>
+                  {candidate.name}
+                </SelectItem>
+              ))}
+            </Select>
+            <ToggleButton isSelected={isEditing} onChange={setEditing}>
+              <RiEqualizerLine className="size-4" />
+              {t('customize')}
+              {isModified && (
+                <>
+                  <span
+                    aria-hidden
+                    className="absolute -top-1 -right-1 size-2.5 rounded-full border-2 border-background bg-primary"
+                  />
+                  <span className="sr-only">{t('modified')}</span>
+                </>
+              )}
+            </ToggleButton>
+          </div>
+          {isEditing && (
+            <div className="flex flex-col gap-4 border-y border-border py-4">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <div className="flex flex-wrap items-end gap-2">
+                  <Select
+                    label={t('format')}
+                    value={format}
+                    onChange={(key) => key && setDraft({ ...draft, format: key as ExportFormat })}
+                    className="w-44"
+                  >
+                    {exportFormats.map((option) => (
+                      <SelectItem key={option} id={option}>
+                        {option.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Select
+                    label={t('layout')}
+                    value={layout}
+                    onChange={(key) => key && setDraft({ ...draft, layout: key as ExportLayout })}
+                    className="w-56"
+                  >
+                    {exportLayouts.map((option) => (
+                      <SelectItem key={option} id={option}>
+                        {t(`layouts.${option}`)}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                  {template && (
+                    <Button
+                      variant="secondary"
+                      className="size-9 px-0"
+                      aria-label={t('updateTemplate', { name: template.name })}
+                      isDisabled={!isModified || !preview}
+                      onPress={updateTemplate}
+                    >
+                      <RiSaveLine className="size-4" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="secondary"
+                    className="size-9 px-0"
+                    aria-label={template ? t('saveAsNewTemplate') : t('saveAsTemplate')}
+                    isDisabled={!preview}
+                    onPress={() => setSaveOpen(true)}
+                  >
+                    <span aria-hidden className="relative">
+                      <RiSaveLine className="size-4" />
+                      <RiAddLine className="absolute -right-1.5 -bottom-1.5 size-3 rounded-full bg-secondary" />
+                    </span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="size-9 px-0"
+                    aria-label={t('discardChanges')}
+                    isDisabled={!isModified}
+                    onPress={() => setDraft(draftOf(template))}
+                  >
+                    <RiArrowGoBackLine className="size-4" />
+                  </Button>
+                </div>
+              </div>
+              <ExportColumnsEditor
+                fields={fields}
+                layout={layout}
+                columns={columns}
+                onColumnsChange={(changed) => setDraft({ ...draft, columns: changed })}
+              />
+            </div>
+          )}
+        </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <dl className="grid grid-cols-3 gap-3">
-          <div className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3">
-            <dt className="text-xs text-muted-foreground">{t('entries')}</dt>
-            <dd className="text-xl font-semibold tabular-nums">{preview?.count ?? 0}</dd>
-          </div>
-          <div className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3">
-            <dt className="text-xs text-muted-foreground">{t('total')}</dt>
-            <dd className="text-xl font-semibold tabular-nums">
-              {formatDuration((preview?.totalMin ?? 0) * 60)}
-            </dd>
-          </div>
-          <div className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3">
-            <dt className="text-xs text-muted-foreground">{t('format')}</dt>
-            <dd className="text-xl font-semibold">{format.toUpperCase()}</dd>
-          </div>
-        </dl>
-        {preview && <ExportPreviewTable preview={preview} />}
+        {preview && <ExportPreviewTable preview={preview} format={format} />}
       </div>
+      {isSaveOpen && (
+        <ExportTemplateDialog
+          title={t('saveAsTitle')}
+          actionLabel={t('save')}
+          onClose={() => setSaveOpen(false)}
+          onSave={saveAsTemplate}
+        />
+      )}
     </div>
   )
 }

@@ -126,8 +126,7 @@
       "newEntry": "Neuer Eintrag",
       "newProject": "Neues Projekt",
       "newClient": "Neuer Leistungsempfänger",
-      "newTag": "Neuer Tag",
-      "newExportTemplate": "Neue Exportvorlage"
+      "newTag": "Neuer Tag"
     },
     "settings": {
       "profileName": "Profilname",
@@ -543,9 +542,6 @@
     "title": "Export",
     "export": "Exportieren…",
     "template": "Vorlage",
-    "defaultTemplate": "Standard",
-    "editTemplate": "Vorlage bearbeiten",
-    "newTemplate": "Neue Vorlage",
     "clients": "Leistungsempfänger",
     "allClients": "Alle Leistungsempfänger",
     "searchClients": "Leistungsempfänger suchen",
@@ -557,10 +553,23 @@
     "searchTags": "Tags suchen",
     "noMatches": "Keine Treffer",
     "format": "Format",
-    "entries": "Einträge",
-    "total": "Gesamtzeit",
-    "help": "Schreibt die abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Eine Vorlage legt fest, welche Spalten die Datei enthält; die Vorschau zeigt, was in der Datei steht.",
-    "more": "Weitere Aktionen"
+    "help": "Schreibt die abgeschlossenen Einträge eines Zeitraums in eine Datei, etwa für die Abrechnung oder andere Systeme. Passe die Spalten für einen einzelnen Export an oder speichere sie als Vorlage, um sie wieder zu verwenden.",
+    "more": "Weitere Aktionen",
+    "standardTemplate": "Standard",
+    "modified": "Geändert",
+    "saveAsTemplate": "Als Vorlage speichern…",
+    "saveAsNewTemplate": "Als neue Vorlage speichern…",
+    "updateTemplate": "Änderungen in „{name}“ speichern",
+    "discardChanges": "Änderungen verwerfen",
+    "saveAsTitle": "Als Vorlage speichern",
+    "save": "Speichern",
+    "customize": "Anpassen",
+    "layout": "Layout",
+    "layouts": {
+      "entries": "Eine Zeile pro Eintrag",
+      "summed": "Summierte Zeilen",
+      "pivot": "Tage als Spalten"
+    }
   },
   "FilterButton": {
     "label": "Filter",
@@ -570,15 +579,12 @@
   "ExportPreviewTable": {
     "title": "Vorschau: {count, plural, one {# Zeile} other {# Zeilen}}",
     "titlePartial": "Vorschau: die ersten {shown} von {count} Zeilen",
-    "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum."
+    "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum.",
+    "summary": "{count, plural, one {# Eintrag} other {# Einträge}} · {total} · {format}"
   },
-  "ExportTemplateView": {
-    "subtitle": "Exportvorlage",
-    "newTitle": "Neue Vorlage",
-    "name": "Name",
-    "cancel": "Abbrechen",
-    "save": "Speichern",
-    "delete": "Vorlage löschen",
+  "ExportColumnsEditor": {
+    "columns": "Spalten",
+    "help": "Ziehe die Spalten in die Reihenfolge der Datei. Ein leerer Name verwendet den grau angezeigten.",
     "builtinSection": "Standardspalten",
     "scopeSections": {
       "project": "Projektfelder",
@@ -605,17 +611,9 @@
     "archived": "archiviert",
     "archivedField": "{name} (archiviert)",
     "limit": "Eine Vorlage enthält höchstens {max} Spalten.",
-    "selected": "In der Datei",
-    "selectedHelp": "Ziehe die Spalten in die Reihenfolge der Datei. Ein leerer Name verwendet den grau angezeigten.",
     "reorder": "{name} verschieben",
     "header": "Name von {name} in der Datei",
     "conflict": "Name doppelt vergeben",
-    "layout": "Layout",
-    "layouts": {
-      "entries": "Eine Zeile pro Eintrag",
-      "summed": "Summierte Zeilen",
-      "pivot": "Tage als Spalten"
-    },
     "aggregation": "Wie {name} summierte Zeilen füllt",
     "aggregations": {
       "group": "Zeilen bilden",
@@ -627,16 +625,13 @@
     "dateInPivot": "Die Tage sind schon Spalten",
     "durationTwice": "Tage als Spalten brauchen genau eine Dauer, in Minuten oder Stunden.",
     "durationMissing": "Summierte Zeilen brauchen eine Dauer in Minuten oder Stunden.",
-    "previewLayout": "Passe die Spalten an das Layout an, um die Vorschau zu sehen.",
     "remove": "{name} entfernen",
-    "previewHelp": "Vorschau mit den Einträgen eines Zeitraums, auch vor dem Speichern.",
-    "previewConflict": "Benenne die markierten Spalten um, um die Vorschau zu sehen.",
-    "deleteConfirmTitle": "Vorlage „{name}“ löschen?",
-    "deleteConfirmText": "Die Vorlage wird endgültig gelöscht. Damit exportierte Dateien bleiben unverändert.",
-    "deleteConfirmAction": "Löschen",
-    "more": "Weitere Aktionen",
-    "addColumn": "Spalte hinzufügen",
-    "help": "Eine Vorlage legt fest, welche Spalten die Exportdatei enthält, in welcher Reihenfolge und unter welchem Namen. So passt die Datei zu dem System, das sie einliest."
+    "addColumn": "Spalte hinzufügen"
+  },
+  "ExportTemplateDialog": {
+    "nameLabel": "Name",
+    "nameRequired": "Gib einen Namen ein.",
+    "cancel": "Abbrechen"
   },
   "ReportBreakdown": {
     "untagged": "Ohne Tag",
@@ -720,7 +715,8 @@
     "title": "Profileinstellungen",
     "general": "Allgemein",
     "help": "Ein Profil ist eine eigene Datei mit allen Projekten und Einträgen, etwa eines für die Arbeit und eines für Privates. Zum Sichern kopierst du einfach die Datei.",
-    "fields": "Benutzerdefinierte Felder"
+    "fields": "Benutzerdefinierte Felder",
+    "templates": "Exportvorlagen"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
@@ -763,6 +759,21 @@
       }
     },
     "more": "Mehr dazu"
+  },
+  "ProfileTemplatesSettings": {
+    "description": "Vorlagen speichern Spalten, Layout und Format eines Exports zur Wiederverwendung. Du speicherst sie beim Exportieren; hier benennst du sie um oder löschst sie.",
+    "more": "Mehr zum Export",
+    "empty": "Noch keine Vorlagen. Speichere eine in der Export-Ansicht.",
+    "summary": "{format} · {layout} · {count, plural, one {# Spalte} other {# Spalten}}",
+    "open": "{name} im Export öffnen",
+    "rename": "{name} umbenennen",
+    "delete": "{name} löschen",
+    "renameTitle": "Vorlage umbenennen",
+    "renameAction": "Umbenennen",
+    "deleteConfirmTitle": "Vorlage „{name}“ löschen?",
+    "deleteConfirmText": "Die Vorlage wird endgültig gelöscht. Damit exportierte Dateien bleiben unverändert.",
+    "deleteConfirmAction": "Löschen",
+    "cancel": "Abbrechen"
   },
   "CustomFieldDialog": {
     "scopes": {
@@ -849,12 +860,12 @@
     "UNKNOWN": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "SHORTCUT_UNAVAILABLE": "Dieses Kürzel ist bereits von einer anderen App oder dem System belegt.",
     "EXPORT_WRITE_FAILED": "Die Datei konnte nicht geschrieben werden. Ist sie noch in einem anderen Programm geöffnet?",
-    "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon in der Vorlage um.",
-    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn und Ende unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus der Vorlage.",
-    "EXPORT_AGGREGATION_NOT_ALLOWED": "Eine Spalte wird auf eine Art zusammengefasst, die sie nicht erlaubt. Wähle in der Vorlage eine andere Option.",
+    "EXPORT_COLUMN_CONFLICT": "Zwei Spalten haben denselben Namen in der Datei. Benenne eine davon um.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Beginn und Ende unterscheiden sich bei jedem Eintrag und passen nicht zu summierten Zeilen. Entferne sie aus den Spalten.",
+    "EXPORT_AGGREGATION_NOT_ALLOWED": "Eine Spalte wird auf eine Art zusammengefasst, die sie nicht erlaubt. Wähle eine andere Option für sie.",
     "EXPORT_DURATION_MISSING": "Summierte Zeilen brauchen eine Spalte mit der Dauer in Minuten oder Stunden.",
     "EXPORT_DURATION_TWICE": "Tage als Spalten brauchen genau eine Spalte mit der Dauer, in Minuten oder Stunden.",
-    "EXPORT_DATE_IN_PIVOT": "Bei Tagen als Spalten steht das Datum schon in den Spaltennamen. Entferne es aus der Vorlage.",
+    "EXPORT_DATE_IN_PIVOT": "Bei Tagen als Spalten steht das Datum schon in den Spaltennamen. Entferne es aus den Spalten.",
     "EXPORT_TEMPLATE_NOT_FOUND": "Die Vorlage existiert nicht mehr.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "Eine Vorlage mit diesem Namen existiert bereits."
   },

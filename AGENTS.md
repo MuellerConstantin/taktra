@@ -72,9 +72,10 @@ total; per-client sums do add up.
 **Export**
 A separate export view writes the completed entries of a period, filtered by
 project, tag and client, to a file (CSV, JSON or Excel) for billing and other systems,
-with a preview of what the file will contain. Export templates of a profile
-choose the columns, their order and names, custom fields included; without one
-the standard columns are written. A template writes one row per entry, sums the
+with a preview of what the file will contain. Columns, their order and names,
+custom fields included, are chosen for each export, starting from the standard
+columns; export templates of a profile save such a choice for reuse, are
+optional and are renamed or deleted in the profile settings. An export writes one row per entry, sums the
 entries per combination of its grouping columns, or sums them with one column
 per day of the period, as in a time sheet. In sums, a column can list the
 distinct values of the summed entries instead of grouping by them.

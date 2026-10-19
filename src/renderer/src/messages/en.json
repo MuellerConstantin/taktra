@@ -126,8 +126,7 @@
       "newEntry": "New entry",
       "newProject": "New project",
       "newClient": "New client",
-      "newTag": "New tag",
-      "newExportTemplate": "New export template"
+      "newTag": "New tag"
     },
     "settings": {
       "profileName": "Profile name",
@@ -509,9 +508,6 @@
     "title": "Export",
     "export": "Export…",
     "template": "Template",
-    "defaultTemplate": "Standard",
-    "editTemplate": "Edit template",
-    "newTemplate": "New template",
     "clients": "Clients",
     "allClients": "All clients",
     "searchClients": "Search clients",
@@ -523,10 +519,23 @@
     "searchTags": "Search tags",
     "noMatches": "No matches",
     "format": "Format",
-    "entries": "Entries",
-    "total": "Total time",
-    "help": "Writes the completed entries of a period to a file, for example for billing or other systems. A template decides which columns the file contains; the preview shows what the file will contain.",
-    "more": "More actions"
+    "help": "Writes the completed entries of a period to a file, for example for billing or other systems. Adjust the columns for a single export, or save them as a template to use them again.",
+    "more": "More actions",
+    "standardTemplate": "Standard",
+    "modified": "Changed",
+    "saveAsTemplate": "Save as template…",
+    "saveAsNewTemplate": "Save as new template…",
+    "updateTemplate": "Save changes to “{name}”",
+    "discardChanges": "Discard changes",
+    "saveAsTitle": "Save as template",
+    "save": "Save",
+    "customize": "Customize",
+    "layout": "Layout",
+    "layouts": {
+      "entries": "One row per entry",
+      "summed": "Summed rows",
+      "pivot": "Days as columns"
+    }
   },
   "FilterButton": {
     "label": "Filter",
@@ -536,15 +545,12 @@
   "ExportPreviewTable": {
     "title": "Preview: {count, plural, one {# row} other {# rows}}",
     "titlePartial": "Preview: first {shown} of {count} rows",
-    "empty": "No completed entries in this period."
+    "empty": "No completed entries in this period.",
+    "summary": "{count, plural, one {# entry} other {# entries}} · {total} · {format}"
   },
-  "ExportTemplateView": {
-    "subtitle": "Export template",
-    "newTitle": "New template",
-    "name": "Name",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete template",
+  "ExportColumnsEditor": {
+    "columns": "Columns",
+    "help": "Drag the columns into the order of the file. An empty name uses the one shown in grey.",
     "builtinSection": "Standard columns",
     "scopeSections": {
       "project": "Project fields",
@@ -571,17 +577,9 @@
     "archived": "archived",
     "archivedField": "{name} (archived)",
     "limit": "A template holds at most {max} columns.",
-    "selected": "In the file",
-    "selectedHelp": "Drag the columns into the order of the file. An empty name uses the one shown in grey.",
     "reorder": "Move {name}",
     "header": "Name of {name} in the file",
     "conflict": "Name used twice",
-    "layout": "Layout",
-    "layouts": {
-      "entries": "One row per entry",
-      "summed": "Summed rows",
-      "pivot": "Days as columns"
-    },
     "aggregation": "How {name} fills summed rows",
     "aggregations": {
       "group": "Group rows",
@@ -593,16 +591,13 @@
     "dateInPivot": "The days are already columns",
     "durationTwice": "Days as columns need exactly one duration, in minutes or hours.",
     "durationMissing": "Summed rows need a duration in minutes or hours.",
-    "previewLayout": "Adjust the columns to the layout to see the preview.",
     "remove": "Remove {name}",
-    "previewHelp": "Preview with the entries of a period, also before saving.",
-    "previewConflict": "Rename the marked columns to see the preview.",
-    "deleteConfirmTitle": "Delete template “{name}”?",
-    "deleteConfirmText": "The template is deleted permanently. Files exported with it stay unchanged.",
-    "deleteConfirmAction": "Delete",
-    "more": "More actions",
-    "addColumn": "Add column",
-    "help": "A template sets which columns the export file contains, in which order and under which name, so the file fits the system that imports it."
+    "addColumn": "Add column"
+  },
+  "ExportTemplateDialog": {
+    "nameLabel": "Name",
+    "nameRequired": "Enter a name.",
+    "cancel": "Cancel"
   },
   "ReportBreakdown": {
     "untagged": "No tag",
@@ -686,7 +681,8 @@
     "title": "Profile settings",
     "general": "General",
     "help": "A profile is a separate file with all its projects and entries, for example one for work and one for private projects. To back it up, simply copy the file.",
-    "fields": "Custom fields"
+    "fields": "Custom fields",
+    "templates": "Export templates"
   },
   "ProfileGeneralSettings": {
     "nameLabel": "Name",
@@ -729,6 +725,21 @@
       }
     },
     "more": "Learn more"
+  },
+  "ProfileTemplatesSettings": {
+    "description": "Templates save the columns, layout and format of an export for reuse. You save them while exporting; here you rename or delete them.",
+    "more": "More about the export",
+    "empty": "No templates yet. Save one from the export view.",
+    "summary": "{format} · {layout} · {count, plural, one {# column} other {# columns}}",
+    "open": "Open {name} in the export",
+    "rename": "Rename {name}",
+    "delete": "Delete {name}",
+    "renameTitle": "Rename template",
+    "renameAction": "Rename",
+    "deleteConfirmTitle": "Delete template “{name}”?",
+    "deleteConfirmText": "The template is deleted permanently. Files exported with it stay unchanged.",
+    "deleteConfirmAction": "Delete",
+    "cancel": "Cancel"
   },
   "CustomFieldDialog": {
     "scopes": {
@@ -815,12 +826,12 @@
     "UNKNOWN": "Something went wrong. Please try again.",
     "SHORTCUT_UNAVAILABLE": "This shortcut is already used by another app or the system.",
     "EXPORT_WRITE_FAILED": "The file could not be written. Is it still open in another program?",
-    "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them in the template.",
-    "EXPORT_COLUMN_NOT_SUMMABLE": "Start and end differ for every entry and do not fit summed rows. Remove them from the template.",
-    "EXPORT_AGGREGATION_NOT_ALLOWED": "A column is summarized in a way it does not allow. Choose another option in the template.",
+    "EXPORT_COLUMN_CONFLICT": "Two columns have the same name in the file. Rename one of them.",
+    "EXPORT_COLUMN_NOT_SUMMABLE": "Start and end differ for every entry and do not fit summed rows. Remove them from the columns.",
+    "EXPORT_AGGREGATION_NOT_ALLOWED": "A column is summarized in a way it does not allow. Choose another option for it.",
     "EXPORT_DURATION_MISSING": "Summed rows need a duration column in minutes or hours.",
     "EXPORT_DURATION_TWICE": "Days as columns need exactly one duration column, in minutes or hours.",
-    "EXPORT_DATE_IN_PIVOT": "With days as columns, the date is already in the column names. Remove it from the template.",
+    "EXPORT_DATE_IN_PIVOT": "With days as columns, the date is already in the column names. Remove it from the columns.",
     "EXPORT_TEMPLATE_NOT_FOUND": "The template no longer exists.",
     "EXPORT_TEMPLATE_NAME_TAKEN": "A template with this name already exists."
   },

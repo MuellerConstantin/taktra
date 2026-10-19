@@ -1,5 +1,6 @@
 import { useTranslations } from 'use-intl'
-import type { ExportPreview, ExportValue } from '../../../../shared/export'
+import type { ExportFormat, ExportPreview, ExportValue } from '../../../../shared/export'
+import { formatDuration } from '../../lib/duration'
 
 function formatCell(value: ExportValue): string {
   return Array.isArray(value) ? value.join(', ') : String(value ?? '')
@@ -7,9 +8,13 @@ function formatCell(value: ExportValue): string {
 
 interface ExportPreviewTableProps {
   readonly preview: ExportPreview
+  readonly format: ExportFormat
 }
 
-export function ExportPreviewTable({ preview }: ExportPreviewTableProps): React.JSX.Element {
+export function ExportPreviewTable({
+  preview,
+  format
+}: ExportPreviewTableProps): React.JSX.Element {
   const t = useTranslations('ExportPreviewTable')
 
   if (preview.count === 0)
@@ -17,11 +22,20 @@ export function ExportPreviewTable({ preview }: ExportPreviewTableProps): React.
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-sm font-semibold">
-        {preview.rows.length < preview.rowCount
-          ? t('titlePartial', { shown: preview.rows.length, count: preview.rowCount })
-          : t('title', { count: preview.rowCount })}
-      </h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-sm font-semibold">
+          {preview.rows.length < preview.rowCount
+            ? t('titlePartial', { shown: preview.rows.length, count: preview.rowCount })
+            : t('title', { count: preview.rowCount })}
+        </h2>
+        <p className="text-sm whitespace-nowrap text-muted-foreground tabular-nums">
+          {t('summary', {
+            count: preview.count,
+            total: formatDuration(preview.totalMin * 60),
+            format: format.toUpperCase()
+          })}
+        </p>
+      </div>
       <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-left font-mono text-xs">
           <thead className="border-b border-border text-muted-foreground">

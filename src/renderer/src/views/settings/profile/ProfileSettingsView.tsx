@@ -16,7 +16,8 @@ function ProfileSettingsView(): React.JSX.Element | null {
       helpTopic="profiles"
       sections={[
         { path: '/profile/general', label: t('general') },
-        { path: '/profile/fields', label: t('fields') }
+        { path: '/profile/fields', label: t('fields') },
+        { path: '/profile/templates', label: t('templates') }
       ]}
     />
   )

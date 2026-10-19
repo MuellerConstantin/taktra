@@ -60,12 +60,14 @@ function textOf(node: React.ReactNode): string {
 }
 
 export function Button({ tooltip = true, shortcut, ...props }: ButtonProps): React.JSX.Element {
-  const label =
-    props.variant === 'icon'
-      ? props['aria-label']
-      : shortcut && typeof props.children !== 'function'
-        ? props['aria-label'] || textOf(props.children)
-        : undefined
+  const isIconOnly =
+    props.variant === 'icon' ||
+    (typeof props.children !== 'function' && textOf(props.children) === '')
+  const label = isIconOnly
+    ? props['aria-label']
+    : shortcut && typeof props.children !== 'function'
+      ? props['aria-label'] || textOf(props.children)
+      : undefined
   const element = (
     <RACButton
       {...props}

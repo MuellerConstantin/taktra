@@ -10,9 +10,13 @@ By default one row per entry, with names instead of internal numbers. Clock time
 
 Whatever the system reading the file expects. To open the file yourself in a spreadsheet, choose XLSX: dates and durations arrive there as such and can be sorted and summed right away. CSV and JSON are meant for other programs.
 
+## Can I choose the columns myself?
+
+Yes, for every export. You set which columns the file contains, in which order and under which name. Besides the standard columns, these can be [custom fields](customFields.md) too. The choice applies to this export only; the next export starts with the standard columns again.
+
 ## What are templates for?
 
-To make the file fit the system that reads it. A template sets which columns the file contains, in which order and under which name. Besides the standard columns, these can be [custom fields](customFields.md) too. Templates are saved in the profile. Without a template, the file contains the standard columns.
+So you do not put together a choice you need often every time, for example for the system that reads the file. A template saves columns, layout and format in the profile. What you change after loading a template applies to this export only, until you save it in the template.
 
 ## Can the file contain sums instead of single entries?
 

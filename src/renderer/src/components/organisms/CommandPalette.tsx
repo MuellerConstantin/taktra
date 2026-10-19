@@ -274,12 +274,6 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       label: t('actions.newTag'),
       icon: RiAddLine,
       run: goTo('/tags', createRequest)
-    },
-    {
-      id: 'newExportTemplate',
-      label: t('actions.newExportTemplate'),
-      icon: RiAddLine,
-      run: goTo('/export/templates/new')
     }
   ]
 

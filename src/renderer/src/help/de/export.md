@@ -10,9 +10,13 @@ Standardmäßig eine Zeile pro Eintrag, mit Namen statt interner Nummern. Uhrzei
 
 Das, was das einlesende System erwartet. Willst du die Datei selbst in einer Tabellenkalkulation öffnen, nimm XLSX: Datum und Dauer kommen dort als solche an und lassen sich gleich sortieren und summieren. CSV und JSON sind für andere Programme gedacht.
 
+## Kann ich die Spalten selbst wählen?
+
+Ja, für jeden Export. Du legst fest, welche Spalten in welcher Reihenfolge und unter welchem Namen in der Datei stehen. Neben den Standardspalten können das auch [benutzerdefinierte Felder](customFields.md) sein. Die Auswahl gilt nur für diesen Export, danach beginnt der Export wieder mit den Standardspalten.
+
 ## Wozu gibt es Vorlagen?
 
-Damit die Datei zum System passt, das sie einliest. Eine Vorlage legt fest, welche Spalten in welcher Reihenfolge und unter welchem Namen in der Datei stehen. Neben den Standardspalten können das auch [benutzerdefinierte Felder](customFields.md) sein. Vorlagen werden im Profil gespeichert. Ohne Vorlage enthält die Datei die Standardspalten.
+Damit du eine Auswahl, die du öfter brauchst, nicht jedes Mal neu zusammenstellst, etwa für das System, das die Datei einliest. Eine Vorlage speichert Spalten, Layout und Format im Profil. Was du nach dem Laden einer Vorlage änderst, gilt nur für diesen Export, bis du es in der Vorlage speicherst.
 
 ## Kann die Datei Summen statt einzelner Einträge enthalten?
 
