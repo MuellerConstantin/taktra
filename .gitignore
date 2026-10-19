@@ -333,3 +333,7 @@ fabric.properties
 
 # Visual Studio Code
 .vscode
+
+# Playwright
+test-results/
+playwright-report/

@@ -9,7 +9,7 @@ files:
   - '!docs/*'
   - '!tests/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!vitest.config.ts'
+  - '!{vitest,playwright}.config.ts'
   - '!drizzle.config.ts'
   - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,CHANGELOG.md,README.md}'
   - '!{AGENTS.md,CLAUDE.md}'
