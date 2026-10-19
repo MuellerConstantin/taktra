@@ -101,26 +101,32 @@ development.
 - **App settings**: `electron-store`
 - **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
+- **Tests**: Vitest (main process), Playwright (end-to-end with Electron)
 
 ## Project Structure
 
 ```
-src/
-├── main/              # Electron main process
-│   ├── db/            # Connection, migrations, schema, backups, sample data
-│   ├── domain/        # Data of the active profile and its IPC handlers; uses db/, never desktop/
-│   └── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
-├── preload/           # Typed `window.api` bridge
-├── shared/            # Types used by main, preload and renderer
-│   └── validation/    # Zod schemas per domain, text length limits
-└── renderer/src/      # React UI
-    ├── views/         # One component per route
-    ├── components/    # Atomic Design: atoms, molecules, organisms, templates
-    ├── contexts/      # Context objects and providers
-    ├── hooks/
-    ├── lib/           # API client and helpers
-    ├── help/          # Help chapters in Markdown, one folder per language
-    └── messages/      # Translations
+./
+├── src/
+│   ├── main/              # Electron main process
+│   │   ├── db/            # Connection, migrations, schema, backups, sample data
+│   │   ├── domain/        # Data of the active profile and its IPC handlers; uses db/, never desktop/
+│   │   └── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
+│   ├── preload/           # Typed `window.api` bridge
+│   ├── shared/            # Types used by main, preload and renderer
+│   │   └── validation/    # Zod schemas per domain, text length limits
+│   └── renderer/src/      # React UI
+│       ├── views/         # One component per route
+│       ├── components/    # Atomic Design: atoms, molecules, organisms, templates
+│       ├── contexts/      # Context objects and providers
+│       ├── hooks/
+│       ├── lib/           # API client and helpers
+│       ├── help/          # Help chapters in Markdown, one folder per language
+│       └── messages/      # Translations
+└── tests/
+    ├── main/              # Vitest, folders as in src/main/
+    │   └── db/seeds/      # Data for the migration test, one file per migration
+    └── e2e/               # Playwright against the built app
 ```
 
 App-wide modules (lifecycle, IPC registration, settings, profiles) sit directly
@@ -285,6 +291,23 @@ the sample profile and are excluded from the packaged app.
   tooltips and the controls settings. The only global shortcut opens the quick
   start; it can be turned off and re-recorded.
 
+### Tests
+
+- **Tests apart from the code**: Tests live in `tests/`, in folders named after
+  `src/`, and never ship with the app.
+- **Main process tests on real files**: Vitest runs the main process code under
+  plain Node against real SQLite files in a temporary folder. Only `electron`
+  and `electron-store` are replaced, never the database.
+- **Every migration is tested with data**: The migration test migrates a
+  profile from every earlier schema version and checks that no row changes. A
+  migration that adds tables gets a seed file named like the migration in
+  `tests/main/db/seeds/`, so the next ones are tested with data in them.
+- **End-to-end tests in their own user data folder**: Playwright starts the
+  built app with `TAKTRA_USER_DATA` pointing to a temporary folder, so profiles,
+  settings and the single instance lock of the user stay untouched. The
+  variable exists for this purpose only. In CI they run on a Windows runner,
+  which has a desktop session.
+
 ## Coding Principles
 
 - **KISS**: Prefer the simplest solution that works. Avoid unnecessary abstractions – extract only after the third repetition (Rule of Three).
@@ -312,5 +335,6 @@ the sample profile and are excluded from the packaged app.
   belong in the commit message, the docs or the issue. In particular: do not
   carry justifications from our conversation into the code just because they
   were convincing at the time.
-- Verify changes with `npm run typecheck`, `npm run lint` and
-  `npm run format` before considering a task done.
+- Verify changes with `npm run typecheck`, `npm run lint`, `npm run format`
+  and `npm test` before considering a task done, and with `npm run test:e2e`
+  when they change the UI.
