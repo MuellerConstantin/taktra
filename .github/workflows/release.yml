@@ -85,6 +85,8 @@ jobs:
         run: npm run lint
       - name: Check formatting
         run: npm run format
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npx electron-vite build
