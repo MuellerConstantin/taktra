@@ -257,7 +257,9 @@ function toCellValue(value: ExportValue): string | number | null {
 /** RFC 4180: comma, quoted fields where needed, CRLF line endings, no BOM. */
 export function toCsv({ headers, rows }: ExportTable): string {
   return stringify([headers, ...rows.map((row) => row.map(toCellValue))], {
-    record_delimiter: 'windows'
+    record_delimiter: 'windows',
+    // csv-stringify only quotes the full record delimiter, not a lone LF or CR as in notes.
+    quoted_match: /[\r\n]/
   })
 }
 
