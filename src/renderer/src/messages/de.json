@@ -568,7 +568,8 @@
     "clear": "Filter zurücksetzen"
   },
   "ExportPreviewTable": {
-    "title": "Vorschau: die ersten {shown} von {count} Einträgen",
+    "title": "Vorschau: {count, plural, one {# Zeile} other {# Zeilen}}",
+    "titlePartial": "Vorschau: die ersten {shown} von {count} Zeilen",
     "empty": "Keine abgeschlossenen Einträge in diesem Zeitraum."
   },
   "ExportTemplateView": {

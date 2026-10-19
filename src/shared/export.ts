@@ -82,6 +82,7 @@ export function durationError(
 
 export interface ExportPreview extends ExportTable {
   readonly count: number
+  readonly rowCount: number
   readonly totalMin: number
 }
 

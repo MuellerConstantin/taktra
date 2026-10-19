@@ -83,6 +83,7 @@ describe('entries layout', () => {
       'client'
     ])
     expect(preview.count).toBe(4)
+    expect(preview.rowCount).toBe(4)
     expect(preview.totalMin).toBe(70)
     expect(preview.rows).toContainEqual([
       '2026-03-04',
@@ -184,6 +185,13 @@ describe('pivot layout', () => {
     expect(preview.isDate).toEqual([false, false, false, false, false, false])
     expect(preview.rows).toContainEqual(['Build', null, 40, null, 20, 'Contoso'])
     expect(preview.rows).toContainEqual(['Run', null, 10, null, null, null])
+  })
+
+  it('counts the summed rows apart from the entries', () => {
+    const preview = previewExport(MARCH, builtins('activity', 'duration_min'), 'pivot')
+
+    expect(preview.count).toBe(4)
+    expect(preview.rowCount).toBe(2)
   })
 
   it('spans the days of the entries when the filter leaves the range open', () => {

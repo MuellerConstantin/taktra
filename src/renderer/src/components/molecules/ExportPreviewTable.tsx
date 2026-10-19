@@ -18,7 +18,9 @@ export function ExportPreviewTable({ preview }: ExportPreviewTableProps): React.
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-sm font-semibold">
-        {t('title', { shown: preview.rows.length, count: preview.count })}
+        {preview.rows.length < preview.rowCount
+          ? t('titlePartial', { shown: preview.rows.length, count: preview.rowCount })
+          : t('title', { count: preview.rowCount })}
       </h2>
       <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-left font-mono text-xs">

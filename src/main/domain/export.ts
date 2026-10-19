@@ -321,6 +321,7 @@ export function previewExport(
     ...table,
     rows: table.rows.slice(0, PREVIEW_ROWS),
     count: entries.length,
+    rowCount: layout === 'entries' ? entries.length : table.rows.length,
     totalMin: entries.reduce((sum, details) => sum + durationMin(details), 0)
   }
 }

@@ -534,7 +534,8 @@
     "clear": "Clear filters"
   },
   "ExportPreviewTable": {
-    "title": "Preview: first {shown} of {count} entries",
+    "title": "Preview: {count, plural, one {# row} other {# rows}}",
+    "titlePartial": "Preview: first {shown} of {count} rows",
     "empty": "No completed entries in this period."
   },
   "ExportTemplateView": {
