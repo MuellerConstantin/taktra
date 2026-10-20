@@ -20,4 +20,4 @@ Meistens Notiz. „Jour fixe“ ist eine Tätigkeit, das Thema der Woche steht i
 
 ## Wo sehe ich, was ich vergessen habe?
 
-In den [Einträgen](#/tracking). Lücken zwischen zwei Einträgen werden dort als nicht erfasste Zeit angezeigt.
+In der [Zeiterfassung](#/tracking). Lücken zwischen zwei Einträgen werden dort als nicht erfasste Zeit angezeigt.

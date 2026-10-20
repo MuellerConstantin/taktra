@@ -2,7 +2,7 @@
   "Navigation": {
     "search": "Suchen…",
     "timer": "Timer",
-    "tracking": "Einträge",
+    "tracking": "Zeiterfassung",
     "projects": "Projekte",
     "clients": "Leistungsempfänger",
     "tags": "Tags",
@@ -682,7 +682,7 @@
       "title": "App-Kürzel",
       "description": "Funktionieren, solange ein Taktra-Fenster aktiv ist. Einzelne Tasten werden beim Tippen ignoriert.",
       "timer": "Zum Timer",
-      "entries": "Zu den Einträgen",
+      "entries": "Zur Zeiterfassung",
       "projects": "Zu den Projekten",
       "clients": "Zu den Leistungsempfängern",
       "tags": "Zu den Tags",

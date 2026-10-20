@@ -20,4 +20,4 @@ Usually a note. "Weekly sync" is an activity; this week's topic goes into the no
 
 ## Where do I see what I forgot?
 
-In the [entries](#/tracking). Gaps between two entries are shown there as untracked time.
+In [time tracking](#/tracking). Gaps between two entries are shown there as untracked time.

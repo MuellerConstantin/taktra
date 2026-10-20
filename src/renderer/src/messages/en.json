@@ -2,7 +2,7 @@
   "Navigation": {
     "search": "Search…",
     "timer": "Timer",
-    "tracking": "Entries",
+    "tracking": "Time tracking",
     "projects": "Projects",
     "clients": "Clients",
     "tags": "Tags",
@@ -648,7 +648,7 @@
       "title": "App shortcuts",
       "description": "Work while a Taktra window is focused. Single keys are ignored while typing.",
       "timer": "Go to timer",
-      "entries": "Go to entries",
+      "entries": "Go to time tracking",
       "projects": "Go to projects",
       "clients": "Go to clients",
       "tags": "Go to tags",
