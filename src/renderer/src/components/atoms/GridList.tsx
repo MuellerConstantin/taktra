@@ -69,7 +69,7 @@ export function GridListChevron(): React.JSX.Element {
   return (
     <RiArrowRightSLine
       aria-hidden
-      className="size-6 shrink-0 stroke-current stroke-1 text-primary"
+      className="size-6 shrink-0 stroke-current stroke-[0.5] text-primary"
     />
   )
 }
