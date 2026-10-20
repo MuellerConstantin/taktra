@@ -2,7 +2,7 @@ import {
   RiArchiveLine,
   RiFolderFill,
   RiInboxUnarchiveLine,
-  RiMoreLine,
+  RiMore2Line,
   RiPencilLine
 } from '@remixicon/react'
 import { useEffect, useState } from 'react'
@@ -98,7 +98,7 @@ function ProjectDetailView(): React.JSX.Element {
             </Button>
             <MenuTrigger placement="bottom end">
               <Button variant="icon" aria-label={t('more')}>
-                <RiMoreLine className="size-4" />
+                <RiMore2Line className="size-4" />
               </Button>
               <Menu onAction={toggleArchived}>
                 <MenuItem id="archive">

@@ -2,7 +2,7 @@ import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/d
 import {
   RiBuilding2Line,
   RiDeleteBinLine,
-  RiMoreLine,
+  RiMore2Line,
   RiPencilLine,
   RiPlayFill,
   RiStopFill,
@@ -222,7 +222,7 @@ function ActivityDetailView(): React.JSX.Element {
               </span>
               <MenuTrigger placement="bottom end">
                 <Button variant="icon" className="mt-2.5" aria-label={t('entryActions', { date })}>
-                  <RiMoreLine className="size-4" />
+                  <RiMore2Line className="size-4" />
                 </Button>
                 <Menu
                   disabledKeys={isEntryRunning ? ['edit'] : []}

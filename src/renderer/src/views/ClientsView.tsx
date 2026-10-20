@@ -3,7 +3,7 @@ import {
   RiArchiveLine,
   RiDeleteBinLine,
   RiInboxUnarchiveLine,
-  RiMoreLine,
+  RiMore2Line,
   RiPencilLine
 } from '@remixicon/react'
 import { useEffect, useRef, useState } from 'react'
@@ -128,7 +128,7 @@ function ClientsView(): React.JSX.Element {
                 </span>
                 <MenuTrigger placement="bottom end">
                   <Button variant="icon" aria-label={t('actions', { name: client.name })}>
-                    <RiMoreLine className="size-4" />
+                    <RiMore2Line className="size-4" />
                   </Button>
                   <Menu
                     onAction={(key) => {

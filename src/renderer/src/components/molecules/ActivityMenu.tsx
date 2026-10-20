@@ -3,7 +3,7 @@ import {
   RiFolderTransferLine,
   RiInboxUnarchiveLine,
   RiMergeCellsHorizontal,
-  RiMoreLine,
+  RiMore2Line,
   RiPencilLine
 } from '@remixicon/react'
 import { useState } from 'react'
@@ -36,7 +36,7 @@ export function ActivityMenu({
     <>
       <MenuTrigger placement="bottom end">
         <Button variant="icon" aria-label={t('label', { name: activity.name })}>
-          <RiMoreLine className="size-4" />
+          <RiMore2Line className="size-4" />
         </Button>
         <Menu
           onAction={(key) => {
