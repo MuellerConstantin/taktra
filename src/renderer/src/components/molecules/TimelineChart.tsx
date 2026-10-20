@@ -2,7 +2,7 @@ import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/d
 import { ResponsiveBar, type BarDatum } from '@nivo/bar'
 import { useLocale } from 'react-aria-components'
 import type { AggregateRow } from '../../../../shared/reports'
-import { chartTheme } from '../../lib/chartTheme'
+import { chartColor, chartTheme } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
 import type { DateRange } from '../../lib/period'
 import { bucketFor, bucketStart, bucketStarts, NEUTRAL_COLOR, type Bucket } from '../../lib/report'
@@ -47,7 +47,7 @@ export function TimelineChart({ rows, range }: TimelineChartProps): React.JSX.El
         data={[...data.values()]}
         keys={[...projects.keys()]}
         indexBy="bucket"
-        colors={({ id }) => projects.get(String(id))?.color ?? NEUTRAL_COLOR}
+        colors={({ id }) => chartColor(projects.get(String(id))?.color ?? NEUTRAL_COLOR)}
         margin={{ top: 8, right: 8, bottom: 28, left: 40 }}
         padding={0.3}
         borderRadius={2}

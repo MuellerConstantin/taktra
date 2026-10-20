@@ -21,3 +21,7 @@ export const chartTheme: React.ComponentProps<typeof ResponsiveBar>['theme'] = {
     container: { background: 'transparent', boxShadow: 'none', padding: 0 }
   }
 }
+
+export function chartColor(color: string): string {
+  return `oklch(from ${color} l calc(c * 0.8) h)`
+}

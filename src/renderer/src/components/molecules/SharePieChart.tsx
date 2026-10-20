@@ -1,5 +1,5 @@
 import { ResponsivePie } from '@nivo/pie'
-import { chartTheme } from '../../lib/chartTheme'
+import { chartColor, chartTheme } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
 import type { ShareItem } from '../../lib/report'
 import { ChartTooltip } from './ChartTooltip'
@@ -19,7 +19,7 @@ export function SharePieChart({ items, formatShare }: SharePieChartProps): React
           color,
           value: totalSec
         }))}
-        colors={({ data }) => data.color}
+        colors={({ data }) => chartColor(data.color)}
         margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
         innerRadius={0.62}
         padAngle={1}
@@ -30,7 +30,7 @@ export function SharePieChart({ items, formatShare }: SharePieChartProps): React
         theme={chartTheme}
         tooltip={({ datum }) => (
           <ChartTooltip
-            color={datum.color}
+            color={datum.data.color}
             title={String(datum.label)}
             detail={`${formatShare(datum.value)} · ${formatDuration(datum.value)}`}
           />

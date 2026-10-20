@@ -2,6 +2,7 @@ import { useLocale } from 'react-aria-components'
 import { twMerge } from 'tailwind-merge'
 import { useTranslations } from 'use-intl'
 import type { AggregateRow } from '../../../../shared/reports'
+import { chartColor } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
 import {
   clientShares,
@@ -31,7 +32,7 @@ function ShareCells({ item, formatShare, showColor = true }: ShareCellsProps): R
         <span
           aria-hidden
           className="size-2.5 shrink-0 rounded-full"
-          style={{ backgroundColor: item.color }}
+          style={{ backgroundColor: chartColor(item.color) }}
         />
       )}
       <span className="min-w-0 flex-1 truncate">{item.label}</span>

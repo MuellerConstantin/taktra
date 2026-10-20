@@ -1,7 +1,7 @@
 import { ResponsiveBar } from '@nivo/bar'
-import { chartTheme } from '../../lib/chartTheme'
+import { chartColor, chartTheme } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
-import type { ShareItem } from '../../lib/report'
+import { NEUTRAL_COLOR, type ShareItem } from '../../lib/report'
 import { ChartTooltip } from './ChartTooltip'
 
 const ROW_HEIGHT = 28
@@ -24,7 +24,9 @@ export function ShareBarChart({ items, formatShare }: ShareBarChartProps): React
         keys={['value']}
         indexBy="id"
         layout="horizontal"
-        colors={({ indexValue }) => byId.get(String(indexValue))?.color ?? ''}
+        colors={({ indexValue }) =>
+          chartColor(byId.get(String(indexValue))?.color ?? NEUTRAL_COLOR)
+        }
         margin={{ top: 8, right: 8, bottom: 8, left: 112 }}
         padding={0.35}
         borderRadius={2}
@@ -41,7 +43,7 @@ export function ShareBarChart({ items, formatShare }: ShareBarChartProps): React
           const item = byId.get(String(indexValue))
           return (
             <ChartTooltip
-              color={item?.color ?? ''}
+              color={item?.color ?? NEUTRAL_COLOR}
               title={item?.label ?? ''}
               detail={`${formatShare(value * 3600)} · ${formatDuration(value * 3600)}`}
             />
