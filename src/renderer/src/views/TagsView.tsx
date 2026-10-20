@@ -1,4 +1,4 @@
-import { RiAddLine, RiDeleteBinLine, RiPencilLine } from '@remixicon/react'
+import { RiAddLine, RiDeleteBinLine, RiMoreLine, RiPencilLine } from '@remixicon/react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
@@ -8,6 +8,7 @@ import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Badge } from '../components/atoms/Badge'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListChevron, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
 import { TagDialog } from '../components/molecules/TagDialog'
@@ -112,20 +113,25 @@ function TagsView(): React.JSX.Element {
                 <div className="flex min-w-0 flex-1">
                   <Badge color={tag.color}>{tag.name}</Badge>
                 </div>
-                <Button
-                  variant="icon"
-                  aria-label={t('edit', { name: tag.name })}
-                  onPress={() => setDialog({ tag })}
-                >
-                  <RiPencilLine className="size-4" />
-                </Button>
-                <Button
-                  variant="icon"
-                  aria-label={t('delete', { name: tag.name })}
-                  onPress={() => setTagToDelete(tag)}
-                >
-                  <RiDeleteBinLine className="size-4" />
-                </Button>
+                <MenuTrigger placement="bottom end">
+                  <Button variant="icon" aria-label={t('actions', { name: tag.name })}>
+                    <RiMoreLine className="size-4" />
+                  </Button>
+                  <Menu
+                    onAction={(key) =>
+                      key === 'delete' ? setTagToDelete(tag) : setDialog({ tag })
+                    }
+                  >
+                    <MenuItem id="edit">
+                      <RiPencilLine aria-hidden className="size-4" />
+                      {t('edit')}
+                    </MenuItem>
+                    <MenuItem id="delete">
+                      <RiDeleteBinLine aria-hidden className="size-4" />
+                      {t('delete')}
+                    </MenuItem>
+                  </Menu>
+                </MenuTrigger>
                 <GridListChevron />
               </GridListItem>
             )}
