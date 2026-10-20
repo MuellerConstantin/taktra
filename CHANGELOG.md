@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- In summed exports, a column can list the distinct values of the summed entries instead of
+  grouping by them, for example all tags of a project.
+- Project rows show the number of activities and the time booked on them.
+- Rows that open a detail view end with an arrow. The detail views of projects, activities and
+  tags show where they belong with a breadcrumb and an icon.
+
+### Changed
+
+- The columns of an export are put together right in the export view, starting from the standard
+  columns. Templates are optional: they save such a choice for reuse and are renamed or deleted in
+  the profile settings.
+- The Entries view is called Time tracking, so it is not mixed up with the entries of an activity.
+- The actions of projects, clients, tags, time entries and export templates moved into a menu per
+  row.
+- Clicking the logo opens the start page. The about dialog stays in the command palette and the
+  app settings.
+- Report charts use calmer colors.
+
+### Fixed
+
+- The export preview counts the rows of the file instead of the entries.
+
 ## [0.4.0] - 2026-10-19
 
 ### Added
