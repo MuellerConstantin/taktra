@@ -14,7 +14,6 @@ import {
 import { Button, Link, TooltipTrigger } from 'react-aria-components'
 import { useMatch } from 'react-router'
 import { useTranslations } from 'use-intl'
-import { useAbout } from '../../hooks/useAbout'
 import { useProfiles } from '../../hooks/useProfiles'
 import { api } from '../../lib/api'
 import { appShortcuts } from '../../lib/shortcuts'
@@ -77,20 +76,18 @@ interface SidebarProps {
 export function Sidebar({ onSearch }: SidebarProps): React.JSX.Element {
   const t = useTranslations('Navigation')
   const { activeProfile } = useProfiles()
-  const { showAbout } = useAbout()
   const hasProfile = activeProfile?.isAvailable ?? false
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
       <div className="px-3 py-3">
-        <Button
-          onPress={showAbout}
-          aria-label={t('about')}
+        <Link
+          href="/timer"
           className="flex w-full cursor-default items-center gap-2 rounded-md px-2 py-2 outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           <img src={logo} alt="" className="size-7 rounded-md" />
           <span className="text-lg font-semibold">Taktra</span>
-        </Button>
+        </Link>
       </div>
       <div className="flex flex-col gap-2 px-3 pb-4">
         <ProfileSwitcher />
