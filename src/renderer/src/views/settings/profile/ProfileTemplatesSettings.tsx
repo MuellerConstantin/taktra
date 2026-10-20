@@ -1,4 +1,4 @@
-import { RiDeleteBinLine, RiDownload2Line, RiPencilLine } from '@remixicon/react'
+import { RiArrowRightUpLine, RiDeleteBinLine, RiMore2Line, RiPencilLine } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-aria-components'
 import { useNavigate } from 'react-router'
@@ -6,6 +6,7 @@ import { useTranslations } from 'use-intl'
 import type { ExportTemplate } from '../../../../../shared/export'
 import { AlertDialog } from '../../../components/atoms/AlertDialog'
 import { Button } from '../../../components/atoms/Button'
+import { Menu, MenuItem, MenuTrigger } from '../../../components/atoms/Menu'
 import { Modal } from '../../../components/atoms/Modal'
 import { ExportTemplateDialog } from '../../../components/molecules/ExportTemplateDialog'
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
@@ -92,22 +93,27 @@ function ProfileTemplatesSettings(): React.JSX.Element {
                 aria-label={t('open', { name: template.name })}
                 onPress={() => navigate(`/export?template=${template.id}`)}
               >
-                <RiDownload2Line className="size-4" />
+                <RiArrowRightUpLine className="size-4" />
               </Button>
-              <Button
-                variant="icon"
-                aria-label={t('rename', { name: template.name })}
-                onPress={() => setTemplateToRename(template)}
-              >
-                <RiPencilLine className="size-4" />
-              </Button>
-              <Button
-                variant="icon"
-                aria-label={t('delete', { name: template.name })}
-                onPress={() => setTemplateToDelete(template)}
-              >
-                <RiDeleteBinLine className="size-4" />
-              </Button>
+              <MenuTrigger placement="bottom end">
+                <Button variant="icon" aria-label={t('actions', { name: template.name })}>
+                  <RiMore2Line className="size-4" />
+                </Button>
+                <Menu
+                  onAction={(key) =>
+                    key === 'delete' ? setTemplateToDelete(template) : setTemplateToRename(template)
+                  }
+                >
+                  <MenuItem id="rename">
+                    <RiPencilLine aria-hidden className="size-4" />
+                    {t('rename')}
+                  </MenuItem>
+                  <MenuItem id="delete">
+                    <RiDeleteBinLine aria-hidden className="size-4" />
+                    {t('delete')}
+                  </MenuItem>
+                </Menu>
+              </MenuTrigger>
             </li>
           ))}
         </ul>
