@@ -62,7 +62,10 @@ export function ReportBreakdown({
   const t = useTranslations('ReportBreakdown')
   const { locale } = useLocale()
   const percent = new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 0 })
-  const formatShare = (sec: number): string => percent.format(totalSec ? sec / totalSec : 0)
+  const formatShare = (sec: number): string => {
+    const share = totalSec ? sec / totalSec : 0
+    return share > 0 && share < 0.01 ? `<${percent.format(0.01)}` : percent.format(share)
+  }
 
   const items =
     breakdown === 'tag'
