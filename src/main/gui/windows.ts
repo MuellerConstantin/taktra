@@ -1,7 +1,7 @@
 import { BrowserWindow, shell, type BrowserWindowConstructorOptions } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import { appEvents, onChanged } from '../core/events'
+import { events } from '../core'
 
 let mainWindow: BrowserWindow | null = null
 let quitting = false
@@ -39,8 +39,8 @@ export function sendToMainWindow(channel: string): void {
 }
 
 export function initWindowEvents(): void {
-  for (const event of appEvents) {
-    onChanged(event, () => {
+  for (const event of events.names) {
+    events.onChanged(event, () => {
       for (const window of BrowserWindow.getAllWindows())
         window.webContents.send(`${event}:changed`)
     })

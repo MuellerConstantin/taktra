@@ -1,22 +1,16 @@
 import { z } from 'zod'
 import { id, note, timeEntryFilter, timeEntryInput } from '../../../shared/validation'
-import {
-  createTimeEntry,
-  deleteTimeEntry,
-  listTimeEntries,
-  setTimeEntryNote,
-  updateTimeEntry
-} from '../../core/domain/timeEntries'
+import { timeEntries } from '../../core'
 import { handle } from './handle'
 
-export function initTimeEntries(): void {
-  handle('timeEntries:list', z.tuple([timeEntryFilter]), (_, filter) => listTimeEntries(filter))
-  handle('timeEntries:create', z.tuple([timeEntryInput]), (_, input) => createTimeEntry(input))
+export function registerTimeEntriesHandlers(): void {
+  handle('timeEntries:list', z.tuple([timeEntryFilter]), (_, filter) => timeEntries.list(filter))
+  handle('timeEntries:create', z.tuple([timeEntryInput]), (_, input) => timeEntries.create(input))
   handle('timeEntries:update', z.tuple([id, timeEntryInput]), (_, entryId, input) =>
-    updateTimeEntry(entryId, input)
+    timeEntries.update(entryId, input)
   )
   handle('timeEntries:note', z.tuple([id, note]), (_, entryId, entryNote) =>
-    setTimeEntryNote(entryId, entryNote)
+    timeEntries.setNote(entryId, entryNote)
   )
-  handle('timeEntries:delete', z.tuple([id]), (_, entryId) => deleteTimeEntry(entryId))
+  handle('timeEntries:delete', z.tuple([id]), (_, entryId) => timeEntries.delete(entryId))
 }

@@ -1,9 +1,6 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
 import { z } from 'zod'
-import { getSettings } from '../core/app/settings'
-import { lazyStore } from '../core/app/store'
-import { hasRunningTimer } from '../core/domain/timer'
-import { onChanged } from '../core/events'
+import { events, lazyStore, settings, timer } from '../core'
 import { handle } from './ipc/handle'
 import { createRendererWindow, showMainWindow } from './windows'
 
@@ -96,7 +93,7 @@ function updateMiniTimer(): void {
   if (!mainWindow || mainWindow.isDestroyed()) return
 
   const isMainHidden = mainWindow.isMinimized() || !isMainVisible
-  const shouldShow = getSettings().miniTimer && isMainHidden && hasRunningTimer()
+  const shouldShow = settings.get().miniTimer && isMainHidden && timer.isRunning()
   if (!shouldShow) {
     miniWindow?.hide()
     return
@@ -119,7 +116,7 @@ export function attachMiniTimer(window: BrowserWindow): void {
 }
 
 export function initMiniTimer(): void {
-  onChanged('timer', updateMiniTimer)
+  events.onChanged('timer', updateMiniTimer)
   handle('app:showMainWindow', z.tuple([]), () => showMainWindow())
   handle('app:setMainVisible', z.tuple([z.boolean()]), (event, visible) => {
     if (event.sender !== mainWindow?.webContents) return

@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { grouping, timeFilter } from '../../../shared/validation'
-import { aggregate } from '../../core/domain/reports'
+import { reports } from '../../core'
 import { handle } from './handle'
 
-export function initReports(): void {
-  handle('reports:aggregate', z.tuple([timeFilter, grouping]), (_, filter, groupBy) =>
-    aggregate(filter, groupBy)
+export function registerReportsHandlers(): void {
+  handle('reports:reports.aggregate', z.tuple([timeFilter, grouping]), (_, filter, groupBy) =>
+    reports.aggregate(filter, groupBy)
   )
 }

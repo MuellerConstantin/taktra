@@ -4,8 +4,8 @@ import { app, BrowserWindow } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { z } from 'zod'
 import type { UpdateStatus } from '../../shared/updates'
+import { settings } from '../core'
 import { handle } from './ipc/handle'
-import { getSettings } from '../core/app/settings'
 import { prepareQuit } from './windows'
 
 const FIRST_CHECK_DELAY_MS = 10_000
@@ -78,7 +78,7 @@ export function initUpdates(): void {
 
   watchUpdater(isInstalled())
   const checkAutomatically = (): void => {
-    if (getSettings().autoUpdate) checkForUpdates()
+    if (settings.get().autoUpdate) checkForUpdates()
   }
   setTimeout(checkAutomatically, FIRST_CHECK_DELAY_MS)
   setInterval(checkAutomatically, CHECK_INTERVAL_MS)

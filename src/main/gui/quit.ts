@@ -1,9 +1,8 @@
 import { app, BrowserWindow, dialog, type MessageBoxOptions } from 'electron'
 import { z } from 'zod'
 import type { Language } from '../../shared/settings'
-import { getRunningTimer, hasRunningTimer, stopTimer } from '../core/domain/timer'
+import { settings, timer } from '../core'
 import { handle } from './ipc/handle'
-import { getSettings } from '../core/app/settings'
 
 const labels: Record<
   Language,
@@ -43,13 +42,13 @@ const enum Choice {
  * which also fires on OS shutdown, where a dialog would block the session from ending.
  */
 export async function requestQuit(window: BrowserWindow | null): Promise<void> {
-  const running = hasRunningTimer() ? getRunningTimer() : null
+  const running = timer.isRunning() ? timer.get() : null
   if (!running) {
     app.quit()
     return
   }
 
-  const text = labels[getSettings().language]
+  const text = labels[settings.get().language]
   const options: MessageBoxOptions = {
     type: 'question',
     message: text.message(running.activity.name),
@@ -64,7 +63,7 @@ export async function requestQuit(window: BrowserWindow | null): Promise<void> {
     : await dialog.showMessageBox(options)
 
   if (response === Choice.Cancel) return
-  if (response === Choice.Stop) stopTimer()
+  if (response === Choice.Stop) timer.stop()
   app.quit()
 }
 

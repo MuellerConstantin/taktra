@@ -1,29 +1,29 @@
-import { initActivities } from './activities'
-import { initClients } from './clients'
-import { initCustomFields } from './customFields'
-import { initDonation } from './donation'
-import { initExport } from './export'
-import { initExportTemplates } from './exportTemplates'
-import { initProfiles } from './profiles'
-import { initProjects } from './projects'
-import { initReports } from './reports'
-import { initSettings } from './settings'
-import { initTags } from './tags'
-import { initTimeEntries } from './timeEntries'
-import { initTimer } from './timer'
+import { registerActivitiesHandlers } from './activities'
+import { registerClientsHandlers } from './clients'
+import { registerCustomFieldsHandlers } from './customFields'
+import { registerDonationHandlers } from './donation'
+import { registerExportHandlers } from './export'
+import { registerExportTemplatesHandlers } from './exportTemplates'
+import { registerProfilesHandlers } from './profiles'
+import { registerProjectsHandlers } from './projects'
+import { registerReportsHandlers } from './reports'
+import { registerSettingsHandlers } from './settings'
+import { registerTagsHandlers } from './tags'
+import { registerTimeEntriesHandlers } from './timeEntries'
+import { registerTimerHandlers } from './timer'
 
-export function initIpc(): void {
-  initSettings()
-  initProfiles()
-  initClients()
-  initProjects()
-  initTags()
-  initActivities()
-  initCustomFields()
-  initTimeEntries()
-  initTimer()
-  initReports()
-  initExport()
-  initExportTemplates()
-  initDonation()
+export function registerIpcHandlers(): void {
+  registerSettingsHandlers()
+  registerProfilesHandlers()
+  registerClientsHandlers()
+  registerProjectsHandlers()
+  registerTagsHandlers()
+  registerActivitiesHandlers()
+  registerCustomFieldsHandlers()
+  registerTimeEntriesHandlers()
+  registerTimerHandlers()
+  registerReportsHandlers()
+  registerExportHandlers()
+  registerExportTemplatesHandlers()
+  registerDonationHandlers()
 }

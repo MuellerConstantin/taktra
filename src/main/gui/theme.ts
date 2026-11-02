@@ -1,12 +1,11 @@
 import { nativeTheme } from 'electron'
-import { getSettings } from '../core/app/settings'
-import { onChanged } from '../core/events'
+import { events, settings } from '../core'
 
 function applyTheme(): void {
-  nativeTheme.themeSource = getSettings().theme
+  nativeTheme.themeSource = settings.get().theme
 }
 
 export function initTheme(): void {
   applyTheme()
-  onChanged('settings', applyTheme)
+  events.onChanged('settings', applyTheme)
 }

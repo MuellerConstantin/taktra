@@ -1,7 +1,7 @@
 import { app } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { initAbout } from './about'
-import { initIpc } from './ipc'
+import { registerIpcHandlers } from './ipc'
 import { openMainWindow } from './mainWindow'
 import { initMiniTimer } from './miniTimer'
 import { initQuickStart } from './quickStart'
@@ -12,11 +12,11 @@ import { initTray } from './tray'
 import { initUpdates } from './updates'
 import { initWindowEvents, prepareQuit } from './windows'
 
-export function initGui(): void {
+export function startGui(): void {
   electronApp.setAppUserModelId('app.taktra')
   initWindowEvents()
   initTheme()
-  initIpc()
+  registerIpcHandlers()
   initMiniTimer()
   initQuit()
   initAbout()

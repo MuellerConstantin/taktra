@@ -6,8 +6,6 @@ export const appEvents = ['timer', 'profiles', 'settings', 'donation'] as const
 export type AppEvent = (typeof appEvents)[number]
 
 const emitter = new EventEmitter<Record<AppEvent, []>>()
-// Consumers may add a listener per connection, so many listeners are expected, not a leak.
-emitter.setMaxListeners(0)
 
 /** Returns a function that removes the listener again. */
 export function onChanged(event: AppEvent, listener: () => void): () => void {

@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { app, BrowserWindow, nativeTheme } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
-import { recordUsageDay } from '../core/app/donation'
+import { donation } from '../core'
 import { attachMiniTimer } from './miniTimer'
 import {
   createRendererWindow,
@@ -31,7 +31,7 @@ function createMainWindow(): void {
     mainWindow.show()
   })
 
-  mainWindow.on('focus', recordUsageDay)
+  mainWindow.on('focus', donation.recordUsageDay)
 
   mainWindow.on('close', (event) => {
     if (isQuitting()) return

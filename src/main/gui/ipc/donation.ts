@@ -1,9 +1,9 @@
 import { z } from 'zod'
-import { dismissHint, isHintDue, snoozeHint } from '../../core/app/donation'
+import { donation } from '../../core'
 import { handle } from './handle'
 
-export function initDonation(): void {
-  handle('donation:hint', z.tuple([]), () => isHintDue())
-  handle('donation:snooze', z.tuple([]), () => snoozeHint())
-  handle('donation:dismiss', z.tuple([]), () => dismissHint())
+export function registerDonationHandlers(): void {
+  handle('donation:hint', z.tuple([]), () => donation.isHintDue())
+  handle('donation:snooze', z.tuple([]), () => donation.snoozeHint())
+  handle('donation:dismiss', z.tuple([]), () => donation.dismissHint())
 }

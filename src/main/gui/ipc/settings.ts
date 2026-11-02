@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { settingsPatch } from '../../../shared/validation'
-import { getSettings, updateSettings } from '../../core/app/settings'
+import { settings } from '../../core'
 import { handle } from './handle'
 
-export function initSettings(): void {
-  handle('settings:get', z.tuple([]), () => getSettings())
-  handle('settings:update', z.tuple([settingsPatch]), (_, patch) => updateSettings(patch))
+export function registerSettingsHandlers(): void {
+  handle('settings:get', z.tuple([]), () => settings.get())
+  handle('settings:update', z.tuple([settingsPatch]), (_, patch) => settings.update(patch))
 }

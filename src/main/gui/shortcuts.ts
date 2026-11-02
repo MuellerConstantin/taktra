@@ -3,9 +3,8 @@ import { z } from 'zod'
 import { AppError } from '../../shared/errors'
 import { accelerator } from '../../shared/validation'
 import type { Settings, ShortcutStatus } from '../../shared/settings'
-import { onChanged } from '../core/events'
+import { events, settings } from '../core'
 import { handle } from './ipc/handle'
-import { getSettings, updateSettings } from '../core/app/settings'
 import { toggleQuickStart } from './quickStart'
 
 let registered: string | null = null
@@ -25,7 +24,7 @@ function unregister(): void {
 }
 
 function applyShortcut(): void {
-  const { quickStartShortcutEnabled, quickStartShortcut } = getSettings()
+  const { quickStartShortcutEnabled, quickStartShortcut } = settings.get()
   if (isSuspended || !quickStartShortcutEnabled) {
     unregister()
     return
@@ -37,24 +36,24 @@ function applyShortcut(): void {
 }
 
 function getStatus(): ShortcutStatus {
-  if (!getSettings().quickStartShortcutEnabled) return 'disabled'
+  if (!settings.get().quickStartShortcutEnabled) return 'disabled'
   return registered || isSuspended ? 'active' : 'unavailable'
 }
 
 function setQuickStartShortcut(accelerator: string): Settings {
-  if (accelerator === getSettings().quickStartShortcut) return getSettings()
+  if (accelerator === settings.get().quickStartShortcut) return settings.get()
 
-  if (getSettings().quickStartShortcutEnabled && !isSuspended) {
+  if (settings.get().quickStartShortcutEnabled && !isSuspended) {
     if (!register(accelerator)) throw new AppError('SHORTCUT_UNAVAILABLE', accelerator)
     unregister()
     registered = accelerator
   }
-  return updateSettings({ quickStartShortcut: accelerator })
+  return settings.update({ quickStartShortcut: accelerator })
 }
 
 export function initShortcuts(): void {
   applyShortcut()
-  onChanged('settings', applyShortcut)
+  events.onChanged('settings', applyShortcut)
   app.on('will-quit', () => globalShortcut.unregisterAll())
 
   handle('shortcuts:status', z.tuple([]), () => getStatus())

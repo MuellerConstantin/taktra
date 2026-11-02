@@ -6,7 +6,7 @@ import { AppError } from '../../../shared/errors'
 import type { ExportColumn, ExportFormat, ExportLayout } from '../../../shared/export'
 import type { TimeFilter } from '../../../shared/reports'
 import { exportColumns, exportFormat, exportLayout, timeFilter } from '../../../shared/validation'
-import { buildExportFile, previewExport } from '../../core/domain/export'
+import { dataExport } from '../../core'
 import { handle } from './handle'
 
 async function saveExportFile(
@@ -17,7 +17,7 @@ async function saveExportFile(
   layout?: ExportLayout
 ): Promise<string | null> {
   // Built before the dialog, so a column conflict is reported before a file is chosen.
-  const file = await buildExportFile(filter, format, columns, layout)
+  const file = await dataExport.buildFile(filter, format, columns, layout)
   const options = {
     defaultPath: join(app.getPath('downloads'), file.fileName),
     filters: [{ name: file.formatName, extensions: [format] }]
@@ -35,11 +35,11 @@ async function saveExportFile(
   return result.filePath
 }
 
-export function initExport(): void {
+export function registerExportHandlers(): void {
   handle(
     'export:preview',
     z.tuple([timeFilter, exportColumns, exportLayout.optional()]),
-    (_, filter, columns, layout) => previewExport(filter, columns, layout)
+    (_, filter, columns, layout) => dataExport.preview(filter, columns, layout)
   )
   handle(
     'export:file',

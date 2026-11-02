@@ -116,7 +116,7 @@ development.
 │   │   │   ├── domain/    # Rules and data of the active profile
 │   │   │   ├── app/       # State of the installation: profiles, settings, donation hint
 │   │   │   └── events.ts  # Changes that several consumers show
-│   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses core/, never core/db/
+│   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
 │   │       └── ipc/       # IPC handlers for the renderer, one file per area
 │   ├── preload/           # Typed `window.api` bridge
 │   ├── shared/            # Types used by main, preload and renderer
@@ -136,9 +136,10 @@ development.
 ```
 
 `src/main/index.ts` only takes the single instance lock and starts the core
-and the GUI through `initCore()` and `initGui()`. Each layer's `index.ts`
-starts what it needs; nothing else reaches into a layer to initialize it. `docs/screenshots/` holds the README screenshots; they show only
-the sample profile and are excluded from the packaged app.
+and the GUI through `startCore()`, `stopCore()` and `startGui()`. Each layer's
+`index.ts` starts what it needs; nothing else reaches into a layer to start
+it. `docs/screenshots/` holds the README screenshots; they show only the
+sample profile and are excluded from the packaged app.
 
 ## Design Decisions
 
@@ -229,8 +230,11 @@ the sample profile and are excluded from the packaged app.
 - **Core apart from its presentation**: `core/` holds the rules as plain
   functions and runs without Electron: it imports neither `electron` nor
   anything from `gui/`, and gets paths and the trash through the environment
-  passed to `initCore()`. `gui/` only validates, calls the core and shows the result, and never
-  touches `core/db/`. A further presentation such as an HTTP API sits next to
+  passed to `startCore()`. `core/index.ts` is its public interface, one
+  stateless service object per area (`projects.create()`, `timer.start()`):
+  `gui/` imports only from there, while modules inside the core import each other
+  directly and never through it. `gui/` only validates, calls the core and
+  shows the result. A further presentation such as an HTTP API sits next to
   `gui/` under the same rules, so it reuses the same functions. Lint rules
   enforce these boundaries.
 - **Validated IPC**: Every handler is registered through `handle()` with a Zod

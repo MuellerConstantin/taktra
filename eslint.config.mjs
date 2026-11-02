@@ -45,6 +45,10 @@ export default defineConfig(
             {
               regex: '(^|/)(gui|api)(/|$)',
               message: 'The core knows neither the GUI nor the API above it.'
+            },
+            {
+              regex: String.raw`^\.\.?(/\.\.)*/?(index)?$`,
+              message: 'Inside the core, import the module itself, not the core index.'
             }
           ]
         }
@@ -59,8 +63,8 @@ export default defineConfig(
         {
           patterns: [
             {
-              regex: '(^|/)core/db(/|$)',
-              message: 'The GUI uses the domain and app modules, never the database directly.'
+              regex: '(^|/)core/',
+              message: 'The GUI imports the core only through its index.'
             },
             { regex: '(^|/)api(/|$)', message: 'The GUI and the API do not know each other.' }
           ]

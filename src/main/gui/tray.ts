@@ -1,8 +1,7 @@
 import { Menu, nativeImage, Tray } from 'electron'
 import icon from '../../../resources/icon.png?asset'
 import type { Language } from '../../shared/settings'
-import { onChanged } from '../core/events'
-import { getSettings } from '../core/app/settings'
+import { events, settings } from '../core'
 import { showAbout } from './about'
 import { toggleQuickStart } from './quickStart'
 import { requestQuit } from './quit'
@@ -25,7 +24,7 @@ const labels: Record<
 let tray: Tray | null = null
 
 function buildMenu(openApp: () => void): Menu {
-  const text = labels[getSettings().language]
+  const text = labels[settings.get().language]
   return Menu.buildFromTemplate([
     { label: text.quickStart, click: toggleQuickStart },
     { label: text.open, click: openApp },
@@ -40,5 +39,5 @@ export function initTray(openApp: () => void): void {
   tray.setToolTip('Taktra')
   tray.setContextMenu(buildMenu(openApp))
   tray.on('click', toggleQuickStart)
-  onChanged('settings', () => tray?.setContextMenu(buildMenu(openApp)))
+  events.onChanged('settings', () => tray?.setContextMenu(buildMenu(openApp)))
 }
