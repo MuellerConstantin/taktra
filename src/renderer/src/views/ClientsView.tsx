@@ -9,7 +9,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { ListLayout, Virtualizer, useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Client } from '../../../shared/clients'
+import type { Client } from '../../../shared/model/clients'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'

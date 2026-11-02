@@ -1,6 +1,10 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import type { BuiltinExportColumn, ExportColumn, ExportLayout } from '../../../../src/shared/export'
-import type { TimeFilter } from '../../../../src/shared/reports'
+import type {
+  BuiltinExportColumn,
+  ExportColumn,
+  ExportLayout
+} from '../../../../src/shared/model/export'
+import type { TimeFilter } from '../../../../src/shared/model/reports'
 import { activateDatabase, closeActiveDatabase } from '../../../../src/main/core/db/database'
 import { createActivity, setActivityTags } from '../../../../src/main/core/domain/activities'
 import { createClient } from '../../../../src/main/core/domain/clients'

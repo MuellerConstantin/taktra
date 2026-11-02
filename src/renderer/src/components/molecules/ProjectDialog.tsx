@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivityWithTags } from '../../../../shared/activities'
-import type { Client } from '../../../../shared/clients'
-import type { Project } from '../../../../shared/projects'
+import type { ActivityWithTags } from '../../../../shared/model/activities'
+import type { Client } from '../../../../shared/model/clients'
+import type { Project } from '../../../../shared/model/projects'
 import { useCustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -15,7 +15,7 @@ import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { ClientSelect } from './ClientSelect'
 import { CustomFieldInputs } from './CustomFieldInputs'
-import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 interface ProjectDialogProps {
   /** The project to edit; without one, a new project is created. */

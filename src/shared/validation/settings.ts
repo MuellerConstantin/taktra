@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { languages, themeSources } from '../settings'
+import { languages, themeSources } from '../model/settings'
 
 export const settingsPatch = z
   .object({

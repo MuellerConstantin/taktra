@@ -119,8 +119,10 @@ development.
 │   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
 │   │       └── ipc/       # IPC handlers for the renderer, one file per area
 │   ├── preload/           # Typed `window.api` bridge
-│   ├── shared/            # Types used by main, preload and renderer
-│   │   └── validation/    # Zod schemas per domain, text length limits
+│   ├── shared/            # Used by main, preload and renderer
+│   │   ├── model/         # Domain types, constants, pure rules, error codes, text length limits
+│   │   ├── validation/    # Zod schemas per domain: the input contract of the core
+│   │   └── gui/           # Contract between main and renderer only (IPC response, updates, about)
 │   └── renderer/src/      # React UI
 │       ├── views/         # One component per route
 │       ├── components/    # Atomic Design: atoms, molecules, organisms, templates
@@ -195,7 +197,7 @@ sample profile and are excluded from the packaged app.
   activities, never to entries, and is a single value, unlike tags.
 - **Text length limits on three levels**: Inputs set `maxLength`, the Zod
   schemas reject longer values, and check constraints in the database are the
-  last line of defence. The limits are defined once in `shared/validation/`.
+  last line of defence. The limits are defined once in `shared/model/limits.ts`.
 - **Exports are a stable file format**: Exports contain a cleaned view (names
   instead of ids, local clock times, durations in whole minutes or in hours
   rounded to hundredths), never the tables, so the schema stays free to change,
@@ -240,11 +242,11 @@ sample profile and are excluded from the packaged app.
 - **Validated IPC**: Every handler is registered through `handle()` with a Zod
   schema for its arguments, never with `ipcMain.handle` directly. The schemas
   also normalize input (trim text, empty optional text to `null`). Rules that
-  need the database stay in the main process. The renderer imports only types
-  and the limits from `shared/`, never the schemas, so Zod stays out of its
-  bundle.
+  need the database stay in the main process. The renderer imports `shared/model/`
+  and `shared/gui/`, never `shared/validation/`, so Zod stays out of its
+  bundle; the core never imports `shared/gui/`.
 - **Uniform errors with codes**: Errors the user may see are thrown as
-  `AppError` with a code from `shared/errors.ts` and translated in the renderer
+  `AppError` with a code from `shared/model/errors.ts` and translated in the renderer
   under `Errors.<CODE>`. Unexpected errors are logged and reach the UI as
   `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog) are
   returned as values.

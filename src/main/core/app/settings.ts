@@ -1,10 +1,10 @@
-import { AppError } from '../../../shared/errors'
+import { AppError } from '../../../shared/model/errors'
 import {
   DEFAULT_QUICK_START_SHORTCUT,
   languages,
   themeSources,
   type Settings
-} from '../../../shared/settings'
+} from '../../../shared/model/settings'
 import { notifyChanged } from '../events'
 import { lazyStore } from './store'
 

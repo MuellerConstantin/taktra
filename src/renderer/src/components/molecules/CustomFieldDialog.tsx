@@ -5,8 +5,8 @@ import type {
   CustomField,
   CustomFieldScope,
   CustomFieldType
-} from '../../../../shared/customFields'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+} from '../../../../shared/model/customFields'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'

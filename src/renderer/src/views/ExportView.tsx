@@ -19,11 +19,11 @@ import {
   type ExportLayout,
   type ExportPreview,
   type ExportTemplate
-} from '../../../shared/export'
-import type { Client } from '../../../shared/clients'
-import type { CustomField } from '../../../shared/customFields'
-import type { Project } from '../../../shared/projects'
-import type { Tag } from '../../../shared/tags'
+} from '../../../shared/model/export'
+import type { Client } from '../../../shared/model/clients'
+import type { CustomField } from '../../../shared/model/customFields'
+import type { Project } from '../../../shared/model/projects'
+import type { Tag } from '../../../shared/model/tags'
 import { Button } from '../components/atoms/Button'
 import { Select, SelectItem } from '../components/atoms/Select'
 import { ToggleButton } from '../components/atoms/ToggleButton'

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Client } from '../../../../shared/clients'
+import type { Client } from '../../../../shared/model/clients'
 import { useCustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -10,7 +10,7 @@ import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
 import { CustomFieldInputs } from './CustomFieldInputs'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 interface ClientDialogProps {
   readonly client?: Client

@@ -4,8 +4,6 @@ export type ThemeSource = (typeof themeSources)[number]
 
 export const DEFAULT_QUICK_START_SHORTCUT = 'CommandOrControl+Alt+T'
 
-export type ShortcutStatus = 'active' | 'disabled' | 'unavailable'
-
 export const languages = ['en', 'de'] as const
 
 export type Language = (typeof languages)[number]

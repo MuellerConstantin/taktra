@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivityDetails, TimeEntry } from '../../../shared/timeEntries'
+import type { ActivityDetails, TimeEntry } from '../../../shared/model/timeEntries'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'

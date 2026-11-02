@@ -1,8 +1,8 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { customFieldOptions } from '../main/core/db/schema/customFieldOptions'
-import type { customFields } from '../main/core/db/schema/customFields'
-import type { customFieldInput, fieldValueInput } from './validation/customFields'
+import type { customFieldOptions } from '../../main/core/db/schema/customFieldOptions'
+import type { customFields } from '../../main/core/db/schema/customFields'
+import type { customFieldInput, fieldValueInput } from '../validation/customFields'
 
 export const customFieldScopes = ['project', 'client', 'activity'] as const
 

@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { customFieldScopes, customFieldTypes } from '../../../../shared/customFields'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { customFieldScopes, customFieldTypes } from '../../../../shared/model/customFields'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 function oneOf(values: readonly string[]): string {
   return values.map((value) => `'${value}'`).join(', ')

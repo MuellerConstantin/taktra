@@ -2,7 +2,7 @@ import { arch, release, type } from 'node:os'
 import { app, shell } from 'electron'
 import { z } from 'zod'
 import { author } from '../../../package.json'
-import type { AppInfo } from '../../shared/about'
+import type { AppInfo } from '../../shared/gui/about'
 import { handle } from './ipc/handle'
 import { sendToMainWindow, showMainWindow } from './windows'
 

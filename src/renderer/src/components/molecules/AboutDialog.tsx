@@ -18,8 +18,8 @@ import {
   RELEASES_URL,
   REPOSITORY_URL,
   type AppInfo
-} from '../../../../shared/about'
-import type { UpdateStatus } from '../../../../shared/updates'
+} from '../../../../shared/gui/about'
+import type { UpdateStatus } from '../../../../shared/gui/updates'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useUpdates } from '../../hooks/useUpdates'
 import { api } from '../../lib/api'

@@ -1,7 +1,7 @@
 import { useLocale } from 'react-aria-components'
 import { twMerge } from 'tailwind-merge'
 import { useTranslations } from 'use-intl'
-import type { AggregateRow } from '../../../../shared/reports'
+import type { AggregateRow } from '../../../../shared/model/reports'
 import { chartColor } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
 import {

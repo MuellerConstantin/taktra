@@ -14,8 +14,8 @@ import {
   type CustomField,
   type CustomFieldScope,
   type CustomFieldWithOptions
-} from '../../../../../shared/customFields'
-import { MAX_ACTIVE_CUSTOM_FIELDS } from '../../../../../shared/validation/limits'
+} from '../../../../../shared/model/customFields'
+import { MAX_ACTIVE_CUSTOM_FIELDS } from '../../../../../shared/model/limits'
 import { AlertDialog } from '../../../components/atoms/AlertDialog'
 import { Button } from '../../../components/atoms/Button'
 import { Modal } from '../../../components/atoms/Modal'

@@ -7,7 +7,7 @@ import {
 } from '@internationalized/date'
 import { TooltipTrigger, useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { TimeEntryDetails } from '../../../../shared/timeEntries'
+import type { TimeEntryDetails } from '../../../../shared/model/timeEntries'
 import { Button } from '../atoms/Button'
 import { Tooltip } from '../atoms/Tooltip'
 import { elapsedSeconds, formatDuration } from '../../lib/duration'

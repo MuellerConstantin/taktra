@@ -7,15 +7,11 @@ import type {
   CustomFieldWithOptions,
   FieldValue,
   FieldValueData
-} from '../../../shared/customFields'
-import { AppError } from '../../../shared/errors'
-import { toNameKey } from '../../../shared/names'
-import {
-  customFieldInput,
-  customFieldListOptions,
-  MAX_ACTIVE_CUSTOM_FIELDS,
-  MAX_ACTIVE_FIELD_OPTIONS
-} from '../../../shared/validation'
+} from '../../../shared/model/customFields'
+import { AppError } from '../../../shared/model/errors'
+import { toNameKey } from '../../../shared/model/names'
+import { MAX_ACTIVE_CUSTOM_FIELDS, MAX_ACTIVE_FIELD_OPTIONS } from '../../../shared/model/limits'
+import { customFieldInput, customFieldListOptions } from '../../../shared/validation'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import {

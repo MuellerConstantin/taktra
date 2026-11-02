@@ -1,5 +1,5 @@
 import { and, count, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm'
-import type { AggregateRow, Grouping, TimeFilter } from '../../../shared/reports'
+import type { AggregateRow, Grouping, TimeFilter } from '../../../shared/model/reports'
 import { getActiveDatabase } from '../db/database'
 import { activities, activityTags, clients, projects, tags, timeEntries } from '../db/schema'
 import { tagsByActivity } from './activities'

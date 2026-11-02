@@ -1,6 +1,6 @@
 import { Menu, nativeImage, Tray } from 'electron'
 import icon from '../../../resources/icon.png?asset'
-import type { Language } from '../../shared/settings'
+import type { Language } from '../../shared/model/settings'
 import { events, settings } from '../core'
 import { showAbout } from './about'
 import { toggleQuickStart } from './quickStart'

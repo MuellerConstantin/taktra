@@ -1,8 +1,8 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
 import type { CustomFieldType } from './customFields'
-import type { exportTemplates } from '../main/core/db/schema/exportTemplates'
-import type { exportTemplateInput } from './validation/export'
+import type { exportTemplates } from '../../main/core/db/schema/exportTemplates'
+import type { exportTemplateInput } from '../validation/export'
 
 /** Column names are part of the file format other systems import, so they never change. */
 export const builtinExportColumns = [

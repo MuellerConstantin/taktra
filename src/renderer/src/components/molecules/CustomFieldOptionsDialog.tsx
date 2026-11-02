@@ -10,8 +10,11 @@ import {
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { CustomFieldOption, CustomFieldWithOptions } from '../../../../shared/customFields'
-import { MAX_ACTIVE_FIELD_OPTIONS, MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import type {
+  CustomFieldOption,
+  CustomFieldWithOptions
+} from '../../../../shared/model/customFields'
+import { MAX_ACTIVE_FIELD_OPTIONS, MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { Button } from '../atoms/Button'

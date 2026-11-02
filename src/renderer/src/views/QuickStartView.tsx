@@ -10,7 +10,7 @@ import {
 } from 'react-aria-components'
 import { tv } from 'tailwind-variants'
 import { useTranslations } from 'use-intl'
-import type { ActivityDetails } from '../../../shared/timeEntries'
+import type { ActivityDetails } from '../../../shared/model/timeEntries'
 import { Button } from '../components/atoms/Button'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'

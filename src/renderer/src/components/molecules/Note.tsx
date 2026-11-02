@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import Markdown, { type Components } from 'react-markdown'
 import { twMerge } from 'tailwind-merge'
 import { useTranslations } from 'use-intl'
-import { noteElements, noteLinkProtocols, noteRemarkPlugins } from '../../../../shared/notes'
+import { noteElements, noteLinkProtocols, noteRemarkPlugins } from '../../lib/notes'
 import { Button } from '../atoms/Button'
 
 function isAllowedLink(href: string | undefined): boolean {

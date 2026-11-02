@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { emptyToNull, id, localDate } from './common'
-import { MAX_NOTE_LENGTH } from './limits'
+import { MAX_NOTE_LENGTH } from '../model/limits'
 
 const MAX_DURATION_SEC = 24 * 3600
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { TimeEntryDetails } from '../../../shared/timeEntries'
+import type { TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { useProfiles } from '../hooks/useProfiles'
 import { api, events } from '../lib/api'
 import { TimerContext } from './TimerContext'

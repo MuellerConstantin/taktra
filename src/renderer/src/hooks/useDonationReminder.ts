@@ -1,7 +1,7 @@
 import { RiHeartLine } from '@remixicon/react'
 import { useCallback, useEffect, useRef } from 'react'
 import { useTranslations } from 'use-intl'
-import { DONATION_URL } from '../../../shared/about'
+import { DONATION_URL } from '../../../shared/gui/about'
 import { api, events } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
 import { toastQueue } from '../lib/toasts'

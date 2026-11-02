@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useTranslations } from 'use-intl'
-import type { ProfileSummary } from '../../../../shared/profiles'
+import type { ProfileSummary } from '../../../../shared/model/profiles'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { useProfiles } from '../../hooks/useProfiles'
 import { AlertDialog } from '../atoms/AlertDialog'

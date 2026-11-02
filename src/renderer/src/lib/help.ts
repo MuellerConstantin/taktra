@@ -1,4 +1,4 @@
-import type { Language } from '../../../shared/settings'
+import type { Language } from '../../../shared/model/settings'
 import activitiesDe from '../help/de/activities.md?raw'
 import activitiesEn from '../help/en/activities.md?raw'
 import basicsDe from '../help/de/basics.md?raw'

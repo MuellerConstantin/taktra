@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Activity, ActivityInput, ActivityWithTags } from '../shared/activities'
-import type { Client, ClientInput } from '../shared/clients'
+import type { Activity, ActivityInput, ActivityWithTags } from '../shared/model/activities'
+import type { Client, ClientInput } from '../shared/model/clients'
 import type {
   CustomField,
   CustomFieldInput,
@@ -9,11 +9,11 @@ import type {
   CustomFieldWithOptions,
   FieldValue,
   FieldValueInput
-} from '../shared/customFields'
-import type { IpcResponse } from '../shared/errors'
-import type { ProfilesState } from '../shared/profiles'
-import type { Project, ProjectInput } from '../shared/projects'
-import type { AppInfo } from '../shared/about'
+} from '../shared/model/customFields'
+import type { IpcResponse } from '../shared/gui/ipc'
+import type { ProfilesState } from '../shared/model/profiles'
+import type { Project, ProjectInput } from '../shared/model/projects'
+import type { AppInfo } from '../shared/gui/about'
 import type {
   ExportColumn,
   ExportFormat,
@@ -21,18 +21,19 @@ import type {
   ExportPreview,
   ExportTemplate,
   ExportTemplateInput
-} from '../shared/export'
-import type { UpdateStatus } from '../shared/updates'
-import type { AggregateRow, Grouping, TimeFilter } from '../shared/reports'
-import type { Settings, ShortcutStatus } from '../shared/settings'
-import type { Tag, TagInput } from '../shared/tags'
+} from '../shared/model/export'
+import type { UpdateStatus } from '../shared/gui/updates'
+import type { AggregateRow, Grouping, TimeFilter } from '../shared/model/reports'
+import type { ShortcutStatus } from '../shared/gui/shortcuts'
+import type { Settings } from '../shared/model/settings'
+import type { Tag, TagInput } from '../shared/model/tags'
 import type {
   ActivityDetails,
   TimeEntry,
   TimeEntryDetails,
   TimeEntryInput,
   TimeEntryFilter
-} from '../shared/timeEntries'
+} from '../shared/model/timeEntries'
 
 function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
   return ipcRenderer.invoke(channel, ...args)

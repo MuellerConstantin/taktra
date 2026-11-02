@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ProfileSummary } from '../../../../../shared/profiles'
+import type { ProfileSummary } from '../../../../../shared/model/profiles'
 import { Button } from '../../../components/atoms/Button'
 import { TextField } from '../../../components/atoms/TextField'
 import { DeleteProfileSection } from '../../../components/molecules/DeleteProfileSection'
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
-import { MAX_NAME_LENGTH } from '../../../../../shared/validation/limits'
+import { MAX_NAME_LENGTH } from '../../../../../shared/model/limits'
 
 interface ProfileNameFormProps {
   readonly profile: ProfileSummary

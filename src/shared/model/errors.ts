@@ -56,7 +56,3 @@ export class AppError extends Error {
 export function isAppError(error: unknown, ...codes: readonly ErrorCode[]): error is AppError {
   return error instanceof AppError && (codes.length === 0 || codes.includes(error.code))
 }
-
-export type IpcResponse<T> =
-  | { readonly ok: true; readonly value: T }
-  | { readonly ok: false; readonly error: { readonly code: ErrorCode } }

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type { ExportFormat, ExportTable } from '../../../../src/shared/export'
-import type { Grouping, TimeFilter } from '../../../../src/shared/reports'
+import type { ExportFormat, ExportTable } from '../../../../src/shared/model/export'
+import type { Grouping, TimeFilter } from '../../../../src/shared/model/reports'
 import { getActivityDetails, listActivities } from '../../../../src/main/core/domain/activities'
 import { listClients } from '../../../../src/main/core/domain/clients'
 import { previewExport, toCsv, toJson, toXlsx } from '../../../../src/main/core/domain/export'

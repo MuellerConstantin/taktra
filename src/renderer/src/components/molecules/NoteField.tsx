@@ -1,7 +1,7 @@
 import { RiEyeLine } from '@remixicon/react'
 import { useId, useState } from 'react'
 import { useTranslations } from 'use-intl'
-import { MAX_NOTE_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_NOTE_LENGTH } from '../../../../shared/model/limits'
 import { TextField } from '../atoms/TextField'
 import { ToggleButton } from '../atoms/ToggleButton'
 import { Note } from './Note'

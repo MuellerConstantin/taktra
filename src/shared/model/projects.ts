@@ -1,7 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { projects } from '../main/core/db/schema/projects'
-import type { projectInput } from './validation/projects'
+import type { projects } from '../../main/core/db/schema/projects'
+import type { projectInput } from '../validation/projects'
 
 export type Project = InferSelectModel<typeof projects>
 

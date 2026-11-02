@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import { BrowserWindow, dialog } from 'electron'
 import { z } from 'zod'
-import { profileFileExtension, type ProfilesState } from '../../../shared/profiles'
+import { profileFileExtension, type ProfilesState } from '../../../shared/model/profiles'
 import { filePath, name } from '../../../shared/validation'
 import { profiles } from '../../core'
 import { handle } from './handle'

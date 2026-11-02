@@ -1,7 +1,7 @@
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
 import { ResponsiveBar, type BarDatum } from '@nivo/bar'
 import { useLocale } from 'react-aria-components'
-import type { AggregateRow } from '../../../../shared/reports'
+import type { AggregateRow } from '../../../../shared/model/reports'
 import { chartColor, chartTheme } from '../../lib/chartTheme'
 import { formatDuration } from '../../lib/duration'
 import type { DateRange } from '../../lib/period'

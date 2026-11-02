@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { UpdateStatus } from '../../../shared/updates'
+import type { UpdateStatus } from '../../../shared/gui/updates'
 
 export interface UpdatesContextValue {
   readonly status: UpdateStatus

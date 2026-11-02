@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { Settings } from '../../../shared/settings'
+import type { Settings } from '../../../shared/model/settings'
 
 export interface SettingsContextValue {
   readonly settings: Settings

@@ -1,7 +1,7 @@
 import { RiAddLine, RiCloseLine, RiDraggable } from '@remixicon/react'
 import { useDragAndDrop } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import { customFieldScopes, type CustomField } from '../../../../shared/customFields'
+import { customFieldScopes, type CustomField } from '../../../../shared/model/customFields'
 import {
   allowedAggregations,
   builtinExportColumns,
@@ -12,9 +12,9 @@ import {
   type ExportColumn,
   type ExportColumnKind,
   type ExportLayout
-} from '../../../../shared/export'
-import { toNameKey } from '../../../../shared/names'
-import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+} from '../../../../shared/model/export'
+import { toNameKey } from '../../../../shared/model/names'
+import { MAX_EXPORT_COLUMNS, MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 import { Button } from '../atoms/Button'
 import { GridList, GridListDropIndicator, GridListItem } from '../atoms/GridList'
 import { Menu, MenuItem, MenuSection, MenuTrigger } from '../atoms/Menu'

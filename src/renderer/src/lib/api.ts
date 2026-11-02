@@ -1,4 +1,5 @@
-import { AppError, type IpcResponse } from '../../../shared/errors'
+import type { IpcResponse } from '../../../shared/gui/ipc'
+import { AppError } from '../../../shared/model/errors'
 
 type Unwrapped<T> = {
   readonly [K in keyof T]: T[K] extends (...args: infer Args) => Promise<IpcResponse<infer Result>>

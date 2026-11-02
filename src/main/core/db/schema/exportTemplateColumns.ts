@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm'
 import { check, index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { builtinExportColumns, exportAggregations } from '../../../../shared/export'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { builtinExportColumns, exportAggregations } from '../../../../shared/model/export'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 import { customFields } from './customFields'
 import { exportTemplates } from './exportTemplates'
 

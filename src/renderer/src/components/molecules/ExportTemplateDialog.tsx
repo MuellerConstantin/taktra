@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'

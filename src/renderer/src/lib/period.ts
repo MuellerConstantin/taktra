@@ -8,7 +8,7 @@ import {
   startOfYear,
   type CalendarDate
 } from '@internationalized/date'
-import type { TimeFilter } from '../../../shared/reports'
+import type { TimeFilter } from '../../../shared/model/reports'
 
 export const periodPresets = [
   'all',

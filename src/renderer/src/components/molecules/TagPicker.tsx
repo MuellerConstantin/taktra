@@ -1,5 +1,5 @@
 import { useTranslations } from 'use-intl'
-import type { Tag } from '../../../../shared/tags'
+import type { Tag } from '../../../../shared/model/tags'
 import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
 import { Tag as TagItem, TagGroup } from '../atoms/TagGroup'
 

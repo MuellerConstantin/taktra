@@ -1,6 +1,6 @@
 import { RiDownload2Line, RiRestartLine } from '@remixicon/react'
 import { useTranslations } from 'use-intl'
-import { RELEASES_URL } from '../../../../shared/about'
+import { RELEASES_URL } from '../../../../shared/gui/about'
 import { useUpdates } from '../../hooks/useUpdates'
 import { Button } from '../atoms/Button'
 

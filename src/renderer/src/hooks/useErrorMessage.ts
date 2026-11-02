@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useTranslations } from 'use-intl'
-import { AppError } from '../../../shared/errors'
+import { AppError } from '../../../shared/model/errors'
 
 export function useErrorMessage(): (error: unknown) => string {
   const t = useTranslations('Errors')

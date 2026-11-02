@@ -1,5 +1,5 @@
 import { useTranslations } from 'use-intl'
-import { MAX_FIELD_VALUE_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_FIELD_VALUE_LENGTH } from '../../../../shared/model/limits'
 import type { CustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { Select, SelectItem } from '../atoms/Select'
 import { TextField } from '../atoms/TextField'

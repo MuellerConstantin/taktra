@@ -1,5 +1,5 @@
-import type { ActivityWithTags } from '../../../shared/activities'
-import { isSimilarName, toNameKey } from '../../../shared/names'
+import type { ActivityWithTags } from '../../../shared/model/activities'
+import { isSimilarName, toNameKey } from '../../../shared/model/names'
 
 const SIMILAR_LIMIT = 5
 

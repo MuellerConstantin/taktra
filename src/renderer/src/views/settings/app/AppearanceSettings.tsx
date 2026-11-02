@@ -7,7 +7,7 @@ import {
   themeSources,
   type Language,
   type ThemeSource
-} from '../../../../../shared/settings'
+} from '../../../../../shared/model/settings'
 
 function AppearanceSettings(): React.JSX.Element {
   const t = useTranslations('AppearanceSettings')

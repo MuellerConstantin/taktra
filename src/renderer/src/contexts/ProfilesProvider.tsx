@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ProfilesState } from '../../../shared/profiles'
+import type { ProfilesState } from '../../../shared/model/profiles'
 import { api, events } from '../lib/api'
 import { ProfilesContext } from './ProfilesContext'
 

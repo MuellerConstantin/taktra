@@ -1,4 +1,4 @@
-import type { Language } from '../../../shared/settings'
+import type { Language } from '../../../shared/model/settings'
 import { getSettings } from '../app/settings'
 
 const collators = new Map<Language, Intl.Collator>()

@@ -1,6 +1,6 @@
 import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
-import { AppError, isAppError } from '../../../shared/errors'
-import type { ActivityDetails, TimeEntryDetails } from '../../../shared/timeEntries'
+import { AppError, isAppError } from '../../../shared/model/errors'
+import type { ActivityDetails, TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
 import { notifyChanged } from '../events'

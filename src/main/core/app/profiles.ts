@@ -5,8 +5,8 @@ import {
   profileFileExtension,
   type ProfilesState,
   type UnavailableReason
-} from '../../../shared/profiles'
-import { AppError, isAppError } from '../../../shared/errors'
+} from '../../../shared/model/profiles'
+import { AppError, isAppError } from '../../../shared/model/errors'
 import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from '../constants'
 import {
   activateDatabase,

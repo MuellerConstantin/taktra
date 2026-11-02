@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { sql } from 'drizzle-orm'
 import { check, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
-import { exportFormats, exportLayouts } from '../../../../shared/export'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { exportFormats, exportLayouts } from '../../../../shared/model/export'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 export const exportTemplates = sqliteTable(
   'export_templates',

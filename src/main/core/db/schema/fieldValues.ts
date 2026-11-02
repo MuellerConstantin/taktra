@@ -8,7 +8,7 @@ import {
   type IndexBuilder,
   type SQLiteColumn
 } from 'drizzle-orm/sqlite-core'
-import { MAX_FIELD_VALUE_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_FIELD_VALUE_LENGTH } from '../../../../shared/model/limits'
 import { customFieldOptions } from './customFieldOptions'
 import { customFields } from './customFields'
 

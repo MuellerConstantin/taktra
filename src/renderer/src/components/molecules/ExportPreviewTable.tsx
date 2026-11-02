@@ -1,5 +1,5 @@
 import { useTranslations } from 'use-intl'
-import type { ExportFormat, ExportPreview, ExportValue } from '../../../../shared/export'
+import type { ExportFormat, ExportPreview, ExportValue } from '../../../../shared/model/export'
 import { formatDuration } from '../../lib/duration'
 
 function formatCell(value: ExportValue): string {

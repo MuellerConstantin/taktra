@@ -8,7 +8,7 @@ import {
 } from '@remixicon/react'
 import { useState } from 'react'
 import { useTranslations } from 'use-intl'
-import type { ActivityRef } from '../../../../shared/activities'
+import type { ActivityRef } from '../../../../shared/model/activities'
 import { Button } from '../atoms/Button'
 import { Menu, MenuItem, MenuTrigger } from '../atoms/Menu'
 import { ActivityDialog } from './ActivityDialog'

@@ -4,7 +4,7 @@ import type {
   CustomFieldWithOptions,
   FieldValue,
   FieldValueInput
-} from '../../../shared/customFields'
+} from '../../../shared/model/customFields'
 import { api } from '../lib/api'
 import { useErrorMessage } from './useErrorMessage'
 

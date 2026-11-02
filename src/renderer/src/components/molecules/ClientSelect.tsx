@@ -1,5 +1,5 @@
 import { useTranslations } from 'use-intl'
-import type { Client } from '../../../../shared/clients'
+import type { Client } from '../../../../shared/model/clients'
 import { Select, SelectItem } from '../atoms/Select'
 
 const NONE = 'none'

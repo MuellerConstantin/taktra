@@ -1,5 +1,5 @@
 import { parseDate, startOfMonth, startOfWeek, type CalendarDate } from '@internationalized/date'
-import type { AggregateRow } from '../../../shared/reports'
+import type { AggregateRow } from '../../../shared/model/reports'
 import { COLORS } from './colors'
 import type { DateRange } from './period'
 

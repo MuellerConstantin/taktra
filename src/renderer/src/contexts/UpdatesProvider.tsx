@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { UpdateStatus } from '../../../shared/updates'
+import type { UpdateStatus } from '../../../shared/gui/updates'
 import { api, events } from '../lib/api'
 import { UpdatesContext } from './UpdatesContext'
 

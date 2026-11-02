@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { groupings } from '../reports'
+import { groupings } from '../model/reports'
 import { id, localDate } from './common'
 
 export const timeFilter = z.object({

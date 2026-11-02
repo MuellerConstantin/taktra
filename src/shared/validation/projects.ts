@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { color, emptyToNull, id, name } from './common'
-import { MAX_DESCRIPTION_LENGTH } from './limits'
+import { MAX_DESCRIPTION_LENGTH } from '../model/limits'
 
 const description = z.string().trim().max(MAX_DESCRIPTION_LENGTH).transform(emptyToNull).nullable()
 

@@ -3,7 +3,7 @@ import type {
   CustomFieldScope,
   CustomFieldWithOptions,
   FieldValue
-} from '../../../../shared/customFields'
+} from '../../../../shared/model/customFields'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 

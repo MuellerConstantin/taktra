@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, type MessageBoxOptions } from 'electron'
 import { z } from 'zod'
-import type { Language } from '../../shared/settings'
+import type { Language } from '../../shared/model/settings'
 import { settings, timer } from '../core'
 import { handle } from './ipc/handle'
 

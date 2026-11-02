@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { normalizeName } from '../names'
-import { MAX_NAME_LENGTH } from './limits'
+import { normalizeName } from '../model/names'
+import { MAX_NAME_LENGTH } from '../model/limits'
 
 export const emptyToNull = (value: string): string | null => value || null
 

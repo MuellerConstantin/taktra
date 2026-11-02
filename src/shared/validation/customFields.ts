@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { customFieldScopes, customFieldTypes } from '../customFields'
+import { customFieldScopes, customFieldTypes } from '../model/customFields'
 import { emptyToNull, id, name } from './common'
-import { MAX_FIELD_VALUE_LENGTH } from './limits'
+import { MAX_FIELD_VALUE_LENGTH } from '../model/limits'
 
 export const customFieldScope = z.enum(customFieldScopes)
 

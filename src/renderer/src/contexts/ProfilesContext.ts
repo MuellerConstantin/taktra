@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { ProfileSummary } from '../../../shared/profiles'
+import type { ProfileSummary } from '../../../shared/model/profiles'
 
 export interface ProfilesContextValue {
   readonly profiles: readonly ProfileSummary[]

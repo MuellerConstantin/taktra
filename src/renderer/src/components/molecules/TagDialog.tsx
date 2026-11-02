@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { Tag } from '../../../../shared/tags'
+import type { Tag } from '../../../../shared/model/tags'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
 import { COLORS } from '../../lib/colors'
@@ -10,7 +10,7 @@ import { ColorSwatchPicker } from '../atoms/ColorSwatchPicker'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 interface TagDialogProps {
   readonly tag?: Tag

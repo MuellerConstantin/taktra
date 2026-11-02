@@ -42,7 +42,7 @@ export default defineConfig(
             },
             {
               regex: '(^|/)(gui|api)(/|$)',
-              message: 'The core knows neither the GUI nor the API above it.'
+              message: 'The core knows neither the GUI nor the API above it, nor shared/gui/.'
             },
             {
               regex: String.raw`^\.\.?(/\.\.)*/?(index)?$`,
@@ -65,6 +65,23 @@ export default defineConfig(
               message: 'The GUI imports the core only through its index.'
             },
             { regex: '(^|/)api(/|$)', message: 'The GUI and the API do not know each other.' }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/renderer/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)shared/validation(/|$)',
+              message:
+                'The renderer uses shared/model/ and shared/gui/; Zod stays out of its bundle.'
+            }
           ]
         }
       ]

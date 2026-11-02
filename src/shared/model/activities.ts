@@ -1,7 +1,7 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { activities } from '../main/core/db/schema/activities'
-import type { activityInput } from './validation/activities'
+import type { activities } from '../../main/core/db/schema/activities'
+import type { activityInput } from '../validation/activities'
 import type { Tag } from './tags'
 
 export type Activity = InferSelectModel<typeof activities>

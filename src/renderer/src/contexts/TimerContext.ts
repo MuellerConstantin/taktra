@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { TimeEntryDetails } from '../../../shared/timeEntries'
+import type { TimeEntryDetails } from '../../../shared/model/timeEntries'
 
 export interface TimerContextValue {
   readonly running: TimeEntryDetails | null

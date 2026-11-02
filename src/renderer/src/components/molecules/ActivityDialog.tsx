@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Form } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivityRef } from '../../../../shared/activities'
-import type { Client } from '../../../../shared/clients'
-import type { Tag } from '../../../../shared/tags'
+import type { ActivityRef } from '../../../../shared/model/activities'
+import type { Client } from '../../../../shared/model/clients'
+import type { Tag } from '../../../../shared/model/tags'
 import { useCustomFieldValues } from '../../hooks/useCustomFieldValues'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
@@ -14,7 +14,7 @@ import { TextField } from '../atoms/TextField'
 import { ClientSelect } from './ClientSelect'
 import { CustomFieldInputs } from './CustomFieldInputs'
 import { TagPicker } from './TagPicker'
-import { MAX_NAME_LENGTH } from '../../../../shared/validation/limits'
+import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 interface ActivityDialogProps {
   readonly activity: ActivityRef
