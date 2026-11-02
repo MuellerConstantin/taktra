@@ -34,14 +34,12 @@ export default defineConfig(
       'no-restricted-imports': [
         'error',
         {
-          paths: [
+          patterns: [
             {
-              name: 'electron',
+              regex: '^@?electron([-/]|$)',
               message:
                 'The core runs without Electron; it gets what it needs through its environment.'
-            }
-          ],
-          patterns: [
+            },
             {
               regex: '(^|/)(gui|api)(/|$)',
               message: 'The core knows neither the GUI nor the API above it.'
@@ -67,6 +65,22 @@ export default defineConfig(
               message: 'The GUI imports the core only through its index.'
             },
             { regex: '(^|/)api(/|$)', message: 'The GUI and the API do not know each other.' }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/main/index.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)core/',
+              message: 'Outside the core, import it only through its index.'
+            }
           ]
         }
       ]
