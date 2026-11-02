@@ -229,6 +229,14 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "nextWeek": "Next week",
+    "weekOf": "Week of {date}",
+    "range": "Period",
+    "day": "Day",
+    "workWeek": "Work week",
+    "week": "Week",
     "empty": "Nothing tracked on this day.",
     "create": "New entry",
     "total": "Total {duration}",
@@ -243,11 +251,17 @@
     "withoutTimes": "Without clock times",
     "continue": "Start timer for {name}",
     "stop": "Stop timer for {name}",
-    "help": "All entries of a day, that is the time booked on activities, by timer or by hand. Add time you forgot to track and correct entries here. Gaps between entries show time not tracked yet."
+    "help": "All entries of a day or a week, that is the time booked on activities, by timer or by hand. Add time you forgot to track and correct entries here. Gaps between entries show time not tracked yet."
+  },
+  "WeekCalendar": {
+    "openDay": "Show {date}",
+    "now": "now"
   },
   "DayNavigator": {
     "previous": "Previous day",
     "next": "Next day",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
     "choose": "Choose day",
     "today": "Today"
   },
@@ -662,8 +676,8 @@
       "donation": "Show donation reminder",
       "create": "New entry, project, client or tag",
       "search": "Search projects, clients or tags",
-      "previousDay": "Previous day",
-      "nextDay": "Next day",
+      "previousDay": "Previous day or week",
+      "nextDay": "Next day or week",
       "today": "Go to today"
     }
   },

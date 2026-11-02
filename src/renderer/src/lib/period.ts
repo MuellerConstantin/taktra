@@ -2,6 +2,7 @@ import {
   endOfMonth,
   endOfWeek,
   endOfYear,
+  isWeekend,
   startOfMonth,
   startOfWeek,
   startOfYear,
@@ -55,6 +56,15 @@ export function presetRange(
     case 'thisYear':
       return { start: startOfYear(today), end: endOfYear(today) }
   }
+}
+
+export type CalendarRange = 'day' | 'workWeek' | 'week'
+
+export function daysOf(date: CalendarDate, range: CalendarRange, locale: string): CalendarDate[] {
+  if (range === 'day') return [date]
+  const start = startOfWeek(date, locale)
+  const days = Array.from({ length: 7 }, (_, index) => start.add({ days: index }))
+  return range === 'workWeek' ? days.filter((day) => !isWeekend(day, locale)) : days
 }
 
 export function periodFilter({ range }: Period): Pick<TimeFilter, 'from' | 'to'> {

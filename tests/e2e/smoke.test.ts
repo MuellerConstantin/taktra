@@ -57,3 +57,28 @@ test('exports with own columns and saves them as a template', async ({ window, e
   await expect(window.getByRole('columnheader', { name: 'note' })).toBeHidden()
   expect(errors).toEqual([])
 })
+
+test('shows the entries of a week and opens a day from it', async ({ window, errors }) => {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  await window.evaluate(() => {
+    location.hash = '#/tracking'
+  })
+
+  await window.getByRole('radio', { name: 'Week', exact: true }).click()
+  await expect(window.getByRole('heading', { name: 'This week' })).toBeVisible()
+  await expect(window.getByRole('button', { name: /^Show / })).toHaveCount(7)
+
+  await window.getByRole('radio', { name: 'Work week' }).click()
+  await expect(window.getByRole('button', { name: /^Show / })).toHaveCount(5)
+  await expect(window.getByRole('button', { name: /^Show (Saturday|Sunday)/ })).toHaveCount(0)
+
+  await window.getByRole('button', { name: 'Previous week' }).click()
+  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  await expect(window.getByRole('button', { name: /^Daily Standup, / }).first()).toBeVisible()
+
+  await window.getByRole('button', { name: /^Show Monday/ }).click()
+  await expect(window.getByRole('radio', { name: 'Day' })).toBeChecked()
+  await expect(window.getByRole('heading', { name: 'Monday' })).toBeVisible()
+  expect(errors).toEqual([])
+})

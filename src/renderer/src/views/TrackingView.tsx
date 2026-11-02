@@ -3,24 +3,31 @@ import {
   getLocalTimeZone,
   isSameDay,
   parseDate,
+  startOfWeek,
   today,
-  type CalendarDate
+  type CalendarDate,
+  type Time
 } from '@internationalized/date'
 import { RiAddLine, RiDeleteBinLine, RiPencilLine, RiPlayFill, RiStopFill } from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { useLocale } from 'react-aria-components'
+import { TooltipTrigger, useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { TimeEntryDetails } from '../../../shared/timeEntries'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
 import { Modal } from '../components/atoms/Modal'
+import { ToggleButton } from '../components/atoms/ToggleButton'
+import { ToggleButtonGroup } from '../components/atoms/ToggleButtonGroup'
+import { Tooltip } from '../components/atoms/Tooltip'
+import { DayViewIcon, WeekViewIcon, WorkWeekViewIcon } from '../components/atoms/ViewIcons'
 import { DayNavigator } from '../components/molecules/DayNavigator'
 import { ExpandableNote } from '../components/molecules/Note'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
+import { WeekCalendar } from '../components/organisms/WeekCalendar'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useNow } from '../hooks/useNow'
 import { useProfiles } from '../hooks/useProfiles'
@@ -29,7 +36,18 @@ import { useCreateRequest } from '../hooks/useCreateRequest'
 import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
+import { daysOf, type CalendarRange } from '../lib/period'
 import { appShortcuts } from '../lib/shortcuts'
+
+const rangeOptions = [
+  { id: 'day', Icon: DayViewIcon },
+  { id: 'workWeek', Icon: WorkWeekViewIcon },
+  { id: 'week', Icon: WeekViewIcon }
+] as const
+
+function parseRange(value: string | null): CalendarRange {
+  return value === 'workWeek' || value === 'week' ? value : 'day'
+}
 
 function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
   if (!value) return fallback
@@ -81,10 +99,18 @@ function TrackingView(): React.JSX.Element {
   const [searchParams, setSearchParams] = useSearchParams()
   const todayDate = today(getLocalTimeZone())
   const date = parseDay(searchParams.get('date'), todayDate)
-  const day = date.toString()
+  const unit = parseRange(searchParams.get('range'))
+  const weekStart = startOfWeek(date, locale)
+  const days = daysOf(date, unit, locale)
+  const from = days[0].toString()
+  const to = days[days.length - 1].toString()
   const [entries, setEntries] = useState<readonly TimeEntryDetails[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [dialog, setDialog] = useState<{ readonly details?: TimeEntryDetails } | null>(null)
+  const [dialog, setDialog] = useState<{
+    readonly date: CalendarDate
+    readonly start?: Time
+    readonly details?: TimeEntryDetails
+  } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -95,17 +121,21 @@ function TrackingView(): React.JSX.Element {
   const durationOf = ({ startedAt, endedAt, durationSec }: TimeEntryDetails['entry']): number =>
     startedAt && !endedAt ? elapsedSeconds(startedAt, now) : (durationSec ?? 0)
 
+  const timeZone = getLocalTimeZone()
   const dayFormatter = new DateFormatter(locale, { dateStyle: 'long' })
+  const mediumDayFormatter = new DateFormatter(locale, { dateStyle: 'medium' })
   const weekdayFormatter = new DateFormatter(locale, { weekday: 'long' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
   const total = (entries ?? []).reduce((sum, { entry }) => sum + durationOf(entry), 0)
   const rows = toRows(entries ?? [], now)
   const showsTimes = (entries ?? []).some(({ entry }) => entry.startedAt)
+  const newEntryDate =
+    unit !== 'day' && !days.some((weekDay) => isSameDay(weekDay, todayDate)) ? days[0] : date
 
   useEffect(() => {
     let isCurrent = true
     api.timeEntries
-      .list({ from: day, to: day })
+      .list({ from, to })
       .then((result) => {
         if (!isCurrent) return
         setEntries(result)
@@ -115,22 +145,39 @@ function TrackingView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, day, reloadCount, revision, errorMessage])
+  }, [activeProfile?.path, from, to, reloadCount, revision, errorMessage])
 
-  const title = isSameDay(date, todayDate)
-    ? t('today')
-    : isSameDay(date, todayDate.subtract({ days: 1 }))
-      ? t('yesterday')
-      : isSameDay(date, todayDate.add({ days: 1 }))
-        ? t('tomorrow')
-        : weekdayFormatter.format(date.toDate(getLocalTimeZone()))
+  const thisWeekStart = startOfWeek(todayDate, locale)
+  const title =
+    unit !== 'day'
+      ? isSameDay(weekStart, thisWeekStart)
+        ? t('thisWeek')
+        : isSameDay(weekStart, thisWeekStart.subtract({ weeks: 1 }))
+          ? t('lastWeek')
+          : isSameDay(weekStart, thisWeekStart.add({ weeks: 1 }))
+            ? t('nextWeek')
+            : t('weekOf', { date: mediumDayFormatter.format(weekStart.toDate(timeZone)) })
+      : isSameDay(date, todayDate)
+        ? t('today')
+        : isSameDay(date, todayDate.subtract({ days: 1 }))
+          ? t('yesterday')
+          : isSameDay(date, todayDate.add({ days: 1 }))
+            ? t('tomorrow')
+            : weekdayFormatter.format(date.toDate(timeZone))
+  const subtitle =
+    unit !== 'day'
+      ? dayFormatter.formatRange(days[0].toDate(timeZone), days[days.length - 1].toDate(timeZone))
+      : dayFormatter.format(date.toDate(timeZone))
 
-  const changeDay = (next: CalendarDate): void => {
-    setSearchParams(isSameDay(next, todayDate) ? {} : { date: next.toString() })
+  const navigate = (next: CalendarDate, nextUnit: CalendarRange): void => {
+    setSearchParams({
+      ...(isSameDay(next, todayDate) ? {} : { date: next.toString() }),
+      ...(nextUnit !== 'day' ? { range: nextUnit } : {})
+    })
   }
 
-  useShortcut(appShortcuts.create, () => setDialog({}))
-  useCreateRequest(() => setDialog({}))
+  useShortcut(appShortcuts.create, () => setDialog({ date: newEntryDate }))
+  useCreateRequest(() => setDialog({ date: newEntryDate }))
 
   const runTimer = async (action: () => Promise<void>): Promise<void> => {
     setDeleteError(null)
@@ -156,26 +203,63 @@ function TrackingView(): React.JSX.Element {
     <div className="flex h-full flex-col">
       <ViewHeader
         title={title}
-        subtitle={dayFormatter.format(date.toDate(getLocalTimeZone()))}
+        subtitle={subtitle}
         help={t('help')}
         helpTopic="tracking"
         actions={
-          <Button onPress={() => setDialog({})} shortcut={appShortcuts.create}>
+          <Button onPress={() => setDialog({ date: newEntryDate })} shortcut={appShortcuts.create}>
             <RiAddLine className="size-4" />
             {t('create')}
           </Button>
         }
       >
-        <div className="flex items-center justify-between gap-4 pb-4">
-          <DayNavigator date={date} today={todayDate} onChange={changeDay} />
-          <span className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pb-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <DayNavigator
+              date={date}
+              today={todayDate}
+              unit={unit}
+              onChange={(next) => navigate(next, unit)}
+            />
+            <ToggleButtonGroup
+              aria-label={t('range')}
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={[unit]}
+              onSelectionChange={(keys) => {
+                const [selected] = keys
+                navigate(date, parseRange(String(selected)))
+              }}
+            >
+              {rangeOptions.map(({ id, Icon }) => (
+                <TooltipTrigger key={id} delay={500}>
+                  <ToggleButton id={id} aria-label={t(id)} className="px-2">
+                    <Icon className="size-5" />
+                  </ToggleButton>
+                  <Tooltip>{t(id)}</Tooltip>
+                </TooltipTrigger>
+              ))}
+            </ToggleButtonGroup>
+          </div>
+          <span className="text-sm whitespace-nowrap text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}
           </span>
         </div>
       </ViewHeader>
       {deleteError && <p className="px-8 pt-4 text-sm text-destructive">{deleteError}</p>}
       {error && <p className="p-8 text-sm text-destructive">{error}</p>}
-      {!error && entries && (
+      {!error && entries && unit !== 'day' && (
+        <WeekCalendar
+          days={days}
+          entries={entries}
+          today={todayDate}
+          now={now}
+          onOpenDay={(day) => navigate(day, 'day')}
+          onCreate={(day, start) => setDialog({ date: day, start })}
+          onEdit={(details) => setDialog({ date: parseDate(details.entry.date), details })}
+        />
+      )}
+      {!error && entries && unit === 'day' && (
         <GridList
           aria-label={title}
           items={rows}
@@ -280,7 +364,7 @@ function TrackingView(): React.JSX.Element {
                   variant="icon"
                   className="mt-2.5"
                   aria-label={t('edit', { name: activity.name })}
-                  onPress={() => setDialog({ details })}
+                  onPress={() => setDialog({ date: parseDate(entry.date), details })}
                   isDisabled={isRunning}
                 >
                   <RiPencilLine className="size-4" />
@@ -300,7 +384,8 @@ function TrackingView(): React.JSX.Element {
       )}
       {dialog && (
         <TimeEntryDialog
-          date={date}
+          date={dialog.date}
+          start={dialog.start}
           details={dialog.details}
           onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}

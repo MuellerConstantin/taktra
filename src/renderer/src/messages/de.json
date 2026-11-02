@@ -263,6 +263,14 @@
     "today": "Heute",
     "yesterday": "Gestern",
     "tomorrow": "Morgen",
+    "thisWeek": "Diese Woche",
+    "lastWeek": "Letzte Woche",
+    "nextWeek": "Nächste Woche",
+    "weekOf": "Woche vom {date}",
+    "range": "Zeitraum",
+    "day": "Tag",
+    "workWeek": "Arbeitswoche",
+    "week": "Woche",
     "empty": "Für diesen Tag ist nichts erfasst.",
     "create": "Neuer Eintrag",
     "total": "Gesamt {duration}",
@@ -277,11 +285,17 @@
     "withoutTimes": "Ohne Uhrzeit",
     "continue": "Timer für {name} starten",
     "stop": "Timer für {name} stoppen",
-    "help": "Alle Einträge eines Tages, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist."
+    "help": "Alle Einträge eines Tages oder einer Woche, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist."
+  },
+  "WeekCalendar": {
+    "openDay": "{date} anzeigen",
+    "now": "jetzt"
   },
   "DayNavigator": {
     "previous": "Vorheriger Tag",
     "next": "Nächster Tag",
+    "previousWeek": "Vorherige Woche",
+    "nextWeek": "Nächste Woche",
     "choose": "Tag auswählen",
     "today": "Heute"
   },
@@ -696,8 +710,8 @@
       "donation": "Spendenerinnerung anzeigen",
       "create": "Neuer Eintrag, neues Projekt, neuer Leistungsempfänger oder neuer Tag",
       "search": "Projekte, Leistungsempfänger oder Tags durchsuchen",
-      "previousDay": "Vorheriger Tag",
-      "nextDay": "Nächster Tag",
+      "previousDay": "Vorheriger Tag oder Woche",
+      "nextDay": "Nächster Tag oder Woche",
       "today": "Zu heute"
     }
   },

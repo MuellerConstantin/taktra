@@ -34,6 +34,7 @@ type Mode = 'range' | 'duration'
 
 interface TimeEntryDialogProps {
   readonly date: CalendarDate
+  readonly start?: Time
   readonly details?: TimeEntryDetails
   readonly onClose: () => void
   readonly onSaved: () => void
@@ -45,6 +46,7 @@ function toLocalTime(date: Date | null): Time | null {
 
 export function TimeEntryDialog({
   date,
+  start: initialStart,
   details,
   onClose,
   onSaved
@@ -58,8 +60,12 @@ export function TimeEntryDialog({
   const [tags, setTags] = useState<readonly Tag[]>([])
   const [chosenTagIds, setChosenTagIds] = useState<readonly number[] | null>(null)
   const [mode, setMode] = useState<Mode>(details && !details.entry.startedAt ? 'duration' : 'range')
-  const [start, setStart] = useState(() => toLocalTime(details?.entry.startedAt ?? null))
-  const [end, setEnd] = useState(() => toLocalTime(details?.entry.endedAt ?? null))
+  const [start, setStart] = useState(() =>
+    details ? toLocalTime(details.entry.startedAt) : (initialStart ?? null)
+  )
+  const [end, setEnd] = useState(() =>
+    details ? toLocalTime(details.entry.endedAt) : (initialStart?.add({ minutes: 30 }) ?? null)
+  )
   const [duration, setDuration] = useState(() =>
     details && !details.entry.startedAt && details.entry.durationSec
       ? formatDuration(details.entry.durationSec)
