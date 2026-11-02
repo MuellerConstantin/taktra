@@ -1,6 +1,6 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { timeEntries } from '../main/db/schema/timeEntries'
+import type { timeEntries } from '../main/core/db/schema/timeEntries'
 import type { Activity, ActivityTag } from './activities'
 import type { Client } from './clients'
 import type { Project } from './projects'

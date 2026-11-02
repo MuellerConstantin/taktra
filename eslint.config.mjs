@@ -28,5 +28,57 @@ export default defineConfig(
       ...eslintPluginReactRefresh.configs.vite.rules
     }
   },
+  {
+    files: ['src/main/core/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'electron',
+              importNames: [
+                'BrowserWindow',
+                'dialog',
+                'globalShortcut',
+                'ipcMain',
+                'Menu',
+                'nativeImage',
+                'nativeTheme',
+                'Notification',
+                'screen',
+                'Tray',
+                'webContents'
+              ],
+              message: 'The core knows no GUI; it belongs to src/main/gui/.'
+            }
+          ],
+          patterns: [
+            {
+              regex: '(^|/)(gui|api)(/|$)',
+              message: 'The core knows neither the GUI nor the API above it.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ['src/main/gui/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)core/db(/|$)',
+              message: 'The GUI uses the domain and app modules, never the database directly.'
+            },
+            { regex: '(^|/)api(/|$)', message: 'The GUI and the API do not know each other.' }
+          ]
+        }
+      ]
+    }
+  },
   eslintConfigPrettier
 )

@@ -111,9 +111,13 @@ development.
 ./
 ├── src/
 │   ├── main/              # Electron main process
-│   │   ├── db/            # Connection, migrations, schema, backups, sample data
-│   │   ├── domain/        # Data of the active profile and its IPC handlers; uses db/, never desktop/
-│   │   └── desktop/       # Windows, tray, global shortcut; uses domain/, never db/ directly
+│   │   ├── core/          # Everything without GUI or transport
+│   │   │   ├── db/        # Connection, migrations, schema, backups, sample data
+│   │   │   ├── domain/    # Rules and data of the active profile
+│   │   │   ├── app/       # State of the installation: profiles, settings, donation hint
+│   │   │   └── events.ts  # Changes that several consumers show
+│   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses core/, never core/db/
+│   │       └── ipc/       # IPC handlers for the renderer, one file per area
 │   ├── preload/           # Typed `window.api` bridge
 │   ├── shared/            # Types used by main, preload and renderer
 │   │   └── validation/    # Zod schemas per domain, text length limits
@@ -127,12 +131,13 @@ development.
 │       └── messages/      # Translations
 └── tests/
     ├── main/              # Vitest, folders as in src/main/
-    │   └── db/seeds/      # Data for the migration test, one file per migration
+    │   └── core/db/seeds/ # Data for the migration test, one file per migration
     └── e2e/               # Playwright against the built app
 ```
 
-App-wide modules (lifecycle, IPC registration, settings, profiles) sit directly
-in `src/main/`. `docs/screenshots/` holds the README screenshots; they show only
+`src/main/index.ts` only takes the single instance lock and starts the core
+and the GUI through `initCore()` and `initGui()`. Each layer's `index.ts`
+starts what it needs; nothing else reaches into a layer to initialize it. `docs/screenshots/` holds the README screenshots; they show only
 the sample profile and are excluded from the packaged app.
 
 ## Design Decisions
@@ -221,6 +226,13 @@ the sample profile and are excluded from the packaged app.
 - **Database and Node APIs only in the main process**: The renderer runs
   sandboxed with context isolation and talks to main only through the typed
   preload API. UI code uses the client in `lib/api.ts`, not `window.api`.
+- **Core apart from its presentation**: `core/` holds the rules as plain
+  functions. It uses no GUI part of Electron (windows, dialogs, menus, theme,
+  IPC) and imports nothing from `gui/`; Electron's paths and trash are fine.
+  `gui/` only validates, calls the core and shows the result, and never
+  touches `core/db/`. A further presentation such as an HTTP API sits next to
+  `gui/` under the same rules, so it reuses the same functions. Lint rules
+  enforce these boundaries.
 - **Validated IPC**: Every handler is registered through `handle()` with a Zod
   schema for its arguments, never with `ipcMain.handle` directly. The schemas
   also normalize input (trim text, empty optional text to `null`). Rules that
@@ -234,7 +246,9 @@ the sample profile and are excluded from the packaged app.
   returned as values.
 - **Main broadcasts, windows reload**: When state that several windows show
   changes (running timer and what it displays, app settings, profiles), the main process
-  sends an event to all windows and each one reloads what it needs.
+  sends an event to all windows and each one reloads what it needs. The core
+  reports such changes through `core/events.ts`; the windows are one of its
+  listeners.
 - **Several windows, one renderer**: The mini timer and the quick start are
   routes of the same renderer, opened as small frameless windows with the same
   preload and sandbox settings as the main window.
@@ -308,7 +322,7 @@ the sample profile and are excluded from the packaged app.
 - **Every migration is tested with data**: The migration test migrates a
   profile from every earlier schema version and checks that no row changes. A
   migration that adds tables gets a seed file named like the migration in
-  `tests/main/db/seeds/`, so the next ones are tested with data in them.
+  `tests/main/core/db/seeds/`, so the next ones are tested with data in them.
 - **End-to-end tests in their own user data folder**: Playwright starts the
   built app with `TAKTRA_USER_DATA` pointing to a temporary folder, so profiles,
   settings and the single instance lock of the user stay untouched. The

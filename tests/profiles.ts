@@ -2,7 +2,11 @@ import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { app } from 'electron'
-import { openProfileDatabase, writeProperty, type ProfileDatabase } from '../src/main/db/database'
+import {
+  openProfileDatabase,
+  writeProperty,
+  type ProfileDatabase
+} from '../src/main/core/db/database'
 
 /** A new file path in the temporary user data folder, which the test setup removes afterwards. */
 export function testProfilePath(): string {

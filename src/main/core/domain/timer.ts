@@ -1,0 +1,121 @@
+import { and, desc, eq, isNotNull, isNull, max, sql } from 'drizzle-orm'
+import { AppError, isAppError } from '../../../shared/errors'
+import type { ActivityDetails, TimeEntryDetails } from '../../../shared/timeEntries'
+import { getActiveDatabase } from '../db/database'
+import { activities, clients, projects, timeEntries } from '../db/schema'
+import { notifyChanged } from '../events'
+import { activityDetailsColumns, findActivity, tagsByActivity } from './activities'
+import { effectiveClientJoin } from './clients'
+import { findProject } from './projects'
+import { deleteTimeEntry, selectTimeEntryDetails } from './timeEntries'
+
+const isRunning = and(isNotNull(timeEntries.startedAt), isNull(timeEntries.endedAt))
+
+function toLocalDate(date: Date): string {
+  const pad = (value: number): string => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+const MINUTE_MS = 60_000
+
+function roundToMinute(date: Date): Date {
+  return new Date(Math.round(date.getTime() / MINUTE_MS) * MINUTE_MS)
+}
+
+/**
+ * Rounds the clock times rather than the duration, so the end of a stopped timer and the start
+ * of the one started in the same moment fall on the same minute instead of overlapping.
+ */
+function bookedTimes(
+  startedAt: Date,
+  stoppedAt: Date
+): { readonly startedAt: Date; readonly endedAt: Date; readonly durationSec: number } {
+  const start = roundToMinute(startedAt)
+  const end = new Date(Math.max(roundToMinute(stoppedAt).getTime(), start.getTime() + MINUTE_MS))
+  return {
+    startedAt: start,
+    endedAt: end,
+    durationSec: (end.getTime() - start.getTime()) / 1000
+  }
+}
+
+function stopRunning(now: Date): void {
+  const db = getActiveDatabase()
+  const entry = db.select().from(timeEntries).where(isRunning).get()
+  if (!entry?.startedAt) return
+
+  db.update(timeEntries)
+    .set(bookedTimes(entry.startedAt, now))
+    .where(eq(timeEntries.id, entry.id))
+    .run()
+}
+
+export function getRunningTimer(): TimeEntryDetails | null {
+  return selectTimeEntryDetails(isRunning)[0] ?? null
+}
+
+export function hasRunningTimer(): boolean {
+  try {
+    return getActiveDatabase().select().from(timeEntries).where(isRunning).get() !== undefined
+  } catch (error) {
+    if (isAppError(error, 'NO_ACTIVE_PROFILE')) return false
+    throw error
+  }
+}
+
+export function startTimer(activityId: number, note: string | null = null): TimeEntryDetails {
+  const activity = findActivity(activityId)
+  if (activity.archivedAt || findProject(activity.projectId).archivedAt)
+    throw new AppError('VALIDATION_FAILED', 'Activity or project is archived')
+
+  const db = getActiveDatabase()
+  const now = new Date()
+  const timer = db.transaction(() => {
+    stopRunning(now)
+    db.insert(timeEntries)
+      .values({
+        activityId,
+        note,
+        date: toLocalDate(now),
+        startedAt: now,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      })
+      .run()
+    return getRunningTimer()!
+  })
+  notifyChanged('timer')
+  return timer
+}
+
+export function stopTimer(): void {
+  const db = getActiveDatabase()
+  db.transaction(() => stopRunning(new Date()))
+  notifyChanged('timer')
+}
+
+export function discardTimer(): void {
+  const entry = getActiveDatabase().select().from(timeEntries).where(isRunning).get()
+  if (!entry) return
+  deleteTimeEntry(entry.id)
+  notifyChanged('timer')
+}
+
+export function listRecentActivities(limit: number): ActivityDetails[] {
+  const rows = getActiveDatabase()
+    .select(activityDetailsColumns)
+    .from(timeEntries)
+    .innerJoin(activities, eq(timeEntries.activityId, activities.id))
+    .innerJoin(projects, eq(activities.projectId, projects.id))
+    .leftJoin(clients, effectiveClientJoin)
+    .where(and(isNull(activities.archivedAt), isNull(projects.archivedAt)))
+    .groupBy(activities.id)
+    .orderBy(
+      desc(max(timeEntries.date)),
+      desc(sql`max(coalesce(${timeEntries.startedAt}, ${timeEntries.createdAt}))`)
+    )
+    .limit(limit)
+    .all()
+
+  const tagMap = tagsByActivity(rows.map((row) => row.activity.id))
+  return rows.map((row) => ({ ...row, tags: tagMap.get(row.activity.id) ?? [] }))
+}

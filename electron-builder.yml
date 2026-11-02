@@ -16,7 +16,7 @@ files:
   - '!{.env,.env.*,.npmrc}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 extraResources:
-  - from: src/main/db/migrations
+  - from: src/main/core/db/migrations
     to: migrations
 asarUnpack:
   - resources/**

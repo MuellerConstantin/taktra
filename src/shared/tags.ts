@@ -1,6 +1,6 @@
 import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { tags } from '../main/db/schema/tags'
+import type { tags } from '../main/core/db/schema/tags'
 import type { tagInput } from './validation/tags'
 
 export type Tag = InferSelectModel<typeof tags>
