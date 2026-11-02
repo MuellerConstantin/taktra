@@ -37,20 +37,8 @@ export default defineConfig(
           paths: [
             {
               name: 'electron',
-              importNames: [
-                'BrowserWindow',
-                'dialog',
-                'globalShortcut',
-                'ipcMain',
-                'Menu',
-                'nativeImage',
-                'nativeTheme',
-                'Notification',
-                'screen',
-                'Tray',
-                'webContents'
-              ],
-              message: 'The core knows no GUI; it belongs to src/main/gui/.'
+              message:
+                'The core runs without Electron; it gets what it needs through its environment.'
             }
           ],
           patterns: [

@@ -1,8 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync, mkdirSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { app, shell } from 'electron'
-import Store from 'electron-store'
 import {
   profileFileExtension,
   type ProfilesState,
@@ -22,20 +20,18 @@ import {
 } from '../db/database'
 import { SAMPLE_PROFILE_NAME, seedSampleData } from '../db/sample'
 import { stopTimer } from '../domain/timer'
+import { getEnvironment } from '../environment'
 import { notifyChanged } from '../events'
+import { lazyStore } from './store'
 
-interface KnownProfiles {
+type KnownProfiles = {
   readonly paths: string[]
   readonly activePath: string | null
 }
 
-const store = new Store<KnownProfiles>({
-  name: 'profiles',
-  schema: {
-    paths: { type: 'array', items: { type: 'string' }, default: [] },
-    activePath: { type: ['string', 'null'], default: null }
-  },
-  clearInvalidConfig: true
+const store = lazyStore<KnownProfiles>('profiles', {
+  paths: { type: 'array', items: { type: 'string' }, default: [] },
+  activePath: { type: ['string', 'null'], default: null }
 })
 
 interface ProfileInspection {
@@ -61,7 +57,7 @@ function readProfileName(path: string): string | null {
 let failedMigrationPath: string | null = null
 
 function syncActiveDatabase(): void {
-  const activePath = store.get('activePath')
+  const activePath = store().get('activePath')
   failedMigrationPath = null
 
   try {
@@ -86,26 +82,28 @@ function unavailableReasonOf(
 }
 
 function updateKnownProfiles(paths: string[], activePath: string | null): void {
-  const previousPath = store.get('activePath')
+  const previousPath = store().get('activePath')
   if (previousPath && previousPath !== activePath && isActiveDatabase(previousPath)) stopTimer()
 
-  store.set({ paths, activePath })
+  store().set({ paths, activePath })
   syncActiveDatabase()
   notifyChanged('profiles')
 }
 
 export function getProfilesState(): ProfilesState {
-  const activePath = store.get('activePath')
-  const profiles = store.get('paths').map((path) => {
-    const inspection = inspectProfile(path)
-    const unavailableReason = unavailableReasonOf(path, activePath, inspection)
-    return {
-      path,
-      name: inspection.name,
-      isAvailable: unavailableReason === null,
-      unavailableReason
-    }
-  })
+  const activePath = store().get('activePath')
+  const profiles = store()
+    .get('paths')
+    .map((path) => {
+      const inspection = inspectProfile(path)
+      const unavailableReason = unavailableReasonOf(path, activePath, inspection)
+      return {
+        path,
+        name: inspection.name,
+        isAvailable: unavailableReason === null,
+        unavailableReason
+      }
+    })
 
   return { profiles, activePath }
 }
@@ -135,7 +133,9 @@ export function createProfile(
     throw error
   }
 
-  const paths = store.get('paths').filter((known) => known !== path)
+  const paths = store()
+    .get('paths')
+    .filter((known) => known !== path)
   updateKnownProfiles([...paths, path], path)
 
   return getProfilesState()
@@ -150,7 +150,7 @@ export function createSampleProfile(): ProfilesState {
 }
 
 export function renameProfile(path: string, name: string): ProfilesState {
-  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
+  if (!store().get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
   if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 
   withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', name))
@@ -160,11 +160,11 @@ export function renameProfile(path: string, name: string): ProfilesState {
 }
 
 export function removeProfile(path: string): ProfilesState {
-  const paths = store.get('paths')
+  const paths = store().get('paths')
   if (!paths.includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
 
   const remaining = paths.filter((known) => known !== path)
-  const activePath = store.get('activePath')
+  const activePath = store().get('activePath')
   const nextActivePath =
     activePath === path
       ? (remaining.find((known) => readProfileName(known) !== null) ?? null)
@@ -175,20 +175,20 @@ export function removeProfile(path: string): ProfilesState {
 }
 
 export async function deleteProfile(path: string): Promise<ProfilesState> {
-  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
-  if (store.get('activePath') === path) closeActiveDatabase()
+  if (!store().get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
+  if (store().get('activePath') === path) closeActiveDatabase()
 
   for (const file of [path, ...SQLITE_SIDECAR_SUFFIXES.map((suffix) => `${path}${suffix}`)]) {
-    if (existsSync(file)) await shell.trashItem(file)
+    if (existsSync(file)) await getEnvironment().trash(file)
   }
 
   return removeProfile(path)
 }
 
 export function setActiveProfile(path: string): ProfilesState {
-  if (!store.get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
+  if (!store().get('paths').includes(path)) throw new AppError('PROFILE_NOT_FOUND', path)
 
-  updateKnownProfiles(store.get('paths'), path)
+  updateKnownProfiles(store().get('paths'), path)
   return getProfilesState()
 }
 
@@ -206,7 +206,7 @@ function slugify(value: string): string {
 }
 
 export function profilesDirectory(): string {
-  return join(app.getPath('userData'), 'profiles')
+  return join(getEnvironment().userDataPath, 'profiles')
 }
 
 export function getDefaultProfilePath(name: string): string {
@@ -227,7 +227,7 @@ export function addProfile(path: string): ProfilesState {
   if (isNewerVersion) throw new AppError('PROFILE_NEWER_VERSION', path)
   if (name === null) throw new AppError('PROFILE_INVALID', path)
 
-  const paths = store.get('paths')
+  const paths = store().get('paths')
   updateKnownProfiles(paths.includes(path) ? paths : [...paths, path], path)
 
   return getProfilesState()
@@ -235,5 +235,4 @@ export function addProfile(path: string): ProfilesState {
 
 export function openActiveProfile(): void {
   syncActiveDatabase()
-  app.on('will-quit', closeActiveDatabase)
 }

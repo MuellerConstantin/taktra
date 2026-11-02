@@ -10,7 +10,7 @@ export const languages = ['en', 'de'] as const
 
 export type Language = (typeof languages)[number]
 
-export interface Settings {
+export type Settings = {
   readonly theme: ThemeSource
   readonly language: Language
   readonly miniTimer: boolean

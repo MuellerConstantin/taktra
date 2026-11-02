@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   main: {
     build: {
-      externalizeDeps: { exclude: ['electron-store'] }
+      externalizeDeps: { exclude: ['conf'] }
     }
   },
   preload: {},

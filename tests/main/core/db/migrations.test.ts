@@ -3,11 +3,11 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import Database from 'better-sqlite3'
 import { readMigrationFiles } from 'drizzle-orm/migrator'
-import { app } from 'electron'
 import { describe, expect, it } from 'vitest'
 import { APPLICATION_ID } from '../../../../src/main/core/constants'
 import { createTestProfile, testProfilePath } from '../../../profiles'
 import { openProfileDatabase } from '../../../../src/main/core/db/database'
+import { getEnvironment } from '../../../../src/main/core/environment'
 
 const MIGRATIONS_FOLDER = 'src/main/core/db/migrations'
 const SEEDS_FOLDER = 'tests/main/core/db/seeds'
@@ -144,7 +144,7 @@ describe('openProfileDatabase', () => {
 
     openProfileDatabase(path).$client.close()
 
-    expect(existsSync(join(app.getPath('userData'), 'backups', uid))).toBe(false)
+    expect(existsSync(join(getEnvironment().userDataPath, 'backups', uid))).toBe(false)
   })
 
   it.each(migrations.slice(1).map((_, index) => index + 1))(
@@ -164,7 +164,7 @@ describe('openProfileDatabase', () => {
         db.$client.close()
       }
 
-      const backups = join(app.getPath('userData'), 'backups', uid)
+      const backups = join(getEnvironment().userDataPath, 'backups', uid)
       const files = readdirSync(backups)
       expect(files).toHaveLength(1)
       withClient(join(backups, files[0]), (client) => {

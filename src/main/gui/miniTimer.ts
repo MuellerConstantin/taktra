@@ -1,10 +1,10 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
-import Store from 'electron-store'
 import { z } from 'zod'
+import { getSettings } from '../core/app/settings'
+import { lazyStore } from '../core/app/store'
 import { hasRunningTimer } from '../core/domain/timer'
 import { onChanged } from '../core/events'
 import { handle } from './ipc/handle'
-import { getSettings } from '../core/app/settings'
 import { createRendererWindow, showMainWindow } from './windows'
 
 const WIDTH = 300
@@ -16,17 +16,13 @@ interface Position {
   readonly y: number
 }
 
-const store = new Store<{ position: Position | null }>({
-  name: 'mini-timer',
-  schema: {
-    position: {
-      type: ['object', 'null'],
-      properties: { x: { type: 'integer' }, y: { type: 'integer' } },
-      required: ['x', 'y'],
-      default: null
-    }
-  },
-  clearInvalidConfig: true
+const store = lazyStore<{ position: Position | null }>('mini-timer', {
+  position: {
+    type: ['object', 'null'],
+    properties: { x: { type: 'integer' }, y: { type: 'integer' } },
+    required: ['x', 'y'],
+    default: null
+  }
 })
 
 let mainWindow: BrowserWindow | null = null
@@ -44,7 +40,7 @@ function contains(area: Rectangle, { x, y }: Position): boolean {
 }
 
 function initialPosition(): Position {
-  const saved = store.get('position')
+  const saved = store().get('position')
   if (
     saved &&
     contains(screen.getDisplayMatching({ ...saved, width: WIDTH, height: HEIGHT }).workArea, saved)
@@ -86,7 +82,7 @@ function createMiniWindow(): BrowserWindow {
   })
   window.on('moved', () => {
     const [x, y] = window.getPosition()
-    store.set('position', { x, y })
+    store().set('position', { x, y })
   })
   window.on('closed', () => {
     miniWindow = null

@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import type Database from 'better-sqlite3'
-import { app } from 'electron'
+import { getEnvironment } from '../environment'
 
 const KEPT_BACKUPS = 3
 
@@ -15,7 +15,7 @@ export function backupBeforeMigration(client: Database.Database): void {
     { value: string } | undefined
   if (!row) throw new Error('Profile has no uid to name its backup folder')
 
-  const folder = join(app.getPath('userData'), 'backups', row.value)
+  const folder = join(getEnvironment().userDataPath, 'backups', row.value)
   mkdirSync(folder, { recursive: true })
 
   // ISO timestamps sort chronologically; colons are not allowed in Windows file names.

@@ -2,8 +2,8 @@ import { join } from 'node:path'
 import { app } from 'electron'
 
 /*
- * Imported first by index.ts, because the electron-store instances read the user data path
- * while their modules load. The folder stays lower-case: it would otherwise follow the
+ * Imported first by index.ts, because the user data path must be set before the app is ready.
+ * The folder stays lower-case: it would otherwise follow the
  * capitalized name, which on Linux is a different folder than the existing one.
  * End-to-end tests pass their own folder, so they never touch real profiles and settings.
  */

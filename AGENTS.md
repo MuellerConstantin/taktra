@@ -100,7 +100,7 @@ development.
 - **Validation**: Zod (main process only)
 - **Charts**: nivo
 - **Notes**: `react-markdown` with `remark-gfm` and `remark-breaks`
-- **App settings**: `electron-store`
+- **App settings**: `conf`
 - **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
 - **Tests**: Vitest (main process), Playwright (end-to-end with Electron)
@@ -215,9 +215,9 @@ the sample profile and are excluded from the packaged app.
   other systems: xlsx writes dates and durations as typed cells, while CSV is
   never adapted to Excel (BOM, semicolons).
 - **App settings outside the database**: Preferences of the installation
-  (theme, language, mini timer, global shortcut) live in an `electron-store` in
-  the user data directory and reach the renderer only through the API.
-  `electron-store` is ESM-only and must stay bundled into the CJS main build.
+  (theme, language, mini timer, global shortcut) live in `conf` files in the
+  user data directory and reach the renderer only through the API. `conf` is
+  ESM-only and must stay bundled into the CJS main build.
 - **No native rebuild**: `better-sqlite3` ships prebuilt, ABI-stable binaries,
   so `postinstall` must not run `electron-builder install-app-deps`.
 
@@ -227,9 +227,9 @@ the sample profile and are excluded from the packaged app.
   sandboxed with context isolation and talks to main only through the typed
   preload API. UI code uses the client in `lib/api.ts`, not `window.api`.
 - **Core apart from its presentation**: `core/` holds the rules as plain
-  functions. It uses no GUI part of Electron (windows, dialogs, menus, theme,
-  IPC) and imports nothing from `gui/`; Electron's paths and trash are fine.
-  `gui/` only validates, calls the core and shows the result, and never
+  functions and runs without Electron: it imports neither `electron` nor
+  anything from `gui/`, and gets paths and the trash through the environment
+  passed to `initCore()`. `gui/` only validates, calls the core and shows the result, and never
   touches `core/db/`. A further presentation such as an HTTP API sits next to
   `gui/` under the same rules, so it reuses the same functions. Lint rules
   enforce these boundaries.
@@ -317,8 +317,9 @@ the sample profile and are excluded from the packaged app.
 - **Tests apart from the code**: Tests live in `tests/`, in folders named after
   `src/`, and never ship with the app.
 - **Main process tests on real files**: Vitest runs the main process code under
-  plain Node against real SQLite files in a temporary folder. Only `electron`
-  and `electron-store` are replaced, never the database.
+  plain Node against real SQLite files in a temporary folder, which the setup
+  passes to the core as its environment. Nothing is replaced, the database
+  included.
 - **Every migration is tested with data**: The migration test migrates a
   profile from every earlier schema version and checks that no row changes. A
   migration that adds tables gets a seed file named like the migration in

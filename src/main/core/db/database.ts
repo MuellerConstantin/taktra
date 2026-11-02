@@ -1,11 +1,10 @@
-import { join } from 'node:path'
 import Database from 'better-sqlite3'
 import { eq } from 'drizzle-orm'
 import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
 import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator'
-import { app } from 'electron'
 import { AppError } from '../../../shared/errors'
 import { APPLICATION_ID } from '../constants'
+import { getEnvironment } from '../environment'
 import { backupBeforeMigration } from './backup'
 import * as schema from './schema'
 
@@ -18,16 +17,10 @@ interface OpenOptions {
   readonly readOnly?: boolean
 }
 
-function migrationsFolder(): string {
-  return app.isPackaged
-    ? join(process.resourcesPath, 'migrations')
-    : join(app.getAppPath(), 'src', 'main', 'core', 'db', 'migrations')
-}
-
 let knownMigrations: MigrationMeta[] | null = null
 
 function getKnownMigrations(): MigrationMeta[] {
-  knownMigrations ??= readMigrationFiles({ migrationsFolder: migrationsFolder() })
+  knownMigrations ??= readMigrationFiles({ migrationsFolder: getEnvironment().migrationsPath })
   return knownMigrations
 }
 
