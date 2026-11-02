@@ -215,12 +215,6 @@ function TrackingView(): React.JSX.Element {
       >
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pb-4">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <DayNavigator
-              date={date}
-              today={todayDate}
-              unit={unit}
-              onChange={(next) => navigate(next, unit)}
-            />
             <ToggleButtonGroup
               aria-label={t('range')}
               selectionMode="single"
@@ -240,6 +234,12 @@ function TrackingView(): React.JSX.Element {
                 </TooltipTrigger>
               ))}
             </ToggleButtonGroup>
+            <DayNavigator
+              date={date}
+              today={todayDate}
+              unit={unit}
+              onChange={(next) => navigate(next, unit)}
+            />
           </div>
           <span className="text-sm whitespace-nowrap text-muted-foreground">
             {t('total', { duration: formatDuration(total) })}
