@@ -214,7 +214,7 @@ function ReportsView(): React.JSX.Element {
                   }}
                 >
                   {breakdowns.map((option) => (
-                    <ToggleButton key={option} id={option}>
+                    <ToggleButton key={option} id={option} variant="segment">
                       {t(`breakdowns.${option}`)}
                     </ToggleButton>
                   ))}

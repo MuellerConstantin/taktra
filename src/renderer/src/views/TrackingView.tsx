@@ -233,7 +233,7 @@ function TrackingView(): React.JSX.Element {
             >
               {rangeOptions.map(({ id, Icon }) => (
                 <TooltipTrigger key={id} delay={500}>
-                  <ToggleButton id={id} aria-label={t(id)} className="px-2">
+                  <ToggleButton id={id} variant="segment" aria-label={t(id)} className="px-2">
                     <Icon className="size-5" />
                   </ToggleButton>
                   <Tooltip>{t(id)}</Tooltip>

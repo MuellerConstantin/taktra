@@ -202,10 +202,10 @@ export function TimeEntryDialog({
                 if (selected === 'range' || selected === 'duration') setMode(selected)
               }}
             >
-              <ToggleButton id="range" className="flex-1">
+              <ToggleButton id="range" variant="segment" className="flex-1">
                 {t('modeRange')}
               </ToggleButton>
-              <ToggleButton id="duration" className="flex-1">
+              <ToggleButton id="duration" variant="segment" className="flex-1">
                 {t('modeDuration')}
               </ToggleButton>
             </ToggleButtonGroup>

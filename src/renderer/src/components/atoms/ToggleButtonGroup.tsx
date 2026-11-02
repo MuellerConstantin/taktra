@@ -6,7 +6,7 @@ import {
 import { tv } from 'tailwind-variants'
 
 const styles = tv({
-  base: 'flex gap-1',
+  base: 'flex gap-0.5 rounded-lg border border-border bg-secondary p-0.5',
   variants: {
     orientation: {
       horizontal: 'flex-row',
