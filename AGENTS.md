@@ -80,6 +80,13 @@ entries per combination of its grouping columns, or sums them with one column
 per day of the period, as in a time sheet. In sums, a column can list the
 distinct values of the summed entries instead of grouping by them.
 
+**Local API**
+For developers and technicians, an optional local HTTP API lets other programs
+on the same machine read projects, activities, clients, tags, entries and
+reports of the active profile, start and stop the timer, and follow changes as
+server-sent events. It is turned on, given a port and a key in the app
+settings.
+
 **Help**
 An in-app help explains the domain rules in short chapters of questions and
 answers, written in Markdown per language. It opens from the command palette
@@ -103,6 +110,7 @@ development.
 - **App settings**: `conf`
 - **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
+- **Local API**: Hono with `@hono/node-server` (main process only)
 - **Tests**: Vitest (main process), Playwright (end-to-end with Electron)
 
 ## Project Structure
@@ -116,8 +124,11 @@ development.
 │   │   │   ├── domain/    # Rules and data of the active profile
 │   │   │   ├── app/       # State of the installation: profiles, settings, donation hint
 │   │   │   └── events.ts  # Changes that several consumers show
-│   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
-│   │       └── ipc/       # IPC handlers for the renderer, one file per area
+│   │   ├── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
+│   │   │   └── ipc/       # IPC handlers for the renderer, one file per area
+│   │   └── api/           # Local HTTP API; uses only core/index.ts, never gui/
+│   │       ├── routes/    # Route handlers of /api/v1, one file per area
+│   │       └── dto/       # Response format of /api/v1, one file per area
 │   ├── preload/           # Typed `window.api` bridge
 │   ├── shared/            # Used by main, preload and renderer
 │   │   ├── model/         # Domain types, constants, pure rules, error codes, text length limits
@@ -242,9 +253,19 @@ sample profile and are excluded from the packaged app.
   stateless service object per area (`projects.create()`, `timer.start()`):
   `gui/` imports only from there, while modules inside the core import each other
   directly and never through it. `gui/` only validates, calls the core and
-  shows the result. A further presentation such as an HTTP API sits next to
-  `gui/` under the same rules, so it reuses the same functions. Lint rules
-  enforce these boundaries.
+  shows the result. `api/` is a second presentation next to `gui/` under the
+  same rules, so it reuses the same functions; the two never import each
+  other. Lint rules enforce these boundaries.
+- **Local API, off by default**: Other programs on the same machine read data
+  and start or stop the timer over HTTP below `/api/v1/`; a new version gets
+  its own sub-app next to it. The server listens on `127.0.0.1` only and lets
+  in only requests with the API key as `Authorization: Bearer`, a `Host` of
+  that address and no `Origin`, so web pages can neither call nor read it.
+  There is one key; only its SHA-256 hash is stored, so it is shown once when
+  created. Responses are their own v1 DTOs mapped from `shared/model/`, with
+  dates as ISO strings, because other programs depend on them. The API reports
+  whether it runs through `apiAccess` in the core, so `gui/` shows it without
+  knowing `api/`.
 - **Validated IPC**: Every handler is registered through `handle()` with a Zod
   schema for its arguments, never with `ipcMain.handle` directly. The schemas
   also normalize input (trim text, empty optional text to `null`). Rules that
@@ -271,8 +292,8 @@ sample profile and are excluded from the packaged app.
   the front, so two instances never work on the same files.
 - **Updates from GitHub releases, optional**: The installed app checks the
   latest published release at start and every few hours, downloads in the
-  background and installs on quit or on request. It is the only network access
-  and can be turned off; without a connection nothing changes. The portable zip
+  background and installs on quit or on request. It is the only outgoing
+  network access and can be turned off; without a connection nothing changes. The portable zip
   never updates itself (the updater would run the installer and leave a second
   copy), it only points to the download. Releases are created as drafts, so
   nothing reaches installed apps before it is published by hand.

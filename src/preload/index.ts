@@ -11,6 +11,7 @@ import type {
   FieldValueInput
 } from '../shared/model/customFields'
 import type { IpcResponse } from '../shared/gui/ipc'
+import type { ApiState } from '../shared/model/apiAccess'
 import type { ProfilesState } from '../shared/model/profiles'
 import type { Project, ProjectInput } from '../shared/model/projects'
 import type { AppInfo } from '../shared/gui/about'
@@ -187,6 +188,10 @@ const api = {
     snooze: () => invoke<void>('donation:snooze'),
     dismiss: () => invoke<void>('donation:dismiss')
   },
+  apiAccess: {
+    state: () => invoke<ApiState>('apiAccess:state'),
+    createKey: () => invoke<string>('apiAccess:createKey')
+  },
   app: {
     showMainWindow: () => invoke<void>('app:showMainWindow'),
     quit: () => invoke<void>('app:quit'),
@@ -201,7 +206,8 @@ const api = {
     onQuickShown: (callback: () => void) => subscribe('quick:shown', callback),
     onShowAbout: (callback: () => void) => subscribe('about:show', callback),
     onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback),
-    onDonationChanged: (callback: () => void) => subscribe('donation:changed', callback)
+    onDonationChanged: (callback: () => void) => subscribe('donation:changed', callback),
+    onApiChanged: (callback: () => void) => subscribe('api:changed', callback)
   }
 }
 

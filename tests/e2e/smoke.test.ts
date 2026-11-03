@@ -14,6 +14,7 @@ const views = [
   'settings/appearance',
   'settings/controls',
   'settings/updates',
+  'settings/api',
   'help'
 ]
 

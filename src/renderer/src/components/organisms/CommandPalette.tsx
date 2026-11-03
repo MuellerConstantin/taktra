@@ -356,6 +356,12 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       keywords: keywords('updates'),
       run: goTo('/settings/updates')
     },
+    {
+      id: 'api',
+      label: tApp('ApiSettings.title'),
+      keywords: keywords('api'),
+      run: goTo('/settings/api')
+    },
     ...(hasProfile ? profileSettings : [])
   ].map((command) => ({ ...command, icon: RiSettings3Line }))
 

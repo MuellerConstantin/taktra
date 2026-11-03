@@ -1,3 +1,4 @@
+import * as apiAccessModule from './app/apiAccess'
 import * as donationModule from './app/donation'
 import * as profilesModule from './app/profiles'
 import * as settingsModule from './app/settings'
@@ -42,6 +43,13 @@ export const events = {
 export const settings = {
   get: settingsModule.getSettings,
   update: settingsModule.updateSettings
+} as const
+
+export const apiAccess = {
+  getState: apiAccessModule.getApiState,
+  setStatus: apiAccessModule.setApiStatus,
+  createKey: apiAccessModule.createApiKey,
+  verifyKey: apiAccessModule.verifyApiKey
 } as const
 
 export const profiles = {
