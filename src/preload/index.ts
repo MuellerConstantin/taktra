@@ -1,43 +1,13 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Activity, ActivityInput, ActivityWithTags } from '../shared/model/activities'
-import type { Client, ClientInput } from '../shared/model/clients'
-import type {
-  CustomField,
-  CustomFieldInput,
-  CustomFieldOption,
-  CustomFieldScope,
-  CustomFieldWithOptions,
-  FieldValue,
-  FieldValueInput
-} from '../shared/model/customFields'
-import type { InvokeChannel, IpcResponse, WindowMessage } from '../shared/gui/ipc'
-import type { ApiState } from '../shared/model/apiAccess'
-import type { ProfilesState } from '../shared/model/profiles'
-import type { Project, ProjectInput } from '../shared/model/projects'
-import type { AppInfo } from '../shared/gui/about'
-import type {
-  ExportColumn,
-  ExportFormat,
-  ExportLayout,
-  ExportPreview,
-  ExportTemplate,
-  ExportTemplateInput
-} from '../shared/model/export'
-import type { UpdateStatus } from '../shared/gui/updates'
-import type { AggregateRow, Grouping, TimeFilter } from '../shared/model/reports'
-import type { ShortcutStatus } from '../shared/gui/shortcuts'
-import type { Settings } from '../shared/model/settings'
-import type { Tag, TagInput } from '../shared/model/tags'
-import type {
-  ActivityDetails,
-  TimeEntry,
-  TimeEntryDetails,
-  TimeEntryInput,
-  TimeEntryFilter
-} from '../shared/model/timeEntries'
+import type { InvokeChannel, IpcContract, IpcResponse, WindowMessage } from '../shared/gui/ipc'
 
-function invoke<T>(channel: InvokeChannel, ...args: unknown[]): Promise<IpcResponse<T>> {
-  return ipcRenderer.invoke(channel, ...args)
+type Result<Channel extends InvokeChannel> = Awaited<ReturnType<IpcContract[Channel]>>
+
+/** The function the renderer calls for a channel, typed by the IPC contract. */
+function invoker<Channel extends InvokeChannel>(
+  channel: Channel
+): (...args: Parameters<IpcContract[Channel]>) => Promise<IpcResponse<Result<Channel>>> {
+  return (...args) => ipcRenderer.invoke(channel, ...args)
 }
 
 function subscribe(channel: WindowMessage, callback: () => void): () => void {
@@ -50,154 +20,127 @@ function subscribe(channel: WindowMessage, callback: () => void): () => void {
 
 const api = {
   settings: {
-    get: () => invoke<Settings>('settings:get'),
-    update: (patch: Partial<Settings>) => invoke<Settings>('settings:update', patch)
+    get: invoker('settings:get'),
+    update: invoker('settings:update')
   },
   profiles: {
-    get: () => invoke<ProfilesState>('profiles:get'),
-    create: (name: string, path: string) => invoke<ProfilesState>('profiles:create', name, path),
-    createSample: () => invoke<ProfilesState>('profiles:createSample'),
-    setActive: (path: string) => invoke<ProfilesState>('profiles:setActive', path),
-    rename: (path: string, name: string) => invoke<ProfilesState>('profiles:rename', path, name),
-    delete: (path: string) => invoke<ProfilesState>('profiles:delete', path),
-    remove: (path: string) => invoke<ProfilesState>('profiles:remove', path),
-    open: () => invoke<ProfilesState | null>('profiles:open'),
-    defaultPath: (name: string) => invoke<string>('profiles:defaultPath', name),
-    choosePath: (defaultPath: string) => invoke<string | null>('profiles:choosePath', defaultPath)
+    get: invoker('profiles:get'),
+    create: invoker('profiles:create'),
+    createSample: invoker('profiles:createSample'),
+    setActive: invoker('profiles:setActive'),
+    rename: invoker('profiles:rename'),
+    delete: invoker('profiles:delete'),
+    remove: invoker('profiles:remove'),
+    open: invoker('profiles:open'),
+    defaultPath: invoker('profiles:defaultPath'),
+    choosePath: invoker('profiles:choosePath')
   },
   projects: {
-    list: (options?: { includeArchived?: boolean }) => invoke<Project[]>('projects:list', options),
-    get: (id: number) => invoke<Project>('projects:get', id),
-    create: (input: ProjectInput) => invoke<Project>('projects:create', input),
-    update: (id: number, patch: Partial<ProjectInput>) =>
-      invoke<Project>('projects:update', id, patch),
-    setArchived: (id: number, archived: boolean) =>
-      invoke<Project>('projects:setArchived', id, archived),
-    delete: (id: number) => invoke<void>('projects:delete', id)
+    list: invoker('projects:list'),
+    get: invoker('projects:get'),
+    create: invoker('projects:create'),
+    update: invoker('projects:update'),
+    setArchived: invoker('projects:setArchived'),
+    delete: invoker('projects:delete')
   },
   clients: {
-    list: (options?: { includeArchived?: boolean }) => invoke<Client[]>('clients:list', options),
-    get: (id: number) => invoke<Client>('clients:get', id),
-    create: (input: ClientInput) => invoke<Client>('clients:create', input),
-    update: (id: number, patch: Partial<ClientInput>) =>
-      invoke<Client>('clients:update', id, patch),
-    setArchived: (id: number, archived: boolean) =>
-      invoke<Client>('clients:setArchived', id, archived),
-    delete: (id: number) => invoke<void>('clients:delete', id)
+    list: invoker('clients:list'),
+    get: invoker('clients:get'),
+    create: invoker('clients:create'),
+    update: invoker('clients:update'),
+    setArchived: invoker('clients:setArchived'),
+    delete: invoker('clients:delete')
   },
   tags: {
-    list: () => invoke<Tag[]>('tags:list'),
-    get: (id: number) => invoke<Tag>('tags:get', id),
-    create: (input: TagInput) => invoke<Tag>('tags:create', input),
-    update: (id: number, patch: Partial<TagInput>) => invoke<Tag>('tags:update', id, patch),
-    delete: (id: number) => invoke<void>('tags:delete', id)
+    list: invoker('tags:list'),
+    get: invoker('tags:get'),
+    create: invoker('tags:create'),
+    update: invoker('tags:update'),
+    delete: invoker('tags:delete')
   },
   activities: {
-    list: (options?: { projectId?: number; includeArchived?: boolean }) =>
-      invoke<ActivityWithTags[]>('activities:list', options),
-    get: (id: number) => invoke<ActivityDetails>('activities:get', id),
-    create: (input: ActivityInput) => invoke<Activity>('activities:create', input),
-    rename: (id: number, name: string) => invoke<Activity>('activities:rename', id, name),
-    move: (id: number, projectId: number, name: string) =>
-      invoke<Activity>('activities:move', id, projectId, name),
-    setArchived: (id: number, archived: boolean) =>
-      invoke<Activity>('activities:setArchived', id, archived),
-    setClient: (id: number, clientId: number | null) =>
-      invoke<Activity>('activities:setClient', id, clientId),
-    setTags: (id: number, tagIds: readonly number[]) =>
-      invoke<void>('activities:setTags', id, tagIds),
-    merge: (id: number, targetId: number) => invoke<void>('activities:merge', id, targetId),
-    delete: (id: number) => invoke<void>('activities:delete', id)
+    list: invoker('activities:list'),
+    get: invoker('activities:get'),
+    create: invoker('activities:create'),
+    rename: invoker('activities:rename'),
+    move: invoker('activities:move'),
+    setArchived: invoker('activities:setArchived'),
+    setClient: invoker('activities:setClient'),
+    setTags: invoker('activities:setTags'),
+    merge: invoker('activities:merge'),
+    delete: invoker('activities:delete')
   },
   customFields: {
-    list: (options?: { scope?: CustomFieldScope; includeArchived?: boolean }) =>
-      invoke<CustomFieldWithOptions[]>('customFields:list', options),
-    create: (input: CustomFieldInput) => invoke<CustomField>('customFields:create', input),
-    rename: (id: number, name: string) => invoke<CustomField>('customFields:rename', id, name),
-    setArchived: (id: number, archived: boolean) =>
-      invoke<CustomField>('customFields:setArchived', id, archived),
-    delete: (id: number) => invoke<void>('customFields:delete', id),
-    createOption: (fieldId: number, name: string) =>
-      invoke<CustomFieldOption>('customFields:createOption', fieldId, name),
-    renameOption: (id: number, name: string) =>
-      invoke<CustomFieldOption>('customFields:renameOption', id, name),
-    setOptionArchived: (id: number, archived: boolean) =>
-      invoke<CustomFieldOption>('customFields:setOptionArchived', id, archived),
-    deleteOption: (id: number) => invoke<void>('customFields:deleteOption', id),
-    values: (scope: CustomFieldScope, ownerId: number) =>
-      invoke<FieldValue[]>('customFields:values', scope, ownerId),
-    setValues: (scope: CustomFieldScope, ownerId: number, values: readonly FieldValueInput[]) =>
-      invoke<FieldValue[]>('customFields:setValues', scope, ownerId, values)
+    list: invoker('customFields:list'),
+    create: invoker('customFields:create'),
+    rename: invoker('customFields:rename'),
+    setArchived: invoker('customFields:setArchived'),
+    delete: invoker('customFields:delete'),
+    createOption: invoker('customFields:createOption'),
+    renameOption: invoker('customFields:renameOption'),
+    setOptionArchived: invoker('customFields:setOptionArchived'),
+    deleteOption: invoker('customFields:deleteOption'),
+    values: invoker('customFields:values'),
+    setValues: invoker('customFields:setValues')
   },
   reports: {
-    aggregate: (filter: TimeFilter, groupBy: readonly Grouping[]) =>
-      invoke<AggregateRow[]>('reports:aggregate', filter, groupBy)
+    aggregate: invoker('reports:aggregate')
   },
   updates: {
-    status: () => invoke<UpdateStatus>('updates:status'),
-    check: () => invoke<void>('updates:check'),
-    install: () => invoke<void>('updates:install')
+    status: invoker('updates:status'),
+    check: invoker('updates:check'),
+    install: invoker('updates:install')
   },
   export: {
-    preview: (filter: TimeFilter, columns?: readonly ExportColumn[], layout?: ExportLayout) =>
-      invoke<ExportPreview>('export:preview', filter, columns, layout),
-    file: (
-      filter: TimeFilter,
-      format: ExportFormat,
-      columns?: readonly ExportColumn[],
-      layout?: ExportLayout
-    ) => invoke<string | null>('export:file', filter, format, columns, layout)
+    preview: invoker('export:preview'),
+    file: invoker('export:file')
   },
   exportTemplates: {
-    list: () => invoke<ExportTemplate[]>('exportTemplates:list'),
-    get: (id: number) => invoke<ExportTemplate>('exportTemplates:get', id),
-    create: (input: ExportTemplateInput) => invoke<ExportTemplate>('exportTemplates:create', input),
-    update: (id: number, input: ExportTemplateInput) =>
-      invoke<ExportTemplate>('exportTemplates:update', id, input),
-    delete: (id: number) => invoke<void>('exportTemplates:delete', id)
+    list: invoker('exportTemplates:list'),
+    get: invoker('exportTemplates:get'),
+    create: invoker('exportTemplates:create'),
+    update: invoker('exportTemplates:update'),
+    delete: invoker('exportTemplates:delete')
   },
   timeEntries: {
-    list: (filter: TimeEntryFilter) => invoke<TimeEntryDetails[]>('timeEntries:list', filter),
-    create: (input: TimeEntryInput) => invoke<TimeEntry>('timeEntries:create', input),
-    update: (id: number, input: TimeEntryInput) =>
-      invoke<TimeEntry>('timeEntries:update', id, input),
-    setNote: (id: number, note: string) => invoke<void>('timeEntries:note', id, note),
-    delete: (id: number) => invoke<void>('timeEntries:delete', id)
+    list: invoker('timeEntries:list'),
+    create: invoker('timeEntries:create'),
+    update: invoker('timeEntries:update'),
+    setNote: invoker('timeEntries:note'),
+    delete: invoker('timeEntries:delete')
   },
   timer: {
-    get: () => invoke<TimeEntryDetails | null>('timer:get'),
-    start: (activityId: number, note?: string) =>
-      invoke<TimeEntryDetails>('timer:start', activityId, note),
-    stop: () => invoke<void>('timer:stop'),
-    discard: () => invoke<void>('timer:discard'),
-    recent: (limit: number) => invoke<ActivityDetails[]>('timer:recent', limit)
+    get: invoker('timer:get'),
+    start: invoker('timer:start'),
+    stop: invoker('timer:stop'),
+    discard: invoker('timer:discard'),
+    recent: invoker('timer:recent')
   },
   shortcuts: {
-    status: () => invoke<ShortcutStatus>('shortcuts:status'),
-    setQuickStart: (accelerator: string) =>
-      invoke<Settings>('shortcuts:setQuickStart', accelerator),
-    setRecording: (recording: boolean) => invoke<void>('shortcuts:setRecording', recording)
+    status: invoker('shortcuts:status'),
+    setQuickStart: invoker('shortcuts:setQuickStart'),
+    setRecording: invoker('shortcuts:setRecording')
   },
   quick: {
-    hide: () => invoke<void>('quick:hide'),
-    toggle: () => invoke<void>('quick:toggle'),
-    resize: (height: number) => invoke<void>('quick:resize', height)
+    hide: invoker('quick:hide'),
+    toggle: invoker('quick:toggle'),
+    resize: invoker('quick:resize')
   },
   donation: {
-    hint: () => invoke<boolean>('donation:hint'),
-    snooze: () => invoke<void>('donation:snooze'),
-    dismiss: () => invoke<void>('donation:dismiss')
+    hint: invoker('donation:hint'),
+    snooze: invoker('donation:snooze'),
+    dismiss: invoker('donation:dismiss')
   },
   apiAccess: {
-    state: () => invoke<ApiState>('apiAccess:state'),
-    createKey: () => invoke<string>('apiAccess:createKey')
+    state: invoker('apiAccess:state'),
+    createKey: invoker('apiAccess:createKey')
   },
   app: {
-    showMainWindow: () => invoke<void>('app:showMainWindow'),
-    quit: () => invoke<void>('app:quit'),
-    info: () => invoke<AppInfo>('app:info'),
-    openDataFolder: () => invoke<void>('app:openDataFolder'),
-    setMainVisible: (visible: boolean) => invoke<void>('app:setMainVisible', visible)
+    showMainWindow: invoker('app:showMainWindow'),
+    quit: invoker('app:quit'),
+    info: invoker('app:info'),
+    openDataFolder: invoker('app:openDataFolder'),
+    setMainVisible: invoker('app:setMainVisible')
   },
   events: {
     onTimerChanged: (callback: () => void) => subscribe('timer:changed', callback),
