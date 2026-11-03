@@ -7,7 +7,7 @@ import { listOptions } from '../../../shared/validation'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { activities, projects, timeEntries } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { findClient } from './clients'
 import { sortByName } from './names'
 
@@ -80,7 +80,7 @@ export function updateProject(id: number, patch: Partial<ProjectData>): Project 
         .returning(projectSelection)
         .get()
     })
-    notifyChanged('timer')
+    emit('signal:timer')
     return project
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))

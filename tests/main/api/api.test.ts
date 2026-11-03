@@ -195,7 +195,7 @@ describe('timer', () => {
 
     tags.create({ name: 'Support' })
     const { value } = await reader.read()
-    expect(new TextDecoder().decode(value)).toContain('event: data')
+    expect(new TextDecoder().decode(value)).toContain('event: signal:data')
 
     await reader.cancel()
   })
@@ -207,7 +207,7 @@ describe('timer', () => {
 
     timer.start(ids.activity)
     const { value } = await reader.read()
-    expect(new TextDecoder().decode(value)).toContain('event: timer')
+    expect(new TextDecoder().decode(value)).toContain('event: signal:timer')
 
     await reader.cancel()
     timer.stop()

@@ -39,5 +39,5 @@ export function initTray(openApp: () => void): void {
   tray.setToolTip('Taktra')
   tray.setContextMenu(buildMenu(openApp))
   tray.on('click', toggleQuickStart)
-  events.onChanged('settings', () => tray?.setContextMenu(buildMenu(openApp)))
+  events.on('signal:settings', () => tray?.setContextMenu(buildMenu(openApp)))
 }

@@ -6,7 +6,7 @@ import {
   themeSources,
   type Settings
 } from '../../../shared/model/settings'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { lazyStore } from './store'
 
 const store = lazyStore<Settings>('settings', {
@@ -30,6 +30,6 @@ export function updateSettings(patch: Partial<Settings>): Settings {
   } catch (error) {
     throw new AppError('VALIDATION_FAILED', String(error))
   }
-  notifyChanged('settings')
+  emit('signal:settings')
   return store().store
 }

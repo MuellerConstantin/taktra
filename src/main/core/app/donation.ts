@@ -1,4 +1,4 @@
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { lazyStore } from './store'
 
 const FIRST_HINT_AFTER_DAYS = 14
@@ -20,7 +20,7 @@ const store = lazyStore<DonationState>('donation', {
 
 function update(patch: Partial<DonationState>): void {
   store().set({ ...store().store, ...patch })
-  notifyChanged('donation')
+  emit('signal:donation')
 }
 
 /** Counts each local day on which the main window was in use once. */

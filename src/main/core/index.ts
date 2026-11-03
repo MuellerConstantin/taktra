@@ -22,7 +22,7 @@ import * as eventsModule from './events'
  */
 
 export type { CoreEnvironment } from './environment'
-export type { AppEvent } from './events'
+export type { AppEvent, Signal } from './events'
 export type { ExportFile } from './domain/export'
 export { lazyStore } from './app/store'
 
@@ -44,14 +44,14 @@ function notifying<Args extends unknown[], Result>(
 ): (...args: Args) => Result {
   return (...args) => {
     const result = write(...args)
-    eventsModule.notifyChanged('data')
+    eventsModule.emit('signal:data')
     return result
   }
 }
 
 export const events = {
-  names: eventsModule.appEvents,
-  onChanged: eventsModule.onChanged
+  signals: eventsModule.signals,
+  on: eventsModule.on
 } as const
 
 export const settings = {

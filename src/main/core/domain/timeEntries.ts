@@ -5,7 +5,7 @@ import { timeEntryFilter } from '../../../shared/validation'
 import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import {
   activityDetailsColumns,
   deleteActivityIfUnused,
@@ -130,7 +130,7 @@ export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
 export function setTimeEntryNote(id: number, note: string | null): void {
   const entry = findTimeEntry(id)
   getActiveDatabase().update(timeEntries).set({ note }).where(eq(timeEntries.id, id)).run()
-  if (entry.endedAt === null && entry.startedAt !== null) notifyChanged('timer')
+  if (entry.endedAt === null && entry.startedAt !== null) emit('signal:timer')
 }
 
 export function deleteTimeEntry(id: number): void {

@@ -16,7 +16,7 @@ import {
   tags,
   timeEntries
 } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { clientRef, effectiveClientJoin, findClient } from './clients'
 import { sortByName } from './names'
 import { findProject } from './projects'
@@ -141,7 +141,7 @@ export function renameActivity(id: number, name: string): Activity {
       .where(eq(activities.id, id))
       .returning(activitySelection)
       .get()
-    notifyChanged('timer')
+    emit('signal:timer')
     return activity
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
@@ -166,7 +166,7 @@ export function moveActivity(id: number, projectId: number, name: string): Activ
       .where(eq(activities.id, id))
       .returning(activitySelection)
       .get()
-    notifyChanged('timer')
+    emit('signal:timer')
     return activity
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
@@ -195,7 +195,7 @@ export function setActivityClient(id: number, clientId: number | null): Activity
     .where(eq(activities.id, id))
     .returning(activitySelection)
     .get()
-  notifyChanged('timer')
+  emit('signal:timer')
   return activity
 }
 
@@ -215,7 +215,7 @@ export function setActivityTags(id: number, tagIds: readonly number[]): void {
         .values(uniqueIds.map((tagId) => ({ activityId: id, tagId })))
         .run()
   })
-  notifyChanged('timer')
+  emit('signal:timer')
 }
 
 function hasTimeEntries(id: number): boolean {
@@ -254,7 +254,7 @@ export function mergeActivity(id: number, targetId: number): void {
       tx.update(activities).set({ archivedAt: null }).where(eq(activities.id, targetId)).run()
     tx.delete(activities).where(eq(activities.id, id)).run()
   })
-  notifyChanged('timer')
+  emit('signal:timer')
 }
 
 export function deleteActivity(id: number): void {

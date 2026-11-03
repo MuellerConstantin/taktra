@@ -21,7 +21,7 @@ import {
 import { SAMPLE_PROFILE_NAME, seedSampleData } from '../db/sample'
 import { stopTimer } from '../domain/timer'
 import { getEnvironment } from '../environment'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { lazyStore } from './store'
 
 type KnownProfiles = {
@@ -87,7 +87,7 @@ function updateKnownProfiles(paths: string[], activePath: string | null): void {
 
   store().set({ paths, activePath })
   syncActiveDatabase()
-  notifyChanged('profiles')
+  emit('signal:profiles')
 }
 
 export function getProfilesState(): ProfilesState {
@@ -154,7 +154,7 @@ export function renameProfile(path: string, name: string): ProfilesState {
   if (readProfileName(path) === null) throw new AppError('PROFILE_UNAVAILABLE', path)
 
   withProfileDatabase(path, {}, (db) => writeProperty(db, 'name', name))
-  notifyChanged('profiles')
+  emit('signal:profiles')
 
   return getProfilesState()
 }

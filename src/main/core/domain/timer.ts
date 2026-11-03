@@ -3,7 +3,7 @@ import { AppError, isAppError } from '../../../shared/model/errors'
 import type { ActivityDetails, TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { getActiveDatabase } from '../db/database'
 import { activities, clients, projects, timeEntries } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { activityDetailsColumns, findActivity, tagsByActivity } from './activities'
 import { effectiveClientJoin } from './clients'
 import { findProject } from './projects'
@@ -83,21 +83,21 @@ export function startTimer(activityId: number, note: string | null = null): Time
       .run()
     return getRunningTimer()!
   })
-  notifyChanged('timer')
+  emit('signal:timer')
   return timer
 }
 
 export function stopTimer(): void {
   const db = getActiveDatabase()
   db.transaction(() => stopRunning(new Date()))
-  notifyChanged('timer')
+  emit('signal:timer')
 }
 
 export function discardTimer(): void {
   const entry = getActiveDatabase().select().from(timeEntries).where(isRunning).get()
   if (!entry) return
   deleteTimeEntry(entry.id)
-  notifyChanged('timer')
+  emit('signal:timer')
 }
 
 export function listRecentActivities(limit: number): ActivityDetails[] {

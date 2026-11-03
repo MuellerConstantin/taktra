@@ -7,5 +7,5 @@ function applyTheme(): void {
 
 export function initTheme(): void {
   applyTheme()
-  events.onChanged('settings', applyTheme)
+  events.on('signal:settings', applyTheme)
 }

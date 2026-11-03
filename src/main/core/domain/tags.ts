@@ -5,7 +5,7 @@ import type { Tag, TagData } from '../../../shared/model/tags'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { tags } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { sortByName } from './names'
 
 export const tagSelection = {
@@ -47,7 +47,7 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
       .where(eq(tags.id, id))
       .returning(tagSelection)
       .get()
-    notifyChanged('timer')
+    emit('signal:timer')
     return tag
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('TAG_NAME_TAKEN', String(error))
@@ -58,5 +58,5 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
 export function deleteTag(id: number): void {
   findTag(id)
   getActiveDatabase().delete(tags).where(eq(tags.id, id)).run()
-  notifyChanged('timer')
+  emit('signal:timer')
 }

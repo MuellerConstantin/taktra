@@ -54,7 +54,7 @@ function setQuickStartShortcut(accelerator: string): Settings {
 
 export function initShortcuts(): void {
   applyShortcut()
-  events.onChanged('settings', applyShortcut)
+  events.on('signal:settings', applyShortcut)
   app.on('will-quit', () => globalShortcut.unregisterAll())
 
   handle('shortcuts:status', z.tuple([]), () => getStatus())

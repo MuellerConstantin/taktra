@@ -39,10 +39,10 @@ export function sendToMainWindow(channel: string): void {
 }
 
 export function initWindowEvents(): void {
-  for (const event of events.names) {
-    events.onChanged(event, () => {
+  for (const signal of events.signals) {
+    events.on(`signal:${signal}`, () => {
       for (const window of BrowserWindow.getAllWindows())
-        window.webContents.send(`${event}:changed`)
+        window.webContents.send(`${signal}:changed`)
     })
   }
 }

@@ -116,7 +116,7 @@ export function attachMiniTimer(window: BrowserWindow): void {
 }
 
 export function initMiniTimer(): void {
-  events.onChanged('timer', updateMiniTimer)
+  events.on('signal:timer', updateMiniTimer)
   handle('app:showMainWindow', z.tuple([]), () => showMainWindow())
   handle('app:setMainVisible', z.tuple([z.boolean()]), (event, visible) => {
     if (event.sender !== mainWindow?.webContents) return

@@ -281,12 +281,16 @@ sample profile and are excluded from the packaged app.
 - **Main broadcasts, windows reload**: When state that several windows show
   changes, the core reports it through `core/events.ts` and each listener
   reloads what it shows; the windows and the API's event stream are listeners.
-  Events name a kind of state, never a single record: the running timer, the
-  profile data (`data`, sent after every write of a service object, whoever
-  made it), the profiles, the app settings, the donation hint and the local
-  API. They carry no ids, because a change often affects more than the record
-  written (a project's client is every activity's client), and a reload is
-  always right where a list of affected records could miss one.
+  Events are named by their kind. A `signal:<state>` names a kind of state,
+  never a single record: the running timer, the profile data (`signal:data`,
+  sent after every write of a service object, whoever made it), the profiles,
+  the app settings, the donation hint and the local API. Signals carry no ids,
+  because a change often affects more than the record written (a project's
+  client is every activity's client), and a reload is always right where a
+  list of affected records could miss one. Events about single facts with a
+  payload, if ever needed, get a kind of their own
+  (`domain:<resource>.<action>`). The IPC channels of the windows
+  (`<state>:changed`) are the GUI's own mapping of the signals.
 - **Several windows, one renderer**: The mini timer and the quick start are
   routes of the same renderer, opened as small frameless windows with the same
   preload and sandbox settings as the main window.

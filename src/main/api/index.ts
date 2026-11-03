@@ -38,7 +38,7 @@ function schedule(): Promise<void> {
 }
 
 export function startApi(): void {
-  events.onChanged('settings', () => void schedule())
+  events.on('signal:settings', () => void schedule())
   void schedule()
 }
 

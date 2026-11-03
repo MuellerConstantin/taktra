@@ -7,7 +7,7 @@ import { listOptions } from '../../../shared/validation'
 import { getActiveDatabase } from '../db/database'
 import { isUniqueViolation } from '../db/errors'
 import { activities, clients, projects, timeEntries } from '../db/schema'
-import { notifyChanged } from '../events'
+import { emit } from '../events'
 import { sortByName } from './names'
 
 export const clientSelection = {
@@ -70,7 +70,7 @@ export function updateClient(id: number, patch: Partial<ClientData>): Client {
       .where(eq(clients.id, id))
       .returning(clientSelection)
       .get()
-    notifyChanged('timer')
+    emit('signal:timer')
     return client
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('CLIENT_NAME_TAKEN', String(error))
@@ -112,5 +112,5 @@ export function deleteClient(id: number): void {
     tx.update(activities).set({ clientId: null }).where(eq(activities.clientId, id)).run()
     tx.delete(clients).where(eq(clients.id, id)).run()
   })
-  notifyChanged('timer')
+  emit('signal:timer')
 }
