@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createApp } from '../../../src/main/api/app'
-import { activities, apiAccess, projects, tags, timer } from '../../../src/main/core'
+import { activities, apiAccess, customFields, projects, tags, timer } from '../../../src/main/core'
 import { activateDatabase, closeActiveDatabase } from '../../../src/main/core/db/database'
 import { getEnvironment } from '../../../src/main/core/environment'
 import { createTestProfile } from '../../profiles'
@@ -82,7 +82,8 @@ describe('reading', () => {
         description: null,
         color: null,
         clientId: null,
-        archivedAt: null
+        archivedAt: null,
+        customFields: []
       }
     ])
   })
@@ -103,6 +104,49 @@ describe('reading', () => {
     expect([unknown.status, await errorCode(unknown)]).toEqual([404, 'ROUTE_NOT_FOUND'])
     const profile = await request('/api/v1/profile')
     expect([profile.status, await errorCode(profile)]).toEqual([409, 'NO_ACTIVE_PROFILE'])
+  })
+})
+
+describe('custom fields', () => {
+  it('lists the fields and embeds their values in the owners', async () => {
+    const costCenter = customFields.create({ scope: 'project', type: 'text', name: 'Cost center' })
+    const billing = customFields.create({ scope: 'activity', type: 'select', name: 'Billing' })
+    const flatRate = customFields.createOption(billing.id, 'Flat rate')
+    customFields.setValues('project', ids.project, [
+      { fieldId: costCenter.id, textValue: '4711', optionId: null }
+    ])
+    customFields.setValues('activity', ids.activity, [
+      { fieldId: billing.id, textValue: null, optionId: flatRate.id }
+    ])
+
+    const fields = await (await request('/api/v1/custom-fields')).json()
+    expect(fields).toEqual([
+      expect.objectContaining({
+        name: 'Billing',
+        type: 'select',
+        options: [expect.objectContaining({ name: 'Flat rate' })]
+      }),
+      expect.objectContaining({ name: 'Cost center', type: 'text', options: [] })
+    ])
+    const project = await (await request(`/api/v1/projects/${ids.project}`)).json()
+    expect(project.customFields).toEqual([
+      { fieldId: costCenter.id, name: 'Cost center', value: '4711', optionId: null }
+    ])
+    const [activity] = (await (await request('/api/v1/activities')).json()) as {
+      customFields: unknown
+    }[]
+    expect(activity.customFields).toEqual([
+      { fieldId: billing.id, name: 'Billing', value: 'Flat rate', optionId: flatRate.id }
+    ])
+  })
+
+  it('filters the fields by scope', async () => {
+    const fields = (await (await request('/api/v1/custom-fields?scope=project')).json()) as {
+      scope: string
+    }[]
+    expect(fields.map((field) => field.scope)).toEqual(['project'])
+    const invalid = await request('/api/v1/custom-fields?scope=entry')
+    expect([invalid.status, await errorCode(invalid)]).toEqual([400, 'VALIDATION_FAILED'])
   })
 })
 

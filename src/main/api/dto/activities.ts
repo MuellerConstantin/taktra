@@ -1,6 +1,7 @@
 import type { ActivityWithTags } from '../../../shared/model/activities'
 import type { ActivityDetails } from '../../../shared/model/timeEntries'
 import { timestamp, toRef, type RefV1, type Timestamp } from './common'
+import type { CustomFieldValueV1 } from './customFields'
 import { toTag, type TagV1 } from './tags'
 
 export interface ActivityV1 {
@@ -10,16 +11,21 @@ export interface ActivityV1 {
   readonly clientId: number | null
   readonly tagIds: readonly number[]
   readonly archivedAt: Timestamp | null
+  readonly customFields: readonly CustomFieldValueV1[]
 }
 
-export function toActivity(activity: ActivityWithTags): ActivityV1 {
+export function toActivity(
+  activity: ActivityWithTags,
+  customFields: readonly CustomFieldValueV1[]
+): ActivityV1 {
   return {
     id: activity.id,
     projectId: activity.projectId,
     name: activity.name,
     clientId: activity.clientId,
     tagIds: activity.tagIds,
-    archivedAt: timestamp(activity.archivedAt)
+    archivedAt: timestamp(activity.archivedAt),
+    customFields
   }
 }
 

@@ -82,8 +82,8 @@ distinct values of the summed entries instead of grouping by them.
 
 **Local API**
 For developers and technicians, an optional local HTTP API lets other programs
-on the same machine read projects, activities, clients, tags, entries and
-reports of the active profile, start and stop the timer, and follow changes as
+on the same machine read projects, activities, clients, tags, custom fields
+with their values, entries and reports of the active profile, start and stop the timer, and follow changes as
 server-sent events. It is turned on, given a port and a key on the
 integrations page of the app settings, which will also hold further
 connections such as MCP.

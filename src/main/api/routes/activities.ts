@@ -4,6 +4,7 @@ import { activityListOptions } from '../../../shared/validation'
 import { activities } from '../../core'
 import { toActivity } from '../dto/activities'
 import { idParam, parse, toBoolean, toNumber } from '../parse'
+import { fieldValuesOf } from './customFields'
 
 export function registerActivityRoutes(v1: Hono): void {
   v1.get('/activities', (c) => {
@@ -12,7 +13,10 @@ export function registerActivityRoutes(v1: Hono): void {
       projectId: projectId === undefined ? undefined : toNumber(projectId),
       includeArchived: toBoolean(c.req.query('includeArchived'))
     })
-    return c.json(activities.list(options).map(toActivity))
+    const valuesOf = fieldValuesOf('activity')
+    return c.json(
+      activities.list(options).map((activity) => toActivity(activity, valuesOf(activity.id)))
+    )
   })
   // The list carries the tag ids, so a single activity has the same shape as in the list.
   v1.get('/activities/:id', (c) => {
@@ -21,6 +25,6 @@ export function registerActivityRoutes(v1: Hono): void {
       .list({ includeArchived: true })
       .find((candidate) => candidate.id === activityId)
     if (!activity) throw new AppError('ACTIVITY_NOT_FOUND', String(activityId))
-    return c.json(toActivity(activity))
+    return c.json(toActivity(activity, fieldValuesOf('activity')(activity.id)))
   })
 }

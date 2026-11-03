@@ -122,6 +122,7 @@ export const customFields = {
   setOptionArchived: customFieldsModule.setCustomFieldOptionArchived,
   deleteOption: customFieldsModule.deleteCustomFieldOption,
   getValues: customFieldsModule.getFieldValues,
+  listValues: customFieldsModule.listFieldValues,
   setValues: customFieldsModule.setFieldValues
 } as const
 
