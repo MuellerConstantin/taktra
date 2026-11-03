@@ -30,6 +30,7 @@
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
     "@hono/node-server": "^2.1.6",
+    "@hono/zod-openapi": "^1.6.3",
     "better-sqlite3": "^13.0.3",
     "conf": "^15.1.0",
     "csv-stringify": "^6.9.0",

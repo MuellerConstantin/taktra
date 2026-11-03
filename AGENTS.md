@@ -112,7 +112,8 @@ development.
 - **App settings**: `conf`
 - **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
-- **Local API**: Hono with `@hono/node-server` (main process only)
+- **Local API**: Hono with `@hono/node-server` and `@hono/zod-openapi` (main
+  process only)
 - **Tests**: Vitest (main process), Playwright (end-to-end with Electron)
 
 ## Project Structure
@@ -129,8 +130,9 @@ development.
 │   │   ├── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
 │   │   │   └── ipc/       # IPC handlers for the renderer, one file per area
 │   │   └── api/           # Local HTTP API; uses only core/index.ts, never gui/
-│   │       ├── routes/    # Route handlers of /api/v1, one file per area
-│   │       └── dto/       # Response format of /api/v1, one file per area
+│   │       └── v1/        # Version 1: its sub-app, description, routes and wire format
+│   │           ├── routes/  # Route declarations and handlers, one file per area
+│   │           └── dto/     # Wire format of requests and responses, one file per area
 │   ├── preload/           # Typed `window.api` bridge
 │   ├── shared/            # Used by main, preload and renderer
 │   │   ├── model/         # Domain types, constants, pure rules, error codes, text length limits
@@ -350,8 +352,13 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 ## Local API
 
 - **Off by default, local only**: Other programs on the same machine use the
-  data of the active profile over HTTP below `/api/v1/`; a new version gets
-  its own sub-app next to it. The server listens on `127.0.0.1` only.
+  data of the active profile over HTTP below `/api/v1/`. The server listens on
+  `127.0.0.1` only.
+- **Each version complete in itself**: A version is a sub-app below
+  `/api/<version>/` with its own access check, body limit, error format, wire
+  format and description, so a new version may change any of them while the
+  old one keeps its contract. The root app only mounts the versions and
+  answers requests outside them with a plain 404.
 - **Profile data only**: The API reads and changes what belongs to the active
   profile. Profiles and app settings are left out: they would let a client
   that holds the key, such as an AI assistant, create or move files by path,
@@ -364,6 +371,14 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 - **Own response format**: Responses are v1 DTOs in `api/dto/`, mapped
   explicitly from `shared/model/` with dates as ISO strings, because other
   programs depend on them while the model may change with the app.
+- **Described by its code**: Every route is declared with `createRoute()`
+  (parameters, body, responses as Zod schemas), the DTOs are Zod schemas whose
+  types are inferred, and request validation follows from the declaration. The
+  OpenAPI 3.1 description is generated from it. Each version describes itself
+  at `/api/<version>/openapi.json`, without the key because it holds nothing
+  secret. A
+  test fails when a served route is not described or a response has fields its
+  schema lacks, so the description cannot drift from the code.
 - **REST plus actions**: Resources are created with `POST` (201), changed
   with `PATCH` or replaced with `PUT`, and deleted with `DELETE` (204).
   Operations without a field of their own are actions such as
@@ -371,9 +386,9 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   request is exactly one operation of the core, so it applies completely or
   not at all. Input uses the names of the responses (`start`, `end` as ISO
   strings; `value` or `optionId` for a custom field).
-- **Uniform errors**: Every error is `{ "error": { "code": … } }` with an HTTP
-  status that follows from the code; validation errors of a request add a
-  `message` naming the invalid fields.
+- **Uniform errors**: In v1, every error is `{ "error": { "code": … } }` with
+  an HTTP status that follows from the code; validation errors of a request
+  add a `message` naming the invalid fields.
 - **Events as SSE**: `/api/v1/events` streams the signals of the core under
   their names (`signal:data`, …), without payload.
 

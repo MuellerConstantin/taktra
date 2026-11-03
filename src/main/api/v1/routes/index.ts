@@ -1,7 +1,8 @@
-import type { Hono } from 'hono'
+import type { OpenAPIHono } from '@hono/zod-openapi'
 import { registerActivityRoutes } from './activities'
 import { registerClientRoutes } from './clients'
 import { registerCustomFieldRoutes } from './customFields'
+import { registerEventRoutes } from './events'
 import { registerExportTemplateRoutes } from './exportTemplates'
 import { registerProfileRoutes } from './profile'
 import { registerProjectRoutes } from './projects'
@@ -10,7 +11,7 @@ import { registerTagRoutes } from './tags'
 import { registerTimeEntryRoutes } from './timeEntries'
 import { registerTimerRoutes } from './timer'
 
-export function registerRoutes(v1: Hono): void {
+export function registerRoutes(v1: OpenAPIHono): void {
   registerProfileRoutes(v1)
   registerProjectRoutes(v1)
   registerActivityRoutes(v1)
@@ -21,4 +22,5 @@ export function registerRoutes(v1: Hono): void {
   registerReportRoutes(v1)
   registerTimerRoutes(v1)
   registerExportTemplateRoutes(v1)
+  registerEventRoutes(v1)
 }

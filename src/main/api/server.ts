@@ -1,9 +1,9 @@
 import type { Server } from 'node:http'
 import { createAdaptorServer } from '@hono/node-server'
-import type { Hono } from 'hono'
+import type { OpenAPIHono } from '@hono/zod-openapi'
 
 /** Listens on the loopback interface only. */
-export function listen(app: Hono, port: number): Promise<Server> {
+export function listen(app: OpenAPIHono, port: number): Promise<Server> {
   const server = createAdaptorServer({ fetch: app.fetch }) as Server
   return new Promise((resolve, reject) => {
     server.once('error', reject)

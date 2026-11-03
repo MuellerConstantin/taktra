@@ -1,50 +1,17 @@
-import { Hono } from 'hono'
-import { bodyLimit } from 'hono/body-limit'
-import { isAppError } from '../../shared/model/errors'
-import { HttpError, statusOf, ValidationError } from './errors'
-import { streamEvents } from './events'
-import { guard } from './guard'
-import { registerRoutes } from './routes'
+import { OpenAPIHono } from '@hono/zod-openapi'
+import { createV1, V1_PATH } from './v1'
+import { notFound as notFoundV1 } from './v1/errors'
 
-const MAX_BODY_BYTES = 64 * 1024
-
-interface ErrorBody {
-  readonly error: { readonly code: string; readonly message?: string }
-}
-
-function errorBody(code: string, message?: string): ErrorBody {
-  return { error: message === undefined ? { code } : { code, message } }
-}
-
-/** The whole API; each version is a sub-app below `/api/<version>`. */
-export function createApp(port: () => number): Hono {
-  const v1 = new Hono()
-  registerRoutes(v1)
-  v1.get('/events', streamEvents)
-
-  const app = new Hono()
-  app.use(
-    guard(port),
-    bodyLimit({
-      maxSize: MAX_BODY_BYTES,
-      onError: (c) => c.json(errorBody('PAYLOAD_TOO_LARGE'), 413)
-    })
+/**
+ * The whole API: each version is a sub-app below `/api/<version>` with its own access, error
+ * format and description. Requests outside every version get a plain 404.
+ */
+export function createApp(port: () => number): OpenAPIHono {
+  const app = new OpenAPIHono()
+  app.route(V1_PATH, createV1(port))
+  // A sub-app's own not-found handler is not used for its paths, so it is chosen here.
+  app.notFound((c) =>
+    c.req.path.startsWith(`${V1_PATH}/`) ? notFoundV1(c) : c.text('Not found', 404)
   )
-  app.route('/api/v1', v1)
-
-  app.notFound((c) => c.json(errorBody('ROUTE_NOT_FOUND'), 404))
-  app.onError((error, c) => {
-    if (error instanceof ValidationError) {
-      return c.json(errorBody(error.code, error.details), 400)
-    }
-    if (error instanceof HttpError) {
-      return c.json(errorBody(error.code), error.status)
-    }
-    if (isAppError(error)) {
-      return c.json(errorBody(error.code), statusOf(error.code))
-    }
-    console.error(`API request ${c.req.method} ${c.req.path} failed`, error)
-    return c.json(errorBody('UNKNOWN'), 500)
-  })
   return app
 }
