@@ -149,15 +149,118 @@ development.
     └── e2e/               # Playwright against the built app
 ```
 
-`src/main/index.ts` only takes the single instance lock and starts the core
-and the GUI through `startCore()`, `stopCore()` and `startGui()`. Each layer's
-`index.ts` starts what it needs; nothing else reaches into a layer to start
-it. `docs/screenshots/` holds the README screenshots; they show only the
-sample profile and are excluded from the packaged app.
+`docs/screenshots/` holds the README screenshots; they show only the sample
+profile and are excluded from the packaged app.
 
-## Design Decisions
+## Architecture
 
-### Data and storage
+### Processes
+
+Taktra runs in the processes Electron gives it, and data crosses between them
+only in one way:
+
+- **Main process**: the core, the database, Node APIs, and the main-process
+  half of the GUI (windows, tray, dialogs) and the local API.
+- **Preload**: the typed `window.api` bridge, the only connection between a
+  window and the main process.
+- **Renderer**: the React UI, one process per window, sandboxed with context
+  isolation. It has no Node APIs and no database; UI code calls the main
+  process through the client in `lib/api.ts`, not `window.api`.
+
+The mini timer and the quick start are routes of the same renderer, opened as
+small frameless windows with the same preload and sandbox settings as the main
+window.
+
+### Layers of the main process
+
+| Layer               | Holds                                                    | Imports                                          |
+| ------------------- | -------------------------------------------------------- | ------------------------------------------------ |
+| `core/`             | rules and data: profile data, installation state, events | `shared/`, Node, libraries; never Electron       |
+| `gui/`              | windows, tray, shortcut, dialogs, theme, IPC handlers    | `core` through its index only                    |
+| `api/`              | the local HTTP API                                       | `core` through its index; never `gui/`, Electron |
+| `src/main/index.ts` | the single instance lock, starting and stopping the rest | each layer through its index                     |
+
+- **The core runs without Electron**: it imports neither `electron` nor
+  anything from `gui/` or `api/`, and gets the user data path, the migrations
+  folder and the trash through the environment passed to `startCore()`. So it
+  runs under plain Node, as in the tests.
+- **One public interface**: `core/index.ts` exports `startCore()`/`stopCore()`
+  and one stateless service object per area (`projects.create()`,
+  `timer.start()`). Presentations import only from there; modules inside the
+  core import each other directly and never through it.
+- **Presentations are thin**: `gui/` and `api/` validate input, call a service
+  object and present the result. They are siblings and never import each
+  other; what one has to show of the other goes through the core (the GUI shows
+  whether the API runs through `apiAccess`).
+- **Each layer starts itself**: `startCore()`, `startGui()` and `startApi()`
+  start what their layer needs; nothing else reaches into a layer to start it.
+- **The caller validates**: Service objects expect input checked and normalized
+  with the schemas of `shared/validation/`, as every presentation does before
+  calling them. Rules that need the database stay in the core.
+
+Lint rules enforce these boundaries.
+
+### Contracts in `shared/`
+
+`shared/` is the contract between the processes and imports nothing from
+`src/main/`.
+
+- **`shared/model/`**: domain types, constants, pure rules, error codes and
+  text length limits, used by every process. What the core returns is described
+  here by hand, without internal columns such as `uid` or timestamps. Core
+  queries select exactly these fields through a selection per table
+  (`projectSelection`), so no full database row leaves the core; the typecheck
+  keeps selection and type in line.
+- **`shared/validation/`**: the Zod schemas, the input contract of the core.
+  They also normalize input (trim text, empty optional text to `null`). The
+  renderer never imports them, so Zod stays out of its bundle.
+- **`shared/gui/`**: what only the main process and the renderer exchange (IPC
+  response, shortcut status, updates, about). The core never imports it.
+
+### IPC
+
+- **Validated handlers**: Every IPC handler is registered through `handle()`
+  with a Zod schema for its arguments, never with `ipcMain.handle` directly.
+  Handlers in `gui/ipc/` make the core reachable for the renderer; a GUI module
+  with state of its own (windows, tray, shortcut, updater) registers its
+  handlers itself.
+- **Uniform errors with codes**: Errors the user may see are thrown as
+  `AppError` with a code from `shared/model/errors.ts` and translated in the
+  renderer under `Errors.<CODE>`. Unexpected errors are logged and reach the UI
+  as `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog)
+  are returned as values.
+
+### Events
+
+When state that several consumers show changes, the core reports it through
+`core/events.ts`, and each listener reloads what it shows.
+
+- **Named by kind**: A `signal:<state>` names a kind of state, never a single
+  record: the running timer, the profile data (`signal:data`, sent after every
+  write of a service object, whoever made it), the profiles, the app settings,
+  the donation hint and the local API. `core/events.ts` documents when each one
+  is sent. Events about single facts with a payload, if ever needed, get a kind
+  of their own (`domain:<resource>.<action>`).
+- **No ids**: A change often affects more than the record written (a project's
+  client is every activity's client), so a reload is always right where a list
+  of affected records could miss one.
+- **They stay in the main process**: Core events are calls on an
+  `EventEmitter` in the main process. Main-process consumers such as the tray,
+  the theme, the global shortcut and the mini timer listen to them directly.
+  The renderer never receives them: `gui/windows.ts` maps each signal to the
+  IPC channel `<state>:changed` and sends it to every window, and the preload
+  subscribes to these channels. They are the GUI's own contract, which also
+  carries messages that do not come from the core (`quick:shown`,
+  `about:show`, `updates:changed`). The local API maps the same signals to
+  server-sent events.
+
+```
+core ── signal:data ──► gui/windows.ts ── IPC data:changed ──► preload ──► renderer
+     ── signal:settings ──► gui/tray.ts, theme.ts, shortcuts.ts (no IPC)
+     ── signal:data ──► api/events.ts ── SSE signal:data ──► other programs
+```
+
+## Data and Storage
 
 - **One SQLite file per profile**: Gives the "open a file" experience, makes
   backups a file copy, and still allows proper SQL for reports. Files are
@@ -200,6 +303,16 @@ sample profile and are excluded from the packaged app.
   edited while it runs, and it is stopped before the active profile changes.
 - **Archive instead of delete**: Anything with booked time is archived, never
   deleted, so historic reports stay complete.
+- **Text length limits on three levels**: Inputs set `maxLength`, the Zod
+  schemas reject longer values, and check constraints in the database are the
+  last line of defence. The limits are defined once in `shared/model/limits.ts`.
+- **App settings outside the database**: Preferences of the installation
+  (theme, language, mini timer, global shortcut, local API) live in `conf`
+  files in the user data directory and reach the renderer only through IPC.
+  `conf` is ESM-only and must stay bundled into the CJS main build.
+
+## Domain Rules
+
 - **Project wins over activity**: The effective client of an activity is the
   project's, else its own. A project with a client leaves its activities
   without one: setting it clears theirs, removing it hands it down to them, and
@@ -207,9 +320,6 @@ sample profile and are excluded from the packaged app.
   has its own. Each change applies retroactively to booked time, so the UI warns
   when it replaces a different client of an activity. A client is attached to
   activities, never to entries, and is a single value, unlike tags.
-- **Text length limits on three levels**: Inputs set `maxLength`, the Zod
-  schemas reject longer values, and check constraints in the database are the
-  last line of defence. The limits are defined once in `shared/model/limits.ts`.
 - **Exports are a stable file format**: Exports contain a cleaned view (names
   instead of ids, local clock times, durations in whole minutes or in hours
   rounded to hundredths), never the tables, so the schema stays free to change,
@@ -221,79 +331,34 @@ sample profile and are excluded from the packaged app.
   aggregation has the default of its kind, so older templates keep their
   meaning. Only durations are summed, because custom field values belong to an
   owner, not to the entry. Columns that allow none (start, end) are rejected in
-  sums rather than dropped. The standard column names
-  are English and never change, because other systems import them; a custom
-  field column is named by the field's name key. A template may rename any
-  column, and names must be unique in a file. CSV follows
-  RFC 4180 strictly (comma, CRLF, no BOM) through a library; further formats
-  get their own writer for the same rows. Excel files are for people, CSV for
-  other systems: xlsx writes dates and durations as typed cells, while CSV is
-  never adapted to Excel (BOM, semicolons).
-- **App settings outside the database**: Preferences of the installation
-  (theme, language, mini timer, global shortcut) live in `conf` files in the
-  user data directory and reach the renderer only through the API. `conf` is
-  ESM-only and must stay bundled into the CJS main build.
-- **No native rebuild**: `better-sqlite3` ships prebuilt, ABI-stable binaries,
-  so `postinstall` must not run `electron-builder install-app-deps`.
+  sums rather than dropped. The standard column names are English and never
+  change, because other systems import them; a custom field column is named by
+  the field's name key. A template may rename any column, and names must be
+  unique in a file. CSV follows RFC 4180 strictly (comma, CRLF, no BOM) through
+  a library; further formats get their own writer for the same rows. Excel
+  files are for people, CSV for other systems: xlsx writes dates and durations
+  as typed cells, while CSV is never adapted to Excel (BOM, semicolons).
 
-### Main and renderer
+## Local API
 
-- **Database and Node APIs only in the main process**: The renderer runs
-  sandboxed with context isolation and talks to main only through the typed
-  preload API. UI code uses the client in `lib/api.ts`, not `window.api`.
-- **Model types as the contract**: What the core returns is described by hand
-  in `shared/model/`, without internal columns such as `uid` or
-  timestamps. Core queries select exactly these fields through a selection
-  per table (`projectSelection`), so no full row leaves the core; the
-  typecheck keeps selection and type in line. `shared/` imports nothing from
-  `src/main/`.
-- **Core apart from its presentation**: `core/` holds the rules as plain
-  functions and runs without Electron: it imports neither `electron` nor
-  anything from `gui/`, and gets paths and the trash through the environment
-  passed to `startCore()`. `core/index.ts` is its public interface, one
-  stateless service object per area (`projects.create()`, `timer.start()`):
-  `gui/` imports only from there, while modules inside the core import each other
-  directly and never through it. `gui/` only validates, calls the core and
-  shows the result. `api/` is a second presentation next to `gui/` under the
-  same rules, so it reuses the same functions; the two never import each
-  other. Lint rules enforce these boundaries.
-- **Local API, off by default**: Other programs on the same machine read data
+- **Off by default, local only**: Other programs on the same machine read data
   and start or stop the timer over HTTP below `/api/v1/`; a new version gets
-  its own sub-app next to it. The server listens on `127.0.0.1` only and lets
-  in only requests with the API key as `Authorization: Bearer`, a `Host` of
-  that address and no `Origin`, so web pages can neither call nor read it.
-  There is one key; only its SHA-256 hash is stored, so it is shown once when
-  created. Responses are their own v1 DTOs mapped from `shared/model/`, with
-  dates as ISO strings, because other programs depend on them. The API reports
-  whether it runs through `apiAccess` in the core, so `gui/` shows it without
-  knowing `api/`.
-- **Validated IPC**: Every handler is registered through `handle()` with a Zod
-  schema for its arguments, never with `ipcMain.handle` directly. The schemas
-  also normalize input (trim text, empty optional text to `null`). Rules that
-  need the database stay in the main process. The renderer imports `shared/model/`
-  and `shared/gui/`, never `shared/validation/`, so Zod stays out of its
-  bundle; the core never imports `shared/gui/`.
-- **Uniform errors with codes**: Errors the user may see are thrown as
-  `AppError` with a code from `shared/model/errors.ts` and translated in the renderer
-  under `Errors.<CODE>`. Unexpected errors are logged and reach the UI as
-  `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog) are
-  returned as values.
-- **Main broadcasts, windows reload**: When state that several windows show
-  changes, the core reports it through `core/events.ts` and each listener
-  reloads what it shows; the windows and the API's event stream are listeners.
-  Events are named by their kind. A `signal:<state>` names a kind of state,
-  never a single record: the running timer, the profile data (`signal:data`,
-  sent after every write of a service object, whoever made it), the profiles,
-  the app settings, the donation hint and the local API. Signals carry no ids,
-  because a change often affects more than the record written (a project's
-  client is every activity's client), and a reload is always right where a
-  list of affected records could miss one. Events about single facts with a
-  payload, if ever needed, get a kind of their own
-  (`domain:<resource>.<action>`). The IPC channels of the windows
-  (`<state>:changed`) are the GUI's own mapping of the signals.
-- **Several windows, one renderer**: The mini timer and the quick start are
-  routes of the same renderer, opened as small frameless windows with the same
-  preload and sandbox settings as the main window.
+  its own sub-app next to it. The server listens on `127.0.0.1` only.
+- **Who gets in**: Only requests with the API key as `Authorization: Bearer`, a
+  `Host` of that address and no `Origin` header, so web pages can neither call
+  nor read the API. There is one key; only its SHA-256 hash is stored, so it is
+  shown once when created.
+- **Own response format**: Responses are v1 DTOs in `api/dto/`, mapped
+  explicitly from `shared/model/` with dates as ISO strings, because other
+  programs depend on them while the model may change with the app.
+- **Uniform errors**: Every error is `{ "error": { "code": … } }` with an HTTP
+  status that follows from the code; validation errors of a request add a
+  `message` naming the invalid fields.
+- **Events as SSE**: `/api/v1/events` streams the signals of the core under
+  their names (`signal:data`, …), without payload.
+
+## Desktop Integration
+
 - **Tray app, single instance**: Closing the main window hides it; the app
   quits from the tray or the sidebar, asking first while a timer runs. The
   question is not hooked into `before-quit`, which also fires on OS shutdown,
@@ -302,10 +367,11 @@ sample profile and are excluded from the packaged app.
 - **Updates from GitHub releases, optional**: The installed app checks the
   latest published release at start and every few hours, downloads in the
   background and installs on quit or on request. It is the only outgoing
-  network access and can be turned off; without a connection nothing changes. The portable zip
-  never updates itself (the updater would run the installer and leave a second
-  copy), it only points to the download. Releases are created as drafts, so
-  nothing reaches installed apps before it is published by hand.
+  network access and can be turned off; without a connection nothing changes.
+  The portable zip never updates itself (the updater would run the installer
+  and leave a second copy), it only points to the download. Releases are
+  created as drafts, so nothing reaches installed apps before it is published
+  by hand.
 - **Two names**: "Taktra" is the display name (window and dialog titles,
   installer, UI text), "taktra" the technical one (package, executable, app id,
   user data folder, generated file names). The user data folder is pinned to
@@ -314,8 +380,10 @@ sample profile and are excluded from the packaged app.
 - **Cross-platform code, Windows packaging first**: Code must not assume an OS:
   paths come from Electron and generated file names are valid on Windows, macOS
   and Linux. Only packaging is configured for Windows so far.
+- **No native rebuild**: `better-sqlite3` ships prebuilt, ABI-stable binaries,
+  so `postinstall` must not run `electron-builder install-app-deps`.
 
-### UI
+## UI
 
 - **No active profile is a first-class state**: All profile-dependent routes
   render the welcome view (create or open a profile) instead while no profile
@@ -324,6 +392,10 @@ sample profile and are excluded from the packaged app.
   keyed by the active profile, so a switch discards open dialogs and unsaved
   input of the old profile. Detail routes go back to their list, because their
   ids mean something else in another profile.
+- **Views reload on changes from elsewhere**: Views that show profile data
+  depend on the data revision (`useDataRevision()`), which counts the
+  `data:changed` messages, and on the timer revision; so they also show
+  changes they did not make themselves.
 - **Hash routing**: The packaged app loads `index.html` via `file://`, where
   path-based URLs would resolve to files on disk.
 - **Theme via semantic tokens**: Colors, radii and shadows are CSS variables
@@ -354,14 +426,14 @@ sample profile and are excluded from the packaged app.
   tooltips and the controls settings. The only global shortcut opens the quick
   start; it can be turned off and re-recorded.
 
-### Tests
+## Tests
 
 - **Tests apart from the code**: Tests live in `tests/`, in folders named after
   `src/`, and never ship with the app.
 - **Main process tests on real files**: Vitest runs the main process code under
   plain Node against real SQLite files in a temporary folder, which the setup
   passes to the core as its environment. Nothing is replaced, the database
-  included.
+  included. The local API is tested through its app without opening a port.
 - **Every migration is tested with data**: The migration test migrates a
   profile from every earlier schema version and checks that no row changes. A
   migration that adds tables gets a seed file named like the migration in
