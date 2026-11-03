@@ -14,10 +14,14 @@ export function registerTimerRoutes(v1: Hono): void {
   })
   v1.post('/timer/start', async (c) => {
     const { activityId, note: timerNote } = parse(startInput, await readBody(c))
-    return c.json(toTimeEntry(timer.start(activityId, timerNote)))
+    return c.json(toTimeEntry(timer.start(activityId, timerNote)), 201)
   })
   v1.post('/timer/stop', (c) => {
     timer.stop()
-    return c.json(null)
+    return c.body(null, 204)
+  })
+  v1.post('/timer/discard', (c) => {
+    timer.discard()
+    return c.body(null, 204)
   })
 }

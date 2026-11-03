@@ -157,7 +157,7 @@ describe('timer', () => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ activityId: ids.activity, note: 'From a script' })
     })
-    expect(started.status).toBe(200)
+    expect(started.status).toBe(201)
     expect(await started.json()).toMatchObject({ end: null, note: 'From a script' })
     expect(await (await request('/api/v1/timer')).json()).not.toBeNull()
 

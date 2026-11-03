@@ -82,9 +82,10 @@ distinct values of the summed entries instead of grouping by them.
 
 **Local API**
 For developers and technicians, an optional local HTTP API lets other programs
-on the same machine read projects, activities, clients, tags, custom fields
-with their values, entries and reports of the active profile, start and stop the timer, and follow changes as
-server-sent events. It is turned on, given a port and a key on the
+on the same machine read and change the data of the active profile (projects,
+activities, clients, tags, custom fields and their values, entries, export
+templates), read reports, run the timer, and follow changes as server-sent
+events. Profiles and app settings stay with the user. It is turned on, given a port and a key on the
 integrations page of the app settings, which will also hold further
 connections such as MCP.
 
@@ -348,9 +349,14 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 
 ## Local API
 
-- **Off by default, local only**: Other programs on the same machine read data
-  and start or stop the timer over HTTP below `/api/v1/`; a new version gets
+- **Off by default, local only**: Other programs on the same machine use the
+  data of the active profile over HTTP below `/api/v1/`; a new version gets
   its own sub-app next to it. The server listens on `127.0.0.1` only.
+- **Profile data only**: The API reads and changes what belongs to the active
+  profile. Profiles and app settings are left out: they would let a client
+  that holds the key, such as an AI assistant, create or move files by path,
+  switch the profile under the user's open views, or turn the API off, and no
+  integration needs them.
 - **Who gets in**: Only requests with the API key as `Authorization: Bearer`, a
   `Host` of that address and no `Origin` header, so web pages can neither call
   nor read the API. There is one key; only its SHA-256 hash is stored, so it is
@@ -358,6 +364,13 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 - **Own response format**: Responses are v1 DTOs in `api/dto/`, mapped
   explicitly from `shared/model/` with dates as ISO strings, because other
   programs depend on them while the model may change with the app.
+- **REST plus actions**: Resources are created with `POST` (201), changed
+  with `PATCH` or replaced with `PUT`, and deleted with `DELETE` (204).
+  Operations without a field of their own are actions such as
+  `POST /activities/:id/move`, `/merge`, `/archive` and `/unarchive`. Each
+  request is exactly one operation of the core, so it applies completely or
+  not at all. Input uses the names of the responses (`start`, `end` as ISO
+  strings; `value` or `optionId` for a custom field).
 - **Uniform errors**: Every error is `{ "error": { "code": … } }` with an HTTP
   status that follows from the code; validation errors of a request add a
   `message` naming the invalid fields.

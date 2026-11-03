@@ -1,4 +1,5 @@
 import type {
+  CustomFieldOption,
   CustomFieldScope,
   CustomFieldType,
   CustomFieldWithOptions,
@@ -22,6 +23,10 @@ export interface CustomFieldV1 {
   readonly options: readonly CustomFieldOptionV1[]
 }
 
+export function toCustomFieldOption(option: CustomFieldOption): CustomFieldOptionV1 {
+  return { id: option.id, name: option.name, archivedAt: timestamp(option.archivedAt) }
+}
+
 export function toCustomField(field: CustomFieldWithOptions): CustomFieldV1 {
   return {
     id: field.id,
@@ -29,11 +34,7 @@ export function toCustomField(field: CustomFieldWithOptions): CustomFieldV1 {
     type: field.type,
     name: field.name,
     archivedAt: timestamp(field.archivedAt),
-    options: field.options.map((option) => ({
-      id: option.id,
-      name: option.name,
-      archivedAt: timestamp(option.archivedAt)
-    }))
+    options: field.options.map(toCustomFieldOption)
   }
 }
 

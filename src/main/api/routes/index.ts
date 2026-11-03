@@ -2,6 +2,7 @@ import type { Hono } from 'hono'
 import { registerActivityRoutes } from './activities'
 import { registerClientRoutes } from './clients'
 import { registerCustomFieldRoutes } from './customFields'
+import { registerExportTemplateRoutes } from './exportTemplates'
 import { registerProfileRoutes } from './profile'
 import { registerProjectRoutes } from './projects'
 import { registerReportRoutes } from './reports'
@@ -19,4 +20,5 @@ export function registerRoutes(v1: Hono): void {
   registerTimeEntryRoutes(v1)
   registerReportRoutes(v1)
   registerTimerRoutes(v1)
+  registerExportTemplateRoutes(v1)
 }

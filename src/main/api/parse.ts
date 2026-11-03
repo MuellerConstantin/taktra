@@ -57,3 +57,8 @@ export async function readBody(c: Context): Promise<unknown> {
     throw new HttpError('INVALID_JSON')
   }
 }
+
+/** Clock times arrive as ISO strings; the schemas expect dates and reject invalid ones. */
+export function toDate(value: unknown): unknown {
+  return typeof value === 'string' ? new Date(value) : value
+}

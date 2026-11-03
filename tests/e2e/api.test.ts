@@ -2,7 +2,10 @@ import { expect, test } from './app'
 
 const PORT = 47123
 
-test('enables the local API and answers with the shown key', async ({ window, errors }) => {
+test('enables the local API, answers with the shown key and updates the views', async ({
+  window,
+  errors
+}) => {
   await window.getByRole('button', { name: 'Try sample profile' }).click()
   await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
   await window.evaluate(() => {
@@ -27,5 +30,18 @@ test('enables the local API and answers with the shown key', async ({ window, er
 
   const refused = await fetch(`http://127.0.0.1:${PORT}/api/v1/projects`)
   expect(refused.status).toBe(401)
+
+  // A change through the API shows up in an open view without reloading it.
+  await window.evaluate(() => {
+    location.hash = '#/projects'
+  })
+  await expect(window.getByRole('heading', { name: 'Projects' })).toBeVisible()
+  const created = await fetch(`http://127.0.0.1:${PORT}/api/v1/projects`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ name: 'Created through the API' })
+  })
+  expect(created.status).toBe(201)
+  await expect(window.getByText('Created through the API')).toBeVisible()
   expect(errors).toEqual([])
 })
