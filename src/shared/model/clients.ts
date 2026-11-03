@@ -1,9 +1,11 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { clients } from '../../main/core/db/schema/clients'
 import type { clientInput } from '../validation/clients'
 
-export type Client = InferSelectModel<typeof clients>
+export interface Client {
+  readonly id: number
+  readonly name: string
+  readonly archivedAt: Date | null
+}
 
 export type ClientInput = z.input<typeof clientInput>
 

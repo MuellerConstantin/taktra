@@ -1,7 +1,5 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
 import type { CustomFieldType } from './customFields'
-import type { exportTemplates } from '../../main/core/db/schema/exportTemplates'
 import type { exportTemplateInput } from '../validation/export'
 
 /** Column names are part of the file format other systems import, so they never change. */
@@ -142,7 +140,11 @@ export interface ExportPreview extends ExportTable {
   readonly totalMin: number
 }
 
-export type ExportTemplate = InferSelectModel<typeof exportTemplates> & {
+export interface ExportTemplate {
+  readonly id: number
+  readonly name: string
+  readonly format: ExportFormat
+  readonly layout: ExportLayout
   readonly columns: readonly ExportColumn[]
 }
 

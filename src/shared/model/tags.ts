@@ -1,9 +1,11 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { tags } from '../../main/core/db/schema/tags'
 import type { tagInput } from '../validation/tags'
 
-export type Tag = InferSelectModel<typeof tags>
+export interface Tag {
+  readonly id: number
+  readonly name: string
+  readonly color: string | null
+}
 
 export type TagInput = z.input<typeof tagInput>
 

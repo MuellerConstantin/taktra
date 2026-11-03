@@ -8,6 +8,13 @@ import { exportTemplateColumns, exportTemplates } from '../db/schema'
 import { checkLayout, resolveHeaders } from './export'
 import { sortByName } from './names'
 
+export const exportTemplateSelection = {
+  id: exportTemplates.id,
+  name: exportTemplates.name,
+  format: exportTemplates.format,
+  layout: exportTemplates.layout
+} satisfies Record<keyof Omit<ExportTemplate, 'columns'>, unknown>
+
 type ColumnRow = typeof exportTemplateColumns.$inferSelect
 
 function toColumn({ builtin, fieldId, header, aggregation }: ColumnRow): ExportColumn {
@@ -27,7 +34,9 @@ function selectColumns(templateId?: number): ColumnRow[] {
 
 export function listExportTemplates(): ExportTemplate[] {
   const columns = selectColumns()
-  return sortByName(getActiveDatabase().select().from(exportTemplates).all()).map((template) => ({
+  return sortByName(
+    getActiveDatabase().select(exportTemplateSelection).from(exportTemplates).all()
+  ).map((template) => ({
     ...template,
     columns: columns.filter((column) => column.templateId === template.id).map(toColumn)
   }))
@@ -35,7 +44,7 @@ export function listExportTemplates(): ExportTemplate[] {
 
 export function getExportTemplate(id: number): ExportTemplate {
   const template = getActiveDatabase()
-    .select()
+    .select(exportTemplateSelection)
     .from(exportTemplates)
     .where(eq(exportTemplates.id, id))
     .get()

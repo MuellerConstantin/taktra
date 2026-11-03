@@ -8,14 +8,20 @@ import { tags } from '../db/schema'
 import { notifyChanged } from '../events'
 import { sortByName } from './names'
 
+export const tagSelection = {
+  id: tags.id,
+  name: tags.name,
+  color: tags.color
+} satisfies Record<keyof Tag, unknown>
+
 export function findTag(id: number): Tag {
-  const tag = getActiveDatabase().select().from(tags).where(eq(tags.id, id)).get()
+  const tag = getActiveDatabase().select(tagSelection).from(tags).where(eq(tags.id, id)).get()
   if (!tag) throw new AppError('TAG_NOT_FOUND', String(id))
   return tag
 }
 
 export function listTags(): Tag[] {
-  return sortByName(getActiveDatabase().select().from(tags).all())
+  return sortByName(getActiveDatabase().select(tagSelection).from(tags).all())
 }
 
 export function createTag(input: TagData): Tag {
@@ -23,7 +29,7 @@ export function createTag(input: TagData): Tag {
     return getActiveDatabase()
       .insert(tags)
       .values({ ...input, nameKey: toNameKey(input.name) })
-      .returning()
+      .returning(tagSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('TAG_NAME_TAKEN', String(error))
@@ -39,7 +45,7 @@ export function updateTag(id: number, patch: Partial<TagData>): Tag {
       .update(tags)
       .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
       .where(eq(tags.id, id))
-      .returning()
+      .returning(tagSelection)
       .get()
     notifyChanged('timer')
     return tag

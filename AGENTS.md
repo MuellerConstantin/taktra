@@ -156,8 +156,8 @@ sample profile and are excluded from the packaged app.
   stays open. It is closed before switching and before its file is moved to the
   trash (Windows locks open files). Other profiles are opened only briefly.
 - **Drizzle schema as the source of truth**: The schema is TypeScript (one file
-  per table, snake_case columns); row and input types are inferred, never
-  written by hand. Schema changes go through
+  per table, snake_case columns); row types are inferred and stay inside the
+  core, input types are inferred from the Zod schemas. Schema changes go through
   `npm run db:generate -- --name <what_changed>`. Generated migrations are
   committed, never edited by hand and never squashed: released profiles with
   real data depend on every migration.
@@ -229,6 +229,12 @@ sample profile and are excluded from the packaged app.
 - **Database and Node APIs only in the main process**: The renderer runs
   sandboxed with context isolation and talks to main only through the typed
   preload API. UI code uses the client in `lib/api.ts`, not `window.api`.
+- **Model types as the contract**: What the core returns is described by hand
+  in `shared/model/`, without internal columns such as `uid` or
+  timestamps. Core queries select exactly these fields through a selection
+  per table (`projectSelection`), so no full row leaves the core; the
+  typecheck keeps selection and type in line. `shared/` imports nothing from
+  `src/main/`.
 - **Core apart from its presentation**: `core/` holds the rules as plain
   functions and runs without Electron: it imports neither `electron` nor
   anything from `gui/`, and gets paths and the trash through the environment

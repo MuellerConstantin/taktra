@@ -11,8 +11,21 @@ import { notifyChanged } from '../events'
 import { findClient } from './clients'
 import { sortByName } from './names'
 
+export const projectSelection = {
+  id: projects.id,
+  name: projects.name,
+  description: projects.description,
+  color: projects.color,
+  clientId: projects.clientId,
+  archivedAt: projects.archivedAt
+} satisfies Record<keyof Project, unknown>
+
 export function findProject(id: number): Project {
-  const project = getActiveDatabase().select().from(projects).where(eq(projects.id, id)).get()
+  const project = getActiveDatabase()
+    .select(projectSelection)
+    .from(projects)
+    .where(eq(projects.id, id))
+    .get()
   if (!project) throw new AppError('PROJECT_NOT_FOUND', String(id))
   return project
 }
@@ -22,7 +35,7 @@ export function listProjects({
 }: z.output<typeof listOptions> = {}): Project[] {
   return sortByName(
     getActiveDatabase()
-      .select()
+      .select(projectSelection)
       .from(projects)
       .where(includeArchived ? undefined : isNull(projects.archivedAt))
       .all()
@@ -36,7 +49,7 @@ export function createProject(input: ProjectData): Project {
     return getActiveDatabase()
       .insert(projects)
       .values({ ...input, nameKey: toNameKey(input.name) })
-      .returning()
+      .returning(projectSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('PROJECT_NAME_TAKEN', String(error))
@@ -64,7 +77,7 @@ export function updateProject(id: number, patch: Partial<ProjectData>): Project 
         .update(projects)
         .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
         .where(eq(projects.id, id))
-        .returning()
+        .returning(projectSelection)
         .get()
     })
     notifyChanged('timer')
@@ -82,7 +95,7 @@ export function setProjectArchived(id: number, archived: boolean): Project {
     .update(projects)
     .set({ archivedAt: archived ? new Date() : null })
     .where(eq(projects.id, id))
-    .returning()
+    .returning(projectSelection)
     .get()
 }
 

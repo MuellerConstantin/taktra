@@ -71,6 +71,22 @@ export default defineConfig(
     }
   },
   {
+    files: ['src/shared/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)main/',
+              message: 'shared/ is the contract between the processes and depends on none of them.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
     files: ['src/renderer/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [

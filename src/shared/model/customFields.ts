@@ -1,7 +1,4 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { customFieldOptions } from '../../main/core/db/schema/customFieldOptions'
-import type { customFields } from '../../main/core/db/schema/customFields'
 import type { customFieldInput, fieldValueInput } from '../validation/customFields'
 
 export const customFieldScopes = ['project', 'client', 'activity'] as const
@@ -12,9 +9,22 @@ export const customFieldTypes = ['text', 'select'] as const
 
 export type CustomFieldType = (typeof customFieldTypes)[number]
 
-export type CustomField = InferSelectModel<typeof customFields>
+export interface CustomField {
+  readonly id: number
+  readonly scope: CustomFieldScope
+  readonly type: CustomFieldType
+  readonly name: string
+  /** Names the field's export column. */
+  readonly nameKey: string
+  readonly archivedAt: Date | null
+}
 
-export type CustomFieldOption = InferSelectModel<typeof customFieldOptions>
+export interface CustomFieldOption {
+  readonly id: number
+  readonly fieldId: number
+  readonly name: string
+  readonly archivedAt: Date | null
+}
 
 /** Archived options are included, because stored values may still refer to them. */
 export type CustomFieldWithOptions = CustomField & {

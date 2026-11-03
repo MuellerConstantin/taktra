@@ -26,6 +26,22 @@ import { findClient } from './clients'
 import { sortByName } from './names'
 import { findProject } from './projects'
 
+export const customFieldSelection = {
+  id: customFields.id,
+  scope: customFields.scope,
+  type: customFields.type,
+  name: customFields.name,
+  nameKey: customFields.nameKey,
+  archivedAt: customFields.archivedAt
+} satisfies Record<keyof CustomField, unknown>
+
+export const customFieldOptionSelection = {
+  id: customFieldOptions.id,
+  fieldId: customFieldOptions.fieldId,
+  name: customFieldOptions.name,
+  archivedAt: customFieldOptions.archivedAt
+} satisfies Record<keyof CustomFieldOption, unknown>
+
 const valueTables = {
   project: {
     table: projectFieldValues,
@@ -60,14 +76,18 @@ const valueTables = {
 }
 
 export function findCustomField(id: number): CustomField {
-  const field = getActiveDatabase().select().from(customFields).where(eq(customFields.id, id)).get()
+  const field = getActiveDatabase()
+    .select(customFieldSelection)
+    .from(customFields)
+    .where(eq(customFields.id, id))
+    .get()
   if (!field) throw new AppError('CUSTOM_FIELD_NOT_FOUND', String(id))
   return field
 }
 
 function findOption(id: number): CustomFieldOption {
   const option = getActiveDatabase()
-    .select()
+    .select(customFieldOptionSelection)
     .from(customFieldOptions)
     .where(eq(customFieldOptions.id, id))
     .get()
@@ -82,7 +102,7 @@ export function listCustomFields({
   const db = getActiveDatabase()
   const fields = sortByName(
     db
-      .select()
+      .select(customFieldSelection)
       .from(customFields)
       .where(
         and(
@@ -96,7 +116,7 @@ export function listCustomFields({
 
   const options = sortByName(
     db
-      .select()
+      .select(customFieldOptionSelection)
       .from(customFieldOptions)
       .where(
         inArray(
@@ -128,7 +148,7 @@ export function createCustomField(input: z.output<typeof customFieldInput>): Cus
     return getActiveDatabase()
       .insert(customFields)
       .values({ ...input, nameKey: toNameKey(input.name) })
-      .returning()
+      .returning(customFieldSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('CUSTOM_FIELD_NAME_TAKEN', String(error))
@@ -144,7 +164,7 @@ export function renameCustomField(id: number, name: string): CustomField {
       .update(customFields)
       .set({ name, nameKey: toNameKey(name) })
       .where(eq(customFields.id, id))
-      .returning()
+      .returning(customFieldSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('CUSTOM_FIELD_NAME_TAKEN', String(error))
@@ -160,7 +180,7 @@ export function setCustomFieldArchived(id: number, archived: boolean): CustomFie
     .update(customFields)
     .set({ archivedAt: archived ? new Date() : null })
     .where(eq(customFields.id, id))
-    .returning()
+    .returning(customFieldSelection)
     .get()
 }
 
@@ -199,7 +219,7 @@ export function createCustomFieldOption(fieldId: number, name: string): CustomFi
     return getActiveDatabase()
       .insert(customFieldOptions)
       .values({ fieldId, name, nameKey: toNameKey(name) })
-      .returning()
+      .returning(customFieldOptionSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error))
@@ -216,7 +236,7 @@ export function renameCustomFieldOption(id: number, name: string): CustomFieldOp
       .update(customFieldOptions)
       .set({ name, nameKey: toNameKey(name) })
       .where(eq(customFieldOptions.id, id))
-      .returning()
+      .returning(customFieldOptionSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error))
@@ -233,7 +253,7 @@ export function setCustomFieldOptionArchived(id: number, archived: boolean): Cus
     .update(customFieldOptions)
     .set({ archivedAt: archived ? new Date() : null })
     .where(eq(customFieldOptions.id, id))
-    .returning()
+    .returning(customFieldOptionSelection)
     .get()
 }
 

@@ -21,8 +21,20 @@ import { clientRef, effectiveClientJoin, findClient } from './clients'
 import { sortByName } from './names'
 import { findProject } from './projects'
 
+export const activitySelection = {
+  id: activities.id,
+  projectId: activities.projectId,
+  name: activities.name,
+  clientId: activities.clientId,
+  archivedAt: activities.archivedAt
+} satisfies Record<keyof Activity, unknown>
+
 export function findActivity(id: number): Activity {
-  const activity = getActiveDatabase().select().from(activities).where(eq(activities.id, id)).get()
+  const activity = getActiveDatabase()
+    .select(activitySelection)
+    .from(activities)
+    .where(eq(activities.id, id))
+    .get()
   if (!activity) throw new AppError('ACTIVITY_NOT_FOUND', String(id))
   return activity
 }
@@ -66,7 +78,7 @@ export function listActivities({
 }: z.output<typeof activityListOptions> = {}): ActivityWithTags[] {
   const rows = sortByName(
     getActiveDatabase()
-      .select()
+      .select(activitySelection)
       .from(activities)
       .where(
         and(
@@ -111,7 +123,7 @@ export function createActivity(input: z.output<typeof activityInput>): Activity 
     return getActiveDatabase()
       .insert(activities)
       .values({ ...input, nameKey: toNameKey(input.name) })
-      .returning()
+      .returning(activitySelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('ACTIVITY_NAME_TAKEN', String(error))
@@ -127,7 +139,7 @@ export function renameActivity(id: number, name: string): Activity {
       .update(activities)
       .set({ name, nameKey: toNameKey(name) })
       .where(eq(activities.id, id))
-      .returning()
+      .returning(activitySelection)
       .get()
     notifyChanged('timer')
     return activity
@@ -152,7 +164,7 @@ export function moveActivity(id: number, projectId: number, name: string): Activ
       .update(activities)
       .set({ projectId, name, nameKey: toNameKey(name), clientId })
       .where(eq(activities.id, id))
-      .returning()
+      .returning(activitySelection)
       .get()
     notifyChanged('timer')
     return activity
@@ -169,7 +181,7 @@ export function setActivityArchived(id: number, archived: boolean): Activity {
     .update(activities)
     .set({ archivedAt: archived ? new Date() : null })
     .where(eq(activities.id, id))
-    .returning()
+    .returning(activitySelection)
     .get()
 }
 
@@ -181,7 +193,7 @@ export function setActivityClient(id: number, clientId: number | null): Activity
     .update(activities)
     .set({ clientId })
     .where(eq(activities.id, id))
-    .returning()
+    .returning(activitySelection)
     .get()
   notifyChanged('timer')
   return activity

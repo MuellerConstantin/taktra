@@ -14,6 +14,17 @@ import {
 } from './activities'
 import { effectiveClientJoin } from './clients'
 
+export const timeEntrySelection = {
+  id: timeEntries.id,
+  activityId: timeEntries.activityId,
+  date: timeEntries.date,
+  startedAt: timeEntries.startedAt,
+  endedAt: timeEntries.endedAt,
+  timezone: timeEntries.timezone,
+  durationSec: timeEntries.durationSec,
+  note: timeEntries.note
+} satisfies Record<keyof TimeEntry, unknown>
+
 type TimeEntryValues = Pick<
   TimeEntry,
   'activityId' | 'date' | 'startedAt' | 'endedAt' | 'timezone' | 'durationSec' | 'note'
@@ -47,14 +58,18 @@ function toValues(input: TimeEntryData): TimeEntryValues {
 }
 
 function findTimeEntry(id: number): TimeEntry {
-  const entry = getActiveDatabase().select().from(timeEntries).where(eq(timeEntries.id, id)).get()
+  const entry = getActiveDatabase()
+    .select(timeEntrySelection)
+    .from(timeEntries)
+    .where(eq(timeEntries.id, id))
+    .get()
   if (!entry) throw new AppError('TIME_ENTRY_NOT_FOUND', String(id))
   return entry
 }
 
 export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails[] {
   const rows = getActiveDatabase()
-    .select({ entry: timeEntries, ...activityDetailsColumns })
+    .select({ entry: timeEntrySelection, ...activityDetailsColumns })
     .from(timeEntries)
     .innerJoin(activities, eq(timeEntries.activityId, activities.id))
     .innerJoin(projects, eq(activities.projectId, projects.id))
@@ -82,7 +97,11 @@ export function listTimeEntries({
 }
 
 export function createTimeEntry(input: TimeEntryData): TimeEntry {
-  return getActiveDatabase().insert(timeEntries).values(toValues(input)).returning().get()
+  return getActiveDatabase()
+    .insert(timeEntries)
+    .values(toValues(input))
+    .returning(timeEntrySelection)
+    .get()
 }
 
 export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
@@ -91,7 +110,12 @@ export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
   const db = getActiveDatabase()
 
   return db.transaction(() => {
-    const entry = db.update(timeEntries).set(values).where(eq(timeEntries.id, id)).returning().get()
+    const entry = db
+      .update(timeEntries)
+      .set(values)
+      .where(eq(timeEntries.id, id))
+      .returning(timeEntrySelection)
+      .get()
     if (previous.activityId !== entry.activityId) deleteActivityIfUnused(previous.activityId)
     return entry
   })

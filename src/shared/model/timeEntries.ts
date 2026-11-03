@@ -1,12 +1,20 @@
-import type { InferSelectModel } from 'drizzle-orm'
 import type { z } from 'zod'
-import type { timeEntries } from '../../main/core/db/schema/timeEntries'
 import type { Activity, ActivityTag } from './activities'
 import type { Client } from './clients'
 import type { Project } from './projects'
 import type { timeEntryInput } from '../validation/timeEntries'
 
-export type TimeEntry = InferSelectModel<typeof timeEntries>
+export interface TimeEntry {
+  readonly id: number
+  readonly activityId: number
+  /** The local day the entry counts towards. */
+  readonly date: string
+  readonly startedAt: Date | null
+  readonly endedAt: Date | null
+  readonly timezone: string | null
+  readonly durationSec: number | null
+  readonly note: string | null
+}
 
 export type TimeEntryTimes =
   | { readonly startedAt: Date; readonly endedAt: Date; readonly timezone: string }

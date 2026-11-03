@@ -10,6 +10,12 @@ import { activities, clients, projects, timeEntries } from '../db/schema'
 import { notifyChanged } from '../events'
 import { sortByName } from './names'
 
+export const clientSelection = {
+  id: clients.id,
+  name: clients.name,
+  archivedAt: clients.archivedAt
+} satisfies Record<keyof Client, unknown>
+
 /** The client that counts for an activity: the one of its project, else its own. */
 export const effectiveClientId = sql<
   number | null
@@ -20,7 +26,11 @@ export const effectiveClientJoin = eq(clients.id, effectiveClientId)
 export const clientRef = { id: clients.id, name: clients.name }
 
 export function findClient(id: number): Client {
-  const client = getActiveDatabase().select().from(clients).where(eq(clients.id, id)).get()
+  const client = getActiveDatabase()
+    .select(clientSelection)
+    .from(clients)
+    .where(eq(clients.id, id))
+    .get()
   if (!client) throw new AppError('CLIENT_NOT_FOUND', String(id))
   return client
 }
@@ -30,7 +40,7 @@ export function listClients({
 }: z.output<typeof listOptions> = {}): Client[] {
   return sortByName(
     getActiveDatabase()
-      .select()
+      .select(clientSelection)
       .from(clients)
       .where(includeArchived ? undefined : isNull(clients.archivedAt))
       .all()
@@ -42,7 +52,7 @@ export function createClient(input: ClientData): Client {
     return getActiveDatabase()
       .insert(clients)
       .values({ ...input, nameKey: toNameKey(input.name) })
-      .returning()
+      .returning(clientSelection)
       .get()
   } catch (error) {
     if (isUniqueViolation(error)) throw new AppError('CLIENT_NAME_TAKEN', String(error))
@@ -58,7 +68,7 @@ export function updateClient(id: number, patch: Partial<ClientData>): Client {
       .update(clients)
       .set(patch.name === undefined ? patch : { ...patch, nameKey: toNameKey(patch.name) })
       .where(eq(clients.id, id))
-      .returning()
+      .returning(clientSelection)
       .get()
     notifyChanged('timer')
     return client
@@ -75,7 +85,7 @@ export function setClientArchived(id: number, archived: boolean): Client {
     .update(clients)
     .set({ archivedAt: archived ? new Date() : null })
     .where(eq(clients.id, id))
-    .returning()
+    .returning(clientSelection)
     .get()
 }
 
