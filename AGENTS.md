@@ -279,10 +279,14 @@ sample profile and are excluded from the packaged app.
   `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog) are
   returned as values.
 - **Main broadcasts, windows reload**: When state that several windows show
-  changes (running timer and what it displays, app settings, profiles), the main process
-  sends an event to all windows and each one reloads what it needs. The core
-  reports such changes through `core/events.ts`; the windows are one of its
-  listeners.
+  changes, the core reports it through `core/events.ts` and each listener
+  reloads what it shows; the windows and the API's event stream are listeners.
+  Events name a kind of state, never a single record: the running timer, the
+  profile data (`data`, sent after every write of a service object, whoever
+  made it), the profiles, the app settings, the donation hint and the local
+  API. They carry no ids, because a change often affects more than the record
+  written (a project's client is every activity's client), and a reload is
+  always right where a list of affected records could miss one.
 - **Several windows, one renderer**: The mini timer and the quick start are
   routes of the same renderer, opened as small frameless windows with the same
   preload and sandbox settings as the main window.

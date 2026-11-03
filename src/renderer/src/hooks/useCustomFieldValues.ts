@@ -7,6 +7,7 @@ import type {
 } from '../../../shared/model/customFields'
 import { api } from '../lib/api'
 import { useErrorMessage } from './useErrorMessage'
+import { useDataRevision } from './useDataRevision'
 
 export interface FieldDraft {
   readonly text: string
@@ -32,6 +33,7 @@ export function useCustomFieldValues(scope: CustomFieldScope, ownerId?: number):
   const [initial, setInitial] = useState<ReadonlyMap<number, FieldValue>>(new Map())
   const [drafts, setDrafts] = useState<ReadonlyMap<number, FieldDraft>>(new Map())
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function useCustomFieldValues(scope: CustomFieldScope, ownerId?: number):
     return () => {
       isCurrent = false
     }
-  }, [scope, ownerId, errorMessage])
+  }, [scope, ownerId, dataRevision, errorMessage])
 
   const draftOf = (fieldId: number): FieldDraft =>
     drafts.get(fieldId) ?? toDraft(initial.get(fieldId))

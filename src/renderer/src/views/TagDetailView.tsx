@@ -24,6 +24,7 @@ import { api } from '../lib/api'
 import { suggestColor } from '../lib/colors'
 import { formatDuration } from '../lib/duration'
 import { allTime, periodFilter, type Period } from '../lib/period'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 interface ProjectGroup {
   readonly project: NonNullable<AggregateRow['project']>
@@ -50,6 +51,7 @@ function TagDetailView(): React.JSX.Element {
   const t = useTranslations('TagDetailView')
   const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const navigate = useNavigate()
   const tagId = Number(useParams().tagId)
   const [tag, setTag] = useState<Tag | null>(null)
@@ -80,7 +82,7 @@ function TagDetailView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [tagId, from, to, reloadCount, errorMessage])
+  }, [tagId, from, to, reloadCount, dataRevision, errorMessage])
 
   if (error) return <p className="p-8 text-sm text-destructive">{error}</p>
   if (!tag || !rows) return <div />

@@ -9,6 +9,7 @@ import SettingsProvider from './contexts/SettingsProvider'
 import LocaleProvider from './contexts/LocaleProvider'
 import ProfilesProvider from './contexts/ProfilesProvider'
 import TimerProvider from './contexts/TimerProvider'
+import DataRevisionProvider from './contexts/DataRevisionProvider'
 
 /*
  * React Aria keeps the last modality across window blur, so refocusing the window would show the
@@ -23,7 +24,9 @@ createRoot(document.getElementById('root')!).render(
       <LocaleProvider>
         <ProfilesProvider>
           <TimerProvider>
-            <RouterProvider router={router} />
+            <DataRevisionProvider>
+              <RouterProvider router={router} />
+            </DataRevisionProvider>
           </TimerProvider>
         </ProfilesProvider>
       </LocaleProvider>

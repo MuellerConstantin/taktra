@@ -25,6 +25,7 @@ import { CustomFieldOptionsDialog } from '../../../components/molecules/CustomFi
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
 import { api } from '../../../lib/api'
+import { useDataRevision } from '../../../hooks/useDataRevision'
 
 interface FieldRowProps {
   readonly field: CustomFieldWithOptions
@@ -94,6 +95,7 @@ function FieldRow({
 function ProfileFieldsSettings(): React.JSX.Element {
   const t = useTranslations('ProfileFieldsSettings')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { activeProfile } = useProfiles()
   const [fields, setFields] = useState<readonly CustomFieldWithOptions[] | null>(null)
   const [showArchived, setShowArchived] = useState(false)
@@ -120,7 +122,7 @@ function ProfileFieldsSettings(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, reloadCount, errorMessage])
+  }, [activeProfile?.path, reloadCount, dataRevision, errorMessage])
 
   const reload = (): void => setReloadCount((count) => count + 1)
 

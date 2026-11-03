@@ -25,10 +25,12 @@ import { useCreateRequest } from '../hooks/useCreateRequest'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 function ClientsView(): React.JSX.Element {
   const t = useTranslations('ClientsView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { activeProfile } = useProfiles()
   const [showArchived, setShowArchived] = useState(false)
   const [clients, setClients] = useState<readonly Client[] | null>(null)
@@ -56,7 +58,7 @@ function ClientsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, showArchived, reloadCount, errorMessage])
+  }, [activeProfile?.path, showArchived, reloadCount, dataRevision, errorMessage])
 
   const runAction = async (action: () => Promise<unknown>): Promise<void> => {
     setActionError(null)

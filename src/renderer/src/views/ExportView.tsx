@@ -37,6 +37,7 @@ import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { periodFilter, presetRange, type Period } from '../lib/period'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 /** What the file looks like, whether it comes from a template or is put together on the fly. */
 interface ExportDraft {
@@ -77,6 +78,7 @@ function isSameDraft(a: ExportDraft, b: ExportDraft): boolean {
 function ExportView(): React.JSX.Element {
   const t = useTranslations('ExportView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -143,7 +145,7 @@ function ExportView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, errorMessage])
+  }, [activeProfile?.path, dataRevision, errorMessage])
 
   const { columns, layout, format } = draft
   const isLoaded = templates !== null && loadedKey === templateKey
@@ -166,7 +168,7 @@ function ExportView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [isLoaded, filter, columns, layout, errorMessage])
+  }, [isLoaded, filter, columns, layout, dataRevision, errorMessage])
 
   const showTemplate = (key: string): void => {
     setSearchParams(key === STANDARD ? {} : { template: key }, { replace: true })

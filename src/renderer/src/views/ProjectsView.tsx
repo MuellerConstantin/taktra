@@ -28,6 +28,7 @@ import { api } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
 import { suggestColor } from '../lib/colors'
 import { formatDuration } from '../lib/duration'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 interface ProjectTotal {
   readonly activityCount: number
@@ -48,6 +49,7 @@ function totalsByProject(rows: readonly AggregateRow[]): ReadonlyMap<number, Pro
 function ProjectsView(): React.JSX.Element {
   const t = useTranslations('ProjectsView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { activeProfile } = useProfiles()
   const navigate = useNavigate()
   const [showArchived, setShowArchived] = useState(false)
@@ -82,7 +84,7 @@ function ProjectsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, showArchived, reloadCount, errorMessage])
+  }, [activeProfile?.path, showArchived, reloadCount, dataRevision, errorMessage])
 
   const handleDelete = async (project: Project): Promise<void> => {
     setDeleteError(null)

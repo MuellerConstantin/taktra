@@ -20,6 +20,7 @@ import { api } from '../lib/api'
 import { formatDuration } from '../lib/duration'
 import { periodFilter, presetRange, type Period } from '../lib/period'
 import { computeKpis, dataRange } from '../lib/report'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 const breakdowns: readonly Breakdown[] = ['project', 'client', 'tag', 'projectTag']
 
@@ -53,6 +54,7 @@ function Kpi({ label, value }: KpiProps): React.JSX.Element {
 function ReportsView(): React.JSX.Element {
   const t = useTranslations('ReportsView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
   const [period, setPeriod] = useState<Period>(() => ({
@@ -98,7 +100,7 @@ function ReportsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, errorMessage])
+  }, [activeProfile?.path, dataRevision, errorMessage])
 
   useEffect(() => {
     let isCurrent = true
@@ -115,7 +117,7 @@ function ReportsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, filter, breakdown, errorMessage])
+  }, [activeProfile?.path, filter, breakdown, dataRevision, errorMessage])
 
   const kpis = computeKpis(data?.timeline ?? [])
   const chartRange = period.range ?? dataRange(data?.timeline ?? [])

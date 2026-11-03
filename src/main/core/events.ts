@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 
 /** State that several consumers show; each of them reloads what it needs when it changes. */
-export const appEvents = ['timer', 'profiles', 'settings', 'donation', 'api'] as const
+export const appEvents = ['timer', 'profiles', 'settings', 'donation', 'apiAccess', 'data'] as const
 
 export type AppEvent = (typeof appEvents)[number]
 

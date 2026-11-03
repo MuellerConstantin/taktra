@@ -27,12 +27,14 @@ import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration, formatElapsed } from '../lib/duration'
 import { NEUTRAL_COLOR } from '../lib/report'
 import { appShortcuts } from '../lib/shortcuts'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 const RECENT_LIMIT = 8
 
 function TimerView(): React.JSX.Element {
   const t = useTranslations('TimerView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
   const { running, revision, start, stop, discard } = useTimer()
@@ -63,7 +65,7 @@ function TimerView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, revision, day, errorMessage])
+  }, [activeProfile?.path, revision, day, dataRevision, errorMessage])
 
   const run = async (action: () => Promise<void>): Promise<void> => {
     setError(null)

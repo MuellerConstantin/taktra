@@ -25,11 +25,13 @@ import { api } from '../lib/api'
 import { suggestColor } from '../lib/colors'
 import { formatDuration } from '../lib/duration'
 import { allTime, periodFilter, type Period } from '../lib/period'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 function ProjectDetailView(): React.JSX.Element {
   const t = useTranslations('ProjectDetailView')
   const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const navigate = useNavigate()
   const projectId = Number(useParams().projectId)
   const [project, setProject] = useState<Project | null>(null)
@@ -63,7 +65,7 @@ function ProjectDetailView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [projectId, from, to, reloadCount, errorMessage])
+  }, [projectId, from, to, reloadCount, dataRevision, errorMessage])
 
   const toggleArchived = async (): Promise<void> => {
     if (!project) return

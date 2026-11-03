@@ -34,11 +34,13 @@ import { useTimer } from '../hooks/useTimer'
 import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
 import { allTime, periodFilter, type Period } from '../lib/period'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 function ActivityDetailView(): React.JSX.Element {
   const t = useTranslations('ActivityDetailView')
   const tNavigation = useTranslations('Navigation')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const navigate = useNavigate()
   const { locale } = useLocale()
   const activityId = Number(useParams().activityId)
@@ -94,7 +96,7 @@ function ActivityDetailView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activityId, from, to, reloadCount, revision, navigate, errorMessage])
+  }, [activityId, from, to, reloadCount, revision, navigate, dataRevision, errorMessage])
 
   const runAction = async (action: () => Promise<unknown>): Promise<void> => {
     setActionError(null)

@@ -189,6 +189,17 @@ describe('timer', () => {
     expect([response.status, await errorCode(response)]).toEqual([415, 'UNSUPPORTED_MEDIA_TYPE'])
   })
 
+  it('sends an event when profile data changes, whoever writes it', async () => {
+    const response = await request('/api/v1/events')
+    const reader = response.body!.getReader()
+
+    tags.create({ name: 'Support' })
+    const { value } = await reader.read()
+    expect(new TextDecoder().decode(value)).toContain('event: data')
+
+    await reader.cancel()
+  })
+
   it('sends an event when the timer changes', async () => {
     const response = await request('/api/v1/events')
     expect(response.headers.get('content-type')).toContain('text/event-stream')

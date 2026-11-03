@@ -6,6 +6,7 @@ import type {
 } from '../../../../shared/model/customFields'
 import { useErrorMessage } from '../../hooks/useErrorMessage'
 import { api } from '../../lib/api'
+import { useDataRevision } from '../../hooks/useDataRevision'
 
 interface CustomFieldValueListProps {
   readonly scope: CustomFieldScope
@@ -26,6 +27,7 @@ export function CustomFieldValueList({
   revision
 }: CustomFieldValueListProps): React.JSX.Element | null {
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const [items, setItems] = useState<
     readonly { readonly id: number; readonly name: string; readonly value: string }[]
   >([])
@@ -50,7 +52,7 @@ export function CustomFieldValueList({
     return () => {
       isCurrent = false
     }
-  }, [scope, ownerId, revision, errorMessage])
+  }, [scope, ownerId, revision, dataRevision, errorMessage])
 
   if (error) return <span className="text-destructive">{error}</span>
   if (items.length === 0) return null

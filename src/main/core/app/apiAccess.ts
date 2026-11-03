@@ -20,7 +20,7 @@ function hashKey(key: string): Buffer {
 export function createApiKey(): string {
   const key = randomBytes(32).toString('base64url')
   store().set('keyHash', hashKey(key).toString('hex'))
-  notifyChanged('api')
+  notifyChanged('apiAccess')
   return key
 }
 
@@ -37,5 +37,5 @@ export function getApiState(): ApiState {
 export function setApiStatus(next: ApiStatus): void {
   if (next === status) return
   status = next
-  notifyChanged('api')
+  notifyChanged('apiAccess')
 }

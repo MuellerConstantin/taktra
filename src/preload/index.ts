@@ -207,7 +207,8 @@ const api = {
     onShowAbout: (callback: () => void) => subscribe('about:show', callback),
     onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback),
     onDonationChanged: (callback: () => void) => subscribe('donation:changed', callback),
-    onApiChanged: (callback: () => void) => subscribe('api:changed', callback)
+    onApiAccessChanged: (callback: () => void) => subscribe('apiAccess:changed', callback),
+    onDataChanged: (callback: () => void) => subscribe('data:changed', callback)
   }
 }
 

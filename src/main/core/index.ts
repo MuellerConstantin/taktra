@@ -35,6 +35,20 @@ export function stopCore(): void {
   closeActiveDatabase()
 }
 
+/**
+ * Wraps a write, so every presentation reloads after it, also after writes it did not make
+ * itself, such as those through the local API.
+ */
+function notifying<Args extends unknown[], Result>(
+  write: (...args: Args) => Result
+): (...args: Args) => Result {
+  return (...args) => {
+    const result = write(...args)
+    eventsModule.notifyChanged('data')
+    return result
+  }
+}
+
 export const events = {
   names: eventsModule.appEvents,
   onChanged: eventsModule.onChanged
@@ -75,71 +89,72 @@ export const donation = {
 export const clients = {
   list: clientsModule.listClients,
   get: clientsModule.findClient,
-  create: clientsModule.createClient,
-  update: clientsModule.updateClient,
-  setArchived: clientsModule.setClientArchived,
-  delete: clientsModule.deleteClient
+  create: notifying(clientsModule.createClient),
+  update: notifying(clientsModule.updateClient),
+  setArchived: notifying(clientsModule.setClientArchived),
+  delete: notifying(clientsModule.deleteClient)
 } as const
 
 export const projects = {
   list: projectsModule.listProjects,
   get: projectsModule.findProject,
-  create: projectsModule.createProject,
-  update: projectsModule.updateProject,
-  setArchived: projectsModule.setProjectArchived,
-  delete: projectsModule.deleteProject
+  create: notifying(projectsModule.createProject),
+  update: notifying(projectsModule.updateProject),
+  setArchived: notifying(projectsModule.setProjectArchived),
+  delete: notifying(projectsModule.deleteProject)
 } as const
 
 export const tags = {
   list: tagsModule.listTags,
   get: tagsModule.findTag,
-  create: tagsModule.createTag,
-  update: tagsModule.updateTag,
-  delete: tagsModule.deleteTag
+  create: notifying(tagsModule.createTag),
+  update: notifying(tagsModule.updateTag),
+  delete: notifying(tagsModule.deleteTag)
 } as const
 
 export const activities = {
   list: activitiesModule.listActivities,
   get: activitiesModule.getActivityDetails,
-  create: activitiesModule.createActivity,
-  rename: activitiesModule.renameActivity,
-  move: activitiesModule.moveActivity,
-  setArchived: activitiesModule.setActivityArchived,
-  setClient: activitiesModule.setActivityClient,
-  setTags: activitiesModule.setActivityTags,
-  merge: activitiesModule.mergeActivity,
-  delete: activitiesModule.deleteActivity
+  create: notifying(activitiesModule.createActivity),
+  rename: notifying(activitiesModule.renameActivity),
+  move: notifying(activitiesModule.moveActivity),
+  setArchived: notifying(activitiesModule.setActivityArchived),
+  setClient: notifying(activitiesModule.setActivityClient),
+  setTags: notifying(activitiesModule.setActivityTags),
+  merge: notifying(activitiesModule.mergeActivity),
+  delete: notifying(activitiesModule.deleteActivity)
 } as const
 
 export const customFields = {
   list: customFieldsModule.listCustomFields,
-  create: customFieldsModule.createCustomField,
-  rename: customFieldsModule.renameCustomField,
-  setArchived: customFieldsModule.setCustomFieldArchived,
-  delete: customFieldsModule.deleteCustomField,
-  createOption: customFieldsModule.createCustomFieldOption,
-  renameOption: customFieldsModule.renameCustomFieldOption,
-  setOptionArchived: customFieldsModule.setCustomFieldOptionArchived,
-  deleteOption: customFieldsModule.deleteCustomFieldOption,
+  create: notifying(customFieldsModule.createCustomField),
+  rename: notifying(customFieldsModule.renameCustomField),
+  setArchived: notifying(customFieldsModule.setCustomFieldArchived),
+  delete: notifying(customFieldsModule.deleteCustomField),
+  createOption: notifying(customFieldsModule.createCustomFieldOption),
+  renameOption: notifying(customFieldsModule.renameCustomFieldOption),
+  setOptionArchived: notifying(customFieldsModule.setCustomFieldOptionArchived),
+  deleteOption: notifying(customFieldsModule.deleteCustomFieldOption),
   getValues: customFieldsModule.getFieldValues,
   listValues: customFieldsModule.listFieldValues,
-  setValues: customFieldsModule.setFieldValues
+  setValues: notifying(customFieldsModule.setFieldValues)
 } as const
 
 export const timeEntries = {
   list: timeEntriesModule.listTimeEntries,
-  create: timeEntriesModule.createTimeEntry,
-  update: timeEntriesModule.updateTimeEntry,
-  setNote: timeEntriesModule.setTimeEntryNote,
-  delete: timeEntriesModule.deleteTimeEntry
+  get: timeEntriesModule.getTimeEntryDetails,
+  create: notifying(timeEntriesModule.createTimeEntry),
+  update: notifying(timeEntriesModule.updateTimeEntry),
+  setNote: notifying(timeEntriesModule.setTimeEntryNote),
+  delete: notifying(timeEntriesModule.deleteTimeEntry)
 } as const
 
 export const timer = {
   get: timerModule.getRunningTimer,
   isRunning: timerModule.hasRunningTimer,
-  start: timerModule.startTimer,
-  stop: timerModule.stopTimer,
-  discard: timerModule.discardTimer,
+  start: notifying(timerModule.startTimer),
+  stop: notifying(timerModule.stopTimer),
+  discard: notifying(timerModule.discardTimer),
   recentActivities: timerModule.listRecentActivities
 } as const
 
@@ -155,7 +170,7 @@ export const dataExport = {
 export const exportTemplates = {
   list: exportTemplatesModule.listExportTemplates,
   get: exportTemplatesModule.getExportTemplate,
-  create: exportTemplatesModule.createExportTemplate,
-  update: exportTemplatesModule.updateExportTemplate,
-  delete: exportTemplatesModule.deleteExportTemplate
+  create: notifying(exportTemplatesModule.createExportTemplate),
+  update: notifying(exportTemplatesModule.updateExportTemplate),
+  delete: notifying(exportTemplatesModule.deleteExportTemplate)
 } as const

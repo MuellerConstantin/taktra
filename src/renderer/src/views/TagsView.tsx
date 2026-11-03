@@ -20,10 +20,12 @@ import { useProfiles } from '../hooks/useProfiles'
 import { api } from '../lib/api'
 import { appShortcuts } from '../lib/shortcuts'
 import { suggestColor } from '../lib/colors'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 function TagsView(): React.JSX.Element {
   const t = useTranslations('TagsView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { activeProfile } = useProfiles()
   const navigate = useNavigate()
   const [tags, setTags] = useState<readonly Tag[] | null>(null)
@@ -51,7 +53,7 @@ function TagsView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, reloadCount, errorMessage])
+  }, [activeProfile?.path, reloadCount, dataRevision, errorMessage])
 
   const handleDelete = async (tag: Tag): Promise<void> => {
     setDeleteError(null)

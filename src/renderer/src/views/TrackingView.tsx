@@ -38,6 +38,7 @@ import { api } from '../lib/api'
 import { elapsedSeconds, formatDuration } from '../lib/duration'
 import { daysOf, type CalendarRange } from '../lib/period'
 import { appShortcuts } from '../lib/shortcuts'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 const rangeOptions = [
   { id: 'day', Icon: DayViewIcon },
@@ -94,6 +95,7 @@ function toRows(entries: readonly TimeEntryDetails[], now: number): Row[] {
 function TrackingView(): React.JSX.Element {
   const t = useTranslations('TrackingView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { locale } = useLocale()
   const { activeProfile } = useProfiles()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -145,7 +147,7 @@ function TrackingView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, from, to, reloadCount, revision, errorMessage])
+  }, [activeProfile?.path, from, to, reloadCount, revision, dataRevision, errorMessage])
 
   const thisWeekStart = startOfWeek(todayDate, locale)
   const title =

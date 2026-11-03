@@ -19,6 +19,7 @@ import { useTimer } from '../hooks/useTimer'
 import { api, events } from '../lib/api'
 import { elapsedSeconds, formatElapsed } from '../lib/duration'
 import { NEUTRAL_COLOR } from '../lib/report'
+import { useDataRevision } from '../hooks/useDataRevision'
 
 const RECENT_LIMIT = 8
 
@@ -40,6 +41,7 @@ function toOption(details: ActivityDetails): Option {
 function QuickStartView(): React.JSX.Element {
   const t = useTranslations('QuickStartView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const { contains } = useFilter({ sensitivity: 'base' })
   const { running, revision, start, stop } = useTimer()
   const { activeProfile } = useProfiles()
@@ -90,7 +92,7 @@ function QuickStartView(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [shownCount, revision, activeProfile?.path, errorMessage])
+  }, [shownCount, revision, activeProfile?.path, dataRevision, errorMessage])
 
   useEffect(() => {
     const root = rootRef.current

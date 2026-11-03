@@ -12,11 +12,13 @@ import { ExportTemplateDialog } from '../../../components/molecules/ExportTempla
 import { useErrorMessage } from '../../../hooks/useErrorMessage'
 import { useProfiles } from '../../../hooks/useProfiles'
 import { api } from '../../../lib/api'
+import { useDataRevision } from '../../../hooks/useDataRevision'
 
 function ProfileTemplatesSettings(): React.JSX.Element {
   const t = useTranslations('ProfileTemplatesSettings')
   const tExport = useTranslations('ExportView')
   const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
   const navigate = useNavigate()
   const { activeProfile } = useProfiles()
   const [templates, setTemplates] = useState<readonly ExportTemplate[] | null>(null)
@@ -39,7 +41,7 @@ function ProfileTemplatesSettings(): React.JSX.Element {
     return () => {
       isCurrent = false
     }
-  }, [activeProfile?.path, reloadCount, errorMessage])
+  }, [activeProfile?.path, reloadCount, dataRevision, errorMessage])
 
   const reload = (): void => setReloadCount((count) => count + 1)
 

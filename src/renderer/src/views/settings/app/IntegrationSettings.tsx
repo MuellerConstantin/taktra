@@ -31,7 +31,7 @@ function IntegrationSettings(): React.JSX.Element {
         .catch((caught) => isCurrent && setError(errorMessage(caught)))
     }
     load()
-    const unsubscribe = events.onApiChanged(load)
+    const unsubscribe = events.onApiAccessChanged(load)
     return () => {
       isCurrent = false
       unsubscribe()
