@@ -1,7 +1,7 @@
 import { screen, type BrowserWindow } from 'electron'
 import { z } from 'zod'
 import { handle } from './ipc/handle'
-import { createRendererWindow } from './windows'
+import { createRendererWindow, send } from './windows'
 
 const WIDTH = 560
 const MIN_HEIGHT = 64
@@ -64,7 +64,7 @@ export function toggleQuickStart(): void {
 
   quickWindow ??= createQuickWindow()
   center(quickWindow)
-  quickWindow.webContents.send('quick:shown')
+  send(quickWindow, 'quick:shown')
   quickWindow.show()
   quickWindow.focus()
 }

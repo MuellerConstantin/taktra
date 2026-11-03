@@ -1,12 +1,12 @@
 import { readdirSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { app, BrowserWindow } from 'electron'
+import { app } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { z } from 'zod'
 import type { UpdateStatus } from '../../shared/gui/updates'
 import { settings } from '../core'
 import { handle } from './ipc/handle'
-import { prepareQuit } from './windows'
+import { prepareQuit, sendToAllWindows } from './windows'
 
 const FIRST_CHECK_DELAY_MS = 10_000
 const CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000
@@ -15,7 +15,7 @@ let status: UpdateStatus = { state: 'idle' }
 
 function setStatus(next: UpdateStatus): void {
   status = next
-  for (const window of BrowserWindow.getAllWindows()) window.webContents.send('updates:changed')
+  sendToAllWindows('updates:changed')
 }
 
 /**

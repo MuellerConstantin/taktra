@@ -1,6 +1,7 @@
 import { BrowserWindow, shell, type BrowserWindowConstructorOptions } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
+import type { WindowMessage } from '../../shared/gui/ipc'
 import { events } from '../core'
 
 let mainWindow: BrowserWindow | null = null
@@ -33,17 +34,22 @@ export function showMainWindow(): void {
   mainWindow.focus()
 }
 
-export function sendToMainWindow(channel: string): void {
+export function send(window: BrowserWindow, message: WindowMessage): void {
+  window.webContents.send(message)
+}
+
+export function sendToAllWindows(message: WindowMessage): void {
+  for (const window of BrowserWindow.getAllWindows()) send(window, message)
+}
+
+export function sendToMainWindow(message: WindowMessage): void {
   if (!mainWindow || mainWindow.isDestroyed()) return
-  mainWindow.webContents.send(channel)
+  send(mainWindow, message)
 }
 
 export function initWindowEvents(): void {
   for (const signal of events.signals) {
-    events.on(`signal:${signal}`, () => {
-      for (const window of BrowserWindow.getAllWindows())
-        window.webContents.send(`${signal}:changed`)
-    })
+    events.on(`signal:${signal}`, () => sendToAllWindows(`${signal}:changed`))
   }
 }
 

@@ -10,7 +10,7 @@ import type {
   FieldValue,
   FieldValueInput
 } from '../shared/model/customFields'
-import type { IpcResponse } from '../shared/gui/ipc'
+import type { InvokeChannel, IpcResponse, WindowMessage } from '../shared/gui/ipc'
 import type { ApiState } from '../shared/model/apiAccess'
 import type { ProfilesState } from '../shared/model/profiles'
 import type { Project, ProjectInput } from '../shared/model/projects'
@@ -36,11 +36,11 @@ import type {
   TimeEntryFilter
 } from '../shared/model/timeEntries'
 
-function invoke<T>(channel: string, ...args: unknown[]): Promise<IpcResponse<T>> {
+function invoke<T>(channel: InvokeChannel, ...args: unknown[]): Promise<IpcResponse<T>> {
   return ipcRenderer.invoke(channel, ...args)
 }
 
-function subscribe(channel: string, callback: () => void): () => void {
+function subscribe(channel: WindowMessage, callback: () => void): () => void {
   const listener = (): void => callback()
   ipcRenderer.on(channel, listener)
   return () => {

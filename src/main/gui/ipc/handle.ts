@@ -1,10 +1,10 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { z } from 'zod'
-import type { IpcResponse } from '../../../shared/gui/ipc'
+import type { InvokeChannel, IpcResponse } from '../../../shared/gui/ipc'
 import { AppError } from '../../../shared/model/errors'
 
 export function handle<Args extends z.ZodTuple, Result>(
-  channel: string,
+  channel: InvokeChannel,
   args: Args,
   fn: (event: IpcMainInvokeEvent, ...args: z.output<Args>) => Result | Promise<Result>
 ): void {

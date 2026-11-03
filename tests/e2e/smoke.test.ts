@@ -34,6 +34,8 @@ test('opens every view with the sample profile', async ({ window, errors }) => {
       for (let frame = 0; frame < 2; frame++) await new Promise(requestAnimationFrame)
     }, `#/${view}`)
     await expect(window.getByText('Unexpected Application Error'), view).toBeHidden()
+    // A view shows a failed load as a message instead of throwing, so it is checked as text.
+    await expect(window.getByText('Something went wrong. Please try again.'), view).toBeHidden()
     expect(errors, view).toEqual([])
   }
 })

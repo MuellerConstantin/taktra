@@ -224,6 +224,11 @@ Lint rules enforce these boundaries.
   Handlers in `gui/ipc/` make the core reachable for the renderer; a GUI module
   with state of its own (windows, tray, shortcut, updater) registers its
   handlers itself.
+- **Typed channels**: The channel names on both sides are typed against
+  `shared/gui/ipc.ts`: `InvokeChannel` for what the renderer invokes and the
+  main process handles, `WindowMessage` for what the main process sends to
+  windows. Windows are only sent messages through the helpers in
+  `gui/windows.ts`, never through `webContents.send` directly.
 - **Uniform errors with codes**: Errors the user may see are thrown as
   `AppError` with a code from `shared/model/errors.ts` and translated in the
   renderer under `Errors.<CODE>`. Unexpected errors are logged and reach the UI
