@@ -6,7 +6,7 @@ test('enables the local API and answers with the shown key', async ({ window, er
   await window.getByRole('button', { name: 'Try sample profile' }).click()
   await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
   await window.evaluate(() => {
-    location.hash = '#/settings/api'
+    location.hash = '#/settings/integrations'
   })
 
   const port = window.getByRole('textbox', { name: 'Port' })

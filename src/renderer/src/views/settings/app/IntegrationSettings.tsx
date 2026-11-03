@@ -12,8 +12,8 @@ import { api, events } from '../../../lib/api'
 const MIN_PORT = 1024
 const MAX_PORT = 65535
 
-function ApiSettings(): React.JSX.Element {
-  const t = useTranslations('ApiSettings')
+function IntegrationSettings(): React.JSX.Element {
+  const t = useTranslations('IntegrationSettings')
   const errorMessage = useErrorMessage()
   const { settings, updateSettings } = useSettings()
   const [state, setState] = useState<ApiState | null>(null)
@@ -162,4 +162,4 @@ function ApiSettings(): React.JSX.Element {
   )
 }
 
-export default ApiSettings
+export default IntegrationSettings

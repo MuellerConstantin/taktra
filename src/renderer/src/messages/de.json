@@ -202,7 +202,7 @@
       "deleteProfile": ["Profil entfernen", "Papierkorb"],
       "profileName": ["umbenennen"],
       "help": ["Handbuch", "Anleitung", "Dokumentation", "Erklärung", "FAQ", "help"],
-      "api": ["Schnittstelle", "Integration", "REST", "HTTP", "Skripte", "Schlüssel"]
+      "integrations": ["API", "Schnittstelle", "REST", "HTTP", "Skripte", "Schlüssel", "verbinden"]
     }
   },
   "TimerView": {
@@ -661,7 +661,7 @@
     "controls": "Bedienung",
     "about": "Über Taktra",
     "updates": "Updates",
-    "api": "API"
+    "integrations": "Integrationen"
   },
   "AppearanceSettings": {
     "theme": {
@@ -722,7 +722,7 @@
     "label": "Automatisch nach Updates suchen",
     "description": "Sucht beim Start und alle paar Stunden auf GitHub nach neuen Versionen. Updates werden im Hintergrund geladen und beim Beenden von Taktra installiert. Ohne Verbindung passiert nichts."
   },
-  "ApiSettings": {
+  "IntegrationSettings": {
     "title": "Lokale API",
     "description": "Erlaubt anderen Programmen auf diesem Computer, Projekte, Einträge und Berichte über HTTP zu lesen und den Timer zu starten oder zu stoppen. Nur Programme, die den Schlüssel kennen, werden eingelassen.",
     "enabled": "Lokale API aktivieren",

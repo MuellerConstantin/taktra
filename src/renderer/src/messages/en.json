@@ -168,7 +168,7 @@
       "deleteProfile": ["remove profile", "trash"],
       "profileName": ["rename"],
       "help": ["manual", "guide", "documentation", "explanation", "FAQ"],
-      "api": ["interface", "integration", "REST", "HTTP", "scripts", "key"]
+      "integrations": ["API", "interface", "REST", "HTTP", "scripts", "key", "connect"]
     }
   },
   "TimerView": {
@@ -627,7 +627,7 @@
     "controls": "Controls",
     "about": "About Taktra",
     "updates": "Updates",
-    "api": "API"
+    "integrations": "Integrations"
   },
   "AppearanceSettings": {
     "theme": {
@@ -688,7 +688,7 @@
     "label": "Check for updates automatically",
     "description": "Looks for new versions on GitHub at start and every few hours. Updates are downloaded in the background and installed when you quit Taktra. Without a connection, nothing happens."
   },
-  "ApiSettings": {
+  "IntegrationSettings": {
     "title": "Local API",
     "description": "Lets other programs on this computer read projects, entries and reports and start or stop the timer over HTTP. Only programs that know the key are let in.",
     "enabled": "Enable local API",
