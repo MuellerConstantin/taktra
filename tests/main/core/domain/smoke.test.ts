@@ -1,27 +1,23 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type { ExportFormat, ExportTable } from '../../../../src/shared/model/export'
-import type { Grouping, TimeFilter } from '../../../../src/shared/model/reports'
-import { getActivityDetails, listActivities } from '../../../../src/main/core/domain/activities'
-import { listClients } from '../../../../src/main/core/domain/clients'
-import { previewExport, toCsv, toJson, toXlsx } from '../../../../src/main/core/domain/export'
-import { listExportTemplates } from '../../../../src/main/core/domain/exportTemplates'
-import { listProjects } from '../../../../src/main/core/domain/projects'
-import { aggregate } from '../../../../src/main/core/domain/reports'
-import { listTags } from '../../../../src/main/core/domain/tags'
-import { listTimeEntries } from '../../../../src/main/core/domain/timeEntries'
+import type { ExportFormat, ExportTable } from '@/shared/model/export'
+import type { Grouping, TimeFilter } from '@/shared/model/reports'
+import { getActivityDetails, listActivities } from '@/main/core/domain/activities'
+import { listClients } from '@/main/core/domain/clients'
+import { previewExport, toCsv, toJson, toXlsx } from '@/main/core/domain/export'
+import { listExportTemplates } from '@/main/core/domain/exportTemplates'
+import { listProjects } from '@/main/core/domain/projects'
+import { aggregate } from '@/main/core/domain/reports'
+import { listTags } from '@/main/core/domain/tags'
+import { listTimeEntries } from '@/main/core/domain/timeEntries'
 import {
   getRunningTimer,
   listRecentActivities,
   startTimer,
   stopTimer
-} from '../../../../src/main/core/domain/timer'
+} from '@/main/core/domain/timer'
 import { createTestProfile } from '../../../profiles'
-import {
-  activateDatabase,
-  closeActiveDatabase,
-  getActiveDatabase
-} from '../../../../src/main/core/db/database'
-import { seedSampleData } from '../../../../src/main/core/db/sample'
+import { activateDatabase, closeActiveDatabase, getActiveDatabase } from '@/main/core/db/database'
+import { seedSampleData } from '@/main/core/db/sample'
 
 const writers: Record<ExportFormat, (table: ExportTable) => string | Promise<Buffer>> = {
   csv: toCsv,

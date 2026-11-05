@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm'
-import { AppError } from '../../../shared/model/errors'
-import { toNameKey } from '../../../shared/model/names'
-import type { Tag, TagData } from '../../../shared/model/tags'
-import { getActiveDatabase } from '../db/database'
-import { isUniqueViolation } from '../db/errors'
-import { tags } from '../db/schema'
-import { emit } from '../events'
+import { AppError } from '@/shared/model/errors'
+import { toNameKey } from '@/shared/model/names'
+import type { Tag, TagData } from '@/shared/model/tags'
+import { getActiveDatabase } from '@/main/core/db/database'
+import { isUniqueViolation } from '@/main/core/db/errors'
+import { tags } from '@/main/core/db/schema'
+import { emit } from '@/main/core/events'
 import { sortByName } from './names'
 
 export const tagSelection = {

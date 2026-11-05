@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import type Database from 'better-sqlite3'
-import { getEnvironment } from '../environment'
+import { getEnvironment } from '@/main/core/environment'
 
 const KEPT_BACKUPS = 3
 

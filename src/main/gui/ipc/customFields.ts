@@ -6,8 +6,8 @@ import {
   fieldValueInput,
   id,
   name
-} from '../../../shared/validation'
-import { customFields } from '../../core'
+} from '@/shared/validation'
+import { customFields } from '@/main/core'
 import { handle } from './handle'
 
 export function registerCustomFieldsHandlers(): void {

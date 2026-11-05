@@ -1,11 +1,11 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { activateDatabase, closeActiveDatabase } from '../../../../src/main/core/db/database'
-import { createCustomField } from '../../../../src/main/core/domain/customFields'
+import { activateDatabase, closeActiveDatabase } from '@/main/core/db/database'
+import { createCustomField } from '@/main/core/domain/customFields'
 import {
   createExportTemplate,
   getExportTemplate,
   updateExportTemplate
-} from '../../../../src/main/core/domain/exportTemplates'
+} from '@/main/core/domain/exportTemplates'
 import { createTestProfile } from '../../../profiles'
 
 beforeEach(() => {

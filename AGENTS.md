@@ -123,7 +123,7 @@ development.
 │   │   ├── model/         # Domain types, constants, pure rules, error codes, text length limits
 │   │   ├── validation/    # Zod schemas per domain: the input contract of the core
 │   │   └── gui/           # Contract between main and renderer only (IPC response, updates, about)
-│   └── renderer/src/      # React UI
+│   └── renderer/          # React UI
 │       ├── views/         # One component per route
 │       ├── components/    # Atomic Design: atoms, molecules, organisms, templates
 │       ├── contexts/      # Context objects and providers
@@ -139,6 +139,11 @@ development.
 
 `docs/screenshots/` holds the README screenshots; they show only the sample
 profile and are excluded from the packaged app.
+
+Imports from outside a file's own folder go through the alias `@/` for `src/`
+(`@/shared/model/limits`); relative paths only reach the own folder and below.
+`shared/` and the database schema stay relative, because drizzle-kit loads
+them without resolving the alias.
 
 ## Architecture
 

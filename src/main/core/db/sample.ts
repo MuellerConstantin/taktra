@@ -1,11 +1,11 @@
-import type { CustomFieldScope } from '../../../shared/model/customFields'
+import type { CustomFieldScope } from '@/shared/model/customFields'
 import type {
   BuiltinExportColumn,
   ExportAggregation,
   ExportFormat,
   ExportLayout
-} from '../../../shared/model/export'
-import { toNameKey } from '../../../shared/model/names'
+} from '@/shared/model/export'
+import { toNameKey } from '@/shared/model/names'
 import type { ProfileDatabase } from './database'
 import {
   activities,

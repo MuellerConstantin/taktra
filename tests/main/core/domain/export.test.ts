@@ -1,23 +1,19 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import type {
-  BuiltinExportColumn,
-  ExportColumn,
-  ExportLayout
-} from '../../../../src/shared/model/export'
-import type { TimeFilter } from '../../../../src/shared/model/reports'
-import { activateDatabase, closeActiveDatabase } from '../../../../src/main/core/db/database'
-import { createActivity, setActivityTags } from '../../../../src/main/core/domain/activities'
-import { createClient } from '../../../../src/main/core/domain/clients'
+import type { BuiltinExportColumn, ExportColumn, ExportLayout } from '@/shared/model/export'
+import type { TimeFilter } from '@/shared/model/reports'
+import { activateDatabase, closeActiveDatabase } from '@/main/core/db/database'
+import { createActivity, setActivityTags } from '@/main/core/domain/activities'
+import { createClient } from '@/main/core/domain/clients'
 import {
   createCustomField,
   createCustomFieldOption,
   setFieldValues
-} from '../../../../src/main/core/domain/customFields'
-import { previewExport, toCsv, toJson } from '../../../../src/main/core/domain/export'
-import { createProject } from '../../../../src/main/core/domain/projects'
-import { createTag } from '../../../../src/main/core/domain/tags'
-import { createTimeEntry } from '../../../../src/main/core/domain/timeEntries'
-import { startTimer } from '../../../../src/main/core/domain/timer'
+} from '@/main/core/domain/customFields'
+import { previewExport, toCsv, toJson } from '@/main/core/domain/export'
+import { createProject } from '@/main/core/domain/projects'
+import { createTag } from '@/main/core/domain/tags'
+import { createTimeEntry } from '@/main/core/domain/timeEntries'
+import { startTimer } from '@/main/core/domain/timer'
 import { createTestProfile } from '../../../profiles'
 
 const MARCH: TimeFilter = { from: '2026-03-01', to: '2026-03-04' }

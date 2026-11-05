@@ -1,16 +1,16 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { activateDatabase, closeActiveDatabase } from '../../../../src/main/core/db/database'
+import { activateDatabase, closeActiveDatabase } from '@/main/core/db/database'
 import {
   createActivity,
   findActivity,
   getActivityDetails,
   moveActivity,
   setActivityClient
-} from '../../../../src/main/core/domain/activities'
-import { createClient } from '../../../../src/main/core/domain/clients'
-import { createProject, updateProject } from '../../../../src/main/core/domain/projects'
-import { aggregate } from '../../../../src/main/core/domain/reports'
-import { createTimeEntry } from '../../../../src/main/core/domain/timeEntries'
+} from '@/main/core/domain/activities'
+import { createClient } from '@/main/core/domain/clients'
+import { createProject, updateProject } from '@/main/core/domain/projects'
+import { aggregate } from '@/main/core/domain/reports'
+import { createTimeEntry } from '@/main/core/domain/timeEntries'
 import { createTestProfile } from '../../../profiles'
 
 const NO_CLIENT = '(none)'

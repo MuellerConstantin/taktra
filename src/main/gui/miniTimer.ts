@@ -1,6 +1,6 @@
 import { screen, type BrowserWindow, type Rectangle } from 'electron'
 import { z } from 'zod'
-import { events, lazyStore, settings, timer } from '../core'
+import { events, lazyStore, settings, timer } from '@/main/core'
 import { handle } from './ipc/handle'
 import { createRendererWindow, showMainWindow } from './windows'
 

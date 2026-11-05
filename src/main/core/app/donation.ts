@@ -1,4 +1,4 @@
-import { emit } from '../events'
+import { emit } from '@/main/core/events'
 import { lazyStore } from './store'
 
 const FIRST_HINT_AFTER_DAYS = 14

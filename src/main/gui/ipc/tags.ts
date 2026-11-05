@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { id, tagInput } from '../../../shared/validation'
-import { tags } from '../../core'
+import { id, tagInput } from '@/shared/validation'
+import { tags } from '@/main/core'
 import { handle } from './handle'
 
 export function registerTagsHandlers(): void {

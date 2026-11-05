@@ -1,12 +1,12 @@
 import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { z } from 'zod'
-import type { Activity, ActivityTag, ActivityWithTags } from '../../../shared/model/activities'
-import type { ActivityDetails } from '../../../shared/model/timeEntries'
-import { AppError, invalidInput } from '../../../shared/model/errors'
-import { toNameKey } from '../../../shared/model/names'
-import { activityInput, activityListOptions } from '../../../shared/validation'
-import { getActiveDatabase } from '../db/database'
-import { isUniqueViolation } from '../db/errors'
+import type { Activity, ActivityTag, ActivityWithTags } from '@/shared/model/activities'
+import type { ActivityDetails } from '@/shared/model/timeEntries'
+import { AppError, invalidInput } from '@/shared/model/errors'
+import { toNameKey } from '@/shared/model/names'
+import { activityInput, activityListOptions } from '@/shared/validation'
+import { getActiveDatabase } from '@/main/core/db/database'
+import { isUniqueViolation } from '@/main/core/db/errors'
 import {
   activities,
   activityFieldValues,
@@ -15,8 +15,8 @@ import {
   projects,
   tags,
   timeEntries
-} from '../db/schema'
-import { emit } from '../events'
+} from '@/main/core/db/schema'
+import { emit } from '@/main/core/events'
 import { clientRef, effectiveClientJoin, findClient } from './clients'
 import { sortByName } from './names'
 import { findProject } from './projects'

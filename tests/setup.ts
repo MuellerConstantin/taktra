@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll } from 'vitest'
-import { setEnvironment } from '../src/main/core/environment'
+import { setEnvironment } from '@/main/core/environment'
 
 /** The core runs under plain Node in tests, against its own temporary user data folder. */
 const userDataPath = mkdtempSync(join(tmpdir(), 'taktra-test-'))

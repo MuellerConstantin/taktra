@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, type MessageBoxOptions } from 'electron'
 import { z } from 'zod'
-import type { Language } from '../../shared/model/settings'
-import { settings, timer } from '../core'
+import type { Language } from '@/shared/model/settings'
+import { settings, timer } from '@/main/core'
 import { handle } from './ipc/handle'
 
 const labels: Record<

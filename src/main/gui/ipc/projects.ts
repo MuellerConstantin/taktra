@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { id, listOptions, projectInput } from '../../../shared/validation'
-import { projects } from '../../core'
+import { id, listOptions, projectInput } from '@/shared/validation'
+import { projects } from '@/main/core'
 import { handle } from './handle'
 
 export function registerProjectsHandlers(): void {

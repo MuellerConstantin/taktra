@@ -5,9 +5,9 @@ import {
   profileFileExtension,
   type ProfilesState,
   type UnavailableReason
-} from '../../../shared/model/profiles'
-import { AppError, isAppError } from '../../../shared/model/errors'
-import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from '../constants'
+} from '@/shared/model/profiles'
+import { AppError, isAppError } from '@/shared/model/errors'
+import { RESERVED_FILE_NAMES, SQLITE_SIDECAR_SUFFIXES } from '@/main/core/constants'
 import {
   activateDatabase,
   closeActiveDatabase,
@@ -17,11 +17,11 @@ import {
   withProfileDatabase,
   writeProperty,
   type ProfileDatabase
-} from '../db/database'
-import { SAMPLE_PROFILE_NAME, seedSampleData } from '../db/sample'
-import { stopTimer } from '../domain/timer'
-import { getEnvironment } from '../environment'
-import { emit } from '../events'
+} from '@/main/core/db/database'
+import { SAMPLE_PROFILE_NAME, seedSampleData } from '@/main/core/db/sample'
+import { stopTimer } from '@/main/core/domain/timer'
+import { getEnvironment } from '@/main/core/environment'
+import { emit } from '@/main/core/events'
 import { lazyStore } from './store'
 
 type KnownProfiles = {

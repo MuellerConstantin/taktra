@@ -1,11 +1,11 @@
-import { AppError } from '../../../shared/model/errors'
+import { AppError } from '@/shared/model/errors'
 import {
   DEFAULT_QUICK_START_SHORTCUT,
   languages,
   themeSources,
   type Settings
-} from '../../../shared/model/settings'
-import { emit } from '../events'
+} from '@/shared/model/settings'
+import { emit } from '@/main/core/events'
 import { lazyStore } from './store'
 
 const store = lazyStore<Settings>('settings', {

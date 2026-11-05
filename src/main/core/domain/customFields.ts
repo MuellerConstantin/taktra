@@ -7,20 +7,20 @@ import type {
   CustomFieldWithOptions,
   FieldValue,
   FieldValueData
-} from '../../../shared/model/customFields'
-import { AppError, invalidInput } from '../../../shared/model/errors'
-import { toNameKey } from '../../../shared/model/names'
-import { MAX_ACTIVE_CUSTOM_FIELDS, MAX_ACTIVE_FIELD_OPTIONS } from '../../../shared/model/limits'
-import { customFieldInput, customFieldListOptions } from '../../../shared/validation'
-import { getActiveDatabase } from '../db/database'
-import { isUniqueViolation } from '../db/errors'
+} from '@/shared/model/customFields'
+import { AppError, invalidInput } from '@/shared/model/errors'
+import { toNameKey } from '@/shared/model/names'
+import { MAX_ACTIVE_CUSTOM_FIELDS, MAX_ACTIVE_FIELD_OPTIONS } from '@/shared/model/limits'
+import { customFieldInput, customFieldListOptions } from '@/shared/validation'
+import { getActiveDatabase } from '@/main/core/db/database'
+import { isUniqueViolation } from '@/main/core/db/errors'
 import {
   activityFieldValues,
   clientFieldValues,
   customFieldOptions,
   customFields,
   projectFieldValues
-} from '../db/schema'
+} from '@/main/core/db/schema'
 import { findActivity } from './activities'
 import { findClient } from './clients'
 import { sortByName } from './names'

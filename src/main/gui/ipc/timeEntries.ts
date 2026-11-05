@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { id, note, timeEntryFilter, timeEntryInput } from '../../../shared/validation'
-import { timeEntries } from '../../core'
+import { id, note, timeEntryFilter, timeEntryInput } from '@/shared/validation'
+import { timeEntries } from '@/main/core'
 import { handle } from './handle'
 
 export function registerTimeEntriesHandlers(): void {

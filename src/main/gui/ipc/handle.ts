@@ -1,7 +1,7 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { z } from 'zod'
-import type { InvokeChannel, IpcContract, IpcResponse } from '../../../shared/gui/ipc'
-import { AppError } from '../../../shared/model/errors'
+import type { InvokeChannel, IpcContract, IpcResponse } from '@/shared/gui/ipc'
+import { AppError } from '@/shared/model/errors'
 
 type Result<Channel extends InvokeChannel> = Awaited<ReturnType<IpcContract[Channel]>>
 

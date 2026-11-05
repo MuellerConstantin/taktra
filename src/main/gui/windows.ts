@@ -1,8 +1,8 @@
 import { BrowserWindow, shell, type BrowserWindowConstructorOptions } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
-import type { WindowMessage } from '../../shared/gui/ipc'
-import { events } from '../core'
+import type { WindowMessage } from '@/shared/gui/ipc'
+import { events } from '@/main/core'
 
 let mainWindow: BrowserWindow | null = null
 let quitting = false

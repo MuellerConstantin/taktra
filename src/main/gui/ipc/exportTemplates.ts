@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { exportTemplateInput, id } from '../../../shared/validation'
-import { exportTemplates } from '../../core'
+import { exportTemplateInput, id } from '@/shared/validation'
+import { exportTemplates } from '@/main/core'
 import { handle } from './handle'
 
 export function registerExportTemplatesHandlers(): void {

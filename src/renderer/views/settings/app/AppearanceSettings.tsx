@@ -1,0 +1,45 @@
+import { useTranslations } from 'use-intl'
+import { RadioCard, RadioGroup } from '@/renderer/components/atoms/RadioGroup'
+import { Select, SelectItem } from '@/renderer/components/atoms/Select'
+import { useSettings } from '@/renderer/hooks/useSettings'
+import { languages, themeSources, type Language, type ThemeSource } from '@/shared/model/settings'
+
+function AppearanceSettings(): React.JSX.Element {
+  const t = useTranslations('AppearanceSettings')
+  const { settings, updateSettings } = useSettings()
+
+  return (
+    <div className="flex max-w-xl flex-col gap-8">
+      <RadioGroup
+        label={t('theme.label')}
+        orientation="horizontal"
+        value={settings.theme}
+        onChange={(value) => updateSettings({ theme: value as ThemeSource })}
+      >
+        {themeSources.map((theme) => (
+          <RadioCard
+            key={theme}
+            value={theme}
+            label={t(`theme.${theme}`)}
+            description={t(`theme.${theme}Description`)}
+          />
+        ))}
+      </RadioGroup>
+
+      <Select
+        label={t('language.label')}
+        value={settings.language}
+        onChange={(value) => updateSettings({ language: value as Language })}
+        className="w-64"
+      >
+        {languages.map((language) => (
+          <SelectItem key={language} id={language}>
+            {t(`language.${language}`)}
+          </SelectItem>
+        ))}
+      </Select>
+    </div>
+  )
+}
+
+export default AppearanceSettings

@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { app, BrowserWindow, nativeTheme } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../../resources/icon.png?asset'
-import { donation } from '../core'
+import { donation } from '@/main/core'
 import { attachMiniTimer } from './miniTimer'
 import {
   createRendererWindow,

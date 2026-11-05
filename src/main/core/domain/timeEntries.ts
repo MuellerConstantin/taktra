@@ -1,11 +1,11 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
-import { AppError, invalidInput } from '../../../shared/model/errors'
-import { timeEntryFilter } from '../../../shared/validation'
-import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../../shared/model/timeEntries'
-import { getActiveDatabase } from '../db/database'
-import { activities, clients, projects, timeEntries } from '../db/schema'
-import { emit } from '../events'
+import { AppError, invalidInput } from '@/shared/model/errors'
+import { timeEntryFilter } from '@/shared/validation'
+import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '@/shared/model/timeEntries'
+import { getActiveDatabase } from '@/main/core/db/database'
+import { activities, clients, projects, timeEntries } from '@/main/core/db/schema'
+import { emit } from '@/main/core/events'
 import {
   activityDetailsColumns,
   deleteActivityIfUnused,

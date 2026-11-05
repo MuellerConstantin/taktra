@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { activityInput, activityListOptions, id, name } from '../../../shared/validation'
-import { activities } from '../../core'
+import { activityInput, activityListOptions, id, name } from '@/shared/validation'
+import { activities } from '@/main/core'
 import { handle } from './handle'
 
 export function registerActivitiesHandlers(): void {

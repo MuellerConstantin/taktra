@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { clientInput, id, listOptions } from '../../../shared/validation'
-import { clients } from '../../core'
+import { clientInput, id, listOptions } from '@/shared/validation'
+import { clients } from '@/main/core'
 import { handle } from './handle'
 
 export function registerClientsHandlers(): void {

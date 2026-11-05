@@ -1,9 +1,9 @@
 import { stringify } from 'csv-stringify/sync'
 import { and, isNotNull } from 'drizzle-orm'
 import writeXlsxFile, { type Cell } from 'write-excel-file/node'
-import type { CustomField } from '../../../shared/model/customFields'
-import { AppError } from '../../../shared/model/errors'
-import { toNameKey } from '../../../shared/model/names'
+import type { CustomField } from '@/shared/model/customFields'
+import { AppError } from '@/shared/model/errors'
+import { toNameKey } from '@/shared/model/names'
 import {
   columnAggregation,
   columnError,
@@ -18,10 +18,10 @@ import {
   type ExportPreview,
   type ExportTable,
   type ExportValue
-} from '../../../shared/model/export'
-import type { TimeFilter } from '../../../shared/model/reports'
-import type { TimeEntryDetails } from '../../../shared/model/timeEntries'
-import { timeEntries } from '../db/schema'
+} from '@/shared/model/export'
+import type { TimeFilter } from '@/shared/model/reports'
+import type { TimeEntryDetails } from '@/shared/model/timeEntries'
+import { timeEntries } from '@/main/core/db/schema'
 import { findCustomField, listFieldValueTexts } from './customFields'
 import { conditions } from './reports'
 import { selectTimeEntryDetails } from './timeEntries'

@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { id, note } from '../../../shared/validation'
-import { timer } from '../../core'
+import { id, note } from '@/shared/validation'
+import { timer } from '@/main/core'
 import { handle } from './handle'
 
 export function registerTimerHandlers(): void {

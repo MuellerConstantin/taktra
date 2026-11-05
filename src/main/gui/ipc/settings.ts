@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { settingsPatch } from '../../../shared/validation'
-import { settings } from '../../core'
+import { settingsPatch } from '@/shared/validation'
+import { settings } from '@/main/core'
 import { handle } from './handle'
 
 export function registerSettingsHandlers(): void {

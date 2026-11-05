@@ -1,20 +1,16 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
-import { activateDatabase, closeActiveDatabase } from '../../../../src/main/core/db/database'
-import {
-  createActivity,
-  mergeActivity,
-  setActivityArchived
-} from '../../../../src/main/core/domain/activities'
+import { activateDatabase, closeActiveDatabase } from '@/main/core/db/database'
+import { createActivity, mergeActivity, setActivityArchived } from '@/main/core/domain/activities'
 import {
   createCustomField,
   createCustomFieldOption,
   setCustomFieldArchived,
   setCustomFieldOptionArchived,
   setFieldValues
-} from '../../../../src/main/core/domain/customFields'
-import { createProject, setProjectArchived } from '../../../../src/main/core/domain/projects'
-import { createTimeEntry } from '../../../../src/main/core/domain/timeEntries'
-import { startTimer } from '../../../../src/main/core/domain/timer'
+} from '@/main/core/domain/customFields'
+import { createProject, setProjectArchived } from '@/main/core/domain/projects'
+import { createTimeEntry } from '@/main/core/domain/timeEntries'
+import { startTimer } from '@/main/core/domain/timer'
 import { createTestProfile } from '../../../profiles'
 
 let projectId: number

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { InvokeChannel, IpcContract, IpcResponse, WindowMessage } from '../shared/gui/ipc'
+import type { InvokeChannel, IpcContract, IpcResponse, WindowMessage } from '@/shared/gui/ipc'
 
 type Result<Channel extends InvokeChannel> = Awaited<ReturnType<IpcContract[Channel]>>
 

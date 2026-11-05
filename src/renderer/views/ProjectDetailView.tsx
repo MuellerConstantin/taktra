@@ -1,0 +1,176 @@
+import {
+  RiArchiveLine,
+  RiFolderFill,
+  RiInboxUnarchiveLine,
+  RiMore2Line,
+  RiPencilLine
+} from '@remixicon/react'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import { useTranslations } from 'use-intl'
+import type { Project } from '@/shared/model/projects'
+import type { AggregateRow } from '@/shared/model/reports'
+import { Button } from '@/renderer/components/atoms/Button'
+import { GridList, GridListChevron, GridListItem } from '@/renderer/components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '@/renderer/components/atoms/Menu'
+import { Breadcrumbs } from '@/renderer/components/molecules/Breadcrumbs'
+import { ActivityMenu } from '@/renderer/components/molecules/activities/ActivityMenu'
+import { CustomFieldValueList } from '@/renderer/components/molecules/customFields/CustomFieldValueList'
+import { ProjectDialog } from '@/renderer/components/molecules/ProjectDialog'
+import { TagBadges } from '@/renderer/components/molecules/tags/TagBadges'
+import { PeriodPicker } from '@/renderer/components/molecules/PeriodPicker'
+import { ViewHeader } from '@/renderer/components/molecules/ViewHeader'
+import { useErrorMessage } from '@/renderer/hooks/useErrorMessage'
+import { api } from '@/renderer/lib/api'
+import { suggestColor } from '@/renderer/lib/colors'
+import { formatDuration } from '@/renderer/lib/duration'
+import { allTime, periodFilter, type Period } from '@/renderer/lib/period'
+import { useDataRevision } from '@/renderer/hooks/useDataRevision'
+
+function ProjectDetailView(): React.JSX.Element {
+  const t = useTranslations('ProjectDetailView')
+  const tNavigation = useTranslations('Navigation')
+  const errorMessage = useErrorMessage()
+  const dataRevision = useDataRevision()
+  const navigate = useNavigate()
+  const projectId = Number(useParams().projectId)
+  const [project, setProject] = useState<Project | null>(null)
+  const [rows, setRows] = useState<readonly AggregateRow[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [reloadCount, setReloadCount] = useState(0)
+  const [isProjectDialogOpen, setProjectDialogOpen] = useState(false)
+  const [period, setPeriod] = useState<Period>(allTime)
+  const { from, to } = periodFilter(period)
+
+  const reload = (): void => setReloadCount((count) => count + 1)
+  const total = (rows ?? []).reduce((sum, row) => sum + row.totalSec, 0)
+  const activities = (rows ?? []).flatMap(({ activity, totalSec, entryCount }) =>
+    activity ? [{ id: activity.id, activity, totalSec, entryCount }] : []
+  )
+
+  useEffect(() => {
+    let isCurrent = true
+    Promise.all([
+      api.projects.get(projectId),
+      api.reports.aggregate({ projectIds: [projectId], from, to }, ['activity'])
+    ])
+      .then(([loadedProject, loadedRows]) => {
+        if (!isCurrent) return
+        setProject(loadedProject)
+        setRows(loadedRows)
+        setError(null)
+      })
+      .catch((caught) => isCurrent && setError(errorMessage(caught)))
+    return () => {
+      isCurrent = false
+    }
+  }, [projectId, from, to, reloadCount, dataRevision, errorMessage])
+
+  const toggleArchived = async (): Promise<void> => {
+    if (!project) return
+    setActionError(null)
+    try {
+      await api.projects.setArchived(project.id, !project.archivedAt)
+      reload()
+    } catch (caught) {
+      setActionError(errorMessage(caught))
+    }
+  }
+
+  if (error) return <p className="p-8 text-sm text-destructive">{error}</p>
+  if (!project || !rows) return <div />
+
+  return (
+    <div className="flex h-full flex-col">
+      <ViewHeader
+        title={
+          <span className="line-clamp-2 wrap-break-word" title={project.name}>
+            {project.name}
+          </span>
+        }
+        icon={RiFolderFill}
+        iconColor={project.color}
+        subtitle={<Breadcrumbs items={[{ href: '/projects', label: tNavigation('projects') }]} />}
+        actions={
+          <>
+            <Button variant="secondary" onPress={() => setProjectDialogOpen(true)}>
+              <RiPencilLine className="size-4" />
+              {t('edit')}
+            </Button>
+            <MenuTrigger placement="bottom end">
+              <Button variant="icon" aria-label={t('more')}>
+                <RiMore2Line className="size-4" />
+              </Button>
+              <Menu onAction={toggleArchived}>
+                <MenuItem id="archive">
+                  {project.archivedAt ? (
+                    <RiInboxUnarchiveLine aria-hidden className="size-4" />
+                  ) : (
+                    <RiArchiveLine aria-hidden className="size-4" />
+                  )}
+                  {project.archivedAt ? t('unarchive') : t('archive')}
+                </MenuItem>
+              </Menu>
+            </MenuTrigger>
+          </>
+        }
+      >
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-4">
+          <div className="flex min-w-0 flex-1 basis-40 flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
+            {project.archivedAt && (
+              <span className="rounded-full border border-border px-2 py-0.5 text-xs">
+                {t('archived')}
+              </span>
+            )}
+            <span className="truncate">{project.description}</span>
+            <CustomFieldValueList scope="project" ownerId={project.id} revision={reloadCount} />
+          </div>
+          <span className="shrink-0 text-sm text-muted-foreground">
+            {t('total', { duration: formatDuration(total) })}
+          </span>
+          <PeriodPicker value={period} onChange={setPeriod} className="ml-auto" />
+        </div>
+      </ViewHeader>
+      {actionError && <p className="px-8 pt-4 text-sm text-destructive">{actionError}</p>}
+      <GridList
+        aria-label={t('activities')}
+        items={activities}
+        onAction={(key) => navigate(`/activities/${key}`)}
+        className="min-h-0 flex-1"
+        renderEmptyState={() =>
+          activities.length === 0 && (
+            <p className="p-8 text-center text-sm text-muted-foreground">
+              {period.range ? t('emptyPeriod') : t('empty')}
+            </p>
+          )
+        }
+      >
+        {({ activity, totalSec, entryCount }) => (
+          <GridListItem textValue={activity.name} className="h-auto">
+            <div className="flex min-w-0 flex-1 flex-col py-3">
+              <span className="truncate font-medium">{activity.name}</span>
+              {activity.tags.length > 0 && <TagBadges tags={activity.tags} className="mt-2" />}
+            </div>
+            <span className="text-muted-foreground">{t('entryCount', { count: entryCount })}</span>
+            <span className="w-14 text-right font-medium tabular-nums">
+              {formatDuration(totalSec)}
+            </span>
+            <ActivityMenu activity={activity} onChanged={reload} />
+            <GridListChevron />
+          </GridListItem>
+        )}
+      </GridList>
+      {isProjectDialogOpen && (
+        <ProjectDialog
+          project={project}
+          defaultColor={project.color ?? suggestColor([])}
+          onClose={() => setProjectDialogOpen(false)}
+          onSaved={reload}
+        />
+      )}
+    </div>
+  )
+}
+
+export default ProjectDetailView

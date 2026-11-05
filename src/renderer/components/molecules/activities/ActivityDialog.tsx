@@ -1,0 +1,122 @@
+import { useEffect, useState } from 'react'
+import { Form } from 'react-aria-components'
+import { useTranslations } from 'use-intl'
+import type { ActivityRef } from '@/shared/model/activities'
+import type { Client } from '@/shared/model/clients'
+import type { Tag } from '@/shared/model/tags'
+import { useCustomFieldValues } from '@/renderer/hooks/useCustomFieldValues'
+import { useErrorMessage } from '@/renderer/hooks/useErrorMessage'
+import { api } from '@/renderer/lib/api'
+import { Button } from '@/renderer/components/atoms/Button'
+import { Dialog, DialogHeading } from '@/renderer/components/atoms/Dialog'
+import { Modal } from '@/renderer/components/atoms/Modal'
+import { TextField } from '@/renderer/components/atoms/TextField'
+import { ClientSelect } from '@/renderer/components/molecules/ClientSelect'
+import { CustomFieldInputs } from '@/renderer/components/molecules/customFields/CustomFieldInputs'
+import { TagPicker } from '@/renderer/components/molecules/tags/TagPicker'
+import { MAX_NAME_LENGTH } from '@/shared/model/limits'
+
+interface ActivityDialogProps {
+  readonly activity: ActivityRef
+  readonly onClose: () => void
+  readonly onSaved: () => void
+}
+
+export function ActivityDialog({
+  activity,
+  onClose,
+  onSaved
+}: ActivityDialogProps): React.JSX.Element {
+  const t = useTranslations('ActivityDialog')
+  const errorMessage = useErrorMessage()
+  const [tags, setTags] = useState<readonly Tag[]>([])
+  const [name, setName] = useState(activity.name)
+  const [tagIds, setTagIds] = useState<readonly number[]>(() => activity.tags.map((tag) => tag.id))
+  const [clients, setClients] = useState<readonly Client[]>([])
+  const [projectClientId, setProjectClientId] = useState<number | null>(null)
+  const [initialClientId, setInitialClientId] = useState<number | null>(null)
+  const [clientId, setClientId] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, setPending] = useState(false)
+  const fieldValues = useCustomFieldValues('activity', activity.id)
+  const shownError = error ?? fieldValues.error
+
+  useEffect(() => {
+    Promise.all([
+      api.tags.list(),
+      api.clients.list({ includeArchived: true }),
+      api.projects.get(activity.projectId),
+      api.activities.list({ projectId: activity.projectId, includeArchived: true })
+    ])
+      .then(([loadedTags, loadedClients, project, activities]) => {
+        const ownClientId = activities.find((other) => other.id === activity.id)?.clientId ?? null
+        setTags(loadedTags)
+        setClients(loadedClients)
+        setProjectClientId(project.clientId)
+        setInitialClientId(ownClientId)
+        setClientId(ownClientId)
+      })
+      .catch((caught) => setError(errorMessage(caught)))
+  }, [activity.id, activity.projectId, errorMessage])
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault()
+    setPending(true)
+    setError(null)
+    try {
+      if (name.trim() !== activity.name) await api.activities.rename(activity.id, name)
+      const previousIds = activity.tags.map((tag) => tag.id)
+      const tagsChanged =
+        tagIds.length !== previousIds.length || tagIds.some((id) => !previousIds.includes(id))
+      if (tagsChanged) await api.activities.setTags(activity.id, tagIds)
+      if (projectClientId === null && clientId !== initialClientId)
+        await api.activities.setClient(activity.id, clientId)
+      await fieldValues.save(activity.id)
+      onSaved()
+      onClose()
+    } catch (caught) {
+      setError(errorMessage(caught))
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <Modal isOpen onOpenChange={(isOpen) => !isOpen && onClose()} isDismissable>
+      <Dialog>
+        {({ close }) => (
+          <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <DialogHeading>{t('title')}</DialogHeading>
+            <TextField
+              maxLength={MAX_NAME_LENGTH}
+              label={t('nameLabel')}
+              value={name}
+              onChange={setName}
+              isRequired
+              autoFocus
+              validate={(value) => (value.trim() ? null : t('nameRequired'))}
+            />
+            <ClientSelect
+              clients={clients}
+              value={projectClientId ?? clientId}
+              onChange={setClientId}
+              description={projectClientId === null ? undefined : t('clientFromProject')}
+              isDisabled={projectClientId !== null}
+            />
+            <TagPicker tags={tags} value={tagIds} onChange={setTagIds} />
+            <CustomFieldInputs values={fieldValues} />
+            {shownError && <p className="text-sm text-destructive">{shownError}</p>}
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onPress={close}>
+                {t('cancel')}
+              </Button>
+              <Button type="submit" isDisabled={isPending}>
+                {t('save')}
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Dialog>
+    </Modal>
+  )
+}

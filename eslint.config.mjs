@@ -5,6 +5,11 @@ import eslintPluginReact from 'eslint-plugin-react'
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh'
 
+const parentImports = {
+  regex: String.raw`^\.\./(?!(\.\./)*(resources/|package\.json$))`,
+  message: 'Import from outside the own folder through @/.'
+}
+
 export default defineConfig(
   { ignores: ['**/node_modules', '**/dist', '**/out'] },
   tseslint.configs.recommended,
@@ -29,6 +34,14 @@ export default defineConfig(
     }
   },
   {
+    files: ['src/**/*.{ts,tsx}'],
+    // drizzle-kit loads the schema and the shared/ it imports without resolving @/.
+    ignores: ['src/shared/**', 'src/main/core/db/schema/**'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': ['error', { patterns: [parentImports] }]
+    }
+  },
+  {
     files: ['src/main/core/**/*.ts'],
     rules: {
       'no-restricted-imports': [
@@ -45,7 +58,7 @@ export default defineConfig(
               message: 'The core knows neither the GUI nor the API above it, nor shared/gui/.'
             },
             {
-              regex: String.raw`^\.\.?(/\.\.)*/?(index)?$`,
+              regex: String.raw`^(\.\.?(/\.\.)*/?|@/main/core/?)(index)?$`,
               message: 'Inside the core, import the module itself, not the core index.'
             }
           ]

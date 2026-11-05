@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { donation } from '../../core'
+import { donation } from '@/main/core'
 import { handle } from './handle'
 
 export function registerDonationHandlers(): void {

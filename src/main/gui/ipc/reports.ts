@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { grouping, timeFilter } from '../../../shared/validation'
-import { reports } from '../../core'
+import { grouping, timeFilter } from '@/shared/validation'
+import { reports } from '@/main/core'
 import { handle } from './handle'
 
 export function registerReportsHandlers(): void {
