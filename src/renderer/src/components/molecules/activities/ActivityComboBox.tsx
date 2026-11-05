@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { useFilter } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import type { ActivityWithTags } from '../../../../shared/model/activities'
-import { normalizeName } from '../../../../shared/model/names'
-import type { Project } from '../../../../shared/model/projects'
-import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
-import { activityOptions } from '../../lib/activities'
-import { ComboBox, ComboBoxItem } from '../atoms/ComboBox'
+import type { ActivityWithTags } from '../../../../../shared/model/activities'
+import { normalizeName } from '../../../../../shared/model/names'
+import type { Project } from '../../../../../shared/model/projects'
+import { MAX_NAME_LENGTH } from '../../../../../shared/model/limits'
+import { activityOptions } from '../../../lib/activities'
+import { ComboBox, ComboBoxItem } from '../../atoms/ComboBox'
 
 interface ActivityComboBoxProps {
   readonly label: string

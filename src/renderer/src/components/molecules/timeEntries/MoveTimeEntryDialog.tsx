@@ -14,14 +14,14 @@ import type {
   TimeEntry,
   TimeEntryDetails,
   TimeEntryInput
-} from '../../../../shared/model/timeEntries'
-import { useErrorMessage } from '../../hooks/useErrorMessage'
-import { api } from '../../lib/api'
-import { toastQueue } from '../../lib/toasts'
-import { Button } from '../atoms/Button'
-import { Calendar } from '../atoms/Calendar'
-import { Dialog, DialogHeading } from '../atoms/Dialog'
-import { Modal } from '../atoms/Modal'
+} from '../../../../../shared/model/timeEntries'
+import { useErrorMessage } from '../../../hooks/useErrorMessage'
+import { api } from '../../../lib/api'
+import { toastQueue } from '../../../lib/toasts'
+import { Button } from '../../atoms/Button'
+import { Calendar } from '../../atoms/Calendar'
+import { Dialog, DialogHeading } from '../../atoms/Dialog'
+import { Modal } from '../../atoms/Modal'
 
 const TOAST_TIMEOUT = 8000
 

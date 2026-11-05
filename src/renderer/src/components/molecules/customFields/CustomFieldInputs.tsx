@@ -1,8 +1,8 @@
 import { useTranslations } from 'use-intl'
-import { MAX_FIELD_VALUE_LENGTH } from '../../../../shared/model/limits'
-import type { CustomFieldValues } from '../../hooks/useCustomFieldValues'
-import { Select, SelectItem } from '../atoms/Select'
-import { TextField } from '../atoms/TextField'
+import { MAX_FIELD_VALUE_LENGTH } from '../../../../../shared/model/limits'
+import type { CustomFieldValues } from '../../../hooks/useCustomFieldValues'
+import { Select, SelectItem } from '../../atoms/Select'
+import { TextField } from '../../atoms/TextField'
 
 const NONE = 'none'
 const SEARCH_THRESHOLD = 10

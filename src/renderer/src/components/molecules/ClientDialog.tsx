@@ -9,7 +9,7 @@ import { Button } from '../atoms/Button'
 import { Dialog, DialogHeading } from '../atoms/Dialog'
 import { Modal } from '../atoms/Modal'
 import { TextField } from '../atoms/TextField'
-import { CustomFieldInputs } from './CustomFieldInputs'
+import { CustomFieldInputs } from './customFields/CustomFieldInputs'
 import { MAX_NAME_LENGTH } from '../../../../shared/model/limits'
 
 interface ClientDialogProps {

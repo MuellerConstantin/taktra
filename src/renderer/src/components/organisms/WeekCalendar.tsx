@@ -9,7 +9,7 @@ import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { TimeEntryDetails } from '../../../../shared/model/timeEntries'
 import { Button } from '../atoms/Button'
-import { CalendarEntry } from '../molecules/CalendarEntry'
+import { CalendarEntry } from '../molecules/timeEntries/CalendarEntry'
 import { useCalendarDrag } from '../../hooks/useCalendarDrag'
 import {
   DAY_MINUTES,

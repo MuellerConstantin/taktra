@@ -1,8 +1,8 @@
 import { useTranslations } from 'use-intl'
-import type { ProfileSummary } from '../../../../shared/model/profiles'
-import { useProfiles } from '../../hooks/useProfiles'
-import { AlertDialog } from '../atoms/AlertDialog'
-import { Modal } from '../atoms/Modal'
+import type { ProfileSummary } from '../../../../../shared/model/profiles'
+import { useProfiles } from '../../../hooks/useProfiles'
+import { AlertDialog } from '../../atoms/AlertDialog'
+import { Modal } from '../../atoms/Modal'
 
 interface UnavailableProfileDialogProps {
   readonly profile: ProfileSummary | null

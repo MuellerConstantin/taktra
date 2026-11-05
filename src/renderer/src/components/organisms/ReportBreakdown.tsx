@@ -14,8 +14,8 @@ import {
   type ShareItem
 } from '../../lib/report'
 import { Disclosure, DisclosureGroup, DisclosureHeader, DisclosurePanel } from '../atoms/Disclosure'
-import { ShareBarChart } from '../molecules/ShareBarChart'
-import { SharePieChart } from '../molecules/SharePieChart'
+import { ShareBarChart } from '../molecules/charts/ShareBarChart'
+import { SharePieChart } from '../molecules/charts/SharePieChart'
 
 export type Breakdown = 'project' | 'client' | 'tag' | 'projectTag'
 

@@ -1,7 +1,7 @@
 import { useTranslations } from 'use-intl'
-import { useErrorMessage } from '../../hooks/useErrorMessage'
-import { AlertDialog } from '../atoms/AlertDialog'
-import { Modal } from '../atoms/Modal'
+import { useErrorMessage } from '../../../hooks/useErrorMessage'
+import { AlertDialog } from '../../atoms/AlertDialog'
+import { Modal } from '../../atoms/Modal'
 
 interface OpenProfileErrorAlertProps {
   readonly error: unknown

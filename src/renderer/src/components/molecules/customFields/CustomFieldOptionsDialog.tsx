@@ -13,14 +13,14 @@ import { useTranslations } from 'use-intl'
 import type {
   CustomFieldOption,
   CustomFieldWithOptions
-} from '../../../../shared/model/customFields'
-import { MAX_ACTIVE_FIELD_OPTIONS, MAX_NAME_LENGTH } from '../../../../shared/model/limits'
-import { useErrorMessage } from '../../hooks/useErrorMessage'
-import { api } from '../../lib/api'
-import { Button } from '../atoms/Button'
-import { Dialog, DialogHeading } from '../atoms/Dialog'
-import { Modal } from '../atoms/Modal'
-import { TextField } from '../atoms/TextField'
+} from '../../../../../shared/model/customFields'
+import { MAX_ACTIVE_FIELD_OPTIONS, MAX_NAME_LENGTH } from '../../../../../shared/model/limits'
+import { useErrorMessage } from '../../../hooks/useErrorMessage'
+import { api } from '../../../lib/api'
+import { Button } from '../../atoms/Button'
+import { Dialog, DialogHeading } from '../../atoms/Dialog'
+import { Modal } from '../../atoms/Modal'
+import { TextField } from '../../atoms/TextField'
 
 interface CustomFieldOptionsDialogProps {
   readonly field: CustomFieldWithOptions

@@ -1,4 +1,4 @@
-import { chartColor } from '../../lib/chartTheme'
+import { chartColor } from '../../../lib/chartTheme'
 
 interface ChartTooltipProps {
   readonly color: string

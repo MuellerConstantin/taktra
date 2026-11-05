@@ -387,7 +387,9 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 - **Atomic Design**: Components follow the structure of tarvello. Atoms wrap
   react-aria-components with the theme styling; everything above uses atoms
   instead of styling react-aria primitives directly. Components use named
-  exports.
+  exports. Within a level, components of one domain (activities, profiles,
+  tags) move into a subfolder once there are three of them; generic ones stay
+  at the top of the level.
 - **Context, provider and hook in separate files**: The `react-refresh` lint
   rule allows only component exports per file.
 - **Responsive down to the minimum window size**: Every view, dialog and

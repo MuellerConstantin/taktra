@@ -1,7 +1,7 @@
 import { ResponsiveBar } from '@nivo/bar'
-import { chartColor, chartTheme } from '../../lib/chartTheme'
-import { formatDuration } from '../../lib/duration'
-import { NEUTRAL_COLOR, type ShareItem } from '../../lib/report'
+import { chartColor, chartTheme } from '../../../lib/chartTheme'
+import { formatDuration } from '../../../lib/duration'
+import { NEUTRAL_COLOR, type ShareItem } from '../../../lib/report'
 import { ChartTooltip } from './ChartTooltip'
 
 const ROW_HEIGHT = 28

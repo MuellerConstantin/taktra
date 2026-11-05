@@ -3,13 +3,13 @@ import { RiArrowLeftSLine, RiArrowRightSLine, RiCalendarLine } from '@remixicon/
 import { useState } from 'react'
 import { DialogTrigger, useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
-import { Button } from '../atoms/Button'
-import { Calendar } from '../atoms/Calendar'
-import { Dialog } from '../atoms/Dialog'
-import { Popover } from '../atoms/Popover'
-import { useShortcut } from '../../hooks/useShortcut'
-import { daysOf, type CalendarRange } from '../../lib/period'
-import { appShortcuts } from '../../lib/shortcuts'
+import { Button } from '../../atoms/Button'
+import { Calendar } from '../../atoms/Calendar'
+import { Dialog } from '../../atoms/Dialog'
+import { Popover } from '../../atoms/Popover'
+import { useShortcut } from '../../../hooks/useShortcut'
+import { daysOf, type CalendarRange } from '../../../lib/period'
+import { appShortcuts } from '../../../lib/shortcuts'
 
 interface DayNavigatorProps {
   readonly date: CalendarDate

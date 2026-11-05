@@ -11,7 +11,7 @@ import { GridList, GridListChevron, GridListItem } from '../components/atoms/Gri
 import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { SearchField } from '../components/atoms/SearchField'
-import { TagDialog } from '../components/molecules/TagDialog'
+import { TagDialog } from '../components/molecules/tags/TagDialog'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'
 import { useShortcut } from '../hooks/useShortcut'

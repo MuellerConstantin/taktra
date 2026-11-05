@@ -1,7 +1,7 @@
 import { ResponsivePie } from '@nivo/pie'
-import { chartColor, chartTheme } from '../../lib/chartTheme'
-import { formatDuration } from '../../lib/duration'
-import type { ShareItem } from '../../lib/report'
+import { chartColor, chartTheme } from '../../../lib/chartTheme'
+import { formatDuration } from '../../../lib/duration'
+import type { ShareItem } from '../../../lib/report'
 import { ChartTooltip } from './ChartTooltip'
 
 interface SharePieChartProps {

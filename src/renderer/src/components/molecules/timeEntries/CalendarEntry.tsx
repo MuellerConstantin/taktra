@@ -1,7 +1,7 @@
 import { TooltipTrigger } from 'react-aria-components'
-import type { TimeEntryDetails } from '../../../../shared/model/timeEntries'
-import { Button } from '../atoms/Button'
-import { Tooltip } from '../atoms/Tooltip'
+import type { TimeEntryDetails } from '../../../../../shared/model/timeEntries'
+import { Button } from '../../atoms/Button'
+import { Tooltip } from '../../atoms/Tooltip'
 
 const TOOLTIP_DELAY = 500
 

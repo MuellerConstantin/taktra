@@ -14,9 +14,9 @@ import {
   DisclosureHeader,
   DisclosurePanel
 } from '../components/atoms/Disclosure'
-import { ActivityMenu } from '../components/molecules/ActivityMenu'
-import { TagBadges } from '../components/molecules/TagBadges'
-import { TagDialog } from '../components/molecules/TagDialog'
+import { ActivityMenu } from '../components/molecules/activities/ActivityMenu'
+import { TagBadges } from '../components/molecules/tags/TagBadges'
+import { TagDialog } from '../components/molecules/tags/TagDialog'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { ViewHeader } from '../components/molecules/ViewHeader'
 import { useErrorMessage } from '../hooks/useErrorMessage'

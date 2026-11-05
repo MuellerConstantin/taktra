@@ -3,10 +3,10 @@ import type {
   CustomFieldScope,
   CustomFieldWithOptions,
   FieldValue
-} from '../../../../shared/model/customFields'
-import { useErrorMessage } from '../../hooks/useErrorMessage'
-import { api } from '../../lib/api'
-import { useDataRevision } from '../../hooks/useDataRevision'
+} from '../../../../../shared/model/customFields'
+import { useErrorMessage } from '../../../hooks/useErrorMessage'
+import { api } from '../../../lib/api'
+import { useDataRevision } from '../../../hooks/useDataRevision'
 
 interface CustomFieldValueListProps {
   readonly scope: CustomFieldScope

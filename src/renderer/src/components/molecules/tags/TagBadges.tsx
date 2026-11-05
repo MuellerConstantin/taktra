@@ -1,9 +1,9 @@
 import { Button, TooltipTrigger } from 'react-aria-components'
 import { twMerge } from 'tailwind-merge'
 import { useTranslations } from 'use-intl'
-import type { ActivityTag } from '../../../../shared/model/activities'
-import { Badge } from '../atoms/Badge'
-import { Tooltip } from '../atoms/Tooltip'
+import type { ActivityTag } from '../../../../../shared/model/activities'
+import { Badge } from '../../atoms/Badge'
+import { Tooltip } from '../../atoms/Tooltip'
 
 const MAX_VISIBLE = 5
 const MAX_IN_TOOLTIP = 10
