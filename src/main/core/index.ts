@@ -1,4 +1,3 @@
-import * as apiAccessModule from './app/apiAccess'
 import * as donationModule from './app/donation'
 import * as profilesModule from './app/profiles'
 import * as settingsModule from './app/settings'
@@ -36,8 +35,8 @@ export function stopCore(): void {
 }
 
 /**
- * Wraps a write, so every presentation reloads after it, also after writes it did not make
- * itself, such as those through the local API.
+ * Wraps a write, so every presentation and window reloads after it, also after writes it did
+ * not make itself.
  */
 function notifying<Args extends unknown[], Result>(
   write: (...args: Args) => Result
@@ -57,13 +56,6 @@ export const events = {
 export const settings = {
   get: settingsModule.getSettings,
   update: settingsModule.updateSettings
-} as const
-
-export const apiAccess = {
-  getState: apiAccessModule.getApiState,
-  setStatus: apiAccessModule.setApiStatus,
-  createKey: apiAccessModule.createApiKey,
-  verifyKey: apiAccessModule.verifyApiKey
 } as const
 
 export const profiles = {
@@ -136,13 +128,11 @@ export const customFields = {
   setOptionArchived: notifying(customFieldsModule.setCustomFieldOptionArchived),
   deleteOption: notifying(customFieldsModule.deleteCustomFieldOption),
   getValues: customFieldsModule.getFieldValues,
-  listValues: customFieldsModule.listFieldValues,
   setValues: notifying(customFieldsModule.setFieldValues)
 } as const
 
 export const timeEntries = {
   list: timeEntriesModule.listTimeEntries,
-  get: timeEntriesModule.getTimeEntryDetails,
   create: notifying(timeEntriesModule.createTimeEntry),
   update: notifying(timeEntriesModule.updateTimeEntry),
   setNote: notifying(timeEntriesModule.setTimeEntryNote),

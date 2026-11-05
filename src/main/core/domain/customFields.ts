@@ -285,25 +285,6 @@ export function getFieldValues(scope: CustomFieldScope, ownerId: number): FieldV
   return selectFieldValues(scope, ownerId)
 }
 
-/** The values of every owner in a scope, keyed by owner id, so a list needs one query. */
-export function listFieldValues(scope: CustomFieldScope): Map<number, FieldValue[]> {
-  const { table, ownerId } = valueTables[scope]
-  const rows = getActiveDatabase()
-    .select({
-      ownerId,
-      fieldId: table.fieldId,
-      textValue: table.textValue,
-      optionId: table.optionId
-    })
-    .from(table)
-    .all()
-  const byOwner = new Map<number, FieldValue[]>()
-  for (const { ownerId: owner, ...value } of rows) {
-    byOwner.set(owner, [...(byOwner.get(owner) ?? []), value])
-  }
-  return byOwner
-}
-
 /** Values of one field as text (option names for select fields), keyed by owner id. */
 export function listFieldValueTexts(field: CustomField): Map<number, string> {
   const { table, ownerId } = valueTables[field.scope]

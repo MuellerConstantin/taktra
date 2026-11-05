@@ -356,12 +356,6 @@ function PaletteDialog({ onClose }: PaletteDialogProps): React.JSX.Element {
       keywords: keywords('updates'),
       run: goTo('/settings/updates')
     },
-    {
-      id: 'integrations',
-      label: tApp('AppSettingsView.integrations'),
-      keywords: keywords('integrations'),
-      run: goTo('/settings/integrations')
-    },
     ...(hasProfile ? profileSettings : [])
   ].map((command) => ({ ...command, icon: RiSettings3Line }))
 

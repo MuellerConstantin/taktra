@@ -67,12 +67,6 @@ function findTimeEntry(id: number): TimeEntry {
   return entry
 }
 
-export function getTimeEntryDetails(id: number): TimeEntryDetails {
-  const [details] = selectTimeEntryDetails(eq(timeEntries.id, id))
-  if (!details) throw new AppError('TIME_ENTRY_NOT_FOUND', String(id))
-  return details
-}
-
 export function selectTimeEntryDetails(where: SQL | undefined): TimeEntryDetails[] {
   const rows = getActiveDatabase()
     .select({ entry: timeEntrySelection, ...activityDetailsColumns })

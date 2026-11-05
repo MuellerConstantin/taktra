@@ -167,8 +167,7 @@
       ],
       "deleteProfile": ["remove profile", "trash"],
       "profileName": ["rename"],
-      "help": ["manual", "guide", "documentation", "explanation", "FAQ"],
-      "integrations": ["API", "interface", "REST", "HTTP", "scripts", "key", "connect"]
+      "help": ["manual", "guide", "documentation", "explanation", "FAQ"]
     }
   },
   "TimerView": {
@@ -626,8 +625,7 @@
     "appearance": "Appearance",
     "controls": "Controls",
     "about": "About Taktra",
-    "updates": "Updates",
-    "integrations": "Integrations"
+    "updates": "Updates"
   },
   "AppearanceSettings": {
     "theme": {
@@ -687,28 +685,6 @@
     "title": "Updates",
     "label": "Check for updates automatically",
     "description": "Looks for new versions on GitHub at start and every few hours. Updates are downloaded in the background and installed when you quit Taktra. Without a connection, nothing happens."
-  },
-  "IntegrationSettings": {
-    "title": "Local API",
-    "description": "Lets other programs on this computer read projects, entries and reports and start or stop the timer over HTTP. Only programs that know the key are let in.",
-    "enabled": "Enable local API",
-    "enabledDescription": "Listens on this computer only, never on the network.",
-    "port": "Port",
-    "portInvalid": "A number from {min} to {max}",
-    "running": "Running at {url}",
-    "portInUse": "The port is used by another program. Choose a different one.",
-    "key": {
-      "title": "API key",
-      "description": "Programs send it as \"Authorization: Bearer <key>\". There is one key for all of them; creating a new one makes the current one stop working.",
-      "label": "New API key",
-      "copy": "Copy",
-      "copied": "Copied",
-      "shownOnce": "Copy the key now. It is not shown again; if you lose it, create a new one.",
-      "exists": "A key exists. It is not shown again.",
-      "missing": "No key yet. The API refuses every request until one exists.",
-      "create": "Create key",
-      "recreate": "Create new key"
-    }
   },
   "ShortcutRecorder": {
     "recording": "Press keys…"

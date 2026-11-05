@@ -9,10 +9,8 @@ import { EventEmitter } from 'node:events'
  * - `profiles`: a profile was added, removed or renamed, or another one became active
  * - `settings`: the app settings changed
  * - `donation`: a usage day was counted, or the donation hint was snoozed or dismissed
- * - `apiAccess`: the local API started, stopped or found its port in use, or a new key was
- *   created
  */
-export const signals = ['timer', 'profiles', 'settings', 'donation', 'apiAccess', 'data'] as const
+export const signals = ['timer', 'profiles', 'settings', 'donation', 'data'] as const
 
 export type Signal = (typeof signals)[number]
 

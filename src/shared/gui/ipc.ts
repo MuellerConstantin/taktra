@@ -1,5 +1,4 @@
 import type { Activity, ActivityInput, ActivityWithTags } from '../model/activities'
-import type { ApiState } from '../model/apiAccess'
 import type { Client, ClientInput } from '../model/clients'
 import type {
   CustomField,
@@ -160,9 +159,6 @@ export interface IpcContract {
   'donation:snooze': () => void
   'donation:dismiss': () => void
 
-  'apiAccess:state': () => ApiState
-  'apiAccess:createKey': () => string
-
   'app:showMainWindow': () => void
   'app:quit': () => void
   'app:info': () => AppInfo
@@ -177,6 +173,6 @@ export type InvokeChannel = keyof IpcContract
  * the core that reports it; the others come from the GUI itself.
  */
 export type WindowMessage =
-  | `${'timer' | 'data' | 'profiles' | 'settings' | 'donation' | 'apiAccess' | 'updates'}:changed`
+  | `${'timer' | 'data' | 'profiles' | 'settings' | 'donation' | 'updates'}:changed`
   | 'quick:shown'
   | 'about:show'

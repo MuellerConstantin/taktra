@@ -1,6 +1,5 @@
 import { AppError } from '../../../shared/model/errors'
 import {
-  DEFAULT_API_PORT,
   DEFAULT_QUICK_START_SHORTCUT,
   languages,
   themeSources,
@@ -15,9 +14,7 @@ const store = lazyStore<Settings>('settings', {
   miniTimer: { type: 'boolean', default: true },
   quickStartShortcutEnabled: { type: 'boolean', default: true },
   quickStartShortcut: { type: 'string', minLength: 1, default: DEFAULT_QUICK_START_SHORTCUT },
-  autoUpdate: { type: 'boolean', default: true },
-  apiEnabled: { type: 'boolean', default: false },
-  apiPort: { type: 'integer', minimum: 1024, maximum: 65535, default: DEFAULT_API_PORT }
+  autoUpdate: { type: 'boolean', default: true }
 })
 
 export function getSettings(): Settings {
