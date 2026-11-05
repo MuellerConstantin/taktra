@@ -209,6 +209,28 @@ function TrackingView(): React.JSX.Element {
     setReloadCount((count) => count + 1)
   }
 
+  const handleMove = async (
+    { entry }: TimeEntryDetails,
+    day: CalendarDate,
+    startedAt: Date,
+    endedAt: Date
+  ): Promise<void> => {
+    setDeleteError(null)
+    try {
+      await api.timeEntries.update(entry.id, {
+        activityId: entry.activityId,
+        date: day.toString(),
+        note: entry.note,
+        startedAt,
+        endedAt,
+        timezone: timeZone
+      })
+    } catch (caught) {
+      setDeleteError(errorMessage(caught))
+    }
+    setReloadCount((count) => count + 1)
+  }
+
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
@@ -265,8 +287,9 @@ function TrackingView(): React.JSX.Element {
           today={todayDate}
           now={now}
           onOpenDay={(day) => navigate(day, 'day')}
-          onCreate={(day, start) => setDialog({ date: day, start })}
+          onCreate={(day, start, end) => setDialog({ date: day, start, end })}
           onEdit={(details) => setDialog({ date: parseDate(details.entry.date), details })}
+          onChange={handleMove}
         />
       )}
       {!error && entries && unit === 'day' && (
@@ -307,7 +330,7 @@ function TrackingView(): React.JSX.Element {
                   <span className="py-1.5 text-xs text-muted-foreground">{label}</span>
                   <RiAddLine
                     aria-hidden
-                    className="size-4 text-muted-foreground opacity-0 group-data-[focus-visible]:opacity-100 group-data-[hovered]:opacity-100"
+                    className="size-4 text-muted-foreground opacity-0 group-data-focus-visible:opacity-100 group-data-hovered:opacity-100"
                   />
                 </GridListItem>
               )

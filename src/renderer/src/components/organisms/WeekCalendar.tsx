@@ -1,76 +1,32 @@
 import {
   DateFormatter,
-  Time,
   getLocalTimeZone,
   isSameDay,
-  type CalendarDate
+  type CalendarDate,
+  type Time
 } from '@internationalized/date'
-import { TooltipTrigger, useLocale } from 'react-aria-components'
+import { useLocale } from 'react-aria-components'
 import { useTranslations } from 'use-intl'
 import type { TimeEntryDetails } from '../../../../shared/model/timeEntries'
 import { Button } from '../atoms/Button'
-import { Tooltip } from '../atoms/Tooltip'
+import { CalendarEntry } from '../molecules/CalendarEntry'
+import { useCalendarDrag } from '../../hooks/useCalendarDrag'
+import {
+  DAY_MINUTES,
+  HOUR_HEIGHT,
+  MIN_BLOCK_HEIGHT,
+  dateAt,
+  layoutDay,
+  timeOf,
+  timedEntriesOn,
+  type Span
+} from '../../lib/calendar'
 import { elapsedSeconds, formatDuration } from '../../lib/duration'
 
-const HOUR_HEIGHT = 64
-const MIN_BLOCK_HEIGHT = 16
 const TWO_LINE_HEIGHT = 32
 const SLOT_MINUTES = 30
 const DEFAULT_FIRST_HOUR = 8
 const DEFAULT_LAST_HOUR = 18
-const DAY_MINUTES = 24 * 60
-const TOOLTIP_DELAY = 500
-
-interface Block {
-  readonly details: TimeEntryDetails
-  readonly start: number
-  readonly end: number
-  readonly column: number
-  readonly columns: number
-}
-
-function minutesOn(day: CalendarDate, time: Date): number {
-  const timeZone = getLocalTimeZone()
-  if (time.getTime() < day.toDate(timeZone).getTime()) return 0
-  if (time.getTime() >= day.add({ days: 1 }).toDate(timeZone).getTime()) return DAY_MINUTES
-  return time.getHours() * 60 + time.getMinutes()
-}
-
-function layoutDay(
-  day: CalendarDate,
-  entries: readonly TimeEntryDetails[],
-  now: number
-): readonly Block[] {
-  const spans = entries
-    .map((details) => ({
-      details,
-      start: minutesOn(day, details.entry.startedAt ?? new Date(now)),
-      end: minutesOn(day, details.entry.endedAt ?? new Date(now))
-    }))
-    .sort((a, b) => a.start - b.start || b.end - a.end)
-
-  const shownEnd = ({ start, end }: (typeof spans)[number]): number =>
-    Math.max(end, start + (MIN_BLOCK_HEIGHT / HOUR_HEIGHT) * 60)
-
-  const groups: (typeof spans)[] = []
-  let groupEnd = -1
-  for (const span of spans) {
-    if (span.start >= groupEnd) groups.push([])
-    groups[groups.length - 1].push(span)
-    groupEnd = Math.max(groupEnd, shownEnd(span))
-  }
-
-  return groups.flatMap((group) => {
-    const columnEnds: number[] = []
-    const placed = group.map((span) => {
-      const free = columnEnds.findIndex((end) => end <= span.start)
-      const column = free === -1 ? columnEnds.length : free
-      columnEnds[column] = shownEnd(span)
-      return { ...span, column }
-    })
-    return placed.map((span) => ({ ...span, columns: columnEnds.length }))
-  })
-}
 
 interface WeekCalendarProps {
   readonly days: readonly CalendarDate[]
@@ -78,8 +34,9 @@ interface WeekCalendarProps {
   readonly today: CalendarDate
   readonly now: number
   readonly onOpenDay: (day: CalendarDate) => void
-  readonly onCreate: (day: CalendarDate, start: Time) => void
+  readonly onCreate: (day: CalendarDate, start: Time, end?: Time) => void
   readonly onEdit: (details: TimeEntryDetails) => void
+  readonly onChange: (details: TimeEntryDetails, day: CalendarDate, start: Date, end: Date) => void
 }
 
 export function WeekCalendar({
@@ -89,7 +46,8 @@ export function WeekCalendar({
   now,
   onOpenDay,
   onCreate,
-  onEdit
+  onEdit,
+  onChange
 }: WeekCalendarProps): React.JSX.Element {
   const t = useTranslations('WeekCalendar')
   const { locale } = useLocale()
@@ -100,28 +58,29 @@ export function WeekCalendar({
   const hourFormatter = new DateFormatter(locale, { hour: 'numeric' })
   const timeFormatter = new DateFormatter(locale, { timeStyle: 'short' })
 
+  // The visible hours follow the saved entries only, so they stay put while an entry is dragged.
+  const savedBlocks = days.flatMap((day) => layoutDay(day, timedEntriesOn(entries, day), now))
+  const firstHour = Math.min(
+    DEFAULT_FIRST_HOUR,
+    ...savedBlocks.map((block) => Math.floor(block.start / 60))
+  )
+  const lastHour = Math.max(
+    DEFAULT_LAST_HOUR,
+    ...savedBlocks.map((block) => Math.ceil(block.end / 60))
+  )
+  const hours = Array.from({ length: lastHour - firstHour }, (_, index) => firstHour + index)
+  const top = (minutes: number): number => ((minutes - firstHour * 60) / 60) * HOUR_HEIGHT
+
+  const { shownEntries, dragged, creating, columnRef, handlePointerDown, pressEntry } =
+    useCalendarDrag({ days, entries, now, firstHour, lastHour, onCreate, onChange })
+
   const durationOf = ({ startedAt, endedAt, durationSec }: TimeEntryDetails['entry']): number =>
     startedAt && !endedAt ? elapsedSeconds(startedAt, now) : (durationSec ?? 0)
   const entriesOf = (day: CalendarDate): readonly TimeEntryDetails[] =>
-    entries.filter(({ entry }) => entry.date === day.toString())
-  const blocksByDay = days.map((day) =>
-    layoutDay(
-      day,
-      entriesOf(day).filter(({ entry }) => entry.startedAt),
-      now
-    )
-  )
+    shownEntries.filter(({ entry }) => entry.date === day.toString())
+  const blocksByDay = days.map((day) => layoutDay(day, timedEntriesOn(shownEntries, day), now))
   const untimedByDay = days.map((day) => entriesOf(day).filter(({ entry }) => !entry.startedAt))
   const hasUntimed = untimedByDay.some((list) => list.length > 0)
-
-  const blocks = blocksByDay.flat()
-  const firstHour = Math.min(
-    DEFAULT_FIRST_HOUR,
-    ...blocks.map((block) => Math.floor(block.start / 60))
-  )
-  const lastHour = Math.max(DEFAULT_LAST_HOUR, ...blocks.map((block) => Math.ceil(block.end / 60)))
-  const hours = Array.from({ length: lastHour - firstHour }, (_, index) => firstHour + index)
-  const top = (minutes: number): number => ((minutes - firstHour * 60) / 60) * HOUR_HEIGHT
 
   const nowDate = new Date(now)
   const nowMinutes = nowDate.getHours() * 60 + nowDate.getMinutes()
@@ -133,13 +92,15 @@ export function WeekCalendar({
       : ''
     return `${activity.name}, ${project.name}, ${times}${formatDuration(durationOf(entry))}`
   }
+  const formatSpan = ({ day, start, end }: Span): string =>
+    timeFormatter.formatRange(dateAt(days[day], start), dateAt(days[day], end))
 
   const handleDoubleClick = (day: CalendarDate, event: React.MouseEvent<HTMLDivElement>): void => {
     if (event.target !== event.currentTarget) return
     const offset = event.clientY - event.currentTarget.getBoundingClientRect().top
     const slot = Math.floor(((offset / HOUR_HEIGHT) * 60) / SLOT_MINUTES) * SLOT_MINUTES
     const minutes = Math.min(firstHour * 60 + slot, DAY_MINUTES - SLOT_MINUTES)
-    onCreate(day, new Time(Math.floor(minutes / 60), minutes % 60))
+    onCreate(day, timeOf(minutes))
   }
 
   const columns = { gridTemplateColumns: `3rem repeat(${days.length}, minmax(0, 1fr))` }
@@ -190,7 +151,7 @@ export function WeekCalendar({
                 className="flex min-w-0 flex-col gap-0.5 border-l border-border p-0.5"
               >
                 {list.map((details) => (
-                  <EntryButton
+                  <CalendarEntry
                     key={details.entry.id}
                     details={details}
                     label={describe(details)}
@@ -198,14 +159,14 @@ export function WeekCalendar({
                     className="h-5"
                   >
                     <span className="truncate">{details.activity.name}</span>
-                  </EntryButton>
+                  </CalendarEntry>
                 ))}
               </div>
             ))}
           </div>
         )}
       </div>
-      <div className="grid" style={columns}>
+      <div className="grid select-none" style={columns}>
         <div className="relative" style={{ height: hours.length * HOUR_HEIGHT }}>
           {hours.map((hour) => (
             <span
@@ -220,6 +181,8 @@ export function WeekCalendar({
         {days.map((day, index) => (
           <div
             key={day.toString()}
+            ref={columnRef(index)}
+            onPointerDownCapture={(event) => handlePointerDown(index, event)}
             onDoubleClick={(event) => handleDoubleClick(day, event)}
             className={
               isSameDay(day, today)
@@ -243,13 +206,23 @@ export function WeekCalendar({
               )
               const { entry, activity, project } = block.details
               const isRunning = entry.endedAt === null
+              const draggedSpan = dragged?.id === entry.id ? dragged.span : null
               return (
-                <EntryButton
+                <CalendarEntry
                   key={entry.id}
                   details={block.details}
                   label={describe(block.details)}
-                  onPress={() => (isRunning ? onOpenDay(day) : onEdit(block.details))}
-                  className={isRunning ? 'absolute ring-2 ring-primary' : 'absolute'}
+                  onPress={() =>
+                    pressEntry(() => (isRunning ? onOpenDay(day) : onEdit(block.details)))
+                  }
+                  isResizable={!isRunning && !block.isClipped}
+                  className={
+                    isRunning
+                      ? 'absolute ring-2 ring-primary'
+                      : draggedSpan
+                        ? 'absolute z-2 shadow-md'
+                        : 'absolute'
+                  }
                   style={{
                     top: top(block.start),
                     height: height - 1,
@@ -259,15 +232,29 @@ export function WeekCalendar({
                 >
                   <span className="truncate font-medium">{activity.name}</span>
                   {height >= TWO_LINE_HEIGHT && (
-                    <span className="truncate text-muted-foreground">{project.name}</span>
+                    <span className="truncate text-muted-foreground">
+                      {draggedSpan ? formatSpan(draggedSpan) : project.name}
+                    </span>
                   )}
-                </EntryButton>
+                </CalendarEntry>
               )
             })}
+            {creating?.day === index && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-px z-2 overflow-hidden rounded-sm border border-dashed border-primary bg-primary/10 px-1 py-px text-[11px] leading-3.5 text-foreground"
+                style={{
+                  top: top(creating.start),
+                  height: ((creating.end - creating.start) / 60) * HOUR_HEIGHT - 1
+                }}
+              >
+                {formatSpan(creating)}
+              </span>
+            )}
             {showsNow && isSameDay(day, today) && (
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 z-[1] border-t-2 border-primary"
+                className="pointer-events-none absolute inset-x-0 z-1 border-t-2 border-primary"
                 style={{ top: top(nowMinutes) }}
               />
             )}
@@ -275,44 +262,5 @@ export function WeekCalendar({
         ))}
       </div>
     </div>
-  )
-}
-
-interface EntryButtonProps {
-  readonly details: TimeEntryDetails
-  readonly label: string
-  readonly onPress: () => void
-  readonly className: string
-  readonly style?: React.CSSProperties
-  readonly children: React.ReactNode
-}
-
-function EntryButton({
-  details,
-  label,
-  onPress,
-  className,
-  style,
-  children
-}: EntryButtonProps): React.JSX.Element {
-  const color = details.project.color ?? 'var(--color-muted-foreground)'
-  return (
-    <TooltipTrigger delay={TOOLTIP_DELAY}>
-      <Button
-        variant="secondary"
-        tooltip={false}
-        aria-label={label}
-        onPress={onPress}
-        className={`${className} min-w-0 flex-col items-stretch justify-start gap-0 overflow-hidden rounded-sm border-0 border-l-[3px] px-1 py-px text-left text-[11px] leading-[14px] text-foreground hover:brightness-95`}
-        style={{
-          ...style,
-          borderLeftColor: color,
-          backgroundColor: `color-mix(in srgb, ${color} 18%, var(--color-background))`
-        }}
-      >
-        {children}
-      </Button>
-      <Tooltip>{label}</Tooltip>
-    </TooltipTrigger>
   )
 }
