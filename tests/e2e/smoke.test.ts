@@ -84,3 +84,22 @@ test('shows the entries of a week and opens a day from it', async ({ window, err
   await expect(window.getByRole('heading', { name: 'Monday' })).toBeVisible()
   expect(errors).toEqual([])
 })
+
+test('books a gap between two entries', async ({ window, errors }) => {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  await window.evaluate(() => {
+    location.hash = '#/tracking?range=workWeek'
+  })
+  await window.getByRole('button', { name: 'Previous week' }).click()
+  await window.getByRole('button', { name: /^Show Monday/ }).click()
+
+  const gap = window.getByRole('row', { name: /not tracked$/ }).first()
+  await gap.click()
+
+  const dialog = window.getByRole('dialog')
+  await expect(dialog.getByRole('heading', { name: 'New entry' })).toBeVisible()
+  await expect(dialog.getByRole('group', { name: 'Start' })).not.toContainText('––')
+  await expect(dialog.getByRole('group', { name: 'End' })).not.toContainText('––')
+  expect(errors).toEqual([])
+})

@@ -35,6 +35,7 @@ type Mode = 'range' | 'duration'
 interface TimeEntryDialogProps {
   readonly date: CalendarDate
   readonly start?: Time
+  readonly end?: Time
   readonly details?: TimeEntryDetails
   readonly onClose: () => void
   readonly onSaved: () => void
@@ -47,6 +48,7 @@ function toLocalTime(date: Date | null): Time | null {
 export function TimeEntryDialog({
   date,
   start: initialStart,
+  end: initialEnd,
   details,
   onClose,
   onSaved
@@ -64,7 +66,9 @@ export function TimeEntryDialog({
     details ? toLocalTime(details.entry.startedAt) : (initialStart ?? null)
   )
   const [end, setEnd] = useState(() =>
-    details ? toLocalTime(details.entry.endedAt) : (initialStart?.add({ minutes: 30 }) ?? null)
+    details
+      ? toLocalTime(details.entry.endedAt)
+      : (initialEnd ?? initialStart?.add({ minutes: 30 }) ?? null)
   )
   const [duration, setDuration] = useState(() =>
     details && !details.entry.startedAt && details.entry.durationSec

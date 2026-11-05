@@ -285,7 +285,7 @@
     "withoutTimes": "Ohne Uhrzeit",
     "continue": "Timer für {name} starten",
     "stop": "Timer für {name} stoppen",
-    "help": "Alle Einträge eines Tages oder einer Woche, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist."
+    "help": "Alle Einträge eines Tages oder einer Woche, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist; ein Klick darauf bucht sie nach."
   },
   "WeekCalendar": {
     "openDay": "{date} anzeigen",

@@ -1,10 +1,12 @@
 import {
   DateFormatter,
+  fromDate,
   getLocalTimeZone,
   isSameDay,
   parseDate,
   startOfWeek,
   today,
+  toTime,
   type CalendarDate,
   type Time
 } from '@internationalized/date'
@@ -61,7 +63,7 @@ function parseDay(value: string | null, fallback: CalendarDate): CalendarDate {
 
 type Row =
   | { readonly kind: 'entry'; readonly id: number; readonly details: TimeEntryDetails }
-  | { readonly kind: 'gap'; readonly id: string; readonly seconds: number }
+  | { readonly kind: 'gap'; readonly id: string; readonly start: Date; readonly end: Date }
   | { readonly kind: 'withoutTimes'; readonly id: string }
 
 /**
@@ -77,9 +79,14 @@ function toRows(entries: readonly TimeEntryDetails[], now: number): Row[] {
     const { id, startedAt, endedAt } = details.entry
     const entryRow: Row = { kind: 'entry', id, details }
     const start = startedAt?.getTime() ?? 0
-    const gapSec = lastEnd === null ? 0 : Math.floor((start - lastEnd) / 1000)
+    const gapStart = lastEnd
     lastEnd = Math.max(lastEnd ?? 0, endedAt?.getTime() ?? now)
-    return gapSec >= 60 ? [{ kind: 'gap', id: `gap-${id}`, seconds: gapSec }, entryRow] : [entryRow]
+    return gapStart !== null && start - gapStart >= 60_000
+      ? [
+          { kind: 'gap', id: `gap-${id}`, start: new Date(gapStart), end: new Date(start) },
+          entryRow
+        ]
+      : [entryRow]
   })
   const untimedRows = untimed.map((details): Row => ({
     kind: 'entry',
@@ -111,6 +118,7 @@ function TrackingView(): React.JSX.Element {
   const [dialog, setDialog] = useState<{
     readonly date: CalendarDate
     readonly start?: Time
+    readonly end?: Time
     readonly details?: TimeEntryDetails
   } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
@@ -265,7 +273,7 @@ function TrackingView(): React.JSX.Element {
         <GridList
           aria-label={title}
           items={rows}
-          disabledKeys={rows.flatMap((row) => (row.kind === 'entry' ? [] : [row.id]))}
+          disabledKeys={rows.flatMap((row) => (row.kind === 'withoutTimes' ? [row.id] : []))}
           className="min-h-0 flex-1"
           renderEmptyState={() =>
             entries.length === 0 && (
@@ -275,15 +283,32 @@ function TrackingView(): React.JSX.Element {
         >
           {(row) => {
             if (row.kind === 'gap') {
-              const label = t('gap', { duration: formatDuration(row.seconds) })
+              const label = t('gap', {
+                duration: formatDuration(elapsedSeconds(row.start, row.end.getTime()))
+              })
               return (
-                <GridListItem id={row.id} textValue={label} className="h-auto">
+                <GridListItem
+                  id={row.id}
+                  textValue={label}
+                  onAction={() =>
+                    setDialog({
+                      date,
+                      start: toTime(fromDate(row.start, timeZone)),
+                      end: toTime(fromDate(row.end, timeZone))
+                    })
+                  }
+                  className="group h-auto"
+                >
                   <span aria-hidden className="w-16 shrink-0" />
                   <span
                     aria-hidden
                     className="ml-px w-1 shrink-0 self-stretch border-l-2 border-dashed border-border"
                   />
                   <span className="py-1.5 text-xs text-muted-foreground">{label}</span>
+                  <RiAddLine
+                    aria-hidden
+                    className="size-4 text-muted-foreground opacity-0 group-data-[focus-visible]:opacity-100 group-data-[hovered]:opacity-100"
+                  />
                 </GridListItem>
               )
             }
@@ -388,6 +413,7 @@ function TrackingView(): React.JSX.Element {
         <TimeEntryDialog
           date={dialog.date}
           start={dialog.start}
+          end={dialog.end}
           details={dialog.details}
           onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}
