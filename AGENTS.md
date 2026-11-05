@@ -238,7 +238,9 @@ Lint rules enforce these boundaries.
   `AppError` with a code from `shared/model/errors.ts` and translated in the
   renderer under `Errors.<CODE>`. Unexpected errors are logged and reach the UI
   as `UNKNOWN`. Expected outcomes that are not errors (e.g. a canceled dialog)
-  are returned as values.
+  are returned as values. Input that is wrong whatever the data is
+  `VALIDATION_FAILED` with the path of the wrong field (`invalidInput()`);
+  input the current data does not allow gets a code of its own.
 
 ### Events
 
@@ -387,8 +389,11 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   not at all. Input uses the names of the responses (`start`, `end` as ISO
   strings; `value` or `optionId` for a custom field).
 - **Uniform errors**: In v1, every error is `{ "error": { "code": … } }` with
-  an HTTP status that follows from the code; validation errors of a request
-  add a `message` naming the invalid fields.
+  an HTTP status that follows from the code. `VALIDATION_FAILED` (400) means
+  the input is wrong whatever the data, and adds `issues` with the path and a
+  message per wrong field, from the request schema and from rules of the core
+  alike. A request that is right but not allowed by the current data, such as
+  a value for an archived field, is a conflict (409) with a code of its own.
 - **Events as SSE**: `/api/v1/events` streams the signals of the core under
   their names (`signal:data`, …), without payload.
 

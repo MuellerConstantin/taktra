@@ -66,7 +66,7 @@ export function hasRunningTimer(): boolean {
 export function startTimer(activityId: number, note: string | null = null): TimeEntryDetails {
   const activity = findActivity(activityId)
   if (activity.archivedAt || findProject(activity.projectId).archivedAt)
-    throw new AppError('VALIDATION_FAILED', 'Activity or project is archived')
+    throw new AppError('ACTIVITY_ARCHIVED', String(activityId))
 
   const db = getActiveDatabase()
   const now = new Date()

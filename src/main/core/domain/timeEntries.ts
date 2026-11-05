@@ -1,6 +1,6 @@
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
-import { AppError } from '../../../shared/model/errors'
+import { AppError, invalidInput } from '../../../shared/model/errors'
 import { timeEntryFilter } from '../../../shared/validation'
 import type { TimeEntry, TimeEntryData, TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { getActiveDatabase } from '../db/database'
@@ -46,7 +46,7 @@ function toValues(input: TimeEntryData): TimeEntryValues {
   }
 
   const durationSec = Math.round((input.endedAt.getTime() - input.startedAt.getTime()) / 1000)
-  if (durationSec <= 0) throw new AppError('VALIDATION_FAILED', 'End must be after start')
+  if (durationSec <= 0) throw invalidInput(['endedAt'], 'End must be after start')
 
   return {
     ...common,

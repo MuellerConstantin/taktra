@@ -2,7 +2,7 @@ import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { z } from 'zod'
 import type { Activity, ActivityTag, ActivityWithTags } from '../../../shared/model/activities'
 import type { ActivityDetails } from '../../../shared/model/timeEntries'
-import { AppError } from '../../../shared/model/errors'
+import { AppError, invalidInput } from '../../../shared/model/errors'
 import { toNameKey } from '../../../shared/model/names'
 import { activityInput, activityListOptions } from '../../../shared/validation'
 import { getActiveDatabase } from '../db/database'
@@ -232,8 +232,7 @@ export function deleteActivityIfUnused(id: number): void {
 }
 
 export function mergeActivity(id: number, targetId: number): void {
-  if (id === targetId)
-    throw new AppError('VALIDATION_FAILED', 'Cannot merge an activity into itself')
+  if (id === targetId) throw invalidInput(['targetId'], 'Cannot merge an activity into itself')
   const source = findActivity(id)
   const target = findActivity(targetId)
 

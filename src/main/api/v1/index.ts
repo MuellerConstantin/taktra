@@ -1,8 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { bodyLimit } from 'hono/body-limit'
-import { ValidationError } from '../errors'
 import { guard } from '../guard'
-import { describeIssues } from '../parse'
+import { invalidRequest } from '../parse'
 import { API_DESCRIPTION } from './description'
 import { handleError, tooLarge } from './errors'
 import { registerRoutes } from './routes'
@@ -18,7 +17,7 @@ const MAX_BODY_BYTES = 64 * 1024
 export function createV1(port: () => number): OpenAPIHono {
   const v1 = new OpenAPIHono({
     defaultHook: (result) => {
-      if (!result.success) throw new ValidationError(describeIssues(result.error))
+      if (!result.success) throw invalidRequest(result.error)
     }
   })
   v1.use(guard(port), bodyLimit({ maxSize: MAX_BODY_BYTES, onError: tooLarge }))

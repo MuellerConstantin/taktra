@@ -176,7 +176,10 @@ describe('timer', () => {
     })
     expect(response.status).toBe(400)
     expect(await response.json()).toEqual({
-      error: { code: 'VALIDATION_FAILED', message: expect.stringContaining('activityId') }
+      error: {
+        code: 'VALIDATION_FAILED',
+        issues: [{ path: 'activityId', message: expect.any(String) }]
+      }
     })
   })
 

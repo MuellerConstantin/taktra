@@ -12,6 +12,7 @@ export const errorCodes = [
   'ACTIVITY_NOT_FOUND',
   'ACTIVITY_NAME_TAKEN',
   'ACTIVITY_HAS_TIME_ENTRIES',
+  'ACTIVITY_ARCHIVED',
   'TIME_ENTRY_NOT_FOUND',
   'TAG_NOT_FOUND',
   'TAG_NAME_TAKEN',
@@ -23,10 +24,12 @@ export const errorCodes = [
   'CUSTOM_FIELD_NAME_TAKEN',
   'CUSTOM_FIELD_LIMIT_REACHED',
   'CUSTOM_FIELD_IN_USE',
+  'CUSTOM_FIELD_ARCHIVED',
   'CUSTOM_FIELD_OPTION_NOT_FOUND',
   'CUSTOM_FIELD_OPTION_NAME_TAKEN',
   'CUSTOM_FIELD_OPTION_LIMIT_REACHED',
   'CUSTOM_FIELD_OPTION_IN_USE',
+  'CUSTOM_FIELD_OPTION_ARCHIVED',
   'SHORTCUT_UNAVAILABLE',
   'EXPORT_WRITE_FAILED',
   'EXPORT_COLUMN_CONFLICT',
@@ -43,14 +46,26 @@ export const errorCodes = [
 
 export type ErrorCode = (typeof errorCodes)[number]
 
+/** One wrong input: the field it concerns, as a path into the input, and what is wrong. */
+export interface InputIssue {
+  readonly path: readonly (string | number)[]
+  readonly message: string
+}
+
 export class AppError extends Error {
   constructor(
     readonly code: ErrorCode,
-    message?: string
+    message?: string,
+    readonly issues: readonly InputIssue[] = []
   ) {
     super(message ?? code)
     this.name = 'AppError'
   }
+}
+
+/** Input that breaks a rule of the core, whatever the state of the data. */
+export function invalidInput(path: InputIssue['path'], message: string): AppError {
+  return new AppError('VALIDATION_FAILED', message, [{ path, message }])
 }
 
 export function isAppError(error: unknown, ...codes: readonly ErrorCode[]): error is AppError {

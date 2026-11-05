@@ -99,6 +99,8 @@ describe('activities', () => {
 
     const other = (await send('POST', '/activities', { projectId: beta, name: 'Review' })).json.id
     await send('POST', '/time-entries', { activityId: other, date: '2026-03-02', durationSec: 600 })
+    const intoItself = await send('POST', `/activities/${other}/merge`, { targetId: other })
+    expect([intoItself.status, intoItself.json.error.issues[0].path]).toEqual([400, 'targetId'])
     const merged = await send('POST', `/activities/${other}/merge`, { targetId: build })
     expect(merged.json.id).toBe(build)
     expect((await send('GET', `/activities/${other}`)).status).toBe(404)
@@ -109,6 +111,8 @@ describe('activities', () => {
       'ACTIVITY_HAS_TIME_ENTRIES'
     ])
     expect((await send('POST', `/activities/${build}/archive`)).json.archivedAt).not.toBeNull()
+    const archived = await send('POST', '/timer/start', { activityId: build })
+    expect([archived.status, archived.json.error.code]).toEqual([409, 'ACTIVITY_ARCHIVED'])
   })
 })
 
@@ -147,7 +151,18 @@ describe('time entries', () => {
       end: '2026-03-03T09:30:00.000Z',
       timezone: 'Europe/Berlin'
     })
-    expect(invalid.status).toBe(400)
+    expect([invalid.status, invalid.json.error.issues[0].path]).toEqual([400, 'start'])
+
+    const backwards = await send('PUT', `/time-entries/${entryId}`, {
+      activityId: activity,
+      date: '2026-03-03',
+      start: '2026-03-03T09:30:00.000Z',
+      end: '2026-03-03T08:00:00.000Z',
+      timezone: 'Europe/Berlin'
+    })
+    expect(backwards.json).toEqual({
+      error: { code: 'VALIDATION_FAILED', issues: [{ path: 'end', message: expect.any(String) }] }
+    })
 
     expect(
       (await send('PUT', `/time-entries/${entryId}/note`, { note: '**Done**' })).json.note
@@ -195,6 +210,11 @@ describe('custom fields', () => {
     const inUse = await send('DELETE', `/custom-fields/${fieldId}`)
     expect([inUse.status, inUse.json.error.code]).toEqual([409, 'CUSTOM_FIELD_IN_USE'])
 
+    const text = await send('PATCH', `/projects/${project}/custom-fields`, [
+      { fieldId, value: 'Flat' }
+    ])
+    expect([text.status, text.json.error.issues[0].path]).toEqual([400, '0.value'])
+
     const cleared = await send('PATCH', `/projects/${project}/custom-fields`, [
       { fieldId, optionId: null }
     ])
@@ -202,7 +222,18 @@ describe('custom fields', () => {
     expect(
       (await send('POST', `/custom-field-options/${optionId}/archive`)).json.archivedAt
     ).not.toBeNull()
+    const archivedOption = await send('PATCH', `/projects/${project}/custom-fields`, [
+      { fieldId, optionId }
+    ])
+    expect([archivedOption.status, archivedOption.json.error.code]).toEqual([
+      409,
+      'CUSTOM_FIELD_OPTION_ARCHIVED'
+    ])
     expect((await send('POST', `/custom-fields/${fieldId}/archive`)).json.archivedAt).not.toBeNull()
+    const archivedField = await send('PATCH', `/projects/${project}/custom-fields`, [
+      { fieldId, optionId }
+    ])
+    expect(archivedField.json.error.code).toBe('CUSTOM_FIELD_ARCHIVED')
     expect((await send('DELETE', `/custom-fields/${fieldId}`)).status).toBe(204)
   })
 })

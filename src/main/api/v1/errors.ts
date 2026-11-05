@@ -1,8 +1,8 @@
 import { z } from '@hono/zod-openapi'
 import type { Context } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { isAppError } from '../../../shared/model/errors'
-import { HttpError, statusOf, ValidationError } from '../errors'
+import { isAppError, type InputIssue } from '../../../shared/model/errors'
+import { HttpError, statusOf } from '../errors'
 import { json } from '../openapi'
 
 /** The error format of version 1, for every response that is not a success. */
@@ -10,18 +10,39 @@ export const ErrorV1 = z
   .object({
     error: z.object({
       code: z.string().openapi({ example: 'PROJECT_NOT_FOUND' }),
-      message: z
-        .string()
+      issues: z
+        .array(
+          z.object({
+            path: z.string().openapi({
+              description:
+                'The wrong field, nested names joined by dots; empty for the whole input.',
+              example: '0.optionId'
+            }),
+            message: z.string().openapi({ description: 'For people; the wording may change.' })
+          })
+        )
         .optional()
-        .openapi({ description: 'Only for invalid requests: which fields are wrong.' })
+        .openapi({ description: 'Only for VALIDATION_FAILED: what is wrong, one per field.' })
     })
   })
   .openapi('Error')
 
 type ErrorV1 = z.infer<typeof ErrorV1>
 
-function errorBody(code: string, message?: string): ErrorV1 {
-  return { error: message === undefined ? { code } : { code, message } }
+function errorBody(code: string, issues?: readonly InputIssue[]): ErrorV1 {
+  return { error: issues === undefined ? { code } : { code, issues: issues.map(toIssue) } }
+}
+
+/** Names of the core that the inputs of v1 call differently. */
+const inputNames: Readonly<Record<string, string>> = {
+  startedAt: 'start',
+  endedAt: 'end',
+  textValue: 'value'
+}
+
+function toIssue({ path, message }: InputIssue): { path: string; message: string } {
+  const names = path.map((key) => (typeof key === 'string' ? (inputNames[key] ?? key) : key))
+  return { path: names.join('.'), message }
 }
 
 const errorDescriptions = {
@@ -53,8 +74,9 @@ export function tooLarge(c: Context): Response {
 }
 
 export function handleError(error: Error, c: Context): Response {
-  if (error instanceof ValidationError) return c.json(errorBody(error.code, error.details), 400)
   if (error instanceof HttpError) return c.json(errorBody(error.code), error.status)
+  if (isAppError(error, 'VALIDATION_FAILED'))
+    return c.json(errorBody(error.code, error.issues), 400)
   if (isAppError(error)) return c.json(errorBody(error.code), statusOf(error.code))
   // Hono's JSON validator throws this for a body that is not valid JSON.
   if (error instanceof HTTPException && error.status === 400) {

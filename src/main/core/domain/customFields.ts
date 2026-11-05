@@ -8,7 +8,7 @@ import type {
   FieldValue,
   FieldValueData
 } from '../../../shared/model/customFields'
-import { AppError } from '../../../shared/model/errors'
+import { AppError, invalidInput } from '../../../shared/model/errors'
 import { toNameKey } from '../../../shared/model/names'
 import { MAX_ACTIVE_CUSTOM_FIELDS, MAX_ACTIVE_FIELD_OPTIONS } from '../../../shared/model/limits'
 import { customFieldInput, customFieldListOptions } from '../../../shared/validation'
@@ -211,8 +211,7 @@ function assertOptionLimit(fieldId: number): void {
 
 export function createCustomFieldOption(fieldId: number, name: string): CustomFieldOption {
   const field = findCustomField(fieldId)
-  if (field.type !== 'select')
-    throw new AppError('VALIDATION_FAILED', `Field ${fieldId} has no options`)
+  if (field.type !== 'select') throw invalidInput(['fieldId'], `Field ${fieldId} has no options`)
   assertOptionLimit(fieldId)
 
   try {
@@ -317,20 +316,21 @@ export function listFieldValueTexts(field: CustomField): Map<number, string> {
   return new Map(rows.map((row) => [row.ownerId, row.textValue ?? row.optionName ?? '']))
 }
 
-function assertValueAllowed(scope: CustomFieldScope, value: FieldValueData): void {
+function assertValueAllowed(scope: CustomFieldScope, value: FieldValueData, index: number): void {
   const field = findCustomField(value.fieldId)
   if (field.scope !== scope)
-    throw new AppError('VALIDATION_FAILED', `Field ${field.id} does not belong to ${scope}`)
-  if (field.archivedAt) throw new AppError('VALIDATION_FAILED', `Field ${field.id} is archived`)
+    throw invalidInput([index, 'fieldId'], `Field ${field.id} does not belong to the ${scope}`)
+  if (field.archivedAt) throw new AppError('CUSTOM_FIELD_ARCHIVED', String(field.id))
   if (field.type === 'text' && value.optionId !== null)
-    throw new AppError('VALIDATION_FAILED', `Field ${field.id} takes text`)
+    throw invalidInput([index, 'optionId'], `Field ${field.id} takes text`)
   if (field.type === 'select' && value.textValue !== null)
-    throw new AppError('VALIDATION_FAILED', `Field ${field.id} takes an option`)
+    throw invalidInput([index, 'textValue'], `Field ${field.id} takes an option`)
   if (value.optionId === null) return
 
   const option = findOption(value.optionId)
-  if (option.fieldId !== field.id || option.archivedAt)
-    throw new AppError('VALIDATION_FAILED', `Option ${option.id} is not selectable`)
+  if (option.fieldId !== field.id)
+    throw invalidInput([index, 'optionId'], `Option ${option.id} belongs to another field`)
+  if (option.archivedAt) throw new AppError('CUSTOM_FIELD_OPTION_ARCHIVED', String(option.id))
 }
 
 /**
@@ -350,7 +350,7 @@ export function setFieldValues(
     const current = new Map(
       selectFieldValues(scope, ownerId).map((value) => [value.fieldId, value])
     )
-    for (const value of values) {
+    for (const [index, value] of values.entries()) {
       const previous = current.get(value.fieldId)
       if (
         (previous?.textValue ?? null) === value.textValue &&
@@ -358,7 +358,7 @@ export function setFieldValues(
       )
         continue
 
-      assertValueAllowed(scope, value)
+      assertValueAllowed(scope, value, index)
       db.delete(table)
         .where(and(eq(ownerColumn, ownerId), eq(table.fieldId, value.fieldId)))
         .run()

@@ -46,8 +46,12 @@ call the API nor read its responses. This description is served without the key.
 
 ## Error Handling
 
-Every error is \`{ "error": { "code": "…" } }\`. Invalid requests add a \`message\` naming the
-wrong fields.
+Every error is \`{ "error": { "code": "…" } }\`. \`VALIDATION_FAILED\` means the request itself
+is wrong and adds \`issues\`, one per wrong field, such as
+\`{ "path": "end", "message": "End must be after start" }\`. The path names the field as in the
+request, nested names joined by dots; the message is for people and may change. A conflict
+(409) means the request is fine, but the current data does not allow it, for example an
+archived activity.
 
 | Status | Codes                                                                       |
 |--------|-----------------------------------------------------------------------------|
@@ -55,7 +59,7 @@ wrong fields.
 | 401    | \`UNAUTHORIZED\`: the key is missing or wrong                               |
 | 403    | \`FORBIDDEN_ORIGIN\`: the request comes from a web page                       |
 | 404    | \`ROUTE_NOT_FOUND\`, and \`<RESOURCE>_NOT_FOUND\` such as \`PROJECT_NOT_FOUND\`   |
-| 409    | conflicts with the current data, such as \`PROJECT_NAME_TAKEN\`, \`ACTIVITY_HAS_TIME_ENTRIES\` or \`NO_ACTIVE_PROFILE\` |
+| 409    | conflicts with the current data, such as \`PROJECT_NAME_TAKEN\`, \`ACTIVITY_ARCHIVED\` or \`NO_ACTIVE_PROFILE\` |
 | 413    | \`PAYLOAD_TOO_LARGE\`: the body is larger than 64 KB                         |
 | 415    | \`UNSUPPORTED_MEDIA_TYPE\`: the body is not JSON                             |
 | 500    | \`UNKNOWN\`: an unexpected error                                             |

@@ -1,5 +1,5 @@
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
-import { AppError, type ErrorCode } from '../../shared/model/errors'
+import type { ErrorCode } from '../../shared/model/errors'
 
 /** Codes of the HTTP layer itself, in addition to the error codes of the core. */
 export type HttpErrorCode =
@@ -29,16 +29,6 @@ export class HttpError extends Error {
 
   get status(): ContentfulStatusCode {
     return httpStatus[this.code]
-  }
-}
-
-/**
- * Invalid input of an API request. Unlike other errors, it tells the caller what was wrong,
- * because only the request itself is described, nothing of the app's internals.
- */
-export class ValidationError extends AppError {
-  constructor(readonly details: string) {
-    super('VALIDATION_FAILED', details)
   }
 }
 
