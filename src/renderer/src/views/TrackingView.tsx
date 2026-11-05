@@ -10,7 +10,15 @@ import {
   type CalendarDate,
   type Time
 } from '@internationalized/date'
-import { RiAddLine, RiDeleteBinLine, RiPencilLine, RiPlayFill, RiStopFill } from '@remixicon/react'
+import {
+  RiAddLine,
+  RiCalendarScheduleLine,
+  RiDeleteBinLine,
+  RiMore2Line,
+  RiPencilLine,
+  RiPlayFill,
+  RiStopFill
+} from '@remixicon/react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { TooltipTrigger, useLocale } from 'react-aria-components'
@@ -19,12 +27,14 @@ import type { TimeEntryDetails } from '../../../shared/model/timeEntries'
 import { AlertDialog } from '../components/atoms/AlertDialog'
 import { Button } from '../components/atoms/Button'
 import { GridList, GridListItem } from '../components/atoms/GridList'
+import { Menu, MenuItem, MenuTrigger } from '../components/atoms/Menu'
 import { Modal } from '../components/atoms/Modal'
 import { ToggleButton } from '../components/atoms/ToggleButton'
 import { ToggleButtonGroup } from '../components/atoms/ToggleButtonGroup'
 import { Tooltip } from '../components/atoms/Tooltip'
 import { DayViewIcon, WeekViewIcon, WorkWeekViewIcon } from '../components/atoms/ViewIcons'
 import { DayNavigator } from '../components/molecules/DayNavigator'
+import { MoveTimeEntryDialog } from '../components/molecules/MoveTimeEntryDialog'
 import { ExpandableNote } from '../components/molecules/Note'
 import { TagBadges } from '../components/molecules/TagBadges'
 import { TimeEntryDialog } from '../components/molecules/TimeEntryDialog'
@@ -123,6 +133,7 @@ function TrackingView(): React.JSX.Element {
   } | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
+  const [entryToMove, setEntryToMove] = useState<TimeEntryDetails | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const { running, revision, start, stop, discard } = useTimer()
   const isRunningShown =
@@ -427,6 +438,24 @@ function TrackingView(): React.JSX.Element {
                 >
                   <RiDeleteBinLine className="size-4" />
                 </Button>
+                <MenuTrigger placement="bottom end">
+                  <Button
+                    variant="icon"
+                    className="mt-2.5"
+                    aria-label={t('actions', { name: activity.name })}
+                  >
+                    <RiMore2Line className="size-4" />
+                  </Button>
+                  <Menu
+                    disabledKeys={isRunning ? ['move'] : []}
+                    onAction={() => setEntryToMove(details)}
+                  >
+                    <MenuItem id="move">
+                      <RiCalendarScheduleLine aria-hidden className="size-4" />
+                      {t('moveEntry')}
+                    </MenuItem>
+                  </Menu>
+                </MenuTrigger>
               </GridListItem>
             )
           }}
@@ -440,6 +469,13 @@ function TrackingView(): React.JSX.Element {
           details={dialog.details}
           onClose={() => setDialog(null)}
           onSaved={() => setReloadCount((count) => count + 1)}
+        />
+      )}
+      {entryToMove && (
+        <MoveTimeEntryDialog
+          details={entryToMove}
+          onClose={() => setEntryToMove(null)}
+          onMoved={() => setReloadCount((count) => count + 1)}
         />
       )}
       <Modal

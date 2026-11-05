@@ -174,3 +174,31 @@ test('drags entries in the week calendar', async ({ window, errors }) => {
   await expect(dialog.getByRole('heading', { name: 'Edit entry' })).toBeVisible()
   expect(errors).toEqual([])
 })
+
+test('moves an entry to another day', async ({ window, errors }) => {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  await window.evaluate(() => {
+    location.hash = '#/tracking?range=workWeek'
+  })
+  await window.getByRole('button', { name: 'Previous week' }).click()
+  await window.getByRole('button', { name: /^Show Monday/ }).click()
+  await expect(window.getByRole('heading', { name: 'Monday' })).toBeVisible()
+  const meetings = window.getByRole('row', { name: /Team Meeting/ })
+  await expect(meetings).toHaveCount(1)
+
+  await window.getByRole('button', { name: 'More actions for Team Meeting' }).click()
+  await window.getByRole('menuitem', { name: 'Move to another day…' }).click()
+  const dialog = window.getByRole('dialog')
+  await expect(dialog.getByRole('heading', { name: 'Move entry' })).toBeVisible()
+  await window.keyboard.press('ArrowRight')
+  await window.keyboard.press('Enter')
+  await dialog.getByRole('button', { name: 'Move' }).click()
+
+  await expect(meetings).toHaveCount(0)
+  await expect(window.getByText(/^Moved to Tuesday/)).toBeVisible()
+  await window.getByRole('button', { name: 'Show', exact: true }).click()
+  await expect(window.getByRole('heading', { name: 'Tuesday' })).toBeVisible()
+  await expect(window.getByRole('row', { name: /Team Meeting/ })).toBeVisible()
+  expect(errors).toEqual([])
+})

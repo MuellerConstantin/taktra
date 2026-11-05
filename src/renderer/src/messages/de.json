@@ -285,6 +285,8 @@
     "withoutTimes": "Ohne Uhrzeit",
     "continue": "Timer für {name} starten",
     "stop": "Timer für {name} stoppen",
+    "actions": "Weitere Aktionen für {name}",
+    "moveEntry": "Auf anderen Tag verschieben…",
     "help": "Alle Einträge eines Tages oder einer Woche, also die Zeit, die du auf Tätigkeiten gebucht hast, per Timer oder von Hand. Hier trägst du vergessene Zeit nach und korrigierst Einträge. Lücken zwischen Einträgen zeigen, welche Zeit noch nicht erfasst ist; ein Klick darauf bucht sie nach."
   },
   "WeekCalendar": {
@@ -390,6 +392,7 @@
     "now": "jetzt",
     "entryActions": "Aktionen für Eintrag vom {date}",
     "editEntry": "Bearbeiten",
+    "moveEntry": "Auf anderen Tag verschieben…",
     "deleteEntry": "Löschen",
     "deleteConfirmTitle": "Eintrag vom {date} löschen?",
     "deleteConfirmText": "Der Zeiteintrag wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden. Ist es der letzte Eintrag der Tätigkeit, wird auch die Tätigkeit gelöscht.",
@@ -412,6 +415,14 @@
     "merge": "Zusammenführen mit…",
     "archive": "Archivieren",
     "unarchive": "Wiederherstellen"
+  },
+  "MoveTimeEntryDialog": {
+    "title": "Eintrag verschieben",
+    "dateLabel": "Tag",
+    "cancel": "Abbrechen",
+    "move": "Verschieben",
+    "moved": "Auf {date} verschoben.",
+    "show": "Anzeigen"
   },
   "MoveActivityDialog": {
     "title": "„{name}“ verschieben",

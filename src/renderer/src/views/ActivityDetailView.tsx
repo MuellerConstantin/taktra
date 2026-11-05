@@ -1,6 +1,7 @@
 import { DateFormatter, getLocalTimeZone, parseDate } from '@internationalized/date'
 import {
   RiBuilding2Line,
+  RiCalendarScheduleLine,
   RiDeleteBinLine,
   RiMore2Line,
   RiPencilLine,
@@ -23,6 +24,7 @@ import { Modal } from '../components/atoms/Modal'
 import { ActivityMenu } from '../components/molecules/ActivityMenu'
 import { Breadcrumbs } from '../components/molecules/Breadcrumbs'
 import { CustomFieldValueList } from '../components/molecules/CustomFieldValueList'
+import { MoveTimeEntryDialog } from '../components/molecules/MoveTimeEntryDialog'
 import { ExpandableNote } from '../components/molecules/Note'
 import { PeriodPicker } from '../components/molecules/PeriodPicker'
 import { TagBadges } from '../components/molecules/TagBadges'
@@ -50,6 +52,7 @@ function ActivityDetailView(): React.JSX.Element {
   const [actionError, setActionError] = useState<string | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
   const [entryToEdit, setEntryToEdit] = useState<TimeEntryDetails | null>(null)
+  const [entryToMove, setEntryToMove] = useState<TimeEntryDetails | null>(null)
   const [entryToDelete, setEntryToDelete] = useState<TimeEntryDetails | null>(null)
   const [period, setPeriod] = useState<Period>(allTime)
   const { from, to } = periodFilter(period)
@@ -227,14 +230,22 @@ function ActivityDetailView(): React.JSX.Element {
                   <RiMore2Line className="size-4" />
                 </Button>
                 <Menu
-                  disabledKeys={isEntryRunning ? ['edit'] : []}
+                  disabledKeys={isEntryRunning ? ['edit', 'move'] : []}
                   onAction={(key) =>
-                    key === 'delete' ? setEntryToDelete(row) : setEntryToEdit(row)
+                    key === 'delete'
+                      ? setEntryToDelete(row)
+                      : key === 'move'
+                        ? setEntryToMove(row)
+                        : setEntryToEdit(row)
                   }
                 >
                   <MenuItem id="edit">
                     <RiPencilLine aria-hidden className="size-4" />
                     {t('editEntry')}
+                  </MenuItem>
+                  <MenuItem id="move">
+                    <RiCalendarScheduleLine aria-hidden className="size-4" />
+                    {t('moveEntry')}
                   </MenuItem>
                   <MenuItem id="delete">
                     <RiDeleteBinLine aria-hidden className="size-4" />
@@ -252,6 +263,13 @@ function ActivityDetailView(): React.JSX.Element {
           details={entryToEdit}
           onClose={() => setEntryToEdit(null)}
           onSaved={reload}
+        />
+      )}
+      {entryToMove && (
+        <MoveTimeEntryDialog
+          details={entryToMove}
+          onClose={() => setEntryToMove(null)}
+          onMoved={reload}
         />
       )}
       <Modal

@@ -251,6 +251,8 @@
     "withoutTimes": "Without clock times",
     "continue": "Start timer for {name}",
     "stop": "Stop timer for {name}",
+    "actions": "More actions for {name}",
+    "moveEntry": "Move to another day…",
     "help": "All entries of a day or a week, that is the time booked on activities, by timer or by hand. Add time you forgot to track and correct entries here. Gaps between entries show time not tracked yet; click one to book it."
   },
   "WeekCalendar": {
@@ -356,6 +358,7 @@
     "now": "now",
     "entryActions": "Actions for entry of {date}",
     "editEntry": "Edit",
+    "moveEntry": "Move to another day…",
     "deleteEntry": "Delete",
     "deleteConfirmTitle": "Delete entry of {date}?",
     "deleteConfirmText": "The time entry is deleted permanently. This cannot be undone. If it is the last entry of the activity, the activity is deleted too.",
@@ -378,6 +381,14 @@
     "merge": "Merge into…",
     "archive": "Archive",
     "unarchive": "Restore"
+  },
+  "MoveTimeEntryDialog": {
+    "title": "Move entry",
+    "dateLabel": "Day",
+    "cancel": "Cancel",
+    "move": "Move",
+    "moved": "Moved to {date}.",
+    "show": "Show"
   },
   "MoveActivityDialog": {
     "title": "Move “{name}”",
