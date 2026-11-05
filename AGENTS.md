@@ -267,7 +267,7 @@ When state that several consumers show changes, the core reports it through
 ```
 core ── signal:data ──► gui/windows.ts ── IPC data:changed ──► preload ──► renderer
      ── signal:settings ──► gui/tray.ts, theme.ts, shortcuts.ts (no IPC)
-     ── signal:data ──► api/events.ts ── SSE signal:data ──► other programs
+     ── signal:data ──► api/v1/routes/events.ts ── SSE signal:data ──► other programs
 ```
 
 ## Data and Storage
@@ -368,7 +368,7 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   `Host` of that address and no `Origin` header, so web pages can neither call
   nor read the API. There is one key; only its SHA-256 hash is stored, so it is
   shown once when created.
-- **Own response format**: Responses are v1 DTOs in `api/dto/`, mapped
+- **Own response format**: Responses are v1 DTOs in `api/v1/dto/`, mapped
   explicitly from `shared/model/` with dates as ISO strings, because other
   programs depend on them while the model may change with the app.
 - **Described by its code**: Every route is declared with `createRoute()`
