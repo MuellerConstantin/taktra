@@ -94,7 +94,13 @@ export const appShortcuts = {
   search: 'CommandOrControl+F',
   previousDay: 'Left',
   nextDay: 'Right',
-  today: 'T'
+  today: 'T',
+  entryEarlier: 'Up',
+  entryLater: 'Down',
+  entryShorter: 'Shift+Up',
+  entryLonger: 'Shift+Down',
+  entryPreviousDay: 'Left',
+  entryNextDay: 'Right'
 } as const
 
 export type AppShortcut = keyof typeof appShortcuts

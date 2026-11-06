@@ -723,7 +723,13 @@
       "search": "Projekte, Leistungsempfänger oder Tags durchsuchen",
       "previousDay": "Vorheriger Tag oder Woche",
       "nextDay": "Nächster Tag oder Woche",
-      "today": "Zu heute"
+      "today": "Zu heute",
+      "entryEarlier": "Fokussierten Kalendereintrag 15 Minuten früher legen",
+      "entryLater": "Fokussierten Kalendereintrag 15 Minuten später legen",
+      "entryShorter": "Fokussierten Kalendereintrag 15 Minuten früher enden lassen",
+      "entryLonger": "Fokussierten Kalendereintrag 15 Minuten später enden lassen",
+      "entryPreviousDay": "Fokussierten Kalendereintrag auf den Vortag legen",
+      "entryNextDay": "Fokussierten Kalendereintrag auf den Folgetag legen"
     }
   },
   "UpdatesSettings": {

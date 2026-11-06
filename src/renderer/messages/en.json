@@ -689,7 +689,13 @@
       "search": "Search projects, clients or tags",
       "previousDay": "Previous day or week",
       "nextDay": "Next day or week",
-      "today": "Go to today"
+      "today": "Go to today",
+      "entryEarlier": "Move the focused calendar entry 15 minutes earlier",
+      "entryLater": "Move the focused calendar entry 15 minutes later",
+      "entryShorter": "End the focused calendar entry 15 minutes earlier",
+      "entryLonger": "End the focused calendar entry 15 minutes later",
+      "entryPreviousDay": "Move the focused calendar entry to the previous day",
+      "entryNextDay": "Move the focused calendar entry to the next day"
     }
   },
   "UpdatesSettings": {

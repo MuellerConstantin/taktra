@@ -202,3 +202,82 @@ test('moves an entry to another day', async ({ window, errors }) => {
   await expect(window.getByRole('row', { name: /Team Meeting/ })).toBeVisible()
   expect(errors).toEqual([])
 })
+
+test('scrolls and switches the week while dragging', async ({ window, errors }) => {
+  await window.setViewportSize({ width: 1000, height: 700 })
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  await window.evaluate(() => {
+    location.hash = '#/tracking?range=week'
+  })
+  await window.getByRole('button', { name: 'Previous week' }).click()
+  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  const monday = window.getByRole('button', { name: /^Show Monday/ })
+  await expect(monday).toContainText('7:30')
+
+  const standup = window.getByRole('button', { name: /^Daily Standup, / }).first()
+  await standup.scrollIntoViewIfNeeded()
+  const standupBox = (await standup.boundingBox())!
+  const viewport = window.viewportSize()!
+  const scrollTop = (): Promise<number> =>
+    window.evaluate(
+      () => document.querySelector('[data-entry-id]')!.closest('.overflow-y-auto')!.scrollTop
+    )
+  const before = await scrollTop()
+  await window.mouse.move(standupBox.x + 20, standupBox.y + 5)
+  await window.mouse.down()
+  await window.mouse.move(standupBox.x + 20, viewport.height - 5, { steps: 10 })
+  await expect.poll(scrollTop).toBeGreaterThan(before + 50)
+  await window.keyboard.press('Escape')
+  await window.mouse.up()
+
+  const meeting = window.getByRole('button', { name: /^Team Meeting, Internal, 4:00 PM/ })
+  await meeting.scrollIntoViewIfNeeded()
+  const meetingBox = (await meeting.boundingBox())!
+  await window.mouse.move(meetingBox.x + 20, meetingBox.y + 10)
+  await window.mouse.down()
+  await window.mouse.move(meetingBox.x + 10, meetingBox.y + 10, { steps: 3 })
+  await window.mouse.move(
+    10 + (await window.getByRole('main').boundingBox())!.x,
+    meetingBox.y + 10,
+    {
+      steps: 5
+    }
+  )
+  await expect(window.getByRole('heading', { name: /^Week of / })).toBeVisible()
+  const sunday = window.getByRole('button', { name: /^Show Sunday/ })
+  const sundayBox = (await sunday.boundingBox())!
+  await window.mouse.move(sundayBox.x + 20, meetingBox.y + 10, { steps: 5 })
+  await window.mouse.up()
+  await expect(sunday).toContainText('1:00')
+
+  await window.getByRole('button', { name: 'Next week' }).click()
+  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  await expect(monday).toContainText('6:30')
+  expect(errors).toEqual([])
+})
+
+test('moves a calendar entry with the keyboard', async ({ window, errors }) => {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  await window.evaluate(() => {
+    location.hash = '#/tracking?range=week'
+  })
+  await window.getByRole('button', { name: 'Previous week' }).click()
+  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+
+  await window.getByRole('button', { name: /^Team Meeting, Internal, 4:00 PM/ }).focus()
+  await window.keyboard.press('ArrowUp')
+  await window.keyboard.press('Shift+ArrowDown')
+  await window.keyboard.press('ArrowRight')
+  const moved = window.getByRole('button', {
+    name: 'Team Meeting, Internal, 3:45 PM – 5:00 PM, 1:15'
+  })
+  await expect(moved).toBeFocused()
+  await expect(window.getByRole('button', { name: /^Show Tuesday/ })).toContainText('8:30')
+  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+
+  await window.getByRole('button', { name: /^Show Tuesday/ }).click()
+  await expect(window.getByRole('row', { name: /Team Meeting/ })).toContainText('3:45 PM')
+  expect(errors).toEqual([])
+})

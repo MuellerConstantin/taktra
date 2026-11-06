@@ -17,9 +17,9 @@ export interface Block {
   readonly isClipped: boolean
 }
 
-/** A time range in minutes of the day, on one of the shown days. */
+/** A time range in minutes of a day. */
 export interface Span {
-  readonly day: number
+  readonly day: CalendarDate
   readonly start: number
   readonly end: number
 }
@@ -128,9 +128,9 @@ export interface DragInput {
   readonly grab: number
   /** Minutes of the day under the pointer, and the day it is over. */
   readonly pointer: number
-  readonly pointerDay: number
+  readonly pointerDay: CalendarDate
   /** The edges of the other entries a day offers to snap to. */
-  readonly edgesOn: (day: number) => readonly number[]
+  readonly edgesOn: (day: CalendarDate) => readonly number[]
   readonly minStart: number
   readonly maxEnd: number
   readonly isFree: boolean
@@ -163,4 +163,37 @@ export function dragSpan({
   return edge >= origin.start
     ? { ...origin, end: Math.max(edge, origin.start + minLength) }
     : { ...origin, start: Math.min(edge, origin.start - minLength), end: origin.start }
+}
+
+export type NudgeKind = 'earlier' | 'later' | 'shorter' | 'longer' | 'previousDay' | 'nextDay'
+
+/**
+ * Moves an entry by a grid step or a day, or changes its end by a grid step, as the keyboard
+ * does. A start or end off the grid first moves onto it.
+ */
+export function nudgeSpan(span: Span, kind: NudgeKind, minStart: number, maxEnd: number): Span {
+  const length = span.end - span.start
+  const step = (minutes: number, direction: 1 | -1): number =>
+    direction === 1
+      ? Math.floor(minutes / SNAP_MINUTES) * SNAP_MINUTES + SNAP_MINUTES
+      : Math.ceil(minutes / SNAP_MINUTES) * SNAP_MINUTES - SNAP_MINUTES
+
+  switch (kind) {
+    case 'earlier':
+    case 'later': {
+      const start = step(span.start, kind === 'later' ? 1 : -1)
+      const clamped = Math.min(Math.max(start, minStart), maxEnd - length)
+      return { ...span, start: clamped, end: clamped + length }
+    }
+    case 'shorter':
+    case 'longer': {
+      const end = step(span.end, kind === 'longer' ? 1 : -1)
+      const minEnd = span.start + Math.min(SNAP_MINUTES, length)
+      return { ...span, end: Math.min(Math.max(end, minEnd), maxEnd) }
+    }
+    case 'previousDay':
+      return { ...span, day: span.day.subtract({ days: 1 }) }
+    case 'nextDay':
+      return { ...span, day: span.day.add({ days: 1 }) }
+  }
 }

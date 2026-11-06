@@ -301,6 +301,7 @@ function TrackingView(): React.JSX.Element {
           onCreate={(day, start, end) => setDialog({ date: day, start, end })}
           onEdit={(details) => setDialog({ date: parseDate(details.entry.date), details })}
           onChange={handleMove}
+          onShiftWeek={(direction) => navigate(date.add({ weeks: direction }), unit)}
         />
       )}
       {!error && entries && unit === 'day' && (

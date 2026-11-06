@@ -1,4 +1,4 @@
-import { TooltipTrigger } from 'react-aria-components'
+import { TooltipTrigger, type ButtonProps } from 'react-aria-components'
 import type { TimeEntryDetails } from '@/shared/model/timeEntries'
 import { Button } from '@/renderer/components/atoms/Button'
 import { Tooltip } from '@/renderer/components/atoms/Tooltip'
@@ -9,6 +9,7 @@ interface CalendarEntryProps {
   readonly details: TimeEntryDetails
   readonly label: string
   readonly onPress: () => void
+  readonly onKeyDown?: ButtonProps['onKeyDown']
   readonly isResizable?: boolean
   readonly className: string
   readonly style?: React.CSSProperties
@@ -20,6 +21,7 @@ export function CalendarEntry({
   details,
   label,
   onPress,
+  onKeyDown,
   isResizable = false,
   className,
   style,
@@ -34,6 +36,7 @@ export function CalendarEntry({
         aria-label={label}
         data-entry-id={details.entry.id}
         onPress={onPress}
+        onKeyDown={onKeyDown}
         className={`${className} min-w-0 flex-col items-stretch justify-start gap-0 overflow-hidden rounded-sm border-0 border-l-[3px] px-1 py-px text-left text-[11px] leading-3.5 text-foreground hover:brightness-95`}
         style={{
           ...style,

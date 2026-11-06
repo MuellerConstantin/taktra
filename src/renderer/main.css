@@ -158,6 +158,17 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+
+  --animate-fill-up: fill-up 700ms linear forwards;
+
+  @keyframes fill-up {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
 }
 
 body {
