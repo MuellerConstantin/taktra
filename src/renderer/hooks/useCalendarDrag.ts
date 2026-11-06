@@ -42,6 +42,8 @@ interface Drag {
   readonly origin: Span
   readonly pointerX: number
   readonly pointerY: number
+  /** Where the pointer is now, once the drag has moved. */
+  readonly at: Pointer | null
   readonly grab: number
   readonly span: Span
   readonly hasMoved: boolean
@@ -80,6 +82,14 @@ interface CalendarDrag {
   readonly nudged: MovedEntry | null
   /** The range being drawn for a new entry. */
   readonly creating: Span | null
+  /** What a drag would do, and where the pointer is, for a label beside it. */
+  readonly pointerLabel: {
+    readonly kind: DragKind
+    readonly span: Span
+    readonly x: number
+    readonly y: number
+    readonly isOnWeekEdge: boolean
+  } | null
   /** Whether the edges for switching the week are shown, and which one is being held. */
   readonly weekEdges: {
     readonly active: WeekDirection | null
@@ -177,7 +187,7 @@ export function useCalendarDrag({
       direction === null ? null : edge?.direction === direction ? edge : { direction, count: 0 }
     )
     if (direction !== null) {
-      updateDrag({ ...current, hasMoved: true })
+      updateDrag({ ...current, hasMoved: true, at: pointer })
       return
     }
     const ignoredId = current.details?.entry.id ?? null
@@ -190,7 +200,7 @@ export function useCalendarDrag({
       maxEnd,
       isFree: pointer.isFree
     })
-    updateDrag({ ...current, hasMoved: true, span })
+    updateDrag({ ...current, hasMoved: true, span, at: pointer })
   }
 
   const finishDrag = (done: Drag): void => {
@@ -213,7 +223,7 @@ export function useCalendarDrag({
     if (event.button !== 0) return
     const target = event.target as HTMLElement
     const pointer = minutesAt(event.clientY)
-    const start = { pointerX: event.clientX, pointerY: event.clientY, hasMoved: false }
+    const start = { pointerX: event.clientX, pointerY: event.clientY, at: null, hasMoved: false }
     const entryElement = target.closest<HTMLElement>('[data-entry-id]')
 
     if (!entryElement) {
@@ -413,6 +423,16 @@ export function useCalendarDrag({
     moved,
     nudged: nudge,
     creating: drag?.hasMoved && drag.kind === 'create' ? drag.span : null,
+    pointerLabel:
+      drag?.hasMoved && drag.at
+        ? {
+            kind: drag.kind,
+            span: drag.span,
+            x: drag.at.x,
+            y: drag.at.y,
+            isOnWeekEdge: weekEdge !== null
+          }
+        : null,
     weekEdges:
       drag?.hasMoved && drag.kind === 'move'
         ? { active: weekEdge?.direction ?? null, count: weekEdge?.count ?? 0 }

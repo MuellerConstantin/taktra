@@ -69,6 +69,7 @@ test('shows the entries of a week and opens a day from it', async ({ window, err
 
   await window.getByRole('radio', { name: 'Week', exact: true }).click()
   await expect(window.getByRole('heading', { name: 'This week' })).toBeVisible()
+  await expect(window.getByText(/^Week \d+ · /)).toBeVisible()
   await expect(window.getByRole('button', { name: /^Show / })).toHaveCount(7)
 
   await window.getByRole('radio', { name: 'Work week' }).click()
@@ -237,6 +238,7 @@ test('scrolls and switches the week while dragging', async ({ window, errors }) 
   await window.mouse.move(meetingBox.x + 20, meetingBox.y + 10)
   await window.mouse.down()
   await window.mouse.move(meetingBox.x + 10, meetingBox.y + 10, { steps: 3 })
+  const targetWeek = (await window.locator('[data-week-edge="previous"]').textContent())!
   await window.mouse.move(
     10 + (await window.getByRole('main').boundingBox())!.x,
     meetingBox.y + 10,
@@ -245,6 +247,7 @@ test('scrolls and switches the week while dragging', async ({ window, errors }) 
     }
   )
   await expect(window.getByRole('heading', { name: /^Week of / })).toBeVisible()
+  await expect(window.locator('span.fixed').getByText(targetWeek, { exact: true })).toBeVisible()
   const sunday = window.getByRole('button', { name: /^Show Sunday/ })
   const sundayBox = (await sunday.boundingBox())!
   await window.mouse.move(sundayBox.x + 20, meetingBox.y + 10, { steps: 5 })

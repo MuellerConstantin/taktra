@@ -11,6 +11,8 @@ interface CalendarEntryProps {
   readonly onPress: () => void
   readonly onKeyDown?: ButtonProps['onKeyDown']
   readonly isResizable?: boolean
+  /** Keeps the tooltip closed, as while an entry is dragged over this one. */
+  readonly isTooltipDisabled?: boolean
   readonly className: string
   readonly style?: React.CSSProperties
   readonly children: React.ReactNode
@@ -23,13 +25,14 @@ export function CalendarEntry({
   onPress,
   onKeyDown,
   isResizable = false,
+  isTooltipDisabled = false,
   className,
   style,
   children
 }: CalendarEntryProps): React.JSX.Element {
   const color = details.project.color ?? 'var(--color-muted-foreground)'
   return (
-    <TooltipTrigger delay={TOOLTIP_DELAY}>
+    <TooltipTrigger delay={TOOLTIP_DELAY} isDisabled={isTooltipDisabled}>
       <Button
         variant="secondary"
         tooltip={false}

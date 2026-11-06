@@ -267,6 +267,7 @@
     "lastWeek": "Letzte Woche",
     "nextWeek": "Nächste Woche",
     "weekOf": "Woche vom {date}",
+    "weekSubtitle": "KW {week} · {range}",
     "range": "Zeitraum",
     "day": "Tag",
     "workWeek": "Arbeitswoche",
@@ -291,7 +292,8 @@
   },
   "WeekCalendar": {
     "openDay": "{date} anzeigen",
-    "now": "jetzt"
+    "now": "jetzt",
+    "week": "KW {week}"
   },
   "DayNavigator": {
     "previous": "Vorheriger Tag",

@@ -48,7 +48,7 @@ import { useCreateRequest } from '@/renderer/hooks/useCreateRequest'
 import { useTimer } from '@/renderer/hooks/useTimer'
 import { api } from '@/renderer/lib/api'
 import { elapsedSeconds, formatDuration } from '@/renderer/lib/duration'
-import { daysOf, type CalendarRange } from '@/renderer/lib/period'
+import { daysOf, weekNumberOf, type CalendarRange } from '@/renderer/lib/period'
 import { appShortcuts } from '@/renderer/lib/shortcuts'
 import { useDataRevision } from '@/renderer/hooks/useDataRevision'
 
@@ -187,7 +187,13 @@ function TrackingView(): React.JSX.Element {
             : weekdayFormatter.format(date.toDate(timeZone))
   const subtitle =
     unit !== 'day'
-      ? dayFormatter.formatRange(days[0].toDate(timeZone), days[days.length - 1].toDate(timeZone))
+      ? t('weekSubtitle', {
+          week: weekNumberOf(days),
+          range: dayFormatter.formatRange(
+            days[0].toDate(timeZone),
+            days[days.length - 1].toDate(timeZone)
+          )
+        })
       : dayFormatter.format(date.toDate(timeZone))
 
   const navigate = (next: CalendarDate, nextUnit: CalendarRange): void => {

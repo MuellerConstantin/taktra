@@ -20,9 +20,11 @@ import {
   layoutDay,
   timeOf,
   timedEntriesOn,
+  type DragKind,
   type Span
 } from '@/renderer/lib/calendar'
 import { elapsedSeconds, formatDuration } from '@/renderer/lib/duration'
+import { daysOf, weekNumberOf } from '@/renderer/lib/period'
 
 const TWO_LINE_HEIGHT = 32
 const SLOT_MINUTES = 30
@@ -79,6 +81,7 @@ export function WeekCalendar({
     moved,
     nudged,
     creating,
+    pointerLabel,
     weekEdges,
     scrollRef,
     headerRef,
@@ -233,6 +236,7 @@ export function WeekCalendar({
                     }
                     onKeyDown={(event) => handleEntryKeyDown(block.details, event)}
                     isResizable={!isRunning && !block.isClipped}
+                    isTooltipDisabled={pointerLabel !== null}
                     className={
                       isRunning
                         ? 'absolute ring-2 ring-primary'
@@ -279,6 +283,7 @@ export function WeekCalendar({
           ))}
         </div>
       </div>
+      {pointerLabel && <PointerLabel {...pointerLabel} days={days} formatSpan={formatSpan} />}
       {weekEdges &&
         ([-1, 1] as const).map((direction) => {
           const Icon = direction === -1 ? RiArrowLeftSLine : RiArrowRightSLine
@@ -288,7 +293,7 @@ export function WeekCalendar({
               key={direction}
               aria-hidden
               data-week-edge={direction === -1 ? 'previous' : 'next'}
-              className={`absolute inset-y-0 z-20 flex w-8 items-center justify-center overflow-hidden border-border bg-background/90 text-muted-foreground ${direction === -1 ? 'left-0 border-r' : 'right-0 border-l'}`}
+              className={`absolute inset-y-0 z-20 flex w-8 flex-col items-center justify-center gap-2 overflow-hidden border-border bg-background/90 text-muted-foreground ${direction === -1 ? 'left-0 border-r' : 'right-0 border-l'}`}
             >
               {isActive && (
                 <span
@@ -297,6 +302,13 @@ export function WeekCalendar({
                 />
               )}
               <Icon className={isActive ? 'relative size-5 text-primary' : 'relative size-5'} />
+              <span
+                className={`relative text-xs font-semibold [writing-mode:vertical-rl] ${isActive ? 'text-primary' : ''}`}
+              >
+                {t('week', {
+                  week: weekNumberOf(days.map((day) => day.add({ weeks: direction })))
+                })}
+              </span>
             </div>
           )
         })}
@@ -304,5 +316,62 @@ export function WeekCalendar({
         {nudgedEntry ? describe(nudgedEntry) : ''}
       </span>
     </div>
+  )
+}
+
+const POINTER_OFFSET = 16
+const LABEL_SPACE = 260
+
+interface PointerLabelProps {
+  readonly kind: DragKind
+  readonly span: Span
+  readonly x: number
+  readonly y: number
+  readonly isOnWeekEdge: boolean
+  readonly days: readonly CalendarDate[]
+  readonly formatSpan: (span: Span) => string
+}
+
+/** Says beside the pointer where a dragged entry lands, with its week when it is moved. */
+function PointerLabel({
+  kind,
+  span,
+  x,
+  y,
+  isOnWeekEdge,
+  days,
+  formatSpan
+}: PointerLabelProps): React.JSX.Element {
+  const t = useTranslations('WeekCalendar')
+  const { locale } = useLocale()
+  const dayFormatter = new DateFormatter(locale, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'numeric'
+  })
+  const week = weekNumberOf(isOnWeekEdge ? days : daysOf(span.day, 'week', locale))
+  const isLeft = x > window.innerWidth - LABEL_SPACE
+
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none fixed z-50 flex items-center gap-1.5 rounded-md border border-border bg-popover px-2 py-1 text-xs whitespace-nowrap text-popover-foreground shadow-md"
+      style={{
+        left: isLeft ? x - POINTER_OFFSET : x + POINTER_OFFSET,
+        top: y + POINTER_OFFSET,
+        translate: isLeft ? '-100% 0' : undefined
+      }}
+    >
+      {kind === 'move' && (
+        <span key={week} className="animate-flash rounded-sm px-1 font-semibold text-primary">
+          {t('week', { week })}
+        </span>
+      )}
+      {!isOnWeekEdge && (
+        <span>
+          {dayFormatter.format(span.day.toDate(getLocalTimeZone()))} · {formatSpan(span)}
+        </span>
+      )}
+    </span>
   )
 }

@@ -1,12 +1,13 @@
 import {
+  CalendarDate,
   endOfMonth,
   endOfWeek,
   endOfYear,
+  getDayOfWeek,
   isWeekend,
   startOfMonth,
   startOfWeek,
-  startOfYear,
-  type CalendarDate
+  startOfYear
 } from '@internationalized/date'
 import type { TimeFilter } from '@/shared/model/reports'
 
@@ -65,6 +66,16 @@ export function daysOf(date: CalendarDate, range: CalendarRange, locale: string)
   const start = startOfWeek(date, locale)
   const days = Array.from({ length: 7 }, (_, index) => start.add({ days: index }))
   return range === 'workWeek' ? days.filter((day) => !isWeekend(day, locale)) : days
+}
+
+/**
+ * The ISO 8601 week number of a shown week. ISO weeks start on Monday and belong to the year of
+ * their Thursday, so the Thursday of the shown days decides, whatever day the locale starts on.
+ */
+export function weekNumberOf(days: readonly CalendarDate[]): number {
+  const mondayFirst = 'de-DE'
+  const thursday = days.find((day) => getDayOfWeek(day, mondayFirst) === 3) ?? days[0]
+  return Math.floor(thursday.compare(new CalendarDate(thursday.year, 1, 1)) / 7) + 1
 }
 
 export function periodFilter({ range }: Period): Pick<TimeFilter, 'from' | 'to'> {

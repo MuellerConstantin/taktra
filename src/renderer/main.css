@@ -160,6 +160,15 @@
   --shadow-2xl: var(--shadow-2xl);
 
   --animate-fill-up: fill-up 700ms linear forwards;
+  --animate-flash: flash 600ms ease-out;
+
+  @keyframes flash {
+    from {
+      transform: scale(1.25);
+      background-color: var(--color-primary);
+      color: var(--color-primary-foreground);
+    }
+  }
 
   @keyframes fill-up {
     from {
