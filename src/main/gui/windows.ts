@@ -4,6 +4,13 @@ import { is } from '@electron-toolkit/utils'
 import type { WindowMessage } from '@/shared/gui/ipc'
 import { events } from '@/main/core'
 
+/**
+ * The id Windows groups the taskbar entry and the jump list by. Process and main window need the
+ * same one, or the jump list ends up under an entry that is never shown. Development gets its own,
+ * so it neither joins the installed app's taskbar entry nor overwrites its jump list.
+ */
+export const appUserModelId = is.dev ? 'app.taktra.dev' : 'app.taktra'
+
 let mainWindow: BrowserWindow | null = null
 let quitting = false
 

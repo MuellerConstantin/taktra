@@ -117,7 +117,7 @@ export default defineConfig(
     }
   },
   {
-    files: ['src/main/index.ts'],
+    files: ['src/main/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

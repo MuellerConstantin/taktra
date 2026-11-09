@@ -1,4 +1,6 @@
+import { spawn } from 'node:child_process'
 import type { Locator, Page } from '@playwright/test'
+import electron from 'electron'
 import { expect, test } from './app'
 
 const views = [
@@ -292,5 +294,46 @@ test('moves a calendar entry with the keyboard', async ({ window, errors }) => {
 
   await tuesday.click()
   await expect(window.getByRole('row', { name: /Team Meeting/ })).toContainText('3:45 PM')
+  expect(errors).toEqual([])
+})
+
+test('starts and stops a timer from a second start of the app', async ({
+  window,
+  userData,
+  errors
+}) => {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+  const recent = await window.evaluate(async () => {
+    const { api } = globalThis as unknown as {
+      api: {
+        timer: {
+          recent: (
+            limit: number
+          ) => Promise<{ value: { activity: { id: number; name: string } }[] }>
+        }
+      }
+    }
+    return (await api.timer.recent(1)).value[0].activity
+  })
+
+  // A jump list entry starts the app again with an argument; the second start hands it over to
+  // the running one and quits.
+  const startAgain = (arg: string): Promise<unknown> =>
+    new Promise((resolve, reject) => {
+      const child = spawn(electron as unknown as string, ['.', arg], {
+        env: { ...process.env, TAKTRA_USER_DATA: userData },
+        stdio: 'ignore'
+      })
+      child.on('exit', resolve)
+      child.on('error', reject)
+    })
+
+  await startAgain(`--start-activity=${recent.id}`)
+  await expect(window.getByText(/^Running since/)).toBeVisible()
+  await expect(window.getByRole('button', { name: `Stop timer for ${recent.name}` })).toBeVisible()
+
+  await startAgain('--stop-timer')
+  await expect(window.getByText('No timer running.')).toBeVisible()
   expect(errors).toEqual([])
 })

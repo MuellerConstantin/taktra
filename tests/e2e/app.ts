@@ -20,17 +20,25 @@ async function findMainWindow(app: ElectronApplication): Promise<Page> {
 }
 
 /**
- * The built app (`out/`) with its own user data folder, and its main window. Errors thrown in
- * the window are collected, so a test can assert that a view rendered without any.
+ * The built app (`out/`) with its own user data folder (`userData`), and its main window. Errors
+ * thrown in the window are collected, so a test can assert that a view rendered without any.
  */
-export const test = base.extend<{ window: Page; errors: string[] }>({
+export const test = base.extend<{ window: Page; errors: string[]; userData: string }>({
   // Playwright reads the fixtures a fixture depends on from this pattern, so it must stay.
   // eslint-disable-next-line no-empty-pattern
   errors: async ({}, provide) => {
     await provide([])
   },
-  window: async ({ errors }, provide) => {
+  // eslint-disable-next-line no-empty-pattern
+  userData: async ({}, provide) => {
     const userData = mkdtempSync(join(tmpdir(), 'taktra-e2e-'))
+    try {
+      await provide(userData)
+    } finally {
+      rmSync(userData, { recursive: true, force: true })
+    }
+  },
+  window: async ({ errors, userData }, provide) => {
     const app = await electron.launch({
       args: ['.'],
       env: { ...process.env, TAKTRA_USER_DATA: userData }
@@ -44,7 +52,6 @@ export const test = base.extend<{ window: Page; errors: string[] }>({
       await provide(window)
     } finally {
       await app.close()
-      rmSync(userData, { recursive: true, force: true })
     }
   }
 })

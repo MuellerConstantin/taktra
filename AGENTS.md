@@ -134,6 +134,7 @@ development.
 └── tests/
     ├── main/              # Vitest, folders as in src/main/
     │   └── core/db/seeds/ # Data for the migration test, one file per migration
+    ├── shared/            # Vitest, folders as in src/shared/
     └── e2e/               # Playwright against the built app
 ```
 
@@ -166,11 +167,12 @@ window.
 
 ### Layers of the main process
 
-| Layer               | Holds                                                    | Imports                                    |
-| ------------------- | -------------------------------------------------------- | ------------------------------------------ |
-| `core/`             | rules and data: profile data, installation state, events | `shared/`, Node, libraries; never Electron |
-| `gui/`              | windows, tray, shortcut, dialogs, theme, IPC handlers    | `core` through its index only              |
-| `src/main/index.ts` | the single instance lock, starting and stopping the rest | each layer through its index               |
+| Layer                | Holds                                                    | Imports                                    |
+| -------------------- | -------------------------------------------------------- | ------------------------------------------ |
+| `core/`              | rules and data: profile data, installation state, events | `shared/`, Node, libraries; never Electron |
+| `gui/`               | windows, tray, shortcut, dialogs, theme, IPC handlers    | `core` through its index only              |
+| `src/main/index.ts`  | the single instance lock, starting and stopping the rest | each layer through its index               |
+| `src/main/launch.ts` | the launch options of this and every later start         | each layer through its index               |
 
 - **The core runs without Electron**: it imports neither `electron` nor
   anything from `gui/`, and gets the user data path, the migrations
@@ -345,6 +347,11 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   question is not hooked into `before-quit`, which also fires on OS shutdown,
   where a dialog would block it. A second start brings the running instance to
   the front, so two instances never work on the same files.
+- **Launch options, not a CLI**: A start of Taktra takes options on its command
+  line (`--start-activity=<id>`, `--stop-timer`), which the jump list of the
+  taskbar uses. A second start hands them to the running instance and quits, so
+  they can trigger an action but never answer; whatever needs an answer goes
+  through an API.
 - **Updates from GitHub releases, optional**: The installed app checks the
   latest published release at start and every few hours, downloads in the
   background and installs on quit or on request. It is the only outgoing

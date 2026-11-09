@@ -6,7 +6,7 @@ export default defineConfig({
     alias: { '@': resolve('src') }
   },
   test: {
-    include: ['tests/main/**/*.test.ts'],
+    include: ['tests/{main,shared}/**/*.test.ts'],
     environment: 'node',
     setupFiles: ['tests/setup.ts'],
     // On the Windows runners of GitHub, SQLite writes are slow: a test with a few profiles takes

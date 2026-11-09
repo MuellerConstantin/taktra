@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { app, shell } from 'electron'
 import { startCore, stopCore } from './core'
 import { startGui } from './gui'
+import { applyLaunchOptions, initLaunchOptions } from './launch'
 
 if (app.requestSingleInstanceLock()) {
   app.whenReady().then(() => {
@@ -13,7 +14,8 @@ if (app.requestSingleInstanceLock()) {
         : join(app.getAppPath(), 'src', 'main', 'core', 'db', 'migrations'),
       trash: (path) => shell.trashItem(path)
     })
-    startGui()
+    startGui(applyLaunchOptions)
+    initLaunchOptions()
   })
   app.on('will-quit', stopCore)
 } else {

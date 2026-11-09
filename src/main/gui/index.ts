@@ -1,5 +1,6 @@
 import { app } from 'electron'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
+import type { LaunchOptions } from '@/shared/model/launchOptions'
+import { optimizer } from '@electron-toolkit/utils'
 import { initAbout } from './about'
 import { registerIpcHandlers } from './ipc'
 import { openMainWindow } from './mainWindow'
@@ -7,13 +8,16 @@ import { initMiniTimer } from './miniTimer'
 import { initQuickStart } from './quickStart'
 import { initQuit } from './quit'
 import { initShortcuts } from './shortcuts'
+import { initTaskbar } from './taskbar'
 import { initTheme } from './theme'
 import { initTray } from './tray'
 import { initUpdates } from './updates'
-import { initWindowEvents, prepareQuit } from './windows'
+import { appUserModelId, initWindowEvents, prepareQuit } from './windows'
 
-export function startGui(): void {
-  electronApp.setAppUserModelId('app.taktra')
+export { openMainWindow }
+
+export function startGui(applyLaunchOptions: (options: LaunchOptions) => void): void {
+  if (process.platform === 'win32') app.setAppUserModelId(appUserModelId)
   initWindowEvents()
   initTheme()
   registerIpcHandlers()
@@ -36,7 +40,7 @@ export function startGui(): void {
   initQuickStart()
   initShortcuts()
   initTray(openMainWindow)
+  initTaskbar(applyLaunchOptions)
 
   app.on('activate', openMainWindow)
-  app.on('second-instance', openMainWindow)
 }

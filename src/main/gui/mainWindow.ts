@@ -5,6 +5,7 @@ import icon from '../../../resources/icon.png?asset'
 import { donation } from '@/main/core'
 import { attachMiniTimer } from './miniTimer'
 import {
+  appUserModelId,
   createRendererWindow,
   hasMainWindow,
   isQuitting,
@@ -54,7 +55,7 @@ function setDevAppDetails(window: BrowserWindow): void {
   }
 
   window.setAppDetails({
-    appId: 'app.taktra',
+    appId: appUserModelId,
     appIconPath: join(app.getAppPath(), 'build', 'icon.ico'),
     relaunchCommand: `"${process.execPath}" "${app.getAppPath()}"`,
     relaunchDisplayName: app.getName()
