@@ -20,14 +20,22 @@ async function findMainWindow(app: ElectronApplication): Promise<Page> {
 }
 
 /**
- * The built app (`out/`) with its own user data folder (`userData`), and its main window. Errors
- * thrown in the window are collected, so a test can assert that a view rendered without any.
+ * The built app (`out/`) with its own user data folder (`userData`), and its main window.
+ * Errors thrown or logged in the main window are collected in `errors`; a test fails if there
+ * are any when it ends.
  */
-export const test = base.extend<{ window: Page; errors: string[]; userData: string }>({
+export const test = base.extend<{
+  errors: string[]
+  userData: string
+  electronApp: ElectronApplication
+  window: Page
+}>({
   // Playwright reads the fixtures a fixture depends on from this pattern, so it must stay.
   // eslint-disable-next-line no-empty-pattern
   errors: async ({}, provide) => {
-    await provide([])
+    const errors: string[] = []
+    await provide(errors)
+    expect(errors, 'errors in the main window').toEqual([])
   },
   // eslint-disable-next-line no-empty-pattern
   userData: async ({}, provide) => {
@@ -38,22 +46,36 @@ export const test = base.extend<{ window: Page; errors: string[]; userData: stri
       rmSync(userData, { recursive: true, force: true })
     }
   },
-  window: async ({ errors, userData }, provide) => {
+  electronApp: async ({ userData }, provide) => {
     const app = await electron.launch({
       args: ['.'],
       env: { ...process.env, TAKTRA_USER_DATA: userData }
     })
     try {
-      const window = await findMainWindow(app)
-      window.on('pageerror', (error) => errors.push(error.message))
-      window.on('console', (message) => {
-        if (message.type() === 'error') errors.push(message.text())
-      })
-      await provide(window)
+      await provide(app)
     } finally {
       await app.close()
     }
+  },
+  window: async ({ electronApp, errors }, provide) => {
+    const window = await findMainWindow(electronApp)
+    window.on('pageerror', (error) => errors.push(error.message))
+    window.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text())
+    })
+    await provide(window)
   }
 })
 
 export { expect } from '@playwright/test'
+
+export async function openSampleProfile(window: Page): Promise<void> {
+  await window.getByRole('button', { name: 'Try sample profile' }).click()
+  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
+}
+
+export async function goTo(window: Page, hash: string): Promise<void> {
+  await window.evaluate((target) => {
+    location.hash = target
+  }, hash)
+}

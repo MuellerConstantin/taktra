@@ -433,6 +433,12 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   settings and the single instance lock of the user stay untouched. The
   variable exists for this purpose only. In CI they run on a Windows runner,
   which has a desktop session.
+- **End-to-end tests rely on fixed sample facts**: The sample profile lays out
+  its entries relative to today and skips workdays at random, so tests rely only
+  on what it always contains (the team meeting on Mondays from 4 to 5 PM, empty
+  weekends) and compare totals before and after a change instead of fixed
+  values. Tests are grouped by area; a fixture fails every test that leaves
+  errors in the main window.
 
 ## Coding Principles
 
