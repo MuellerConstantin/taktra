@@ -209,6 +209,7 @@
     "switch": "Tätigkeit wechseln",
     "todayTotal": "Heute {duration}",
     "since": "Läuft seit {time}",
+    "changeStart": "Startzeit ändern, läuft seit {time}",
     "stop": "Stoppen",
     "discard": "Verwerfen",
     "addNote": "Notiz hinzufügen",
@@ -253,6 +254,15 @@
     "activityLabel": "Tätigkeit",
     "cancel": "Abbrechen",
     "start": "Starten"
+  },
+  "TimerStartDialog": {
+    "title": "Startzeit ändern",
+    "startLabel": "Start",
+    "yesterday": "Gestern",
+    "fromLastEnd": "Ab Ende des letzten Eintrags ({time})",
+    "overlap": "Der Timer überschneidet sich dann mit bereits erfasster Zeit.",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
   },
   "TimerNoteDialog": {
     "title": "Notiz",
@@ -880,6 +890,9 @@
     "ACTIVITY_ARCHIVED": "Die Tätigkeit oder ihr Projekt ist archiviert.",
     "TIME_ENTRY_NOT_FOUND": "Der Zeiteintrag existiert nicht mehr.",
     "TIME_ENTRY_RUNNING": "Ein laufender Timer kann nicht verschoben werden. Stoppe ihn zuerst.",
+    "TIMER_NOT_RUNNING": "Es läuft kein Timer.",
+    "TIMER_START_IN_FUTURE": "Der Timer kann nicht später als jetzt beginnen.",
+    "TIMER_START_TOO_EARLY": "Der Timer kann höchstens vor 24 Stunden begonnen haben.",
     "TAG_NOT_FOUND": "Der Tag existiert nicht mehr.",
     "TAG_NAME_TAKEN": "Ein Tag mit diesem Namen existiert bereits.",
     "CLIENT_NOT_FOUND": "Der Leistungsempfänger existiert nicht mehr.",

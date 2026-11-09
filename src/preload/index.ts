@@ -113,6 +113,7 @@ const api = {
   timer: {
     get: invoker('timer:get'),
     start: invoker('timer:start'),
+    setStart: invoker('timer:setStart'),
     stop: invoker('timer:stop'),
     discard: invoker('timer:discard'),
     recent: invoker('timer:recent')

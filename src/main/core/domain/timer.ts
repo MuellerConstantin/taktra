@@ -87,6 +87,31 @@ export function startTimer(activityId: number, note: string | null = null): Time
   return timer
 }
 
+const MAX_RUNNING_MS = 24 * 60 * MINUTE_MS
+
+/**
+ * Moves the start of the running timer, to the whole minute, while it keeps running. Its entry
+ * then counts towards the day of the new start. A start later than now is refused, and so is one
+ * more than a day ago, which would book a longer duration than any entry may have.
+ */
+export function setTimerStart(startedAt: Date): TimeEntryDetails {
+  const db = getActiveDatabase()
+  const entry = db.select().from(timeEntries).where(isRunning).get()
+  if (!entry) throw new AppError('TIMER_NOT_RUNNING')
+
+  const start = roundToMinute(startedAt)
+  const now = Date.now()
+  if (start.getTime() > now) throw new AppError('TIMER_START_IN_FUTURE')
+  if (now - start.getTime() > MAX_RUNNING_MS) throw new AppError('TIMER_START_TOO_EARLY')
+
+  db.update(timeEntries)
+    .set({ startedAt: start, date: toLocalDate(start) })
+    .where(eq(timeEntries.id, entry.id))
+    .run()
+  emit('signal:timer')
+  return getRunningTimer()!
+}
+
 export function stopTimer(): void {
   const db = getActiveDatabase()
   db.transaction(() => stopRunning(new Date()))

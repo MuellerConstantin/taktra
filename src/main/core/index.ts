@@ -144,6 +144,7 @@ export const timer = {
   get: timerModule.getRunningTimer,
   isRunning: timerModule.hasRunningTimer,
   start: notifying(timerModule.startTimer),
+  setStart: notifying(timerModule.setTimerStart),
   stop: notifying(timerModule.stopTimer),
   discard: notifying(timerModule.discardTimer),
   recentActivities: timerModule.listRecentActivities

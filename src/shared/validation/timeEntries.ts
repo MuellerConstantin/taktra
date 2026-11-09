@@ -13,7 +13,7 @@ const timezone = z.string().refine((value) => {
   }
 }, 'Invalid timezone')
 
-const validDate = z.date().refine((value) => !Number.isNaN(value.getTime()), 'Invalid date')
+export const validDate = z.date().refine((value) => !Number.isNaN(value.getTime()), 'Invalid date')
 
 export const note = z.string().trim().max(MAX_NOTE_LENGTH).transform(emptyToNull).nullable()
 

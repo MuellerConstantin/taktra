@@ -140,6 +140,7 @@ export interface IpcContract {
 
   'timer:get': () => TimeEntryDetails | null
   'timer:start': (activityId: number, note?: string) => TimeEntryDetails
+  'timer:setStart': (startedAt: Date) => TimeEntryDetails
   'timer:stop': () => void
   'timer:discard': () => void
   'timer:recent': (limit: number) => ActivityDetails[]

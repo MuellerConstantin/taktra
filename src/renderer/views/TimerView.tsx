@@ -18,6 +18,7 @@ import { ExpandableNote } from '@/renderer/components/molecules/Note'
 import { StartTimerDialog } from '@/renderer/components/molecules/timer/StartTimerDialog'
 import { TagBadges } from '@/renderer/components/molecules/tags/TagBadges'
 import { TimerNoteDialog } from '@/renderer/components/molecules/timer/TimerNoteDialog'
+import { TimerStartDialog } from '@/renderer/components/molecules/timer/TimerStartDialog'
 import { ViewHeader } from '@/renderer/components/molecules/ViewHeader'
 import { useErrorMessage } from '@/renderer/hooks/useErrorMessage'
 import { useNow } from '@/renderer/hooks/useNow'
@@ -44,6 +45,7 @@ function TimerView(): React.JSX.Element {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isDiscardOpen, setDiscardOpen] = useState(false)
   const [noteEntry, setNoteEntry] = useState<TimeEntry | null>(null)
+  const [isStartOpen, setStartOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const todayDate = today(getLocalTimeZone())
@@ -147,9 +149,17 @@ function TimerView(): React.JSX.Element {
                     {t('addNote')}
                   </Button>
                 )}
-                <span className="text-xs text-muted-foreground">
+                <Button
+                  variant="icon"
+                  aria-label={t('changeStart', {
+                    time: timeFormatter.format(running.entry.startedAt)
+                  })}
+                  onPress={() => setStartOpen(true)}
+                  className="gap-1 px-2 text-xs"
+                >
                   {t('since', { time: timeFormatter.format(running.entry.startedAt) })}
-                </span>
+                  <RiPencilLine className="size-3.5" />
+                </Button>
               </div>
               <div className="flex gap-2">
                 <Button onPress={() => run(stop)} shortcut={appShortcuts.stopTimer}>
@@ -233,6 +243,9 @@ function TimerView(): React.JSX.Element {
         </section>
       </div>
       {isDialogOpen && <StartTimerDialog onClose={() => setDialogOpen(false)} />}
+      {isStartOpen && running && (
+        <TimerStartDialog running={running} onClose={() => setStartOpen(false)} />
+      )}
       {noteEntry && (
         <TimerNoteDialog
           entryId={noteEntry.id}

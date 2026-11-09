@@ -175,6 +175,7 @@
     "switch": "Switch activity",
     "todayTotal": "Today {duration}",
     "since": "Running since {time}",
+    "changeStart": "Change start time, running since {time}",
     "stop": "Stop",
     "discard": "Discard",
     "addNote": "Add note",
@@ -219,6 +220,15 @@
     "activityLabel": "Activity",
     "cancel": "Cancel",
     "start": "Start"
+  },
+  "TimerStartDialog": {
+    "title": "Change start time",
+    "startLabel": "Start",
+    "yesterday": "Yesterday",
+    "fromLastEnd": "From the end of the last entry ({time})",
+    "overlap": "The timer then overlaps with time already tracked.",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "TimerNoteDialog": {
     "title": "Note",
@@ -846,6 +856,9 @@
     "ACTIVITY_ARCHIVED": "The activity or its project is archived.",
     "TIME_ENTRY_NOT_FOUND": "The time entry no longer exists.",
     "TIME_ENTRY_RUNNING": "A running timer cannot be moved. Stop it first.",
+    "TIMER_NOT_RUNNING": "No timer is running.",
+    "TIMER_START_IN_FUTURE": "The timer cannot start later than now.",
+    "TIMER_START_TOO_EARLY": "The timer can start at most 24 hours ago.",
     "TAG_NOT_FOUND": "The tag no longer exists.",
     "TAG_NAME_TAKEN": "A tag with this name already exists.",
     "CLIENT_NOT_FOUND": "The client no longer exists.",

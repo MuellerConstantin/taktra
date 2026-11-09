@@ -10,6 +10,10 @@ Because you only work on one thing at a time. When you start something new, the 
 
 Taktra books whole minutes. Start and end are rounded to the minute, and at least one minute is booked. In return, two timers in a row meet without a gap.
 
+## I started the timer too late. What now?
+
+Move its start back; it simply keeps running. The start cannot be later than now and at most 24 hours ago. If it lies before midnight, the entry counts towards the previous day.
+
 ## How do I start a timer without opening Taktra?
 
 With the quick start: press the [shortcut](#/settings/controls), search an activity, press Enter.

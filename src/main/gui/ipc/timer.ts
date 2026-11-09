@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { id, note } from '@/shared/validation'
+import { id, note, validDate } from '@/shared/validation'
 import { timer } from '@/main/core'
 import { handle } from './handle'
 
@@ -8,6 +8,7 @@ export function registerTimerHandlers(): void {
   handle('timer:start', z.tuple([id, note.optional()]), (_, activityId, timerNote) =>
     timer.start(activityId, timerNote)
   )
+  handle('timer:setStart', z.tuple([validDate]), (_, startedAt) => timer.setStart(startedAt))
   handle('timer:stop', z.tuple([]), () => timer.stop())
   handle('timer:discard', z.tuple([]), () => timer.discard())
   handle('timer:recent', z.tuple([id.max(50)]), (_, limit) => timer.recentActivities(limit))

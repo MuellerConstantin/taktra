@@ -300,8 +300,9 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   timezone they were recorded in, and each entry stores the local date it
   counts towards. Reports sum durations only, however an entry was recorded.
 - **Running timer persisted in the database**: A running timer is an entry
-  without an end, so it survives crashes and restarts. Only its note can be
-  edited while it runs, and it is stopped before the active profile changes.
+  without an end, so it survives crashes and restarts. While it runs, only its
+  note and its start can be changed, the start to a whole minute no later than
+  now and at most a day ago; it is stopped before the active profile changes.
 - **Archive instead of delete**: Anything with booked time is archived, never
   deleted, so historic reports stay complete.
 - **Text length limits on three levels**: Inputs set `maxLength`, the Zod

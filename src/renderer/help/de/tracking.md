@@ -10,6 +10,10 @@ Weil du nur an einer Sache gleichzeitig arbeitest. Startest du etwas Neues, stop
 
 Taktra bucht ganze Minuten. Start und Ende werden auf die Minute gerundet, mindestens eine Minute wird gebucht. Dafür schließen zwei Timer direkt hintereinander lückenlos aneinander an.
 
+## Ich habe den Timer zu spät gestartet. Was nun?
+
+Verlege seinen Start nach vorn, er läuft dabei einfach weiter. Der Start kann nicht später als jetzt liegen und höchstens 24 Stunden zurück. Liegt er vor Mitternacht, zählt der Eintrag zum Vortag.
+
 ## Wie starte ich einen Timer, ohne Taktra zu öffnen?
 
 Mit dem Schnellstart: [Tastenkürzel](#/settings/controls) drücken, Tätigkeit suchen, Enter.
