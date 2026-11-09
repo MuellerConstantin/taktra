@@ -49,7 +49,10 @@ machine, and your data is a plain file you own.
 - Projects, activities and tags; recurring work is simply the same activity booked again
 - Clients to see who the work is for
 - Time entries with start and end, as a plain duration or by a start/stop timer, with Markdown notes
-- Quick start from the tray or a global shortcut, and an always-on-top mini timer
+- A week calendar to draw, move and resize entries with the mouse or the keyboard, and untracked
+  gaps that are booked with a click
+- Quick start from the tray or a global shortcut, recently used activities in the Windows taskbar,
+  and an always-on-top mini timer
 - Reports by project, client and tag over any period
 - Custom fields on projects, clients and activities, e.g. an order number or a cost center
 - Export to CSV, JSON or Excel in a stable format for billing and other tools, with the columns
@@ -63,14 +66,14 @@ machine, and your data is a plain file you own.
 
 <table>
   <tr>
-    <td width="33%"><a href="./docs/screenshots/entries.png"><img alt="Entries of one day as a timeline" src="./docs/screenshots/entries.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/entries.png"><img alt="Entries of a week as a calendar" src="./docs/screenshots/entries.png"></a></td>
     <td width="33%"><a href="./docs/screenshots/reports.png"><img alt="Reports with the tracked time per day" src="./docs/screenshots/reports.png"></a></td>
     <td width="33%"><a href="./docs/screenshots/export.png"><img alt="Export as a monthly time sheet with a preview of the file" src="./docs/screenshots/export.png"></a></td>
   </tr>
   <tr>
     <td width="33%"><a href="./docs/screenshots/projects.png"><img alt="Projects of the sample profile" src="./docs/screenshots/projects.png"></a></td>
     <td width="33%"><a href="./docs/screenshots/quick-start.png"><img alt="Quick start window" src="./docs/screenshots/quick-start.png"></a></td>
-    <td width="33%"><a href="./docs/screenshots/entries-dark.png"><img alt="Entries in the dark theme" src="./docs/screenshots/entries-dark.png"></a></td>
+    <td width="33%"><a href="./docs/screenshots/entries-dark.png"><img alt="Entries of one day with untracked gaps in the dark theme" src="./docs/screenshots/entries-dark.png"></a></td>
   </tr>
 </table>
 
