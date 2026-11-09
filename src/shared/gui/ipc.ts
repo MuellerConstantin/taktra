@@ -134,6 +134,7 @@ export interface IpcContract {
   'timeEntries:list': (filter: TimeEntryFilter) => TimeEntryDetails[]
   'timeEntries:create': (input: TimeEntryInput) => TimeEntry
   'timeEntries:update': (id: number, input: TimeEntryInput) => TimeEntry
+  'timeEntries:moveToDay': (id: number, date: string) => TimeEntry
   'timeEntries:note': (id: number, note: string) => void
   'timeEntries:delete': (id: number) => void
 

@@ -1,3 +1,4 @@
+import { fromDate, parseDate, toCalendarDateTime } from '@internationalized/date'
 import { and, asc, eq, gte, lte, type SQL } from 'drizzle-orm'
 import { z } from 'zod'
 import { AppError, invalidInput } from '@/shared/model/errors'
@@ -119,6 +120,39 @@ export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
     if (previous.activityId !== entry.activityId) deleteActivityIfUnused(previous.activityId)
     return entry
   })
+}
+
+/**
+ * Moves an entry to another day. Its clock times stay the same in the timezone it was recorded
+ * in, also across a change to or from daylight saving time.
+ */
+export function moveTimeEntryToDay(id: number, date: string): TimeEntry {
+  const entry = findTimeEntry(id)
+  if (entry.startedAt !== null && entry.endedAt === null)
+    throw new AppError('TIME_ENTRY_RUNNING', String(id))
+
+  const days = parseDate(date).compare(parseDate(entry.date))
+  const timezone = entry.timezone ?? 'UTC'
+  const shift = (time: Date): Date =>
+    toCalendarDateTime(fromDate(time, timezone)).add({ days }).toDate(timezone)
+  const times =
+    entry.startedAt && entry.endedAt
+      ? {
+          startedAt: shift(entry.startedAt),
+          endedAt: shift(entry.endedAt)
+        }
+      : {}
+  const durationSec =
+    times.startedAt && times.endedAt
+      ? Math.round((times.endedAt.getTime() - times.startedAt.getTime()) / 1000)
+      : entry.durationSec
+
+  return getActiveDatabase()
+    .update(timeEntries)
+    .set({ date, ...times, durationSec })
+    .where(eq(timeEntries.id, id))
+    .returning(timeEntrySelection)
+    .get()
 }
 
 export function setTimeEntryNote(id: number, note: string | null): void {

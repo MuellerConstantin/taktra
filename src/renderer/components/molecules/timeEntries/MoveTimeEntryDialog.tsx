@@ -1,16 +1,14 @@
 import {
   DateFormatter,
-  fromDate,
   getLocalTimeZone,
   parseDate,
-  toCalendarDateTime,
   type CalendarDate
 } from '@internationalized/date'
 import { useState } from 'react'
 import { Form, useLocale } from 'react-aria-components'
 import { useNavigate } from 'react-router'
 import { useTranslations } from 'use-intl'
-import type { TimeEntry, TimeEntryDetails, TimeEntryInput } from '@/shared/model/timeEntries'
+import type { TimeEntryDetails } from '@/shared/model/timeEntries'
 import { useErrorMessage } from '@/renderer/hooks/useErrorMessage'
 import { api } from '@/renderer/lib/api'
 import { toastQueue } from '@/renderer/lib/toasts'
@@ -20,18 +18,6 @@ import { Dialog, DialogHeading } from '@/renderer/components/atoms/Dialog'
 import { Modal } from '@/renderer/components/atoms/Modal'
 
 const TOAST_TIMEOUT = 8000
-
-/** The entry on another day, at the clock times of the timezone it was recorded in. */
-function movedEntry(entry: TimeEntry, date: CalendarDate): TimeEntryInput {
-  const base = { activityId: entry.activityId, date: date.toString(), note: entry.note }
-  if (!entry.startedAt || !entry.endedAt) return { ...base, durationSec: entry.durationSec ?? 0 }
-
-  const timezone = entry.timezone ?? getLocalTimeZone()
-  const days = date.compare(parseDate(entry.date))
-  const shift = (time: Date): Date =>
-    toCalendarDateTime(fromDate(time, timezone)).add({ days }).toDate(timezone)
-  return { ...base, startedAt: shift(entry.startedAt), endedAt: shift(entry.endedAt), timezone }
-}
 
 interface MoveTimeEntryDialogProps {
   readonly details: TimeEntryDetails
@@ -66,7 +52,7 @@ export function MoveTimeEntryDialog({
     setPending(true)
     setError(null)
     try {
-      await api.timeEntries.update(entry.id, movedEntry(entry, date))
+      await api.timeEntries.moveToDay(entry.id, date.toString())
       onMoved()
       onClose()
       toastQueue.add(

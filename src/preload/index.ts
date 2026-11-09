@@ -106,6 +106,7 @@ const api = {
     list: invoker('timeEntries:list'),
     create: invoker('timeEntries:create'),
     update: invoker('timeEntries:update'),
+    moveToDay: invoker('timeEntries:moveToDay'),
     setNote: invoker('timeEntries:note'),
     delete: invoker('timeEntries:delete')
   },

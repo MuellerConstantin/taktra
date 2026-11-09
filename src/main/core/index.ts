@@ -135,6 +135,7 @@ export const timeEntries = {
   list: timeEntriesModule.listTimeEntries,
   create: notifying(timeEntriesModule.createTimeEntry),
   update: notifying(timeEntriesModule.updateTimeEntry),
+  moveToDay: notifying(timeEntriesModule.moveTimeEntryToDay),
   setNote: notifying(timeEntriesModule.setTimeEntryNote),
   delete: notifying(timeEntriesModule.deleteTimeEntry)
 } as const
