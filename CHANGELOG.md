@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Time tracking shows a week or a work week as a calendar, with the calendar week next to the
+  dates. A day opens from its header.
+- In the week calendar, entries are drawn by dragging on a free spot, moved by dragging, also to
+  another day, and made longer or shorter at their edges. They snap to quarter hours and to
+  neighbouring entries; holding Alt moves them by the minute. While an entry is moved, the edges of
+  the calendar switch to the previous or next week, the calendar scrolls along at its top and
+  bottom, and a label beside the pointer shows the week, day and time it lands on.
+- A focused calendar entry moves by a quarter hour with the arrow keys, by a day with left and
+  right, and changes its end with Shift and the arrow keys.
+- Clicking an untracked gap in the day view books it, with its start and end filled in.
+- An entry moves to another day from the menu of its row, keeping its clock times. A message
+  leads to the day it moved to.
+- The start of a running timer can be moved back, for example to the end of the last entry, while
+  the timer keeps running.
+- On Windows, right-clicking Taktra in the taskbar starts a recently used activity or stops the
+  running timer, with a dot in the color of its project.
+
+### Changed
+
+- Reports show shares below one percent as <1 % instead of 0 %.
+- Toggle button groups look like one segmented control.
+- Views show changes made in another window, such as the quick start, right away.
+
 ## [0.5.0] - 2026-10-20
 
 ### Added
