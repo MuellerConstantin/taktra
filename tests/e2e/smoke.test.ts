@@ -1,3 +1,4 @@
+import type { Locator, Page } from '@playwright/test'
 import { expect, test } from './app'
 
 const views = [
@@ -105,73 +106,96 @@ test('books a gap between two entries', async ({ window, errors }) => {
   expect(errors).toEqual([])
 })
 
-test('drags entries in the week calendar', async ({ window, errors }) => {
-  await window.setViewportSize({ width: 1200, height: 800 })
+const hourHeight = 64
+
+/** The duration a day header of the week calendar shows, in minutes. */
+async function totalOf(dayButton: Locator): Promise<number> {
+  const [hours, minutes] = (await dayButton.locator('span').last().textContent())!
+    .split(':')
+    .map(Number)
+  return hours * 60 + minutes
+}
+
+async function drag(
+  window: Page,
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+): Promise<void> {
+  await window.mouse.move(from.x, from.y)
+  await window.mouse.down()
+  await window.mouse.move(from.x, from.y + 5)
+  await window.mouse.move(to.x, to.y, { steps: 5 })
+  await window.mouse.up()
+}
+
+/**
+ * Opens a past week of the sample profile in the calendar whose Monday has the team meeting from
+ * 4 to 5 PM. The sample data are laid out relative to today and skip a few workdays at random, so
+ * the calendar tests rely on this meeting and on empty weekends only.
+ */
+async function openWeekWithTeamMeeting(window: Page): Promise<Locator> {
   await window.getByRole('button', { name: 'Try sample profile' }).click()
   await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
   await window.evaluate(() => {
     location.hash = '#/tracking?range=week'
   })
-  await window.getByRole('button', { name: 'Previous week' }).click()
-
-  const drag = async (
-    from: { x: number; y: number },
-    to: { x: number; y: number }
-  ): Promise<void> => {
-    await window.mouse.move(from.x, from.y)
-    await window.mouse.down()
-    await window.mouse.move(from.x, from.y + 5)
-    await window.mouse.move(to.x, to.y, { steps: 5 })
-    await window.mouse.up()
-  }
-  const hourHeight = 64
-
   const meeting = window.getByRole('button', { name: /^Team Meeting, Internal, 4:00 PM/ })
-  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
-  await expect(meeting).toBeVisible()
-  await meeting.scrollIntoViewIfNeeded()
+  for (let weeks = 1; weeks <= 4; weeks++) {
+    const heading = await window.getByRole('heading').first().textContent()
+    await window.getByRole('button', { name: 'Previous week' }).click()
+    await expect(window.getByRole('heading').first()).not.toHaveText(heading!)
+    await expect(window.locator('[data-entry-id]').first()).toBeVisible()
+    if ((await meeting.count()) > 0) return meeting
+  }
+  throw new Error('No week with a team meeting in the sample profile')
+}
+
+test('drags entries in the week calendar', async ({ window, errors }) => {
+  await window.setViewportSize({ width: 1200, height: 800 })
+  const meeting = await openWeekWithTeamMeeting(window)
+
+  await meeting.evaluate((element) => element.scrollIntoView({ block: 'center' }))
   const meetingBox = (await meeting.boundingBox())!
   const meetingCenter = { x: meetingBox.x + meetingBox.width / 2, y: meetingBox.y + 20 }
-  await drag(meetingCenter, { x: meetingCenter.x, y: meetingCenter.y - hourHeight })
-  await expect(
-    window.getByRole('button', { name: 'Team Meeting, Internal, 3:00 PM – 4:00 PM, 1:00' })
-  ).toBeVisible()
+  await drag(window, meetingCenter, { x: meetingCenter.x, y: meetingCenter.y + hourHeight })
+  const later = window.getByRole('button', {
+    name: 'Team Meeting, Internal, 5:00 PM – 6:00 PM, 1:00'
+  })
+  await expect(later).toBeVisible()
   await expect(window.getByRole('dialog')).toBeHidden()
 
-  const triage = window.getByRole('button', { name: /^Issue Triage, Open Source, 9:15 AM/ }).first()
-  await triage.scrollIntoViewIfNeeded()
-  const triageBox = (await triage.boundingBox())!
-  const triageBottom = {
-    x: triageBox.x + triageBox.width / 2,
-    y: triageBox.y + triageBox.height - 2
-  }
-  await drag(triageBottom, { x: triageBottom.x, y: triageBottom.y + hourHeight / 4 })
-  await expect(
-    window.getByRole('button', { name: 'Issue Triage, Open Source, 9:15 AM – 11:30 AM, 2:15' })
-  ).toBeVisible()
+  await later.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  const laterBox = (await later.boundingBox())!
+  const laterTop = { x: laterBox.x + laterBox.width / 2, y: laterBox.y + 2 }
+  await drag(window, laterTop, { x: laterTop.x, y: laterTop.y - hourHeight / 4 })
+  const longer = window.getByRole('button', {
+    name: 'Team Meeting, Internal, 4:45 PM – 6:00 PM, 1:15'
+  })
+  await expect(longer).toBeVisible()
 
   const sunday = window.getByRole('button', { name: /^Show Sunday/ })
   const sundayX = (await sunday.boundingBox())!.x + 20
-  const moved = window.getByRole('button', { name: /^Team Meeting, Internal, 3:00 PM/ })
-  await moved.scrollIntoViewIfNeeded()
-  const movedBox = (await moved.boundingBox())!
+  await longer.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  const longerBox = (await longer.boundingBox())!
   await drag(
-    { x: movedBox.x + movedBox.width / 2, y: movedBox.y + 20 },
-    { x: sundayX, y: movedBox.y + 20 }
+    window,
+    { x: longerBox.x + longerBox.width / 2, y: longerBox.y + 30 },
+    { x: sundayX, y: longerBox.y + 30 }
   )
-  await expect(sunday).toContainText('1:00')
+  await expect.poll(() => totalOf(sunday)).toBe(75)
 
-  const standup = window.getByRole('button', { name: /^Daily Standup, / }).first()
-  await standup.scrollIntoViewIfNeeded()
-  const nine = (await standup.boundingBox())!.y + 3
-  await drag({ x: sundayX, y: nine + hourHeight }, { x: sundayX, y: nine + hourHeight * 2.5 })
+  const ten = window.getByText('10 AM', { exact: true })
+  await ten.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  const tenBox = (await ten.boundingBox())!
+  const tenY = tenBox.y + tenBox.height / 2 + 3
+  await drag(window, { x: sundayX, y: tenY }, { x: sundayX, y: tenY + hourHeight * 1.5 })
   const dialog = window.getByRole('dialog')
   await expect(dialog.getByRole('heading', { name: 'New entry' })).toBeVisible()
   await expect(dialog.getByRole('group', { name: 'Start' })).toContainText('10:00')
   await expect(dialog.getByRole('group', { name: 'End' })).toContainText('11:30')
   await dialog.getByRole('button', { name: 'Cancel' }).click()
 
-  await window.getByRole('button', { name: /^Team Meeting, Internal, 3:00 PM/ }).click()
+  await longer.click()
   await expect(dialog.getByRole('heading', { name: 'Edit entry' })).toBeVisible()
   expect(errors).toEqual([])
 })
@@ -206,70 +230,56 @@ test('moves an entry to another day', async ({ window, errors }) => {
 
 test('scrolls and switches the week while dragging', async ({ window, errors }) => {
   await window.setViewportSize({ width: 1000, height: 700 })
-  await window.getByRole('button', { name: 'Try sample profile' }).click()
-  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
-  await window.evaluate(() => {
-    location.hash = '#/tracking?range=week'
-  })
-  await window.getByRole('button', { name: 'Previous week' }).click()
-  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  const meeting = await openWeekWithTeamMeeting(window)
+  const shownWeek = await window.getByRole('heading').first().textContent()
   const monday = window.getByRole('button', { name: /^Show Monday/ })
-  await expect(monday).toContainText('7:30')
+  const mondayTotal = await totalOf(monday)
 
-  const standup = window.getByRole('button', { name: /^Daily Standup, / }).first()
-  await standup.scrollIntoViewIfNeeded()
-  const standupBox = (await standup.boundingBox())!
-  const viewport = window.viewportSize()!
-  const scrollTop = (): Promise<number> =>
+  const calendarScroll = (): Promise<number> =>
     window.evaluate(
       () => document.querySelector('[data-entry-id]')!.closest('.overflow-y-auto')!.scrollTop
     )
-  const before = await scrollTop()
-  await window.mouse.move(standupBox.x + 20, standupBox.y + 5)
+  await window.evaluate(() => {
+    document.querySelector('[data-entry-id]')!.closest('.overflow-y-auto')!.scrollTop = 0
+  })
+  const sundayX = (await window.getByRole('button', { name: /^Show Sunday/ }).boundingBox())!.x + 20
+  const nineBox = (await window.getByText('9 AM', { exact: true }).boundingBox())!
+  await window.mouse.move(sundayX, nineBox.y + nineBox.height / 2 + 3)
   await window.mouse.down()
-  await window.mouse.move(standupBox.x + 20, viewport.height - 5, { steps: 10 })
-  await expect.poll(scrollTop).toBeGreaterThan(before + 50)
+  await window.mouse.move(sundayX, window.viewportSize()!.height - 5, { steps: 10 })
+  await expect.poll(calendarScroll).toBeGreaterThan(50)
   await window.keyboard.press('Escape')
   await window.mouse.up()
 
-  const meeting = window.getByRole('button', { name: /^Team Meeting, Internal, 4:00 PM/ })
-  await meeting.scrollIntoViewIfNeeded()
+  await meeting.evaluate((element) => element.scrollIntoView({ block: 'center' }))
   const meetingBox = (await meeting.boundingBox())!
   await window.mouse.move(meetingBox.x + 20, meetingBox.y + 10)
   await window.mouse.down()
   await window.mouse.move(meetingBox.x + 10, meetingBox.y + 10, { steps: 3 })
   const targetWeek = (await window.locator('[data-week-edge="previous"]').textContent())!
-  await window.mouse.move(
-    10 + (await window.getByRole('main').boundingBox())!.x,
-    meetingBox.y + 10,
-    {
-      steps: 5
-    }
-  )
-  await expect(window.getByRole('heading', { name: /^Week of / })).toBeVisible()
+  const left = (await window.getByRole('main').boundingBox())!.x + 10
+  await window.mouse.move(left, meetingBox.y + 10, { steps: 5 })
+  await expect(window.getByRole('heading').first()).not.toHaveText(shownWeek!)
   await expect(window.locator('span.fixed').getByText(targetWeek, { exact: true })).toBeVisible()
   const sunday = window.getByRole('button', { name: /^Show Sunday/ })
   const sundayBox = (await sunday.boundingBox())!
   await window.mouse.move(sundayBox.x + 20, meetingBox.y + 10, { steps: 5 })
   await window.mouse.up()
-  await expect(sunday).toContainText('1:00')
+  await expect.poll(() => totalOf(sunday)).toBe(60)
 
   await window.getByRole('button', { name: 'Next week' }).click()
-  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
-  await expect(monday).toContainText('6:30')
+  await expect(window.getByRole('heading').first()).toHaveText(shownWeek!)
+  await expect.poll(() => totalOf(monday)).toBe(mondayTotal - 60)
   expect(errors).toEqual([])
 })
 
 test('moves a calendar entry with the keyboard', async ({ window, errors }) => {
-  await window.getByRole('button', { name: 'Try sample profile' }).click()
-  await expect(window.getByRole('button', { name: 'Try sample profile' })).toBeHidden()
-  await window.evaluate(() => {
-    location.hash = '#/tracking?range=week'
-  })
-  await window.getByRole('button', { name: 'Previous week' }).click()
-  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  const meeting = await openWeekWithTeamMeeting(window)
+  const shownWeek = await window.getByRole('heading').first().textContent()
+  const tuesday = window.getByRole('button', { name: /^Show Tuesday/ })
+  const tuesdayTotal = await totalOf(tuesday)
 
-  await window.getByRole('button', { name: /^Team Meeting, Internal, 4:00 PM/ }).focus()
+  await meeting.focus()
   await window.keyboard.press('ArrowUp')
   await window.keyboard.press('Shift+ArrowDown')
   await window.keyboard.press('ArrowRight')
@@ -277,10 +287,10 @@ test('moves a calendar entry with the keyboard', async ({ window, errors }) => {
     name: 'Team Meeting, Internal, 3:45 PM – 5:00 PM, 1:15'
   })
   await expect(moved).toBeFocused()
-  await expect(window.getByRole('button', { name: /^Show Tuesday/ })).toContainText('8:30')
-  await expect(window.getByRole('heading', { name: 'Last week' })).toBeVisible()
+  await expect.poll(() => totalOf(tuesday)).toBe(tuesdayTotal + 75)
+  await expect(window.getByRole('heading').first()).toHaveText(shownWeek!)
 
-  await window.getByRole('button', { name: /^Show Tuesday/ }).click()
+  await tuesday.click()
   await expect(window.getByRole('row', { name: /Team Meeting/ })).toContainText('3:45 PM')
   expect(errors).toEqual([])
 })
