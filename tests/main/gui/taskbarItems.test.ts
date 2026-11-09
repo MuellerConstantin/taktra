@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ActivityDetails, TimeEntryDetails } from '@/shared/model/timeEntries'
-import { taskbarItems } from '@/main/gui/taskbarItems'
+import { NO_PROJECT_COLOR, taskbarItems } from '@/main/gui/taskbarItems'
 
 function activity(id: number, name: string): ActivityDetails {
   return {
@@ -41,9 +41,20 @@ describe('taskbar items', () => {
 
     expect(taskbarItems('de', running(meeting), [meeting, activity(4, 'Review')])).toEqual({
       recentTitle: 'Zuletzt verwendet',
-      recent: [{ title: 'Review – Internal', options: { startActivity: 4 } }],
+      recent: [
+        { title: 'Review – Internal', options: { startActivity: 4 }, color: NO_PROJECT_COLOR }
+      ],
       stop: { title: 'Meeting – Internal stoppen', options: { stopTimer: true } }
     })
+  })
+
+  it('shows the project color of an activity to start', () => {
+    const colored = {
+      ...activity(5, 'Design'),
+      project: { id: 2, name: 'Web', color: '#22c55e', archivedAt: null }
+    }
+
+    expect(taskbarItems('en', null, [colored]).recent[0].color).toBe('#22c55e')
   })
 
   it('offers at most five recent activities', () => {

@@ -1,14 +1,18 @@
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   app,
   Menu,
+  nativeImage,
   type JumpListCategory,
   type JumpListItem,
-  type MenuItemConstructorOptions
+  type MenuItemConstructorOptions,
+  type NativeImage
 } from 'electron'
 import { isAppError } from '@/shared/model/errors'
 import { events, settings, timer } from '@/main/core'
 import { toLaunchArgs, type LaunchOptions } from '@/shared/model/launchOptions'
+import { DOT_ICON_SIZE, colorDotPixels, icoFromPng } from './colorDot'
 import {
   RECENT_IN_TASKBAR,
   taskbarItems,
@@ -28,17 +32,52 @@ function readItems(): TaskbarItems {
   }
 }
 
-function toTask({ title, options }: TaskbarItem): JumpListItem {
+function colorDot(color: string, scaleFactor = 1): NativeImage {
+  return nativeImage.createFromBitmap(colorDotPixels(color), {
+    width: DOT_ICON_SIZE,
+    height: DOT_ICON_SIZE,
+    scaleFactor
+  })
+}
+
+function dotIconFolder(): string {
+  return join(app.getPath('userData'), 'jumplist-icons')
+}
+
+/**
+ * Windows keeps jump list icons in its cache, so a file is named by its color: a project that gets
+ * another color gets another file instead of an old dot from the cache.
+ */
+function dotIconPath(color: string): string {
+  const path = join(dotIconFolder(), `${color.slice(1)}.ico`)
+  if (!existsSync(path)) {
+    mkdirSync(dotIconFolder(), { recursive: true })
+    writeFileSync(path, icoFromPng(colorDot(color).toPNG()))
+  }
+  return path
+}
+
+function removeUnusedDotIcons(items: readonly TaskbarItem[]): void {
+  if (!existsSync(dotIconFolder())) return
+  const used = new Set(items.flatMap(({ color }) => (color ? [`${color.slice(1)}.ico`] : [])))
+  for (const file of readdirSync(dotIconFolder()))
+    if (!used.has(file)) rmSync(join(dotIconFolder(), file), { force: true })
+}
+
+function toTask({ title, options, color }: TaskbarItem): JumpListItem {
   // Unpackaged, Electron itself is the program: it needs the app's folder as first argument, and
   // its own icon would stand beside every entry.
   const appArg = process.defaultApp ? `"${app.getAppPath()}" ` : ''
+  const appIcon = process.defaultApp
+    ? join(app.getAppPath(), 'build', 'icon.ico')
+    : process.execPath
   return {
     type: 'task',
     title,
     description: title,
     program: process.execPath,
     args: `${appArg}${toLaunchArgs(options).join(' ')}`,
-    iconPath: process.defaultApp ? join(app.getAppPath(), 'build', 'icon.ico') : process.execPath,
+    iconPath: color ? dotIconPath(color) : appIcon,
     iconIndex: 0
   }
 }
@@ -48,6 +87,7 @@ function toTask({ title, options }: TaskbarItem): JumpListItem {
 let isCustomCategoryRefused = false
 
 function updateJumpList({ recentTitle, recent, stop }: TaskbarItems): void {
+  removeUnusedDotIcons(recent)
   if (recent.length === 0 && !stop) {
     app.setJumpList(null)
     return
@@ -68,8 +108,10 @@ function updateDockMenu(
   { recent, stop }: TaskbarItems,
   apply: (options: LaunchOptions) => void
 ): void {
-  const toItem = ({ title, options }: TaskbarItem): MenuItemConstructorOptions => ({
+  const toItem = ({ title, options, color }: TaskbarItem): MenuItemConstructorOptions => ({
     label: title,
+    // Twice the size at a scale factor of 2 keeps the dot sharp on Retina displays.
+    ...(color ? { icon: colorDot(color, 2) } : {}),
     click: () => apply(options)
   })
   app.dock?.setMenu(

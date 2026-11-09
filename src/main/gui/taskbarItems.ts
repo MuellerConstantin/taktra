@@ -4,9 +4,14 @@ import type { ActivityDetails, TimeEntryDetails } from '@/shared/model/timeEntri
 
 export const RECENT_IN_TASKBAR = 5
 
+/** Stands in for projects without a color, as the gray bar does in the app. */
+export const NO_PROJECT_COLOR = '#8e8a96'
+
 export interface TaskbarItem {
   readonly title: string
   readonly options: LaunchOptions
+  /** The project color of an activity to start, shown as a dot; without one, the app icon. */
+  readonly color?: string
 }
 
 export interface TaskbarItems {
@@ -45,7 +50,8 @@ export function taskbarItems(
       .slice(0, RECENT_IN_TASKBAR)
       .map((details) => ({
         title: nameOf(details),
-        options: { startActivity: details.activity.id }
+        options: { startActivity: details.activity.id },
+        color: details.project.color ?? NO_PROJECT_COLOR
       })),
     stop: running ? { title: text.stop(nameOf(running)), options: { stopTimer: true } } : null
   }
