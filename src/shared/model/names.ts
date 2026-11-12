@@ -12,6 +12,14 @@ export function toNameKey(name: string): string {
   return normalizeName(name).normalize('NFC').toLowerCase()
 }
 
+/** True when every word of the search occurs in the text, in any order and case: "rev alp" ~ "Review Alpha". */
+export function matchesSearch(text: string, search: string): boolean {
+  const key = toNameKey(text)
+  return toNameKey(search)
+    .split(' ')
+    .every((word) => key.includes(word))
+}
+
 function significantWords(name: string): Set<string> {
   return new Set(
     toNameKey(name)

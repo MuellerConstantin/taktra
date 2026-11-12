@@ -84,7 +84,8 @@ distinct values of the summed entries instead of grouping by them.
 For developers and technicians, an optional local HTTP API lets other programs
 on the same machine read and change the data of the active profile (projects,
 activities, clients, tags, custom fields and their values, entries, export
-templates), read reports, export with a template, run the timer, and follow
+templates), find activities by name, read reports, export with a template,
+run the timer and offer its recent activities, and follow
 changes as server-sent events. Profiles and app settings stay with the user. It is turned on, given a port and a key on the
 integrations page of the app settings, which will also hold further
 connections such as MCP.

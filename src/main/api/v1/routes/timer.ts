@@ -1,5 +1,6 @@
-import { createRoute, type OpenAPIHono } from '@hono/zod-openapi'
+import { createRoute, z, type OpenAPIHono } from '@hono/zod-openapi'
 import { timer } from '@/main/core'
+import { ActivityDetailsV1, toActivityDetails } from '@/main/api/v1/dto/activities'
 import {
   TimerChangeInputV1,
   TimerStartInputV1,
@@ -17,6 +18,26 @@ const get = createRoute({
   tags,
   summary: 'Get the running timer',
   responses: { 200: json(TimeEntryV1.nullable(), 'The running timer, or null'), ...errors(409) }
+})
+
+const MAX_RECENT = 50
+
+const recent = createRoute({
+  method: 'get',
+  path: '/timer/recent',
+  tags,
+  summary: 'List recently used activities',
+  description:
+    'The activities with the latest booked time, newest first, without archived ones: what the timer view offers to start again.',
+  request: {
+    query: z.object({
+      limit: z.coerce.number().int().min(1).max(MAX_RECENT).default(10)
+    })
+  },
+  responses: {
+    200: json(z.array(ActivityDetailsV1), 'The activities with their project, client and tags'),
+    ...errors(400, 409)
+  }
 })
 
 const start = createRoute({
@@ -62,6 +83,9 @@ export function registerTimerRoutes(v1: OpenAPIHono): void {
     const running = timer.get()
     return c.json(running && toTimeEntry(running), 200)
   })
+  v1.openapi(recent, (c) =>
+    c.json(timer.recentActivities(c.req.valid('query').limit).map(toActivityDetails), 200)
+  )
   v1.openapi(start, (c) => {
     const { activityId, note: timerNote } = c.req.valid('json')
     return c.json(toTimeEntry(timer.start(activityId, timerNote)), 201)

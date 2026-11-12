@@ -1,6 +1,6 @@
 import { createRoute, z, type OpenAPIHono } from '@hono/zod-openapi'
 import { AppError } from '@/shared/model/errors'
-import { activityInput } from '@/shared/validation'
+import { activityInput, activityListOptions } from '@/shared/validation'
 import { activities } from '@/main/core'
 import {
   ActivityClientInputV1,
@@ -13,6 +13,7 @@ import {
 import { NameInputV1 } from '@/main/api/v1/dto/common'
 import { json, jsonBody, noContent } from '@/main/api/openapi'
 import { errors } from '@/main/api/v1/errors'
+import { parse } from '@/main/api/parse'
 import { booleanQuery, idParams, idQuery } from '@/main/api/v1/params'
 import { registerArchiveRoutes } from './archive'
 import { fieldValuesOf, registerFieldValueRoutes } from './customFields'
@@ -33,7 +34,15 @@ const list = createRoute({
   path: '/activities',
   tags,
   summary: 'List activities',
-  request: { query: z.object({ projectId: idQuery, includeArchived: booleanQuery }) },
+  description:
+    'With search, only activities whose name and project name together contain every word of it, in any order and case.',
+  request: {
+    query: z.object({
+      projectId: idQuery,
+      includeArchived: booleanQuery,
+      search: z.string().optional().openapi({ example: 'review alpha' })
+    })
+  },
   responses: { 200: json(z.array(ActivityV1), 'The activities, sorted by name'), ...errors(400) }
 })
 
@@ -125,7 +134,7 @@ const remove = createRoute({
 export function registerActivityRoutes(v1: OpenAPIHono): void {
   v1.openapi(list, (c) => {
     const valuesOf = fieldValuesOf('activity')
-    const found = activities.list(c.req.valid('query'))
+    const found = activities.list(parse(activityListOptions, c.req.valid('query')))
     return c.json(
       found.map((activity) => toActivity(activity, valuesOf(activity.id))),
       200

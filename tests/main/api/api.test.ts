@@ -104,6 +104,16 @@ describe('reading', () => {
     expect(single).toMatchObject({ tagIds: [ids.tag], projectId: ids.project })
   })
 
+  it('searches activities by the words of their name and project name', async () => {
+    const search = async (text: string): Promise<unknown> =>
+      ((await (await request(`/api/v1/activities?search=${text}`)).json()) as { id: number }[]).map(
+        (activity) => activity.id
+      )
+    expect(await search('ALPHA%20bui')).toEqual([ids.activity])
+    expect(await search('build%20beta')).toEqual([])
+    expect(await search('')).toEqual([ids.activity])
+  })
+
   it('maps errors of the core and of the request to their status', async () => {
     const missing = await request('/api/v1/projects/999')
     expect([missing.status, await errorCode(missing)]).toEqual([404, 'PROJECT_NOT_FOUND'])
@@ -175,6 +185,19 @@ describe('timer', () => {
     const entries = (await (await request('/api/v1/time-entries')).json()) as { end: string }[]
     expect(entries).toHaveLength(1)
     expect(entries[0].end).toMatch(/Z$/)
+  })
+
+  it('lists the recently used activities with their project and tags', async () => {
+    const response = await request('/api/v1/timer/recent?limit=5')
+    expect(await response.json()).toEqual([
+      {
+        activity: { id: ids.activity, name: 'Build', archivedAt: null },
+        project: { id: ids.project, name: 'Alpha', color: null, archivedAt: null },
+        client: null,
+        tags: [{ id: ids.tag, name: 'Meeting', color: null }]
+      }
+    ])
+    expect((await request('/api/v1/timer/recent?limit=51')).status).toBe(400)
   })
 
   it('tells what is wrong with invalid input', async () => {

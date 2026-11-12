@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { Activity, ActivityTag, ActivityWithTags } from '@/shared/model/activities'
 import type { ActivityDetails } from '@/shared/model/timeEntries'
 import { AppError, invalidInput } from '@/shared/model/errors'
-import { toNameKey } from '@/shared/model/names'
+import { matchesSearch, toNameKey } from '@/shared/model/names'
 import { activityInput, activityListOptions } from '@/shared/validation'
 import { getActiveDatabase } from '@/main/core/db/database'
 import { isUniqueViolation } from '@/main/core/db/errors'
@@ -74,19 +74,35 @@ export function tagsByActivity(activityIds: readonly number[]): Map<number, Acti
 
 export function listActivities({
   projectId,
-  includeArchived = false
+  includeArchived = false,
+  search
 }: z.output<typeof activityListOptions> = {}): ActivityWithTags[] {
-  const rows = sortByName(
-    getActiveDatabase()
-      .select(activitySelection)
-      .from(activities)
-      .where(
-        and(
-          projectId === undefined ? undefined : eq(activities.projectId, projectId),
-          includeArchived ? undefined : isNull(activities.archivedAt)
-        )
+  const db = getActiveDatabase()
+  const found = db
+    .select(activitySelection)
+    .from(activities)
+    .where(
+      and(
+        projectId === undefined ? undefined : eq(activities.projectId, projectId),
+        includeArchived ? undefined : isNull(activities.archivedAt)
       )
-      .all()
+    )
+    .all()
+  const projectNames = new Map(
+    search
+      ? db
+          .select({ id: projects.id, name: projects.name })
+          .from(projects)
+          .all()
+          .map((project) => [project.id, project.name])
+      : []
+  )
+  const rows = sortByName(
+    search
+      ? found.filter((activity) =>
+          matchesSearch(`${activity.name} ${projectNames.get(activity.projectId)}`, search)
+        )
+      : found
   )
 
   const tagMap = tagsByActivity(rows.map((activity) => activity.id))
