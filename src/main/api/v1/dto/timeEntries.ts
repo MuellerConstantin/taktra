@@ -63,3 +63,17 @@ export const TimerStartInputV1 = z
   .object({ activityId: id, note: note.optional() })
   .strict()
   .openapi('TimerStartInput')
+
+export const TimerChangeInputV1 = z
+  .object({
+    start: TimestampV1.openapi({
+      description: 'Rounded to the minute; not in the future and at most a day ago.'
+    })
+  })
+  .strict()
+  .openapi('TimerChangeInput')
+
+export const TimeEntryMoveInputV1 = z
+  .object({ date: localDate.openapi({ description: 'The day to move the entry to.' }) })
+  .strict()
+  .openapi('TimeEntryMoveInput')

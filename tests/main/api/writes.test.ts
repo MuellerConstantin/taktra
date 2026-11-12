@@ -179,6 +179,69 @@ describe('time entries', () => {
     expect((await send('POST', '/timer/discard')).status).toBe(204)
     expect((await send('GET', '/timer')).json).toBeNull()
   })
+
+  it('moves an entry to another day at the same clock times', async () => {
+    const project = (await send('POST', '/projects', { name: 'Eta' })).json.id
+    const activity = (await send('POST', '/activities', { projectId: project, name: 'Plan' })).json
+      .id
+    const entryId = (
+      await send('POST', '/time-entries', {
+        activityId: activity,
+        date: '2026-03-27',
+        start: '2026-03-27T07:00:00.000Z',
+        end: '2026-03-27T08:00:00.000Z',
+        timezone: 'Europe/Berlin'
+      })
+    ).json.id
+
+    // Across the change to daylight saving time, 8 AM in Berlin is an hour earlier in UTC.
+    const moved = await send('POST', `/time-entries/${entryId}/move`, { date: '2026-03-30' })
+    expect([moved.status, moved.json]).toMatchObject([
+      200,
+      {
+        date: '2026-03-30',
+        start: '2026-03-30T06:00:00.000Z',
+        end: '2026-03-30T07:00:00.000Z',
+        durationSec: 3600
+      }
+    ])
+
+    expect((await send('POST', '/time-entries/999/move', { date: '2026-03-30' })).status).toBe(404)
+    await send('POST', '/timer/start', { activityId: activity })
+    const running = (await send('GET', '/timer')).json.id
+    const refused = await send('POST', `/time-entries/${running}/move`, { date: '2026-03-30' })
+    expect([refused.status, refused.json.error.code]).toEqual([409, 'TIME_ENTRY_RUNNING'])
+    await send('POST', '/timer/discard')
+  })
+
+  it('moves the start of the running timer back', async () => {
+    const notRunning = await send('PATCH', '/timer', { start: new Date().toISOString() })
+    expect([notRunning.status, notRunning.json.error.code]).toEqual([409, 'TIMER_NOT_RUNNING'])
+
+    const project = (await send('POST', '/projects', { name: 'Zeta' })).json.id
+    const activity = (await send('POST', '/activities', { projectId: project, name: 'Fix' })).json
+      .id
+    await send('POST', '/timer/start', { activityId: activity })
+
+    const earlier = new Date(Date.now() - 30 * 60_000)
+    earlier.setSeconds(0, 0)
+    const changed = await send('PATCH', '/timer', { start: earlier.toISOString() })
+    expect([changed.status, changed.json.start, changed.json.end]).toEqual([
+      200,
+      earlier.toISOString(),
+      null
+    ])
+
+    const future = await send('PATCH', '/timer', {
+      start: new Date(Date.now() + 3_600_000).toISOString()
+    })
+    expect([future.status, future.json.error.code]).toEqual([409, 'TIMER_START_IN_FUTURE'])
+    const tooEarly = await send('PATCH', '/timer', {
+      start: new Date(Date.now() - 2 * 86_400_000).toISOString()
+    })
+    expect([tooEarly.status, tooEarly.json.error.code]).toEqual([409, 'TIMER_START_TOO_EARLY'])
+    await send('POST', '/timer/discard')
+  })
 })
 
 describe('custom fields', () => {

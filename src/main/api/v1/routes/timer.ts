@@ -1,6 +1,11 @@
 import { createRoute, type OpenAPIHono } from '@hono/zod-openapi'
 import { timer } from '@/main/core'
-import { TimerStartInputV1, TimeEntryV1, toTimeEntry } from '@/main/api/v1/dto/timeEntries'
+import {
+  TimerChangeInputV1,
+  TimerStartInputV1,
+  TimeEntryV1,
+  toTimeEntry
+} from '@/main/api/v1/dto/timeEntries'
 import { json, jsonBody, noContent } from '@/main/api/openapi'
 import { errors } from '@/main/api/v1/errors'
 
@@ -23,6 +28,17 @@ const start = createRoute({
     'Stops a running timer first. Start and end are rounded to whole minutes; only one timer runs, across all profiles.',
   request: { body: jsonBody(TimerStartInputV1) },
   responses: { 201: json(TimeEntryV1, 'The running timer'), ...errors(400, 404, 409) }
+})
+
+const change = createRoute({
+  method: 'patch',
+  path: '/timer',
+  tags,
+  summary: 'Move the start of the running timer',
+  description:
+    'Only the start and the note of a running timer can change; the note is set like that of any entry.',
+  request: { body: jsonBody(TimerChangeInputV1) },
+  responses: { 200: json(TimeEntryV1, 'The running timer'), ...errors(400, 409) }
 })
 
 const stop = createRoute({
@@ -50,6 +66,9 @@ export function registerTimerRoutes(v1: OpenAPIHono): void {
     const { activityId, note: timerNote } = c.req.valid('json')
     return c.json(toTimeEntry(timer.start(activityId, timerNote)), 201)
   })
+  v1.openapi(change, (c) =>
+    c.json(toTimeEntry(timer.setStart(new Date(c.req.valid('json').start))), 200)
+  )
   v1.openapi(stop, (c) => {
     timer.stop()
     return c.body(null, 204)

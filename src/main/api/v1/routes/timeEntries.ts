@@ -4,6 +4,7 @@ import { timeEntries } from '@/main/core'
 import {
   NoteInputV1,
   TimeEntryInputV1,
+  TimeEntryMoveInputV1,
   TimeEntryV1,
   toTimeEntry
 } from '@/main/api/v1/dto/timeEntries'
@@ -61,6 +62,17 @@ const replace = createRoute({
   responses: { 200: json(TimeEntryV1, 'The changed entry'), ...errors(400, 404, 409) }
 })
 
+const move = createRoute({
+  method: 'post',
+  path: '/time-entries/{id}/move',
+  tags,
+  summary: 'Move a time entry to another day',
+  description:
+    'Its clock times stay the same in the timezone it was recorded in, also across a change to or from daylight saving time. The running timer cannot be moved.',
+  request: { params: idParams, body: jsonBody(TimeEntryMoveInputV1) },
+  responses: { 200: json(TimeEntryV1, 'The moved entry'), ...errors(400, 404, 409) }
+})
+
 const setNote = createRoute({
   method: 'put',
   path: '/time-entries/{id}/note',
@@ -89,6 +101,10 @@ export function registerTimeEntryRoutes(v1: OpenAPIHono): void {
   })
   v1.openapi(replace, (c) => {
     const entry = timeEntries.update(c.req.valid('param').id, toInput(c.req.valid('json')))
+    return c.json(toTimeEntry(timeEntries.get(entry.id)), 200)
+  })
+  v1.openapi(move, (c) => {
+    const entry = timeEntries.moveToDay(c.req.valid('param').id, c.req.valid('json').date)
     return c.json(toTimeEntry(timeEntries.get(entry.id)), 200)
   })
   v1.openapi(setNote, (c) => {
