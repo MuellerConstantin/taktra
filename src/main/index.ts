@@ -1,6 +1,7 @@
 import './identity'
 import { join } from 'node:path'
 import { app, shell } from 'electron'
+import { startApi, stopApi } from './api'
 import { startCore, stopCore } from './core'
 import { startGui } from './gui'
 import { applyLaunchOptions, initLaunchOptions } from './launch'
@@ -16,8 +17,12 @@ if (app.requestSingleInstanceLock()) {
     })
     startGui(applyLaunchOptions)
     initLaunchOptions()
+    startApi()
   })
-  app.on('will-quit', stopCore)
+  app.on('will-quit', () => {
+    void stopApi()
+    stopCore()
+  })
 } else {
   app.quit()
 }

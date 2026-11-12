@@ -80,6 +80,15 @@ entries per combination of its grouping columns, or sums them with one column
 per day of the period, as in a time sheet. In sums, a column can list the
 distinct values of the summed entries instead of grouping by them.
 
+**Local API**
+For developers and technicians, an optional local HTTP API lets other programs
+on the same machine read and change the data of the active profile (projects,
+activities, clients, tags, custom fields and their values, entries, export
+templates), read reports, run the timer, and follow changes as server-sent
+events. Profiles and app settings stay with the user. It is turned on, given a port and a key on the
+integrations page of the app settings, which will also hold further
+connections such as MCP.
+
 **Help**
 An in-app help explains the domain rules in short chapters of questions and
 answers, written in Markdown per language. It opens from the command palette
@@ -103,6 +112,8 @@ development.
 - **App settings**: `conf`
 - **Export**: `csv-stringify`, `write-excel-file` (main process only)
 - **Updates**: `electron-updater` with GitHub releases
+- **Local API**: Hono with `@hono/node-server` and `@hono/zod-openapi` (main
+  process only)
 - **Tests**: Vitest (main process), Playwright (end-to-end with Electron)
 
 ## Project Structure
@@ -116,8 +127,12 @@ development.
 │   │   │   ├── domain/    # Rules and data of the active profile
 │   │   │   ├── app/       # State of the installation: profiles, settings, donation hint
 │   │   │   └── events.ts  # Changes that several consumers show
-│   │   └── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
-│   │       └── ipc/       # IPC handlers for the renderer, one file per area
+│   │   ├── gui/           # Windows, tray, global shortcut, dialogs, theme; uses only core/index.ts
+│   │   │   └── ipc/       # IPC handlers for the renderer, one file per area
+│   │   └── api/           # Local HTTP API; uses only core/index.ts, never gui/
+│   │       └── v1/        # Version 1: its sub-app, description, routes and wire format
+│   │           ├── routes/  # Route declarations and handlers, one file per area
+│   │           └── dto/     # Wire format of requests and responses, one file per area
 │   ├── preload/           # Typed `window.api` bridge
 │   ├── shared/            # Used by main, preload and renderer
 │   │   ├── model/         # Domain types, constants, pure rules, error codes, text length limits
@@ -154,7 +169,7 @@ Taktra runs in the processes Electron gives it, and data crosses between them
 only in one way:
 
 - **Main process**: the core, the database, Node APIs, and the main-process
-  half of the GUI (windows, tray, dialogs).
+  half of the GUI (windows, tray, dialogs) and the local API.
 - **Preload**: the typed `window.api` bridge, the only connection between a
   window and the main process.
 - **Renderer**: the React UI, one process per window, sandboxed with context
@@ -167,27 +182,28 @@ window.
 
 ### Layers of the main process
 
-| Layer                | Holds                                                    | Imports                                    |
-| -------------------- | -------------------------------------------------------- | ------------------------------------------ |
-| `core/`              | rules and data: profile data, installation state, events | `shared/`, Node, libraries; never Electron |
-| `gui/`               | windows, tray, shortcut, dialogs, theme, IPC handlers    | `core` through its index only              |
-| `src/main/index.ts`  | the single instance lock, starting and stopping the rest | each layer through its index               |
-| `src/main/launch.ts` | the launch options of this and every later start         | each layer through its index               |
+| Layer                | Holds                                                    | Imports                                          |
+| -------------------- | -------------------------------------------------------- | ------------------------------------------------ |
+| `core/`              | rules and data: profile data, installation state, events | `shared/`, Node, libraries; never Electron       |
+| `gui/`               | windows, tray, shortcut, dialogs, theme, IPC handlers    | `core` through its index only                    |
+| `api/`               | the local HTTP API                                       | `core` through its index; never `gui/`, Electron |
+| `src/main/index.ts`  | the single instance lock, starting and stopping the rest | each layer through its index                     |
+| `src/main/launch.ts` | the launch options of this and every later start         | each layer through its index                     |
 
 - **The core runs without Electron**: it imports neither `electron` nor
-  anything from `gui/`, and gets the user data path, the migrations
+  anything from `gui/` or `api/`, and gets the user data path, the migrations
   folder and the trash through the environment passed to `startCore()`. So it
   runs under plain Node, as in the tests.
 - **One public interface**: `core/index.ts` exports `startCore()`/`stopCore()`
   and one stateless service object per area (`projects.create()`,
   `timer.start()`). Presentations import only from there; modules inside the
   core import each other directly and never through it.
-- **Presentations are thin**: `gui/` validates input, calls a service object
-  and presents the result. A further presentation, such as a local API, would
-  be a sibling of `gui/` that never imports it; what one has to show of the
-  other goes through the core.
-- **Each layer starts itself**: `startCore()` and `startGui()` start what their
-  layer needs; nothing else reaches into a layer to start it.
+- **Presentations are thin**: `gui/` and `api/` validate input, call a service
+  object and present the result. They are siblings and never import each
+  other; what one has to show of the other goes through the core (the GUI shows
+  whether the API runs through `apiAccess`).
+- **Each layer starts itself**: `startCore()`, `startGui()` and `startApi()`
+  start what their layer needs; nothing else reaches into a layer to start it.
 - **The caller validates**: Service objects expect input checked and normalized
   with the schemas of `shared/validation/`, as every presentation does before
   calling them. Rules that need the database stay in the core.
@@ -241,7 +257,7 @@ When state that several consumers show changes, the core reports it through
 - **Named by kind**: A `signal:<state>` names a kind of state, never a single
   record: the running timer, the profile data (`signal:data`, sent after every
   write of a service object, whoever made it), the profiles, the app settings,
-  and the donation hint. `core/events.ts` documents when each one
+  the donation hint and the local API. `core/events.ts` documents when each one
   is sent. Events about single facts with a payload, if ever needed, get a kind
   of their own (`domain:<resource>.<action>`).
 - **No ids**: A change often affects more than the record written (a project's
@@ -254,11 +270,13 @@ When state that several consumers show changes, the core reports it through
   IPC channel `<state>:changed` and sends it to every window, and the preload
   subscribes to these channels. They are the GUI's own contract, which also
   carries messages that do not come from the core (`quick:shown`,
-  `about:show`, `updates:changed`).
+  `about:show`, `updates:changed`). The local API maps the same signals to
+  server-sent events.
 
 ```
 core ── signal:data ──► gui/windows.ts ── IPC data:changed ──► preload ──► renderer
      ── signal:settings ──► gui/tray.ts, theme.ts, shortcuts.ts (no IPC)
+     ── signal:data ──► api/v1/routes/events.ts ── SSE signal:data ──► other programs
 ```
 
 ## Data and Storage
@@ -309,7 +327,7 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   schemas reject longer values, and check constraints in the database are the
   last line of defence. The limits are defined once in `shared/model/limits.ts`.
 - **App settings outside the database**: Preferences of the installation
-  (theme, language, mini timer, global shortcut) live in `conf`
+  (theme, language, mini timer, global shortcut, local API) live in `conf`
   files in the user data directory and reach the renderer only through IPC.
   `conf` is ESM-only and must stay bundled into the CJS main build.
 
@@ -340,6 +358,52 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   a library; further formats get their own writer for the same rows. Excel
   files are for people, CSV for other systems: xlsx writes dates and durations
   as typed cells, while CSV is never adapted to Excel (BOM, semicolons).
+
+## Local API
+
+- **Off by default, local only**: Other programs on the same machine use the
+  data of the active profile over HTTP below `/api/v1/`. The server listens on
+  `127.0.0.1` only.
+- **Each version complete in itself**: A version is a sub-app below
+  `/api/<version>/` with its own access check, body limit, error format, wire
+  format and description, so a new version may change any of them while the
+  old one keeps its contract. The root app only mounts the versions and
+  answers requests outside them with a plain 404.
+- **Profile data only**: The API reads and changes what belongs to the active
+  profile. Profiles and app settings are left out: they would let a client
+  that holds the key, such as an AI assistant, create or move files by path,
+  switch the profile under the user's open views, or turn the API off, and no
+  integration needs them.
+- **Who gets in**: Only requests with the API key as `Authorization: Bearer`, a
+  `Host` of that address and no `Origin` header, so web pages can neither call
+  nor read the API. There is one key; only its SHA-256 hash is stored, so it is
+  shown once when created.
+- **Own response format**: Responses are v1 DTOs in `api/v1/dto/`, mapped
+  explicitly from `shared/model/` with dates as ISO strings, because other
+  programs depend on them while the model may change with the app.
+- **Described by its code**: Every route is declared with `createRoute()`
+  (parameters, body, responses as Zod schemas), the DTOs are Zod schemas whose
+  types are inferred, and request validation follows from the declaration. The
+  OpenAPI 3.1 description is generated from it. Each version describes itself
+  at `/api/<version>/openapi.json`, without the key because it holds nothing
+  secret. A
+  test fails when a served route is not described or a response has fields its
+  schema lacks, so the description cannot drift from the code.
+- **REST plus actions**: Resources are created with `POST` (201), changed
+  with `PATCH` or replaced with `PUT`, and deleted with `DELETE` (204).
+  Operations without a field of their own are actions such as
+  `POST /activities/:id/move`, `/merge`, `/archive` and `/unarchive`. Each
+  request is exactly one operation of the core, so it applies completely or
+  not at all. Input uses the names of the responses (`start`, `end` as ISO
+  strings; `value` or `optionId` for a custom field).
+- **Uniform errors**: In v1, every error is `{ "error": { "code": … } }` with
+  an HTTP status that follows from the code. `VALIDATION_FAILED` (400) means
+  the input is wrong whatever the data, and adds `issues` with the path and a
+  message per wrong field, from the request schema and from rules of the core
+  alike. A request that is right but not allowed by the current data, such as
+  a value for an archived field, is a conflict (409) with a code of its own.
+- **Events as SSE**: `/api/v1/events` streams the signals of the core under
+  their names (`signal:data`, …), without payload.
 
 ## Desktop Integration
 
@@ -424,7 +488,7 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
 - **Main process tests on real files**: Vitest runs the main process code under
   plain Node against real SQLite files in a temporary folder, which the setup
   passes to the core as its environment. Nothing is replaced, the database
-  included.
+  included. The local API is tested through its app without opening a port.
 - **Every migration is tested with data**: The migration test migrates a
   profile from every earlier schema version and checks that no row changes. A
   migration that adds tables gets a seed file named like the migration in

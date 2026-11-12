@@ -1,4 +1,5 @@
 import { registerActivitiesHandlers } from './activities'
+import { registerApiAccessHandlers } from './apiAccess'
 import { registerClientsHandlers } from './clients'
 import { registerCustomFieldsHandlers } from './customFields'
 import { registerDonationHandlers } from './donation'
@@ -26,4 +27,5 @@ export function registerIpcHandlers(): void {
   registerExportHandlers()
   registerExportTemplatesHandlers()
   registerDonationHandlers()
+  registerApiAccessHandlers()
 }

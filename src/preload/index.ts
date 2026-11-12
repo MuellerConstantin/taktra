@@ -133,6 +133,10 @@ const api = {
     snooze: invoker('donation:snooze'),
     dismiss: invoker('donation:dismiss')
   },
+  apiAccess: {
+    state: invoker('apiAccess:state'),
+    createKey: invoker('apiAccess:createKey')
+  },
   app: {
     showMainWindow: invoker('app:showMainWindow'),
     quit: invoker('app:quit'),
@@ -148,6 +152,7 @@ const api = {
     onShowAbout: (callback: () => void) => subscribe('about:show', callback),
     onUpdatesChanged: (callback: () => void) => subscribe('updates:changed', callback),
     onDonationChanged: (callback: () => void) => subscribe('donation:changed', callback),
+    onApiAccessChanged: (callback: () => void) => subscribe('apiAccess:changed', callback),
     onDataChanged: (callback: () => void) => subscribe('data:changed', callback)
   }
 }

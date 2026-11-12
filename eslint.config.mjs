@@ -84,6 +84,30 @@ export default defineConfig(
     }
   },
   {
+    files: ['src/main/api/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '(^|/)core/',
+              message: 'The API imports the core only through its index.'
+            },
+            {
+              regex: '(^|/)gui(/|$)',
+              message: 'The GUI and the API do not know each other.'
+            },
+            {
+              regex: '^@?electron([-/]|$)',
+              message: 'The API runs without Electron, so it can be tested under plain Node.'
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
     files: ['src/shared/**/*.ts'],
     rules: {
       'no-restricted-imports': [

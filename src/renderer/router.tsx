@@ -16,6 +16,7 @@ import ExportView from './views/ExportView'
 import AppSettingsView from './views/settings/app/AppSettingsView'
 import AppearanceSettings from './views/settings/app/AppearanceSettings'
 import ControlsSettings from './views/settings/app/ControlsSettings'
+import IntegrationSettings from './views/settings/app/IntegrationSettings'
 import UpdatesSettings from './views/settings/app/UpdatesSettings'
 import ProfileSettingsView from './views/settings/profile/ProfileSettingsView'
 import ProfileFieldsSettings from './views/settings/profile/ProfileFieldsSettings'
@@ -64,7 +65,8 @@ export const router = createHashRouter([
           { index: true, element: <Navigate to="appearance" replace /> },
           { path: 'appearance', element: <AppearanceSettings /> },
           { path: 'controls', element: <ControlsSettings /> },
-          { path: 'updates', element: <UpdatesSettings /> }
+          { path: 'updates', element: <UpdatesSettings /> },
+          { path: 'integrations', element: <IntegrationSettings /> }
         ]
       },
       {

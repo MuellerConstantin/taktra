@@ -201,7 +201,8 @@
       ],
       "deleteProfile": ["Profil entfernen", "Papierkorb"],
       "profileName": ["umbenennen"],
-      "help": ["Handbuch", "Anleitung", "Dokumentation", "Erklärung", "FAQ", "help"]
+      "help": ["Handbuch", "Anleitung", "Dokumentation", "Erklärung", "FAQ", "help"],
+      "integrations": ["API", "Schnittstelle", "REST", "HTTP", "Skripte", "Schlüssel", "verbinden"]
     }
   },
   "TimerView": {
@@ -682,7 +683,8 @@
     "appearance": "Darstellung",
     "controls": "Bedienung",
     "about": "Über Taktra",
-    "updates": "Updates"
+    "updates": "Updates",
+    "integrations": "Integrationen"
   },
   "AppearanceSettings": {
     "theme": {
@@ -748,6 +750,28 @@
     "title": "Updates",
     "label": "Automatisch nach Updates suchen",
     "description": "Sucht beim Start und alle paar Stunden auf GitHub nach neuen Versionen. Updates werden im Hintergrund geladen und beim Beenden von Taktra installiert. Ohne Verbindung passiert nichts."
+  },
+  "IntegrationSettings": {
+    "title": "Lokale API",
+    "description": "Erlaubt anderen Programmen auf diesem Computer, Projekte, Einträge und Berichte über HTTP zu lesen und den Timer zu starten oder zu stoppen. Nur Programme, die den Schlüssel kennen, werden eingelassen.",
+    "enabled": "Lokale API aktivieren",
+    "enabledDescription": "Lauscht nur auf diesem Computer, nie im Netzwerk.",
+    "port": "Port",
+    "portInvalid": "Eine Zahl von {min} bis {max}",
+    "running": "Läuft unter {url}",
+    "portInUse": "Der Port wird von einem anderen Programm benutzt. Wähle einen anderen.",
+    "key": {
+      "title": "API-Schlüssel",
+      "description": "Programme senden ihn als „Authorization: Bearer <Schlüssel>“. Es gibt einen Schlüssel für alle; ein neuer macht den bisherigen ungültig.",
+      "label": "Neuer API-Schlüssel",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "shownOnce": "Kopiere den Schlüssel jetzt. Er wird nicht wieder angezeigt; ist er verloren, erzeuge einen neuen.",
+      "exists": "Ein Schlüssel ist vorhanden. Er wird nicht wieder angezeigt.",
+      "missing": "Noch kein Schlüssel. Die API lehnt jede Anfrage ab, bis einer existiert.",
+      "create": "Schlüssel erzeugen",
+      "recreate": "Neuen Schlüssel erzeugen"
+    }
   },
   "ShortcutRecorder": {
     "recording": "Tasten drücken…"
