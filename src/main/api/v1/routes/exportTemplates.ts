@@ -1,10 +1,11 @@
 import { createRoute, z, type OpenAPIHono } from '@hono/zod-openapi'
+import { exportFormats, type ExportFormat } from '@/shared/model/export'
 import { exportTemplateInput } from '@/shared/validation'
-import { exportTemplates } from '@/main/core'
-import { ExportTemplateV1, toExportTemplate } from '@/main/api/v1/dto/exportTemplates'
+import { dataExport, exportTemplates } from '@/main/core'
+import { ExportRowV1, ExportTemplateV1, toExportTemplate } from '@/main/api/v1/dto/exportTemplates'
 import { json, jsonBody, noContent } from '@/main/api/openapi'
 import { errors } from '@/main/api/v1/errors'
-import { idParams } from '@/main/api/v1/params'
+import { idParams, timeFilterQuery } from '@/main/api/v1/params'
 
 const tags = ['Export templates']
 
@@ -53,6 +54,44 @@ const remove = createRoute({
   responses: { 204: noContent, ...errors(400, 404) }
 })
 
+const mediaTypes: Record<ExportFormat, string> = {
+  csv: 'text/csv',
+  json: 'application/json',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+}
+
+const file = createRoute({
+  method: 'get',
+  path: '/export-templates/{id}/file',
+  tags,
+  summary: 'Export with a template',
+  description:
+    'Writes the completed entries of a period, filtered, with the columns and layout of the template: the same file the app exports. Lists are comma-separated, such as projectIds=1,2.',
+  request: {
+    params: idParams,
+    query: z.object({
+      ...timeFilterQuery,
+      format: z
+        .enum(exportFormats)
+        .optional()
+        .openapi({ description: 'The format of the file; by default the one of the template.' })
+    })
+  },
+  responses: {
+    200: {
+      description: 'The file, named in Content-Disposition',
+      content: {
+        [mediaTypes.json]: { schema: z.array(ExportRowV1) },
+        [mediaTypes.csv]: {
+          schema: z.string().openapi({ description: 'RFC 4180: comma, CRLF, no BOM.' })
+        },
+        [mediaTypes.xlsx]: { schema: z.string().openapi({ format: 'binary' }) }
+      }
+    },
+    ...errors(400, 404, 409)
+  }
+})
+
 export function registerExportTemplateRoutes(v1: OpenAPIHono): void {
   v1.openapi(list, (c) => c.json(exportTemplates.list().map(toExportTemplate), 200))
   v1.openapi(get, (c) =>
@@ -67,6 +106,20 @@ export function registerExportTemplateRoutes(v1: OpenAPIHono): void {
       200
     )
   )
+  v1.openapi(file, async (c) => {
+    const template = exportTemplates.get(c.req.valid('param').id)
+    const { format = template.format, ...filter } = c.req.valid('query')
+    const exported = await dataExport.buildFile(filter, format, template.columns, template.layout)
+    const isText = typeof exported.content === 'string'
+    return c.body(
+      typeof exported.content === 'string' ? exported.content : new Uint8Array(exported.content),
+      200,
+      {
+        'content-type': isText ? `${mediaTypes[format]}; charset=utf-8` : mediaTypes[format],
+        'content-disposition': `attachment; filename="${exported.fileName}"`
+      }
+    )
+  })
   v1.openapi(remove, (c) => {
     exportTemplates.delete(c.req.valid('param').id)
     return c.body(null, 204)

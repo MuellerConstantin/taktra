@@ -2,7 +2,16 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createApp } from '@/main/api/app'
-import { activities, apiAccess, customFields, projects, tags, timer } from '@/main/core'
+import {
+  activities,
+  apiAccess,
+  customFields,
+  exportTemplates,
+  projects,
+  tags,
+  timeEntries,
+  timer
+} from '@/main/core'
 import { activateDatabase, closeActiveDatabase } from '@/main/core/db/database'
 import { getEnvironment } from '@/main/core/environment'
 import { createTestProfile } from '../../profiles'
@@ -214,5 +223,64 @@ describe('timer', () => {
 
     await reader.cancel()
     timer.stop()
+  })
+})
+
+describe('export', () => {
+  const period = 'from=2026-03-02&to=2026-03-04'
+  let templateId: number
+
+  beforeAll(() => {
+    timeEntries.create({ activityId: ids.activity, date: '2026-03-02', durationSec: 90 * 60 })
+    timeEntries.create({ activityId: ids.activity, date: '2026-03-03', durationSec: 30 * 60 })
+    templateId = exportTemplates.create({
+      name: 'Time sheet',
+      format: 'csv',
+      layout: 'pivot',
+      columns: [{ builtin: 'project' }, { builtin: 'duration_h' }]
+    }).id
+  })
+
+  it('writes the file of a template in its own format', async () => {
+    const response = await request(`/api/v1/export-templates/${templateId}/file?${period}`)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('text/csv; charset=utf-8')
+    expect(response.headers.get('content-disposition')).toBe(
+      'attachment; filename="taktra_2026-03-02_2026-03-04.csv"'
+    )
+    expect(await response.text()).toBe(
+      'project,2026-03-02,2026-03-03,2026-03-04\r\nAlpha,1.5,0.5,\r\n'
+    )
+  })
+
+  it('writes the same rows as JSON or Excel on request', async () => {
+    const asJson = await request(
+      `/api/v1/export-templates/${templateId}/file?${period}&format=json`
+    )
+    expect(asJson.headers.get('content-type')).toBe('application/json; charset=utf-8')
+    expect(await asJson.json()).toEqual([
+      { project: 'Alpha', '2026-03-02': 1.5, '2026-03-03': 0.5, '2026-03-04': null }
+    ])
+
+    const asXlsx = await request(
+      `/api/v1/export-templates/${templateId}/file?${period}&format=xlsx`
+    )
+    expect(asXlsx.headers.get('content-type')).toBe(
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    expect(new TextDecoder().decode((await asXlsx.arrayBuffer()).slice(0, 2))).toBe('PK')
+  })
+
+  it('applies the filter and refuses a missing template or format', async () => {
+    const other = projects.create({ name: 'Beta' }).id
+    const filtered = await request(
+      `/api/v1/export-templates/${templateId}/file?${period}&projectIds=${other}&format=json`
+    )
+    expect(await filtered.json()).toEqual([])
+
+    const missing = await request(`/api/v1/export-templates/999/file?${period}`)
+    expect([missing.status, await errorCode(missing)]).toEqual([404, 'EXPORT_TEMPLATE_NOT_FOUND'])
+    const wrongFormat = await request(`/api/v1/export-templates/${templateId}/file?format=pdf`)
+    expect([wrongFormat.status, await errorCode(wrongFormat)]).toEqual([400, 'VALIDATION_FAILED'])
   })
 })

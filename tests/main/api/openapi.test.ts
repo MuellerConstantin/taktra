@@ -4,7 +4,7 @@ import { createApp } from '@/main/api/app'
 import { ActivityV1 } from '@/main/api/v1/dto/activities'
 import { ClientV1 } from '@/main/api/v1/dto/clients'
 import { CustomFieldV1 } from '@/main/api/v1/dto/customFields'
-import { ExportTemplateV1 } from '@/main/api/v1/dto/exportTemplates'
+import { ExportRowV1, ExportTemplateV1 } from '@/main/api/v1/dto/exportTemplates'
 import { ProjectV1 } from '@/main/api/v1/dto/projects'
 import { ReportRowV1 } from '@/main/api/v1/dto/reports'
 import { TagV1 } from '@/main/api/v1/dto/tags'
@@ -130,5 +130,7 @@ describe('the responses', () => {
     await expectShape('/time-entries', TimeEntryV1.array())
     await expectShape('/reports?groupBy=client,project,activity,tag,date', ReportRowV1.array())
     await expectShape('/export-templates', ExportTemplateV1.array())
+    const [template] = exportTemplates.list()
+    await expectShape(`/export-templates/${template.id}/file?format=json`, ExportRowV1.array())
   })
 })

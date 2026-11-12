@@ -84,8 +84,8 @@ distinct values of the summed entries instead of grouping by them.
 For developers and technicians, an optional local HTTP API lets other programs
 on the same machine read and change the data of the active profile (projects,
 activities, clients, tags, custom fields and their values, entries, export
-templates), read reports, run the timer, and follow changes as server-sent
-events. Profiles and app settings stay with the user. It is turned on, given a port and a key on the
+templates), read reports, export with a template, run the timer, and follow
+changes as server-sent events. Profiles and app settings stay with the user. It is turned on, given a port and a key on the
 integrations page of the app settings, which will also hold further
 connections such as MCP.
 
@@ -402,6 +402,10 @@ core ── signal:data ──► gui/windows.ts ── IPC data:changed ──�
   message per wrong field, from the request schema and from rules of the core
   alike. A request that is right but not allowed by the current data, such as
   a value for an archived field, is a conflict (409) with a code of its own.
+- **Exports as files**: `GET /export-templates/:id/file` returns the same file
+  the export view writes, for a period and filter in the query, in the format
+  of the template or the one asked for. So the export is one contract, whether
+  it is written by the app or fetched by a program.
 - **Events as SSE**: `/api/v1/events` streams the signals of the core under
   their names (`signal:data`, …), without payload.
 

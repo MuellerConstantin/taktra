@@ -1,10 +1,10 @@
 import { createRoute, z, type OpenAPIHono } from '@hono/zod-openapi'
-import { grouping, localDate } from '@/shared/validation'
+import { grouping } from '@/shared/validation'
 import { reports } from '@/main/core'
 import { ReportRowV1, toReportRow } from '@/main/api/v1/dto/reports'
 import { json } from '@/main/api/openapi'
 import { errors } from '@/main/api/v1/errors'
-import { idListQuery, splitList } from '@/main/api/v1/params'
+import { splitList, timeFilterQuery } from '@/main/api/v1/params'
 
 const report = createRoute({
   method: 'get',
@@ -15,12 +15,7 @@ const report = createRoute({
     'Sums the completed entries of a period, filtered and grouped. Lists are comma-separated, such as groupBy=project,tag.',
   request: {
     query: z.object({
-      from: localDate.optional(),
-      to: localDate.optional(),
-      clientIds: idListQuery,
-      projectIds: idListQuery,
-      activityIds: idListQuery,
-      tagIds: idListQuery,
+      ...timeFilterQuery,
       groupBy: z
         .string()
         .transform(splitList)

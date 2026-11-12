@@ -52,3 +52,10 @@ export function toExportTemplate(template: ExportTemplate): ExportTemplateV1 {
     columns: template.columns.map(toColumn)
   }
 }
+
+export const ExportRowV1 = z
+  .record(z.string(), z.union([z.string(), z.number(), z.array(z.string()), z.null()]))
+  .openapi('ExportRow', {
+    description:
+      'One row of a JSON export, keyed by the column headers in their order. Lists such as tags are arrays; durations are numbers.'
+  })
