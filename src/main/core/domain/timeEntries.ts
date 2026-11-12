@@ -105,8 +105,14 @@ export function createTimeEntry(input: TimeEntryData): TimeEntry {
     .get()
 }
 
+function isRunningEntry(entry: TimeEntry): boolean {
+  return entry.startedAt !== null && entry.endedAt === null
+}
+
+/** The running timer is changed only through the timer, so it cannot be booked by accident. */
 export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
   const previous = findTimeEntry(id)
+  if (isRunningEntry(previous)) throw new AppError('TIME_ENTRY_RUNNING', String(id))
   const values = toValues(input)
   const db = getActiveDatabase()
 
@@ -128,8 +134,7 @@ export function updateTimeEntry(id: number, input: TimeEntryData): TimeEntry {
  */
 export function moveTimeEntryToDay(id: number, date: string): TimeEntry {
   const entry = findTimeEntry(id)
-  if (entry.startedAt !== null && entry.endedAt === null)
-    throw new AppError('TIME_ENTRY_RUNNING', String(id))
+  if (isRunningEntry(entry)) throw new AppError('TIME_ENTRY_RUNNING', String(id))
 
   const days = parseDate(date).compare(parseDate(entry.date))
   const timezone = entry.timezone ?? 'UTC'
@@ -158,7 +163,7 @@ export function moveTimeEntryToDay(id: number, date: string): TimeEntry {
 export function setTimeEntryNote(id: number, note: string | null): void {
   const entry = findTimeEntry(id)
   getActiveDatabase().update(timeEntries).set({ note }).where(eq(timeEntries.id, id)).run()
-  if (entry.endedAt === null && entry.startedAt !== null) emit('signal:timer')
+  if (isRunningEntry(entry)) emit('signal:timer')
 }
 
 export function deleteTimeEntry(id: number): void {
@@ -169,4 +174,5 @@ export function deleteTimeEntry(id: number): void {
     db.delete(timeEntries).where(eq(timeEntries.id, id)).run()
     deleteActivityIfUnused(entry.activityId)
   })
+  if (isRunningEntry(entry)) emit('signal:timer')
 }

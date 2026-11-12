@@ -855,7 +855,7 @@
     "ACTIVITY_HAS_TIME_ENTRIES": "The activity has tracked time and cannot be deleted. Archive it instead.",
     "ACTIVITY_ARCHIVED": "The activity or its project is archived.",
     "TIME_ENTRY_NOT_FOUND": "The time entry no longer exists.",
-    "TIME_ENTRY_RUNNING": "A running timer cannot be moved. Stop it first.",
+    "TIME_ENTRY_RUNNING": "A running timer cannot be changed or moved. Stop it first.",
     "TIMER_NOT_RUNNING": "No timer is running.",
     "TIMER_START_IN_FUTURE": "The timer cannot start later than now.",
     "TIMER_START_TOO_EARLY": "The timer can start at most 24 hours ago.",

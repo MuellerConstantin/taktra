@@ -122,7 +122,6 @@ export function discardTimer(): void {
   const entry = getActiveDatabase().select().from(timeEntries).where(isRunning).get()
   if (!entry) return
   deleteTimeEntry(entry.id)
-  emit('signal:timer')
 }
 
 export function listRecentActivities(limit: number): ActivityDetails[] {

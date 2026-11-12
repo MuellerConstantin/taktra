@@ -889,7 +889,7 @@
     "ACTIVITY_HAS_TIME_ENTRIES": "Auf der Tätigkeit ist Zeit erfasst, sie kann nicht gelöscht werden. Archiviere sie stattdessen.",
     "ACTIVITY_ARCHIVED": "Die Tätigkeit oder ihr Projekt ist archiviert.",
     "TIME_ENTRY_NOT_FOUND": "Der Zeiteintrag existiert nicht mehr.",
-    "TIME_ENTRY_RUNNING": "Ein laufender Timer kann nicht verschoben werden. Stoppe ihn zuerst.",
+    "TIME_ENTRY_RUNNING": "Ein laufender Timer kann nicht geändert oder verschoben werden. Stoppe ihn zuerst.",
     "TIMER_NOT_RUNNING": "Es läuft kein Timer.",
     "TIMER_START_IN_FUTURE": "Der Timer kann nicht später als jetzt beginnen.",
     "TIMER_START_TOO_EARLY": "Der Timer kann höchstens vor 24 Stunden begonnen haben.",
